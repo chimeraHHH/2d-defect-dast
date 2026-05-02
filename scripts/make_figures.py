@@ -117,34 +117,34 @@ def fig_metric_table(runs: Dict[str, Dict], out_path: Path) -> None:
 
 
 def main() -> None:
-    runs = {
-        "Baseline (Crystal Transformer)": _load_run("baseline"),
-        "DAST (ours)": _load_run("improved"),
-        "Local-only ablation": _load_run("ablate_local_only"),
-        "DAST -no virtual": _load_run("ablate_no_virtual"),
-        "DAST -no lattice": _load_run("ablate_no_lattice"),
-    }
-    runs = {k: v for k, v in runs.items() if v}
-    if not runs:
+    # Auto-discover every run under results/
+    all_runs: Dict[str, Dict] = {}
+    for d in sorted(RESULTS.iterdir()):
+        if not d.is_dir():
+            continue
+        data = _load_run(d.name)
+        if data:
+            all_runs[d.name] = data
+    if not all_runs:
         print("No runs found in results/. Train something first.", file=sys.stderr)
         return
 
-    fig_parity(
-        {k: v for k, v in runs.items() if k in (
-            "Baseline (Crystal Transformer)",
-            "DAST (ours)",
-        )},
-        FIG_DIR / "fig_parity.png",
-    )
-    fig_curves(runs, FIG_DIR / "fig_curves.png")
-    fig_error_dist(
-        {k: v for k, v in runs.items() if k in (
-            "Baseline (Crystal Transformer)",
-            "DAST (ours)",
-        )},
-        FIG_DIR / "fig_error_dist.png",
-    )
-    fig_metric_table(runs, FIG_DIR / "metrics_table.tsv")
+    # Highlight set: best three configurations of interest for parity / error dist
+    headline_keys = [
+        "baseline_aug",
+        "baseline",
+        "improved",
+    ]
+    headline = {
+        f"{k} (test MAE {v['test_mae']:.3f})": v
+        for k, v in all_runs.items()
+        if k in headline_keys
+    }
+
+    fig_parity(headline, FIG_DIR / "fig_parity.png")
+    fig_curves(all_runs, FIG_DIR / "fig_curves.png")
+    fig_error_dist(headline, FIG_DIR / "fig_error_dist.png")
+    fig_metric_table(all_runs, FIG_DIR / "metrics_table.tsv")
     print("Figures written to", FIG_DIR)
 
 

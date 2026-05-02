@@ -1,0 +1,22 @@
+Config: {"model": "baseline", "data_path": "data/processed/cleaned_dataset.pkl", "output_dir": "results/baseline_h128_long", "seed": 42, "batch_size": 64, "epochs": 60, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "mse", "grad_clip": 5.0, "optimizer": {"lr": 0.0003, "weight_decay": 0.0001}, "scheduler": {"factor": 0.5, "patience": 6}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 128, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.1}}
+Device: cuda
+Model: CrystalTransformer | params=0.747M
+Train/Val/Test sizes: 8512/1064/1065
+Target stats: mean=2.6040 std=3.1769
+Epoch 01/60 | train MAE 2.2521 | val MAE 2.1142 RMSE 2.7708 | lr 3.00e-04 | 5.6s *
+Epoch 02/60 | train MAE 2.0911 | val MAE 1.9387 RMSE 2.5898 | lr 3.00e-04 | 4.9s *
+Epoch 03/60 | train MAE 1.8742 | val MAE 1.7751 RMSE 2.4838 | lr 3.00e-04 | 5.0s *
+Epoch 04/60 | train MAE 1.7833 | val MAE 1.6753 RMSE 2.3913 | lr 3.00e-04 | 4.9s *
+Epoch 05/60 | train MAE 1.6269 | val MAE 1.3959 RMSE 2.1100 | lr 3.00e-04 | 5.0s *
+Epoch 06/60 | train MAE 1.4047 | val MAE 1.3296 RMSE 1.9712 | lr 3.00e-04 | 5.0s *
+Epoch 07/60 | train MAE 1.3385 | val MAE 1.4458 RMSE 2.0705 | lr 3.00e-04 | 5.0s 
+Epoch 08/60 | train MAE 1.2440 | val MAE 1.2900 RMSE 1.9033 | lr 3.00e-04 | 5.0s *
+Epoch 09/60 | train MAE 1.1939 | val MAE 1.2208 RMSE 1.8136 | lr 3.00e-04 | 5.0s *
+Epoch 10/60 | train MAE 1.1199 | val MAE 1.0906 RMSE 1.6924 | lr 3.00e-04 | 5.0s *
+Epoch 11/60 | train MAE 1.0989 | val MAE 1.1923 RMSE 1.7947 | lr 3.00e-04 | 5.0s 
+Epoch 12/60 | train MAE 1.0768 | val MAE 1.1867 RMSE 1.7654 | lr 3.00e-04 | 4.9s 
+Epoch 13/60 | train MAE 1.0033 | val MAE 1.1665 RMSE 1.6769 | lr 3.00e-04 | 5.0s 
+Epoch 14/60 | train MAE 0.9932 | val MAE 1.0972 RMSE 1.6021 | lr 3.00e-04 | 4.9s 
+Epoch 15/60 | train MAE 0.9553 | val MAE 1.0183 RMSE 1.5090 | lr 3.00e-04 | 5.0s *
+Epoch 16/60 | train MAE 0.9016 | val MAE 0.9965 RMSE 1.5000 | lr 3.00e-04 | 5.1s *
+Epoch 17/60 | train MAE 0.9376 | val MAE 0.9754 RMSE 1.4632 | lr 3.00e-04 | 5.0s *

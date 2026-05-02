@@ -45,14 +45,19 @@ def per_run_extras(data) -> dict:
 
 
 def main():
-    runs = {
-        "Baseline (Crystal Transformer)": load("baseline_v2") or load("baseline"),
-        "DAST (ours)": load("improved_v2") or load("improved"),
-        "Local-only ablation": load("ablate_local_only"),
-        "DAST -no virtual": load("ablate_no_virtual"),
-        "DAST -no lattice": load("ablate_no_lattice"),
-    }
-    runs = {k: v for k, v in runs.items() if v}
+    # Auto-discover every results/<dir>/metrics.json
+    runs = {}
+    for d in sorted(RESULTS.iterdir()):
+        if not d.is_dir():
+            continue
+        data = load(d.name)
+        if data is None:
+            continue
+        runs[d.name] = data
+    # Sort by test MAE ascending so the strongest configurations appear first
+    runs = dict(
+        sorted(runs.items(), key=lambda kv: kv[1].get("test_mae", float("inf")))
+    )
     if not runs:
         print("No metrics.json files found.", file=sys.stderr)
         return
