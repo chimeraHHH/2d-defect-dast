@@ -23,6 +23,7 @@ baseline_h128_aug_long_seed1	0.747	0.2604	0.4970
 baseline_h128_aug_long_seed2	0.747	0.2965	0.4281
 baseline_h128_aug_long_seed3	0.747	0.2393	0.3904
 baseline_h128_aug_xlong_safe	0.747	0.4780	1.1458
+baseline_h128_aug_xlong_safe_seed0	0.747	0.5036	1.1637
 baseline_h128_long	0.747	0.6221	1.1667
 baseline_h192_aug_long_safe	2.338	0.6736	1.2910
 baseline_long	0.198	0.7371	1.3285
