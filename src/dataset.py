@@ -32,7 +32,16 @@ class CrystalGraphDataset(Dataset):
         if not path.exists():
             raise FileNotFoundError(path)
         with open(path, "rb") as f:
-            self.data: List[Dict[str, Any]] = pickle.load(f)
+            blob = pickle.load(f)
+        # Two on-disk formats:
+        #   list-of-dict       (original / aug datasets used by random make_splits)
+        #   {data, meta}       (leak-free aug, with explicit ordered splits)
+        self.meta: Optional[Dict[str, Any]] = None
+        if isinstance(blob, dict) and "data" in blob:
+            self.data = blob["data"]
+            self.meta = blob.get("meta")
+        else:
+            self.data = blob
         # default to the reference min-max normalised feature table (better
         # convergence than the home-grown z-score variant in src/features.py).
         if feature_table_path is None:
@@ -175,9 +184,25 @@ def make_splits(
     val_ratio: float = 0.1,
     seed: int = 42,
 ) -> Tuple[Subset, Subset, Subset]:
-    train_idx, val_idx, test_idx = split_indices(
-        len(dataset), train_ratio=train_ratio, val_ratio=val_ratio, seed=seed
-    )
+    """Split the dataset.
+
+    If the dataset was built as a "leak-free aug" file (carries
+    ``meta["version"] == "leak_free_v1"``), use the explicit ordered split
+    encoded in the meta: train_section + val_section + test_section. Otherwise
+    fall back to a deterministic random shuffle.
+    """
+    if (
+        dataset.meta is not None
+        and dataset.meta.get("version") == "leak_free_v1"
+    ):
+        n_tr, n_va, n_te = dataset.meta["n_train"], dataset.meta["n_val"], dataset.meta["n_test"]
+        train_idx = list(range(n_tr))
+        val_idx = list(range(n_tr, n_tr + n_va))
+        test_idx = list(range(n_tr + n_va, n_tr + n_va + n_te))
+    else:
+        train_idx, val_idx, test_idx = split_indices(
+            len(dataset), train_ratio=train_ratio, val_ratio=val_ratio, seed=seed
+        )
     return Subset(dataset, train_idx), Subset(dataset, val_idx), Subset(dataset, test_idx)
 
 
