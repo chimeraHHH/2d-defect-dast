@@ -129,11 +129,11 @@ def main() -> None:
         print("No runs found in results/. Train something first.", file=sys.stderr)
         return
 
-    # Highlight set: best three configurations of interest for parity / error dist
+    # Highlight set: 3 representative configurations spanning the result range
     headline_keys = [
-        "baseline_aug",
-        "baseline",
-        "improved",
+        "baseline_h128_aug_long",  # best
+        "baseline_aug",            # representative aug
+        "baseline",                # plain baseline
     ]
     headline = {
         f"{k} (test MAE {v['test_mae']:.3f})": v
