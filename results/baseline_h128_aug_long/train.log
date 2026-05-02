@@ -1,0 +1,9 @@
+Config: {"model": "baseline", "data_path": "data/processed/augmented_dataset.pkl", "output_dir": "results/baseline_h128_aug_long", "seed": 42, "batch_size": 64, "epochs": 50, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "mse", "grad_clip": 5.0, "optimizer": {"lr": 0.0003, "weight_decay": 0.0001}, "scheduler": {"factor": 0.5, "patience": 6}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 128, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.1}}
+Device: cuda
+Model: CrystalTransformer | params=0.747M
+Train/Val/Test sizes: 25538/3192/3193
+Target stats: mean=2.6053 std=3.1978
+Epoch 01/50 | train MAE 2.0328 | val MAE 1.8114 RMSE 2.4932 | lr 3.00e-04 | 15.4s *
+Epoch 02/50 | train MAE 1.4283 | val MAE 1.2615 RMSE 1.8363 | lr 3.00e-04 | 14.8s *
+Epoch 03/50 | train MAE 1.1542 | val MAE 1.1044 RMSE 1.6311 | lr 3.00e-04 | 15.0s *
+Epoch 04/50 | train MAE 1.0089 | val MAE 1.0819 RMSE 1.6134 | lr 3.00e-04 | 14.7s *
