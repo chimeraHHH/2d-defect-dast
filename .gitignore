@@ -1,0 +1,49 @@
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node.js
+node_modules/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Build & Dist
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Python / Machine Learning
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+env/
+.env/
+
+# Data, Models, and Outputs
+checkpoints/
+result/
+*.pt
+*.pkl
+*.h5
+*.hdf5
+*.ckpt
+
+# Custom specific ignores
+A8CA35F0B827306D4263B8A0329CFA09.gif
+
+# Test outputs and extra logs
+*training_log.txt
+*.png
+*.jpg
