@@ -17,6 +17,7 @@
 | baseline_aug_seed3 | baseline | augmented_dataset.pkl | 0.198 | 30 | 3 | 0.5131 | 0.7632 |
 | dast_dense_aug | improved | augmented_dataset.pkl | 0.202 | 30 | 42 | 0.515 | 0.7444 |
 | baseline_h128_aug_long_safe | baseline | augmented_dataset_safe.pkl | 0.747 | 50 | 42 | 0.5161 | 1.1314 |
+| loho_MoS2 | baseline | loho_MoS2.pkl | 0.747 | 50 | 42 | 0.5163 | 1.0047 |
 | baseline_h128_aug_long_safe_seed0 | baseline | augmented_dataset_safe.pkl | 0.747 | 50 | 0 | 0.5332 | 1.1701 |
 | baseline_aug_seed1 | baseline | augmented_dataset.pkl | 0.198 | 30 | 1 | 0.545 | 0.8611 |
 | baseline_h128_aug_long_safe_seed1 | baseline | augmented_dataset_safe.pkl | 0.747 | 50 | 1 | 0.545 | 1.2019 |
@@ -61,3 +62,31 @@
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
 |---|---|---|---|---|---|---|---|
 | deep ensemble (4 long + 2 xlong) | ensemble + τ | leak_free_v1 | n×0.747 | — | — | 0.4582 | 1.192 |
+
+## LOHO (raw)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| loho_MoS2 | baseline h128 | loho_MoS2.pkl | 0.747 | 50 | 42 | 0.5163 | 1.0047 |
+
+## UQ method comparison
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| 6-member mixed ensemble | various | leak_free_v1 | — | — | — | 0.4428 | 1.0943 |
+| 4-seed ensemble | various | leak_free_v1 | — | — | — | 0.4644 | 1.1016 |
+| MC-Dropout (K=30) | various | leak_free_v1 | — | — | — | 0.5155 | 1.1433 |
+
+## Feature ablation (permutation)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| perm-electron_affinity | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.5358 | — |
+| perm-vdW_radius | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.595 | — |
+| perm-ionisation_energy | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.654 | — |
+| perm-covalent_radius | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.8303 | — |
+| perm-period | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.8735 | — |
+| perm-atomic_mass | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.8905 | — |
+| perm-electronegativity | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.9187 | — |
+| perm-valence_electrons | baseline h128 | leak_free_v1 | 0.747 | — | — | 1.1503 | — |
+| perm-group | baseline h128 | leak_free_v1 | 0.747 | — | — | 1.6644 | — |

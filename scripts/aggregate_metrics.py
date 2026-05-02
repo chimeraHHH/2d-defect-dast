@@ -129,6 +129,58 @@ def main():
                 "test_mae": round(h["loho_mae"], 4),
                 "test_rmse": round(h["loho_rmse"], 4),
             })
+    else:
+        # If summary not yet built, scan loho_* directly
+        for d in sorted(RESULTS.glob("loho_*")):
+            mp = d / "metrics.json"
+            if not mp.exists():
+                continue
+            m = json.loads(mp.read_text())
+            rows.append({
+                "category": "LOHO (raw)",
+                "run": d.name,
+                "model": "baseline h128",
+                "data": f"{d.name}.pkl",
+                "params_M": round(m["n_params"] / 1e6, 3),
+                "epochs": m["config"].get("epochs"),
+                "seed": m["config"].get("seed"),
+                "test_mae": round(m["test_mae"], 4),
+                "test_rmse": round(m["test_rmse"], 4),
+            })
+
+    # ---- MC-Dropout ----
+    mc = _read_json(RESULTS / "mc_dropout_vs_ensemble.json")
+    if mc:
+        for entry in mc.get("methods", []):
+            raw = entry["raw"]
+            rows.append({
+                "category": "UQ method comparison",
+                "run": entry["method"],
+                "model": "various",
+                "data": "leak_free_v1",
+                "params_M": "—",
+                "epochs": "—",
+                "seed": "—",
+                "test_mae": round(raw["mae"], 4),
+                "test_rmse": round(raw["rmse"], 4),
+            })
+
+    # ---- Feature importance summary row ----
+    fi = _read_json(RESULTS / "feature_importance.json")
+    if fi:
+        # add a "ablation feature x" row per feature
+        for r in fi["rows"]:
+            rows.append({
+                "category": "Feature ablation (permutation)",
+                "run": f"perm-{r['feature_name']}",
+                "model": "baseline h128",
+                "data": "leak_free_v1",
+                "params_M": 0.747,
+                "epochs": "—",
+                "seed": "—",
+                "test_mae": round(fi["baseline_mae"] + r["mean_delta_mae"], 4),
+                "test_rmse": "—",
+            })
 
     # ---- write CSV ----
     csv_path = RESULTS / "all_metrics.csv"
