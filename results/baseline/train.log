@@ -1,5 +1,10 @@
-Config: {"model": "baseline", "data_path": "data/processed/cleaned_dataset.pkl", "output_dir": "results/baseline", "seed": 42, "batch_size": 32, "epochs": 35, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "huber", "huber_delta": 1.0, "grad_clip": 1.0, "optimizer": {"lr": 0.001, "weight_decay": 0.0001}, "scheduler": {"factor": 0.5, "patience": 4}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 128, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "n_rbf_edge": 32, "n_rbf_dist": 32, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.1}}
+Config: {"model": "baseline", "data_path": "data/processed/cleaned_dataset.pkl", "output_dir": "results/baseline", "seed": 42, "batch_size": 64, "epochs": 30, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "mse", "grad_clip": 5.0, "optimizer": {"lr": 0.001, "weight_decay": 1e-05}, "scheduler": {"factor": 0.5, "patience": 4}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 64, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "n_rbf_edge": 32, "n_rbf_dist": 32, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.0}}
 Device: cpu
-Model: CrystalTransformer | params=0.845M
+Model: CrystalTransformer | params=0.198M
 Train/Val/Test sizes: 8512/1064/1065
 Target stats: mean=2.6040 std=3.1769
+Epoch 01/30 | train MAE 2.2989 | val MAE 2.4355 RMSE 3.2995 | lr 1.00e-03 | 39.9s *
+Epoch 02/30 | train MAE 2.1755 | val MAE 1.9751 RMSE 2.6177 | lr 1.00e-03 | 50.4s *
+Epoch 03/30 | train MAE 1.9940 | val MAE 1.9042 RMSE 2.5238 | lr 1.00e-03 | 68.9s *
+Epoch 04/30 | train MAE 1.8606 | val MAE 1.8993 RMSE 2.4834 | lr 1.00e-03 | 66.9s *
+Epoch 05/30 | train MAE 1.7728 | val MAE 1.7422 RMSE 2.3738 | lr 1.00e-03 | 63.3s *

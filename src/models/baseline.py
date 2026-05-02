@@ -28,15 +28,22 @@ class RBFExpansion(nn.Module):
 
 
 class LocalInteractionLayer(nn.Module):
-    """Bond + angle GNN layer with residual node update."""
+    """SchNet-style continuous-filter convolution + angle modulation.
+
+    For every edge (i, j), the neighbour ``j`` sends a "filtered" version of
+    its own features to centre ``i``: ``m_ij = phi(d_ij) * W_filter h_j``,
+    where ``phi`` is an MLP over the RBF-expanded distance. Triplet messages
+    capture three-body geometry and are aggregated at centre ``i``.
+    """
 
     def __init__(self, hidden_dim: int, n_rbf_edge: int = 32, n_rbf_angle: int = 32) -> None:
         super().__init__()
-        self.edge_mlp = nn.Sequential(
-            nn.Linear(2 * hidden_dim + n_rbf_edge, hidden_dim),
+        self.filter_mlp = nn.Sequential(
+            nn.Linear(n_rbf_edge, hidden_dim),
             nn.SiLU(),
             nn.Linear(hidden_dim, hidden_dim),
         )
+        self.value_mlp = nn.Linear(hidden_dim, hidden_dim)
         self.angle_rbf = RBFExpansion(0.0, math.pi, n_rbf_angle)
         self.triplet_mlp = nn.Sequential(
             nn.Linear(hidden_dim + n_rbf_angle, hidden_dim),
@@ -44,7 +51,7 @@ class LocalInteractionLayer(nn.Module):
             nn.Linear(hidden_dim, hidden_dim),
         )
         self.node_mlp = nn.Sequential(
-            nn.Linear(2 * hidden_dim, hidden_dim),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.SiLU(),
             nn.Linear(hidden_dim, hidden_dim),
         )
@@ -58,8 +65,11 @@ class LocalInteractionLayer(nn.Module):
         triplet_index: torch.Tensor,
         angles: torch.Tensor,
     ) -> torch.Tensor:
-        row, col = edge_index
-        edge_messages = self.edge_mlp(torch.cat([x[row], x[col], edge_attr_rbf], dim=-1))
+        row, col = edge_index  # row = centre i, col = neighbour j
+        # Message: filter on distance gates the value of the neighbour.
+        filt = self.filter_mlp(edge_attr_rbf)
+        v_neigh = self.value_mlp(x[col])
+        edge_messages = filt * v_neigh
 
         if triplet_index.numel() > 0:
             angle_rbf = self.angle_rbf(angles)
@@ -74,7 +84,7 @@ class LocalInteractionLayer(nn.Module):
         if triplet_messages.numel() > 0:
             aggr.index_add_(0, centres, triplet_messages)
 
-        update = self.node_mlp(torch.cat([x, aggr], dim=-1))
+        update = self.node_mlp(aggr)
         return self.norm(x + update)
 
 
