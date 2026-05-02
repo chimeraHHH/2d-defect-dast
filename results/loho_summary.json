@@ -1,0 +1,31 @@
+{
+  "in_distribution_reference": "baseline_h128_aug_long_safe",
+  "hosts": [
+    {
+      "host": "MoS2",
+      "n_test": 308,
+      "loho_mae": 0.5162575399720823,
+      "loho_rmse": 1.0046708891679013,
+      "loho_r2": 0.9484812568326259,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 1.0003192441204483,
+      "degradation_factor_rmse": 0.8879847106645385
+    },
+    {
+      "host": "Cr2I6",
+      "n_test": 334,
+      "loho_mae": 0.8400641801114568,
+      "loho_rmse": 1.3113157152139852,
+      "loho_r2": 0.6549902218153985,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 1.6277386780776106,
+      "degradation_factor_rmse": 1.159014676864548
+    }
+  ],
+  "in_distribution_test_mae": 0.5160927803863382,
+  "in_distribution_test_rmse": 1.1314056166755828,
+  "avg_loho_mae": 0.6781608600417696,
+  "avg_degradation_factor": 1.3140289610990294
+}
