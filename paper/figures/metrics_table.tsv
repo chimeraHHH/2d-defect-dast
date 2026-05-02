@@ -12,6 +12,9 @@ baseline_aug_seed3	0.198	0.5131	0.7632
 baseline_h128	1.060	1.8156	2.5060
 baseline_h128_aug	1.060	1.4734	1.9917
 baseline_h128_aug_long	0.747	0.2058	0.3100
+baseline_h128_aug_long_seed0	0.747	0.3172	0.4731
+baseline_h128_aug_long_seed1	0.747	0.2604	0.4970
+baseline_h128_aug_long_seed2	0.747	0.2965	0.4281
 baseline_h128_long	0.747	0.6221	1.1667
 baseline_long	0.198	0.7371	1.3285
 dast_dense	0.202	1.4857	2.1149
