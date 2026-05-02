@@ -230,7 +230,11 @@ CrystalTransformer 在**同一 1065 个原始测试样本**上比较。
 
 | 模型 | 参数 (M) | Test MAE (eV) | Test RMSE (eV) | 备注 |
 |---|---|---|---|---|
-| **baseline_h128_aug_xlong_safe** (h128, 100 ep, leak-free aug) | 0.747 | **0.478** | 1.146 | 100ep 单 seed |
+| 🥇 **6-member ensemble (4×50ep + 2×100ep)** | 6 × 0.747 | **0.443** | 1.094 | 跨训练长度集成 |
+| **6-member ensemble** + τ=1.83 校准 | 6 × 0.747 | 0.458 (eval-half) | n/a | 校准后置信区间 |
+| 4-seed deep ensemble (raw, all 50ep) | 4 × 0.747 | 0.464 | 1.102 | §5.9 |
+| **baseline_h128_aug_xlong_safe** (h128, 100 ep, leak-free aug) | 0.747 | 0.478 | 1.146 | 100ep 单 seed (seed=42) |
+| baseline_h128_aug_xlong_safe (2-seed mean) | 0.747 | 0.491 ± 0.013 | 1.155 ± 0.009 | 100ep 多种子 |
 | **baseline_h128_aug_long_safe** (h128, 50 ep, leak-free aug) | 0.747 | 0.516 | 1.131 | 50ep 单 seed |
 | **ALIGNN** (报告引用) | 4.030 | 0.540 | 1.167 | 文献基线 |
 | baseline_h128_aug_long_safe (4-seed mean) | 0.747 | 0.537 ± 0.016 | 1.169 ± 0.029 | 50ep 多种子 |
@@ -250,12 +254,18 @@ CrystalTransformer 在**同一 1065 个原始测试样本**上比较。
 
 **核心数字（leak-free 公平对比）**：
 
+- 🥇 **6-member ensemble (4 × 50ep + 2 × 100ep) Test MAE 0.443 eV**——
+  比 ALIGNN（0.540 eV）改善 **18%**，是本工作主推的部署配置；该数字
+  的来源是 4 个 leak-free 50-epoch + 2 个 leak-free 100-epoch 训练好的
+  种子共同的预测平均（详见 §5.9）。
 - ``baseline_h128_aug_long_safe`` 4-seed 平均 Test MAE **0.537 ± 0.016 eV**
   / RMSE 1.169 ± 0.029 eV，与 ALIGNN（0.540, 4.03 M）统计意义上**完全
-  持平**；模型体量仅 0.75 M（ALIGNN 1/5）。
+  持平**（这是单模型的诚实化基线；多种子集成给出 §5.9 中 0.443 的最终
+  结果）；模型体量仅 0.75 M（ALIGNN 1/5）。
 - 把训练时长由 50 epoch 延到 100 epoch（``baseline_h128_aug_xlong_safe``）
-  后单 seed Test MAE 降到 **0.478 eV**，相对 ALIGNN 改善 **11.5%**；
-  多种子稳定性结果（§5.4）见下。
+  后单 seed Test MAE 降到 **0.478 eV**（seed=42）；2-seed mean 给出
+  **0.491 ± 0.013 eV**，相对 ALIGNN 改善 9%；多种子稳定性结果（§5.4）
+  见下。
 - 在更紧凑的 h64 (0.20 M) 上，``baseline_aug_long_safe`` 取得 0.628 eV，
   仍在 ALIGNN ± 0.1 eV 量级。
 - 所有 DAST 变体（sparse / dense / no-virtual / no-lattice）均显著差于
