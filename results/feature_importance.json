@@ -1,0 +1,70 @@
+{
+  "baseline_mae": 0.5163581967353821,
+  "baseline_rmse": 1.1435918807983398,
+  "n_reps": 5,
+  "rows": [
+    {
+      "feature_idx": 0,
+      "feature_name": "group",
+      "mean_delta_mae": 1.1480310320854188,
+      "std_delta_mae": 0.11397366441086215,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 5,
+      "feature_name": "valence_electrons",
+      "mean_delta_mae": 0.6339074969291687,
+      "std_delta_mae": 0.058255682330574036,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 2,
+      "feature_name": "electronegativity",
+      "mean_delta_mae": 0.4023540377616882,
+      "std_delta_mae": 0.0623410622018096,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 8,
+      "feature_name": "atomic_mass",
+      "mean_delta_mae": 0.3740943193435669,
+      "std_delta_mae": 0.07802334365357995,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 1,
+      "feature_name": "period",
+      "mean_delta_mae": 0.35713533163070676,
+      "std_delta_mae": 0.026204142833903026,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 3,
+      "feature_name": "covalent_radius",
+      "mean_delta_mae": 0.3139705300331116,
+      "std_delta_mae": 0.05124107715385762,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 6,
+      "feature_name": "ionisation_energy",
+      "mean_delta_mae": 0.13760476112365722,
+      "std_delta_mae": 0.03577208804106875,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 4,
+      "feature_name": "vdW_radius",
+      "mean_delta_mae": 0.07859240770339966,
+      "std_delta_mae": 0.009902400999785373,
+      "n_reps": 5
+    },
+    {
+      "feature_idx": 7,
+      "feature_name": "electron_affinity",
+      "mean_delta_mae": 0.019482743740081788,
+      "std_delta_mae": 0.009138298475908538,
+      "n_reps": 5
+    }
+  ]
+}
