@@ -135,9 +135,9 @@ def main() -> None:
 
     # Highlight set: 3 representative configurations spanning the result range
     headline_keys = [
-        "baseline_h128_aug_long",  # best
-        "baseline_aug",            # representative aug
-        "baseline",                # plain baseline
+        "baseline_h128_aug_xlong_safe",  # best (honest, leak-free)
+        "baseline_h128_aug_long_safe",   # standard config (honest)
+        "baseline",                       # plain baseline (no aug)
     ]
     headline = {
         f"{k} (test MAE {v['test_mae']:.3f})": v
