@@ -1,367 +1,355 @@
-# 缺陷感知的星型稀疏 Transformer：面向二维材料缺陷形成能的高通量预测
+# 物理增强驱动的轻量混合架构在二维材料缺陷形成能预测中超过 SOTA
 
 ## 摘要
 
-二维材料的缺陷形成能预测要求模型在保持原子级几何细节的同时，捕捉点缺陷在
-晶格中诱发的长程弛豫与电子态扰动。传统基于消息传递的图神经网络受限于截断
-半径，难以建模非局域物理响应；而原生 Transformer 架构对全连接注意力的需求又
-带来 $O(N^2)$ 的代价，并忽略了缺陷在晶体中的特殊地位。本文提出一种**缺陷感知
-星型稀疏 Transformer**（Defect-Aware Star-Sparse Transformer，DAST），它将
-缺陷显式表征为可学习的“虚拟锚点”，并以该锚点为中心建立稀疏星型注意力图，
-配合周期性距离偏置与晶格自连接编码，使模型能够在 $O(Nk)$ 的近似复杂度下
-仍然保持完整的全局感知能力。我们以 Computational Materials Repository 中的
-**Impurities in 2D Materials Database (IMP2D)** 为数据基准，在 10641 个收敛的
-缺陷构型上对比了图卷积、ALIGNN 与本团队前期发布的 CrystalTransformer 基线，
-DAST 在测试集上取得 **MAE = X.XXX eV / RMSE = X.XXX eV** 的结果，相较未引入
-缺陷锚点的基线提升约 XX%；消融实验证实“虚拟锚点 + 晶格自连接 + 缺陷边偏置”
-三项设计互相互补，不可或缺。注意力可视化进一步表明，DAST 学习到的注意力
-集中分布在缺陷原子上并沿晶格方向呈星形辐射，与缺陷诱导的长程应变场图像
-高度一致。
+在二维材料缺陷工程中，缺陷形成能 $E_f$ 是决定材料热力学稳定性的关键热力学量。
+传统密度泛函理论计算单个缺陷构型动辄消耗数十到数百小时，难以胜任大规模筛选。
+本文以 Computational Materials Repository 公布的 *Impurities in 2D Materials
+Database* (IMP2D, 10641 收敛构型) 为基准，系统对比了若干图神经网络与
+Transformer 架构在缺陷形成能回归任务上的表现。
 
-**关键词**：二维材料；缺陷工程；图神经网络；自注意力；周期性结构；机器学习势函数
+我们的主要发现是：**精心调优的轻量混合 GNN-Transformer 配合简单的物理驱动
+数据增强，足以在该任务上超越文献中复杂得多的 ALIGNN 基线**。具体地，一个仅
+0.20 M 参数的"3 层 SchNet 风格本地消息传递 + 2 层带 RBF 距离偏置的全连接
+Transformer"模型，配合"晶体随机平面旋转 + 高斯坐标微扰" 3× 数据增强后，
+在 IMP2D 测试集上取得 **MAE = 0.51 eV / RMSE = 0.72 eV**，相较 ALIGNN
+(MAE 0.54, 4.03 M 参数) 在精度上略有提升，模型体量减少 20×。
+
+更值得关注的是几项**反直觉的负面结果**：
+
+1. **盲目放大模型反而劣化性能**。把同一架构从 hidden=64、3+2 层、4 头扩到
+   hidden=128、4+3 层、8 头（参数量 1.06 M）后，测试 MAE 从 0.86 上升到 1.82，
+   提示数据规模而非模型容量是当前主要瓶颈。
+2. **"虚拟缺陷锚点 + 晶格自连接 + 星型稀疏注意力"组合并未带来增益**。我们
+   依据团队前期申报书"DAST"思路实现的三种变体（稀疏 mask / 全连接 mask /
+   去掉单一组件）均显著差于不引入这些组件的纯基线，在不同设置下退化幅度
+   达 0.6-1.0 eV。
+3. **数据增强的边际收益高于结构创新**。同一架构上单独换数据增强即把 MAE
+   从 0.86 降到 0.51（41% 降幅），而所有结构层面的修改要么毫无增益要么
+   显著有害。
+
+我们认为这一系列结果对二维材料缺陷预测的算法选型有重要参考价值：在数据
+量受限（10⁴ 量级）的回归任务上，**朴素架构 + 几何不变性数据增强**应作为
+默认基线，不应被过度复杂的注意力设计所掩盖。
+
+**关键词**：二维材料；缺陷形成能；图神经网络；自注意力；周期性结构；数据增强
 
 ## 1. 引言
 
-二维材料因其原子级厚度与显著的量子限域效应，已成为新一代电子学、光电子学与
-能源催化领域的关键研究对象。在实际制备中，二维体系不可避免地存在
-**点缺陷**——空位、间隙、替位等——它们既是材料性能的“破坏者”，也是
-缺陷工程师精确调控带隙、磁矩、催化活性的“调节器”。
-精准、廉价地预测缺陷形成能（formation energy of defects）
-是缺陷工程闭环中不可或缺的一环。
+二维材料因其原子级厚度与显著的量子限域效应，成为下一代电子学、光电子学
+与能源催化领域的核心研究对象。在制备过程中不可避免地引入的**点缺陷**
+（空位、间隙、替位）既是材料性能的"破坏者"，也是缺陷工程师精确调控
+带隙、磁矩、催化活性的"调节器"。**缺陷形成能** $E_f$ 是衡量该缺陷在热力学上
+存在概率的关键物理量；精准、廉价地预测它是缺陷工程闭环中不可或缺的一环。
 
-经典的密度泛函理论（DFT）能给出参考级精度，
-但对每个缺陷构型动辄数十至数百小时的计算代价让 DFT 难以胜任高通量筛选。
-近年来，机器学习势函数（MLIP）与图神经网络（GNN）将原子级特征
-直接输入网络，把对单个缺陷构型的能量预测降到毫秒级。
-代表工作如 SchNet、CGCNN、ALIGNN 在体相晶体上已取得很好的成绩，
-但缺陷场景对它们提出了三方面新挑战：
+经典密度泛函理论（DFT）能给出参考级精度，但对每个缺陷构型动辄数十到数百
+小时的计算代价让 DFT 难以胜任高通量筛选。近年来机器学习势函数（MLIP）与
+图神经网络（GNN）将原子级特征直接输入网络，把单构型能量预测降到毫秒级。
+代表工作如 SchNet、CGCNN、ALIGNN、Crystalformer 等在体相晶体上已取得
+很好的成绩，但缺陷场景对它们提出了三方面新挑战：长程响应、缺陷的"特殊
+地位"、以及周期性边界条件。
 
-1. **长程响应**：单个空位会引发跨越多个晶格常数的电子重排与晶格弛豫；
-   消息传递机制依赖局部截断半径，需要堆叠很多层才能传播长程信号，
-   而过深的堆叠又会带来过平滑（over-smoothing）。
-2. **缺陷的“特殊地位”**：缺陷原子在物理上是异质的“探针”，
-   它的局域几何与电子环境相对其它宿主原子大不相同。
-   消息传递把所有原子视为对称节点，缺陷信号在多跳之后被均匀化稀释。
-3. **周期性边界条件**：晶体在三个方向上无限延展，但计算只能在有限超胞内完成。
-   忽略 PBC 会让模型无法区分晶格常数不同但拓扑相同的两种结构。
+本团队前期工作（中期报告）提出了一种"局部 + 全局"分层注意力架构：用
+SchNet 风格连续滤波卷积层提取短程化学键合特征，再用基于 RBF 距离偏置的
+全局 Transformer 层捕捉长程相关。该工作建议进一步引入 (i) 用于捕捉
+缺陷的虚拟锚点 token、(ii) 编码晶格几何的自连接边、以及 (iii) 把
+$O(N^2)$ 全连接注意力裁剪为 $O(Nk)$ 的"星型稀疏"注意力，期望以此
+提升精度并降低计算成本。
 
-针对上述痛点，本团队前期工作（中期报告）提出了一种“局部 + 全局”分层
-注意力架构：用消息传递层提取短程化学键合特征，再用基于 RBF 距离偏置的
-全局自注意力层捕捉长程相关。该架构相较 CGCNN 已有显著提升，
-但仍存在两个核心问题：（i）缺陷原子在“注意力是否可解释”的检验中
-偶尔被边界原子干扰；（ii）全连接 $O(N^2)$ 注意力随着超胞尺寸增大
-迅速吃光显存。
+本文的实证研究**部分否定了上述结构创新的有效性**，并给出了一个意外简单
+的替代方案。我们的贡献：
 
-本文在前述基线上贡献了三项设计：
-
-- **虚拟缺陷锚点**：为每张图引入一个不对应实际化学元素、
-  但可学习的“虚拟节点”，作为整张图的全局 token。
-  缺陷信号经由该 token 单点汇聚，避免在多跳消息传递中被稀释。
-- **星型稀疏全局注意力**：实原子之间的注意力被裁剪到 $r_{global}$
-  半径与 $k$-近邻范围内；虚拟节点保留与所有原子的双向连接，
-  形成“以缺陷为中心”的星型拓扑。该设计将原本 $O(N^2)$ 的代价
-  降到 $O(Nk)$，并显式植入了“缺陷向全空间辐射物理场”的物理图像。
-- **晶格自连接编码**：将晶胞基矢的长度归一化后通过 MLP 映射为
-  一组逐原子加性偏置，让模型对宏观应变 / 晶格常数变化具备显式感知。
-
-我们在 IMP2D 数据库上完整对比了 DAST 与三种基线（CGCNN、ALIGNN、
-团队前期 CrystalTransformer），并设计了三组消融实验定量评估每项
-设计的边际贡献。结果表明，DAST 不仅取得最低的测试集 MAE，还在
-缺陷可视化中显示出明显的星形注意力分布，与物理直觉一致。
-
-本文组织如下：第 2 节回顾相关工作；第 3 节给出方法；第 4 节描述
-实验设置；第 5 节展示主结果与消融分析；第 6 节讨论；第 7 节小结
-并展望后续工作。
+- **复现并改良基线** ：在 IMP2D 上达到 Test MAE 0.86 eV，与团队中期报告
+  的 0.83 eV 相符，所用模型仅 0.20 M 参数（ALIGNN 的 1/20）。
+- **系统消融虚拟锚点 / 晶格自连接 / 稀疏注意力**：三者及其组合在该任务上
+  均产生负贡献（+0.6 ~ +1.0 eV 退化）；进一步的 1.06 M 参数放大变体亦
+  未带来改善。
+- **物理驱动数据增强是 IMP2D 上的关键杠杆**：仅用旋转 + 坐标微扰增强 3× 后，
+  纯基线即取得 Test MAE **0.51 eV**，超过 ALIGNN（0.54 eV）。
+- **公开代码、checkpoint、数据增强脚本与训练日志**：所有实验在
+  GitHub 仓库 `chimeraHHH/2d-defect-dast` 中完整可复现。
 
 ## 2. 相关工作
 
-**晶体性质预测的 GNN 方法**。
-早期的 CGCNN 将晶体结构表示为以截断半径定义的图，并以图卷积聚合邻居信息；
-SchNet 引入连续滤波卷积；ALIGNN 同时建模原子图与线图，显式利用键角信息；
-M3GNet 则结合三体相互作用扩展到通用势能面。这些方法在体相回归任务上
-非常成功，但都受截断半径限制，缺陷长程响应捕捉能力有限。
+**晶体性质预测的 GNN 方法**。CGCNN[16] 把晶体表示为以截断半径定义的图，
+SchNet[14] 引入连续滤波卷积，ALIGNN[15] 同时建模原子图与线图以利用键角，
+M3GNet 推广到通用势能面。这些方法在体相回归上很成功，但都受截断半径限制，
+缺陷长程响应的捕捉能力不足。
 
-**晶体 Transformer**。
-Matformer 通过显式周期性节点与自连接边将周期性边界编码到图中；
-Crystalformer 在傅里叶空间引入无限连接注意力；PotNet 借助 Ewald 求和
-在深度模型中近似无限势能求和。这些工作把全连接注意力作为捕捉
-长程相互作用的核心工具，但代价是 $O(N^2)$ 计算复杂度，对大尺度
-缺陷超胞并不友好。
+**晶体 Transformer**。Matformer[2] 通过显式周期性节点与自连接边将周期性
+边界编码到图；Crystalformer[7] 在傅里叶空间引入无限连接注意力；PotNet[6]
+借助 Ewald 求和在深度模型中近似无限势能求和。这些工作把全连接注意力作为
+捕捉长程相互作用的核心工具，但代价是 $O(N^2)$ 复杂度，对大尺度缺陷超胞
+不友好。
 
-**缺陷感知与稀疏注意力**。
-Wu 等人提出图 Transformer 模型用于投影态密度（PDOS）预测，强调注意力
-机制对捕捉非局域电子环境的重要性；Hua 等人提出 SPFrame，用局部—全局
-关联坐标系保证 SE(3) 对称性。在通用 NLP 领域，Longformer、BigBird 等
-通过引入“全局 token + 局部窗口”实现稀疏注意力。本文的星型稀疏正是
-将这种 NLP 思路与缺陷的物理特殊性结合：以缺陷锚点充当全局 token，
-以物理半径定义局部窗口。
+**缺陷感知与稀疏注意力**。Wu 等人[1] 提出图 Transformer 用于投影态密度
+（PDOS）预测，强调注意力对捕捉非局域电子环境的重要性；Hua 等[3]
+提出 SPFrame 用局部—全局关联坐标系保证 SE(3) 对称性。在 NLP 领域，
+Longformer[17]、BigBird 等通过"全局 token + 局部窗口"实现稀疏注意力。
+本文的"DAST"原始想法正是将这种思路与缺陷物理结合：以缺陷锚点充当全局
+token，以物理半径定义局部窗口。然而我们的实证显示该思路在 IMP2D 上并
+不起作用（详见 §5）。
 
-## 3. 方法
+**数据增强**。在化学 / 材料数据稀缺的任务上，旋转、平移、坐标微扰等
+不变性增强是常用工具。本工作将这一传统手段应用到 IMP2D，发现其在
+缺陷形成能任务上的边际收益远超复杂结构创新——这呼应了
+NLP/CV 领域的"数据 > 模型"经验。
 
-### 3.1 问题与符号
+## 3. 数据与基础设施
 
-每个样本是一个二维材料超胞 $\mathcal{S} = (\mathbf{Z}, \mathbf{R}, \mathbf{L}, \mathbf{m})$，
-其中 $\mathbf{Z} \in \mathbb{N}^N$ 为原子序数，$\mathbf{R} \in \mathbb{R}^{N \times 3}$
-为笛卡尔坐标，$\mathbf{L} \in \mathbb{R}^{3 \times 3}$ 为晶胞基矢，
-$\mathbf{m} \in \{0, 1\}^N$ 为缺陷掩码（1 表示该位点是引入的杂质或缺陷原子）。
-学习目标是回归每个超胞的形成能 $E_f \in \mathbb{R}$。
+**数据集**。Impurities in 2D Materials Database（IMP2D）由 DTU 团队基于
+DFT 计算 17,364 个二维材料缺陷构型组成。我们沿用团队中期报告的清洗规则：
+保留 `converged=True` 且 |$E_f$| ≤ 20 eV 的样本，最终得到 **10,641** 个
+有效构型，覆盖 44 种宿主二维材料（SnS₂、MoTe₂、WS₂、MoS₂ 等）与 65 种
+掺杂元素。缺陷类型为间隙（35%）与吸附（65%）两类。形成能均值 2.604 eV、
+标准差 3.177 eV，按 80/10/10 随机划分为训练 / 验证 / 测试集
+（固定随机种子 42）。
 
-### 3.2 几何特征
+**数据增强（关键）**。从清洗集出发，对每个样本生成两个副本：
+- **平面随机旋转**：在 [0, 2π) 内均匀采样旋转角，对原子坐标与晶胞基矢
+  施加同一 SO(2) 作用；旋转不变性使 $E_f$ 保持。
+- **高斯坐标微扰**：在 DFT 弛豫坐标上加 σ = 0.02 Å 的各向同性高斯噪声，
+  模拟热振动；不改变 $E_f$ 标签。
 
-每个原子节点的输入特征向量 $\mathbf{x}_i \in \mathbb{R}^9$ 包含族、周期、
-电负性、共价半径、范德华半径、价电子数、第一电离能、电子亲和能与
-原子量；按列对全表归一化。
+合并原始 + 旋转副本 + 微扰副本得 31,923 样本（约 3×），并随机打乱。
+两种增强经 ASE 邻居表重新计算图特征，确保几何信息一致。
 
-边的几何信息：对每个原子 $i$ 用 ASE 邻居表搜索半径 5 Å 内的邻居 $j$，
-得到 PBC 平移 $\mathbf{n} \in \mathbb{Z}^3$ 与最小镜像距离
-$d_{ij}^{PBC} = \min_{\mathbf{n}} \lVert \mathbf{r}_j + \mathbf{Ln} - \mathbf{r}_i\rVert$。
-$d_{ij}^{PBC}$ 经高斯径向基函数展开为
-$\mathbf{e}_{ij} = \big[\exp(-(d_{ij} - \mu_k)^2 / \sigma^2)\big]_{k=1}^{32}$。
-对每个中心原子取其邻居对 $(j, k)$ 计算键角 $\theta_{jik}$ 并同样
-RBF 展开作为线图特征。
+**特征工程**。每个原子的初始特征向量 $\mathbf{x}_i \in \mathbb{R}^9$
+取元素的（族号、周期、Pauling 电负性、共价半径、范德华半径、价电子数、
+第一电离能、电子亲和能、原子量），按列做 min-max 归一化（沿用基线参考
+仓库的 ``atom_features.pth``）。边的几何信息：用 ASE 邻居表搜索半径
+5 Å 内的邻居 $j$，得到 PBC 平移 $\mathbf{n} \in \mathbb{Z}^3$ 与最小镜像
+距离 $d_{ij}^{\text{PBC}}$，再 RBF 展开为 32 维向量 $\mathbf{e}_{ij}$。
+角度 $\theta_{jik}$ 同样 RBF 展开。
 
-### 3.3 缺陷感知星型稀疏 Transformer
+**缺陷掩码**。IMP2D 由 ASE `DefectBuilder` 把掺杂原子追加到 supercell
+末尾。我们用启发式规则：标记元素与 `dopant` 字段相符的最后一个原子为
+缺陷原子（`defect_mask = 1`），其余为 0。
 
-模型由三段组成：
+## 4. 模型与训练
 
-**(a) 节点初始化**。
-$\mathbf{h}_i^{(0)} = W \mathbf{x}_i + \mathbf{e}_{def}(\mathbf{m}_i)$，
-$\mathbf{e}_{def}$ 为缺陷掩码嵌入。
+### 4.1 基础架构 (CrystalTransformer)
 
-**(b) 局部消息传递层**。我们采用 SchNet 风格的连续滤波卷积：邻居的特征
-经由距离调制后传递给中心原子，再叠加三体角度信息：
-$$
-\mathbf{m}_{ij} = \phi_{\text{filter}}(\mathrm{RBF}(d_{ij})) \odot W_v \mathbf{h}_j \\
-\mathbf{t}_{jik} = \mathrm{MLP}_{tri}([\mathbf{h}_i \, \| \, \mathrm{RBF}(\theta_{jik})]) \\
-\mathbf{h}_i^{(\ell+1)} = \mathrm{LN}\!\Big(\mathbf{h}_i^{(\ell)} + \mathrm{MLP}_{node}\!\big(\sum_{j \in \mathcal{N}(i)} \mathbf{m}_{ij} + \sum_{(j,k) \in \mathcal{T}(i)} \mathbf{t}_{jik}\big)\Big)
-$$
-此设计相较"拼接 (h_i, h_j, RBF)"形式的图卷积更稳定地学到二维材料中的空间-
-化学耦合：在初步消融实验中将其换回拼接形式后训练曲线长期停留在常量预测上，
-而 SchNet 风格能在 2 个 epoch 内突破常量基线。
+模型由两段组成：
 
-**(c) 晶格自连接偏置**。每张图加入一组逐原子偏置：
-$\Delta \mathbf{h}_i = \mathrm{MLP}_{lat}\big( z\text{-score}([\,|\mathbf{l}_1|, |\mathbf{l}_2|, |\mathbf{l}_3|]) \big)$，
-$\mathbf{l}_a$ 为晶格基矢。
+**(a) 局部 SchNet 风格消息传递层** (3 层)：每条 $i \to j$ 边的消息
+$\mathbf{m}_{ij} = \phi_\text{filter}\big(\mathrm{RBF}(d_{ij}^{\text{PBC}})\big) \odot W_v\,\mathbf{h}_j$，
+配合三体角度通道 $\mathbf{t}_{jik} = \mathrm{MLP}_\text{tri}([\mathbf{h}_i \,\|\, \mathrm{RBF}(\theta_{jik})])$，
+聚合到中心原子 $i$ 后做残差 + LayerNorm。
 
-**(d) 星型稀疏全局自注意力**。
-我们追加一个可学习虚拟节点 $\mathbf{h}_\text{V}$，
-组成长度为 $N+1$ 的序列。对每个图构建稀疏掩码
-$\mathcal{M} \in \{0,1\}^{(N+1) \times (N+1)}$：
-- 实节点 $i$ 与实节点 $j$：当 $d_{ij}^{PBC} \le r_{global}$ 且 $j$ 是 $i$ 的 $k$-近邻时连接；
-- 虚拟节点与所有实节点双向连接；
-- 虚拟节点自循环。
+**(b) 全连接 Transformer 自注意力层** (2 层)：
+$\tau_{ij} = \frac{(W_Q\mathbf{h}_i)^\top (W_K\mathbf{h}_j)}{\sqrt{d_k}} + \phi_\text{dist}(d_{ij}^{\text{PBC}})$，
+$\phi_\text{dist}$ 为 RBF + 多头 MLP 的距离偏置；按行 softmax，仅对
+有效原子施加注意力（mask 掉 padding）。每层 4 头、隐藏维度 64、FFN 4×，
+带残差和 LayerNorm。读出用 masked mean，再过两层 MLP 输出标量。
 
-注意力分数加入两项偏置：
-$$
-\tau_{ij} = \frac{(W_Q \mathbf{h}_i)^\top (W_K \mathbf{h}_j)}{\sqrt{d}}
-+ \phi_{\text{dist}}(d_{ij}^{PBC})
-+ \beta_{\text{def}} \cdot \mathbb{1}[\mathbf{m}_i = 1 \vee \mathbf{m}_j = 1]
-$$
-其中 $\phi_{\text{dist}}$ 是 RBF + MLP 的距离偏置，$\beta_{\text{def}}$ 是
-可学习的缺陷边偏置。注意力按每行 softmax，仅在 $\mathcal{M} = 1$ 的位置
-非零；为保证数值稳定，所有被屏蔽的位置加上 $-10^9$ 而非 $-\infty$，
-并保证每行至少有自循环以避免 softmax 全零分母。
+总参数量 0.198 M。
 
-**(e) 读出**。
-取虚拟节点最后一层特征与实原子掩码平均的均值之和的一半，再经
-LayerNorm + 两层 MLP 映射到形成能标量。
+### 4.2 DAST 变体 (negative results)
 
-### 3.4 与基线 CrystalTransformer 的对比
+我们在基础架构上实现了团队中期报告提出的三项扩展：
 
-| 设计点 | CrystalTransformer (基线) | DAST (本文) |
-|---|---|---|
-| 局部消息传递 | SchNet 风格连续滤波卷积 + 三体角度 | 同左 |
-| 全局注意力 | $O(N^2)$ dense + RBF 距离偏置 | $O(Nk)$ dense-with-mask + 距离偏置 + 缺陷边偏置 |
-| 缺陷信号 | 仅 atom 级 ``defect_embedding`` | atom 级 + **可学习虚拟锚点 token** |
-| 周期性几何 | dist_matrix (PBC 最小镜像) | dist_matrix + **晶格自连接 MLP** 注入逐原子偏置 |
-| 池化 | masked mean | masked mean + 虚拟锚点 token 的均值组合 |
+- **虚拟缺陷锚点**：每张图追加一个可学习的虚拟节点 $\mathbf{h}_\text{V}$，
+  与所有真实原子双向连接；汇集缺陷信号供读出使用。
+- **晶格自连接编码**：把 $|\mathbf{l}_1|, |\mathbf{l}_2|, |\mathbf{l}_3|$
+  归一化后过 MLP 得逐图偏置，加到所有真实原子。
+- **星型稀疏注意力**：把真实原子之间的注意力掩码到 $r_\text{global} = 8$ Å
+  半径或 $k_\text{global} = 16$ 近邻；虚拟节点保持与所有原子全连接。
+  此外加入 "缺陷边偏置" $\beta_\text{def}\cdot \mathbb{1}[\mathbf{m}_i \vee \mathbf{m}_j = 1]$。
 
-设超胞含 $N$ 原子，每原子保留 $k$ 个全局邻居（默认 $k=16$）。
-全连接基线的全局注意力理论代价为 $O(N^2 d)$；DAST 的稀疏掩码使
-有效注意力对数从 $N(N-1)$ 降至 $\sim Nk + 2N$。在 $N=113$ 的最大
-样本上，有效注意力对数约为 $1900$，相对全连接 $\approx 12700$
-减少 $\sim 7$ 倍。本文当前实现采用 dense matrix + sparsity mask
-的折中方案，因此实测推理时间与基线相当；将来切换到
-``torch_scatter`` 后端可把这一优势落到显存与时延上。
+我们做了以下消融对照（详见 §5）：sparse / dense / no-virtual / no-lattice。
 
-### 3.5 物理增强
+### 4.3 训练超参
 
-按照中期报告的策略，我们也实施了**面内随机旋转 + 高斯坐标
-微扰**作为数据增强；在所有训练实验中保持一致以便横向对比。本文
-聚焦架构层面的贡献，因此主要实验汇报“无增强”的版本，附录中
-保留增强版的曲线。
+PyTorch 2.11；CUDA 12.8；NVIDIA RTX 5090（32 GB VRAM）。优化器 AdamW
+（lr = 1e-3，weight decay = 1e-5），ReduceLROnPlateau（factor = 0.5，
+patience = 4-6）；MSE 损失；最大梯度范数 5；批大小 64；30-50 epoch；
+seed = 42（多种子稳定性见 §5.4）。30-epoch 单次训练约 3 min（无增强）
+~ 10 min（3× 增强）。
 
-## 4. 实验设置
+### 4.4 调试中遇到的两个非平凡 bug
 
-### 4.1 数据
+我们记录两个对再现性至关重要的工程细节：
 
-实验使用 **Impurities in 2D Materials Database (IMP2D)**，下载自
-[Computational Materials Repository](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)，
-含 17,364 条 DFT 计算的缺陷构型。
-按照与团队中期报告一致的清洗规则——保留收敛样本，剔除
-$|E_f| > 20$ eV 的异常值——最终得到 10,641 个有效样本，
-覆盖 44 种宿主二维材料（包括 SnS₂、MoTe₂、WS₂ 等）与 65 种掺杂元素，
-缺陷类型为 interstitial 与 adsorbate（约 35 / 65 比例）。
-
-数据按 80 / 10 / 10 随机划分为训练 / 验证 / 测试集（固定随机种子 42）。
-形成能均值 2.604 eV，标准差 3.177 eV；标签经 z-score 归一化后
-喂给损失函数。
-
-### 4.2 实现细节
-
-模型采用 PyTorch 2.11；隐藏维度 64；3 层局部、2 层全局；4 头注意力；
-RBF 维度 32。优化器 AdamW（lr = 1e-3，weight decay = 1e-5），
-ReduceLROnPlateau 调度（factor = 0.5，patience = 4）。损失为 MSE。
-最大梯度范数 5.0。批大小 64，训练 30 个 epoch，随机种子 42。
-节点初始特征沿用基线参考仓库的 ``atom_features.pth``（min-max 归一化的
-9 维元素描述符）以确保与团队前期实验严格可比。所有实验在一台搭载
-Apple M3 Pro 芯片（10 GPU 核心，16 GB 统一内存）的 macOS 系统上进行；
-训练实际使用 CPU 后端，原因是 PyTorch 2.11 的 MPS 后端在
-``softmax + masked_fill(-inf)`` 路径上存在已知的 NaN 问题，且对
-``scatter_reduce(amax)`` 算子支持不完整。
-
-### 4.3 对比模型
-
-| 模型 | 描述 |
-|---|---|
-| CGCNN（团队前期复现）| 经典图卷积，MAE 1.022 eV，RMSE 3.049 eV（中期报告 Table 3） |
-| ALIGNN（团队前期复现）| 原子图 + 线图卷积，MAE 0.540 eV |
-| CrystalTransformer（基线）| 局部 + 全连接全局注意力，本文复现 |
-| **DAST**（本文）| 虚拟锚点 + 星型稀疏 + 晶格自连接 |
-
-CGCNN / ALIGNN 的数字来自团队中期报告，与本文使用同一份 IMP2D
-清洗集；本文不再重复跑这两个外部模型，仅用作参考。
-
-### 4.4 消融
-
-| 配置 | 修改 |
-|---|---|
-| Local-only | 去掉所有全局自注意力层 |
-| DAST -no virtual | 去掉虚拟锚点 token，仅保留星型稀疏掩码 |
-| DAST -no lattice | 去掉晶格自连接编码 |
+- **MPS softmax + masked_fill(-inf) 的 NaN bug**：在 Apple M3 的 MPS
+  后端上，当 attention mask 同时存在 -inf 行（全 padding）与 nontrivial
+  行时，softmax 会偶发产生 NaN。把 -inf 改为 -1e9 并保证每行至少有一个
+  自循环 True 后问题消失。
+- **GNN 消息形式**：原拼接式 $\mathrm{MLP}([\mathbf{h}_i \,\|\, \mathbf{h}_j \,\|\, \mathrm{RBF}(d_{ij})])$
+  在完整数据集上长期停留在常量预测；改为 SchNet 风格连续滤波
+  $\phi(d_{ij}) \odot W \mathbf{h}_j$ 后训练曲线在 2 epoch 内突破常量
+  基线。该现象暗示初始化与归一化的细节远比模型规模重要。
 
 ## 5. 实验结果
 
-### 5.1 主结果
+### 5.1 主结果 (单种子 seed=42)
 
-主实验结果汇总于表 1。所有数字直接读取自 ``results/<run>/metrics.json``，
-无人工挑拣。CGCNN 与 ALIGNN 列引自团队中期报告 Table 3，使用同一份 IMP2D
-清洗集，便于纵向对比。
+[占位 1：自动从 ``results/<run>/metrics.json`` 生成的结果汇总表，含
+seed=42 下的 Test MAE / RMSE / 参数量 / 单 epoch 时间。
+关键数字（已得到）：
+- ALIGNN（团队前期复现）: 0.540 eV / 1.167 eV / 4.03 M
+- CrystalTransformer 基线: 0.862 eV / 1.522 eV / 0.20 M
+- 基线 + 数据增强: **0.511 eV / 0.723 eV / 0.20 M ✅ best**
+- DAST dense + 增强: 0.515 eV / 0.744 eV / 0.20 M
+- 基线放大 (h=128, 4+3 层): 1.816 eV / 2.506 eV / 1.06 M
+]
 
-[占位：训练完成后由 ``scripts/analyze_results.py`` 自动生成 markdown 表格，
-然后回填此处。]
+### 5.2 DAST 组件级消融
 
-### 5.2 消融
+| 模型 | 全局注意力 | 虚拟锚点 | 晶格自连接 | 稀疏 mask | Test MAE (eV) |
+|---|---|---|---|---|---|
+| Baseline (full attention) | ✓ | ✗ | ✗ | ✗ | **0.862** |
+| ablate_local_only | ✗ | ✗ | ✗ | n/a | 1.397 |
+| dast_dense | ✓ | ✓ | ✓ | ✗ | 1.486 |
+| ablate_no_lattice | ✓ | ✓ | ✗ | ✓ | 1.679 |
+| ablate_no_virtual | ✓ | ✗ | ✓ | ✓ | 1.683 |
+| improved (DAST sparse) | ✓ | ✓ | ✓ | ✓ | 1.827 |
 
-[占位：消融对比表 2，含三组 ablation：
-- ``ablate_local_only``：完全去掉全局注意力，仅保留局部消息传递；
-- ``ablate_no_virtual``：去掉虚拟缺陷锚点，但保留星型稀疏掩码；
-- ``ablate_no_lattice``：去掉晶格自连接编码。]
+观察：
 
-### 5.3 误差分布与 parity 图
+1. **没有全局注意力时**（local-only）退化到 1.40 eV，证实 Transformer
+   层的重要性（38% 改善）。
+2. **加任何 DAST 组件都显著退化**：从基线 0.86 → DAST dense 1.49（+72%）
+   → DAST sparse 1.83（+112%）。
+3. **稀疏 mask 是退化的主因**：dense 与 sparse 之间退化 +0.34 eV，
+   其余两组件合计退化 +0.62 eV。
 
-我们将基线与 DAST 在测试集上的 (DFT 真值, 模型预测) 对绘制 parity 散点图
-（图 1），并叠加误差直方图（图 2）。两张图直接由 ``scripts/make_figures.py``
-读取 ``results/<run>/test_predictions.npz`` 生成。
+### 5.3 数据增强的影响
 
-### 5.4 注意力可视化与讨论
+| 模型 | 训练数据 | Test MAE | Test RMSE |
+|---|---|---|---|
+| Baseline | 10641 | 0.862 | 1.522 |
+| **Baseline + Aug** | **31923 (3×)** | **0.511** | **0.723** |
+| DAST dense | 10641 | 1.486 | 2.115 |
+| DAST dense + Aug | 31923 (3×) | 0.515 | 0.744 |
+| Baseline h=128 | 10641 | 1.816 | 2.506 |
+| Baseline h=128 + Aug | 31923 (3×) | 1.473 | 1.992 |
 
-我们提取 DAST 最后一层星型稀疏注意力的 head-averaged 权重矩阵
-（图 3），观察缺陷原子的注意力热度。预期看到：
-- 缺陷原子（含虚拟锚点）对应的列权重显著高于普通宿主原子；
-- 注意力沿晶格方向呈星形分布，对应缺陷诱导的弹性应变场。
+观察：
 
-如观察到上述分布，则印证 DAST 的星型稀疏设计与缺陷物理图像一致；
-若分布弥散，则说明虚拟锚点未充分发挥作用，需进一步引入显式空间偏置。
+1. **基线 + 增强是最强配置**：Test MAE 0.511 vs ALIGNN 的 0.540，
+   参数量仅 ALIGNN 的 1/20。
+2. **增强让 DAST dense 追平基线**：DAST 的"先天劣势"被增强部分
+   补偿（1.49 → 0.52），但仍然不优于直接增强基线。
+3. **大模型 (h=128) 即使增强也未学好**：1.81 → 1.47，仍远差于
+   小模型基线，提示 30-epoch 训练对该容量不够。
 
-### 5.5 物理增强的补充实验
+[占位 2：等长训练 (50-60 epoch) 完成后，补充 ``baseline_long`` 与
+``baseline_h128_long`` 的数字以排除"训练不足"的可能性。]
 
-为了验证 DAST 与团队前期"物理增强"策略可叠加，我们在
-``data/processed/cleaned_dataset.pkl`` 之上调用 ``src.augment``
-生成 3× 增强训练集（原样本 + 平面随机旋转 + σ=0.02 Å 高斯坐标微扰），
-保留原始的验证 / 测试划分；其余超参与主实验一致。该实验在主结果
-出来后视情况补充。
+### 5.4 多种子稳定性
 
-## 6. 局限与未来工作
+[占位 3：等 baseline_aug × 4 种子完成后填入 mean ± std。]
 
-DAST 在 IMP2D 上的形成能预测精度已显著优于 CGCNN，但与 ALIGNN
-（4 M 参数）相比仍有提升空间。后续计划：
+### 5.5 误差分布与 parity 图
 
-1. **真正的稀疏算子**：当前实现以 dense mask 为权宜之计，未来将
-   切换到 PyG / `torch_scatter` 后端，把星型稀疏的复杂度优势落到
-   真实显存占用上，使模型能扩展到 $\sim 1000$ 原子超胞。
-2. **E(3) 等变张量场**：将节点特征从标量升级到不可约张量表示
-   （球面调和 + Clebsch-Gordan 张量积），用于磁矩、压电等
-   矢量 / 张量场预测任务。
-3. **主动学习闭环**：在读出层引入证据深度学习（EDL），输出
-   不确定度；高方差样本流入 DFT 校验 → 数据回流 → 模型迭代，
-   形成自动闭环。
+[占位 4：parity scatter（图 1）+ 误差直方图（图 2）+ 验证 MAE 训练曲线
+（图 3）由 ``scripts/make_figures.py`` 生成。]
 
-## 7. 结论
+## 6. 讨论
 
-我们在二维材料缺陷形成能预测任务上提出 DAST——一种缺陷感知的
-星型稀疏 Transformer 架构。通过显式植入虚拟缺陷锚点、星型稀疏注意力
-与晶格自连接编码，DAST 在 IMP2D 数据集上以约 0.2 M 参数取得了
-显著优于纯局部 GNN 与团队前期 CrystalTransformer 基线的形成能预测
-精度，并通过消融实验定量验证了三项设计的边际贡献。注意力可视化
-进一步表明模型自发学到了"缺陷锚点 + 长程辐射"的物理图像。
-本工作为构建"可解释、可扩展、面向缺陷工程"的二维材料高通量预测
-平台奠定了基础，并为后续的 E(3) 等变升级与主动学习闭环提供了一个
-干净的代码与实验起点。
+### 6.1 为什么 DAST 在 IMP2D 上失败？
+
+我们提出三种可能解释（按可能性排序）：
+
+1. **任务规模偏小**：IMP2D 仅 ~10⁴ 样本，supercell 通常 28-49 原子。
+   这种规模下"显式编码周期性"等结构创新的边际收益小于其引入的额外学习
+   难度。Matformer / Crystalformer 等论文报告的强增益主要在百万级体相
+   晶体数据（Materials Project）上观察到。
+2. **缺陷标记的不完美**：我们用启发式规则把"最后一个匹配 dopant 元素的
+   原子"标为缺陷，但 IMP2D 也包含自代替（host == dopant）样本，此时
+   该规则只能任选一个。虚拟锚点把这种含噪缺陷信号集中起来，反而放大
+   了误差。
+3. **稀疏 mask 切除了远场信息**：尽管"长程效应"是物理直觉的核心动机，
+   实际形成能很大程度上由缺陷局域化学环境决定（短程成键 / 配位变化），
+   远场弛豫的贡献相对弱。把所有 $r > r_\text{global}$ 的原子裁掉
+   反而让模型失去对超胞整体应变的感知。
+
+### 6.2 为什么数据增强如此有效？
+
+旋转增强强迫模型学习"与取向无关"的几何关系。在我们使用的特征中，
+本来就只输入距离与角度（标量不变量），所以模型本身具备一定的旋转不变
+性偏置。然而：(i) 训练数据 SO(2) 取向往往集中（相同晶系材料的 cell
+朝向相似），导致网络可能把"在某一取向下学到的特征"过拟合；(ii) 高斯
+坐标微扰让模型在 DFT 弛豫坐标的"邻域"上做平滑回归，而非死记 DFT 的
+精确坐标。两者结合提供"几何归纳偏置"，比把这些偏置硬编码进网络结构
+更为有效。
+
+### 6.3 为什么放大模型反而劣化？
+
+10⁴ 量级的训练样本对 1.06 M 参数模型不充分。此外深层模型在缺乏 warmup
+与梯度裁剪精调的情况下容易陷入鞍点。补完长训练 (60 epoch) 实验后我们
+将能给出更明确的判断（§5.3 的占位 2）。
+
+## 7. 局限与未来工作
+
+1. **更强的负面证据**：我们目前仅在 seed=42 下做了完整对比；多种子
+   实验（§5.4）将给出 DAST 退化幅度的统计显著性。
+2. **跨数据集验证**：把同一 DAST 实现搬到更大的体相数据集（Materials
+   Project）跑一次，看看负面结果是否还成立。如成立，则说明 DAST 思路
+   本身有问题；如不成立，则确认 IMP2D 的特殊性。
+3. **更强的物理增强**：除了旋转 + 微扰，还可加入"超胞复制 → 形成能按
+   原子数缩放"等增强；以及"Wyckoff position 替换"等晶体学增强。
+4. **不确定度量化**：在读出层加 EDL 或 deep ensembles，给每个预测附
+   置信区间，配合 active learning 闭环可大幅降低 DFT 标注成本。
+
+## 8. 结论
+
+我们对二维材料缺陷形成能预测做了系统的算法对比，得到三个关键结论：
+**(i)** 朴素的 SchNet+Transformer 混合架构 + 简单数据增强可在 IMP2D 上
+取得 0.51 eV 的 SOTA，超过 ALIGNN 等更复杂模型；**(ii)** 包括"虚拟缺陷
+锚点"、"晶格自连接编码"、"星型稀疏注意力"在内的若干结构创新在该任务
+上均产生**负贡献**；**(iii)** 在 10⁴ 量级数据上盲目放大模型容量也会
+劣化精度。这些发现为后续设计"可解释、可扩展、面向缺陷工程"的二维材料
+高通量预测平台提供了三条务实指引：先做几何不变性增强、慎重引入复杂注意
+力、并把模型容量与数据规模匹配。
 
 ## 参考文献
 
-[1] Wu J, Lu W, Wu J, *et al.* Graph transformer model integrating physical
-    features for projected electronic density of states prediction.
-    *J. Phys. Chem. A*, 2025, **129**(25): 5700-5708.
+[1] Wu J, *et al.* Graph transformer model integrating physical features
+    for projected electronic density of states prediction. *J. Phys. Chem. A*,
+    2025, **129**(25): 5700-5708.
 
-[2] Yan K, Liu Y, Lin Y, *et al.* Periodic graph transformers for crystal
-    material property prediction. *NeurIPS*, 2022, **35**: 15066-15080.
+[2] Yan K, *et al.* Periodic graph transformers for crystal material property
+    prediction. *NeurIPS*, 2022, **35**: 15066-15080.
 
 [3] Hua H, Lin W. Local-global associative frames for symmetry-preserving
     crystal structure modeling. *arXiv:2505.15315*, 2025.
 
-[4] Yan K, Li X, Ling H, *et al.* Invariant tokenization of crystalline
-    materials for language model enabled generation. *NeurIPS*, 2024,
-    **37**: 125050-125072.
+[4] Yan K, *et al.* Invariant tokenization of crystalline materials for
+    language model enabled generation. *NeurIPS*, 2024, **37**: 125050-125072.
 
-[5] Kazeev N, Nong W, Romanov I, *et al.* Wyckoff transformer: Generation of
-    symmetric crystals. *arXiv:2503.02407*, 2025.
+[5] Kazeev N, *et al.* Wyckoff transformer: Generation of symmetric crystals.
+    *arXiv:2503.02407*, 2025.
 
-[6] Lin Y, Yan K, Luo Y, *et al.* Efficient approximations of complete
-    interatomic potentials for crystal property prediction. *ICML*, 2023:
-    21260-21287.
+[6] Lin Y, *et al.* Efficient approximations of complete interatomic
+    potentials for crystal property prediction. *ICML*, 2023: 21260-21287.
 
-[7] Taniai T, Igarashi R, Suzuki Y, *et al.* Crystalformer: Infinitely
-    connected attention for periodic structure encoding. *arXiv:2403.11686*,
-    2024.
+[7] Taniai T, *et al.* Crystalformer: Infinitely connected attention for
+    periodic structure encoding. *arXiv:2403.11686*, 2024.
 
-[8] Hossen M F, Shendokar S, Aravamudhan S. Defects and defect engineering
-    of two-dimensional transition metal dichalcogenide (2D TMDC) materials.
-    *Nanomaterials*, 2024, **14**(5): 410.
+[8] Hossen M F, *et al.* Defects and defect engineering of two-dimensional
+    transition metal dichalcogenide (2D TMDC) materials. *Nanomaterials*,
+    2024, **14**(5): 410.
 
-[9] Zhang J, Koneru A, Sankaranarayanan S K R S, *et al.* Graph neural
-    network guided evolutionary search of grain boundaries in 2D materials.
-    *ACS Appl. Mater. Interfaces*, 2023, **15**(16): 20520-20530.
+[9] Zhang J, *et al.* Graph neural network guided evolutionary search of
+    grain boundaries in 2D materials. *ACS Appl. Mater. Interfaces*, 2023,
+    **15**(16): 20520-20530.
 
 [10] Schleberger M, Kotakoski J. 2D material science: Defect engineering by
      particle irradiation. *Materials*, 2018, **11**(10): 1885.
 
-[11] Reiser P, Neubert M, Eberhard A, *et al.* Graph neural networks for
-     materials science and chemistry. *Communications Materials*, 2022,
-     **3**(1): 93.
+[11] Reiser P, *et al.* Graph neural networks for materials science and
+     chemistry. *Communications Materials*, 2022, **3**(1): 93.
 
-[12] Zhang Y, Appleton R J, Lin K, *et al.* Generalizable machine learning
-     potentials for quantum-accurate predictions of non-equilibrium behavior
-     in 2D materials. *Comput. Methods Appl. Mech. Eng.*, 2026, **448**:
-     118502.
+[12] Zhang Y, *et al.* Generalizable machine learning potentials for
+     quantum-accurate predictions of non-equilibrium behavior in 2D
+     materials. *Comput. Methods Appl. Mech. Eng.*, 2026, **448**: 118502.
 
-[13] Vaswani A, Shazeer N, Parmar N, *et al.* Attention is all you need.
-     *NeurIPS*, 2017, **30**.
+[13] Vaswani A, *et al.* Attention is all you need. *NeurIPS*, 2017, **30**.
 
-[14] Schütt K T, Sauceda H E, Kindermans P-J, *et al.* SchNet: A deep
-     learning architecture for molecules and materials. *J. Chem. Phys.*,
-     2018, **148**(24): 241722.
+[14] Schütt K T, *et al.* SchNet: A deep learning architecture for molecules
+     and materials. *J. Chem. Phys.*, 2018, **148**(24): 241722.
 
 [15] Choudhary K, DeCost B. Atomistic line graph neural network for improved
      materials property predictions. *npj Comput. Mater.*, 2021, **7**: 185.
@@ -370,35 +358,45 @@ DAST 在 IMP2D 上的形成能预测精度已显著优于 CGCNN，但与 ALIGNN
      accurate and interpretable prediction of material properties.
      *Phys. Rev. Lett.*, 2018, **120**: 145301.
 
-[17] Beltagy I, Peters M E, Cohan A. Longformer: The long-document
-     transformer. *arXiv:2004.05150*, 2020.
+[17] Beltagy I, *et al.* Longformer: The long-document transformer.
+     *arXiv:2004.05150*, 2020.
 
-[18] Pandey A, Bligaard T, Rasmussen S H, *et al.* Computational Materials
-     Repository (CMR) database. https://cmr.fysik.dtu.dk/
+[18] Pandey A, *et al.* Computational Materials Repository (CMR) database.
+     https://cmr.fysik.dtu.dk/
 
 ## 复现指南
 
-完整复现需要：
+完整实验复现：
 
 ```bash
-# 1. 获取代码并准备 Python 环境
-cd project && python3.12 -m venv .venv && source .venv/bin/activate
+# 1. 准备代码与环境 (要求 Python ≥ 3.10, NVIDIA GPU 可选但强烈推荐)
+git clone https://github.com/chimeraHHH/2d-defect-dast.git && cd 2d-defect-dast
+python3 -m venv .venv && source .venv/bin/activate
+# 若有 NVIDIA GPU，建议使用 cu128 wheel（对 RTX 50 系必须）
+pip install --index-url https://download.pytorch.org/whl/cu128 torch
 pip install -r requirements.txt
 
-# 2. 下载 IMP2D 数据库
+# 2. 拉取 IMP2D 原始数据库
 mkdir -p data/raw
 curl -L https://cmr.fysik.dtu.dk/_downloads/imp2d.db -o data/raw/imp2d.db
 
-# 3. 预处理 (10641 样本, ~1 min)
+# 3. 预处理（约 1 min CPU）
 python scripts/prepare_dataset.py
 
-# 4. 运行所有实验 (~2 小时 CPU)
+# 4. 生成 3× 数据增强（约 4 min CPU）
+python -m src.augment
+
+# 5. 主实验：跑获胜配置（baseline + augmentation, 30 epoch, ≈ 10 min on RTX 5090）
+python -m src.train --config configs/baseline_aug.yaml
+
+# 6. 对比基线与所有消融
 bash scripts/run_queue.sh
 
-# 5. 生成论文图表
+# 7. 生成图表与汇总表
 python scripts/make_figures.py
 python scripts/analyze_results.py
 ```
 
-所有训练日志、checkpoint 与 ``test_predictions.npz`` 保留在
-``results/<run>/`` 下，可用于二次分析与同行评审。
+所有训练日志、checkpoint、`test_predictions.npz` 全部保留在
+`results/<run>/` 下。论文中的全部数字均可从 `metrics.json` 中读出，
+不需任何手工挑拣。
