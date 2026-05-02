@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.egg-info/
+.pytest_cache/
+
+# Data and large artifacts
+data/raw/*.db
+data/processed/*.pkl
+data/processed/*.lmdb
+results/checkpoints/*.pth
+results/checkpoints/*.pt
+
+# Logs
+results/logs/*.log
+results/logs/*.txt
+
+# Editor / OS
+.vscode/
+.idea/

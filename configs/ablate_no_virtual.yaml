@@ -1,0 +1,31 @@
+model: improved
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: results/ablate_no_virtual
+seed: 42
+batch_size: 32
+epochs: 35
+train_ratio: 0.8
+val_ratio: 0.1
+loss: huber
+huber_delta: 1.0
+grad_clip: 1.0
+optimizer:
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+scheduler:
+  factor: 0.5
+  patience: 4
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  r_global: 8.0
+  k_global: 16
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  use_lattice_self_loop: true
+  use_virtual_node: false   # ablation: drop the defect-anchor virtual token
