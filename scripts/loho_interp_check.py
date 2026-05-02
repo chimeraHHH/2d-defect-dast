@@ -92,21 +92,26 @@ def occlusion_per_atom(model, sample, nmean, nstd):
 
 
 def main():
-    # ---- LOHO MoS2 model + dataset ----
-    cfg = yaml.safe_load(open(ROOT / "configs/loho_MoS2.yaml"))
-    safe = ROOT / cfg["data_path"]  # data/processed/loho_MoS2.pkl — not local
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--host", default="MoS2", help="LOHO host name")
+    args = ap.parse_args()
+    host = args.host
+    print(f"=== LOHO interp check for host={host} ===")
+
+    cfg_path = ROOT / f"configs/loho_{host}.yaml"
+    cfg = yaml.safe_load(open(cfg_path))
+    safe = ROOT / cfg["data_path"]
     cleaned = ROOT / "data/processed/cleaned_dataset.pkl"
 
     if not safe.exists():
-        # the LOHO MoS2 leak-free aug pickle is too big to ship; we instead
-        # subset the cleaned dataset to MoS2 host directly
-        print("LOHO MoS2 pickle not local; using cleaned + MoS2 filter")
+        print(f"LOHO {host} pickle not local; using cleaned + {host} filter")
         ds_full = CrystalGraphDataset(cleaned)
-        moS2_idx = [i for i, s in enumerate(ds_full.data)
-                    if (s["metadata"].get("host") or "?") == "MoS2"]
-        print(f"  found {len(moS2_idx)} MoS2 samples")
+        host_idx = [i for i, s in enumerate(ds_full.data)
+                    if (s["metadata"].get("host") or "?") == host]
+        print(f"  found {len(host_idx)} {host} samples")
         from torch.utils.data import Subset
-        test_set = Subset(ds_full, moS2_idx)
+        test_set = Subset(ds_full, host_idx)
         ds = ds_full
     else:
         ds = CrystalGraphDataset(safe)
@@ -114,7 +119,7 @@ def main():
                                       cfg.get("val_ratio", 0.1), cfg.get("seed", 42))
 
     model = CrystalTransformer(**cfg["model_kwargs"])
-    ckpt_path = ROOT / "results/loho_MoS2/best.pt"
+    ckpt_path = ROOT / f"results/loho_{host}/best.pt"
     if not ckpt_path.exists():
         print(f"!! missing {ckpt_path}; can't run")
         return
@@ -157,8 +162,8 @@ def main():
 
     summary = {
         "n_samples_used": len(inc_def),
-        "model": "loho_MoS2 (trained without any MoS2 sample)",
-        "test_set": "MoS2 hosts (308 OOD samples; 80 sampled)",
+        "model": f"loho_{host} (trained without any {host} sample)",
+        "test_set": f"{host} hosts (OOD samples; up to 80 sampled)",
         "incoming_attn_to_defect_mean": float(np.mean(inc_def)),
         "incoming_attn_to_random_other_mean": float(np.mean(inc_other)),
         "ratio_defect_over_other_attn": float(np.mean(inc_def) / max(np.mean(inc_other), 1e-9)),
@@ -169,9 +174,10 @@ def main():
         "fraction_attribution_at_defect_atom_std": float(np.std(fraction_at_def)),
     }
     print(json.dumps(summary, indent=2))
-    with open(RESULTS / "loho_interp_check.json", "w") as f:
+    out_path = RESULTS / f"loho_interp_check_{host}.json"
+    with open(out_path, "w") as f:
         json.dump(summary, f, indent=2)
-    print("saved -> results/loho_interp_check.json")
+    print(f"saved -> {out_path}")
 
 
 if __name__ == "__main__":
