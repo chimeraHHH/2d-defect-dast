@@ -1,0 +1,21 @@
+{
+  "n_samples_used": 200,
+  "incoming_attention_to_defect_atom_mean": 0.5224165916442871,
+  "incoming_attention_to_random_other_mean": 0.016226058825850487,
+  "ratio_defect_over_other": 32.19614791870117,
+  "per_layer_head_mean_entropy_nats": [
+    [
+      0.09901861503854892,
+      0.1046573310547319,
+      0.33474187151528895,
+      0.9617866927373688
+    ],
+    [
+      0.17181761257773473,
+      2.0974478996545076,
+      0.22304502269628756,
+      2.8249636078625917
+    ]
+  ],
+  "max_entropy_uniform_log_N": 4.727387818712341
+}
