@@ -1,0 +1,14 @@
+{
+  "n_samples_used": 100,
+  "mean_abs_delta_at_defect": 6.870452646419308,
+  "mean_abs_delta_at_other_atoms": 0.015321918218589095,
+  "ratio_defect_over_other": 448.40682141768843,
+  "fraction_of_total_attribution_at_defect_atom_mean": 0.9067563648100694,
+  "fraction_of_total_attribution_at_defect_atom_std": 0.12955345569993226,
+  "pearson_abs_delta_vs_inv_dist_mean": 0.9902581744043172,
+  "pearson_abs_delta_vs_inv_dist_std": 0.061381717035753035,
+  "radius_for_80pct_mean": 0.5483995914459229,
+  "radius_for_80pct_std": 1.5814829413520581,
+  "radius_for_80pct_excl_defect_mean": 8.997363114356995,
+  "radius_for_80pct_excl_defect_std": 2.5514701094050656
+}
