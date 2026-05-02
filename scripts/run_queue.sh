@@ -21,6 +21,7 @@ declare -a CONFIGS=(
   "configs/ablate_local_only.yaml results/ablate_local_only"
   "configs/ablate_no_virtual.yaml results/ablate_no_virtual"
   "configs/ablate_no_lattice.yaml results/ablate_no_lattice"
+  "configs/dast_dense.yaml results/dast_dense"
 )
 
 for entry in "${CONFIGS[@]}"; do
