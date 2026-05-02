@@ -62,9 +62,12 @@ def fig_parity(runs: Dict[str, Dict], out: Path) -> None:
     plt.close(fig)
 
 
-def fig_curves(runs: Dict[str, Dict], out: Path) -> None:
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    for name, data in runs.items():
+def fig_curves(runs: Dict[str, Dict], out: Path, keys: list = None) -> None:
+    fig, ax = plt.subplots(figsize=(8, 5))
+    items = list(runs.items())
+    if keys is not None:
+        items = [(k, v) for k, v in items if k in keys]
+    for name, data in items:
         history = data.get("history") or []
         if not history:
             continue
@@ -75,7 +78,8 @@ def fig_curves(runs: Dict[str, Dict], out: Path) -> None:
     ax.set_ylabel("Validation MAE (eV)")
     ax.set_title("Validation MAE per epoch")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.set_yscale("log")
+    ax.legend(fontsize=8, loc="upper right")
     fig.tight_layout()
     fig.savefig(out, dpi=200)
     plt.close(fig)
@@ -142,7 +146,22 @@ def main() -> None:
     }
 
     fig_parity(headline, FIG_DIR / "fig_parity.png")
-    fig_curves(all_runs, FIG_DIR / "fig_curves.png")
+    # focused curves for the core narrative; full one for appendix
+    fig_curves(
+        all_runs,
+        FIG_DIR / "fig_curves_core.png",
+        keys=[
+            "baseline",
+            "baseline_long",
+            "baseline_aug",
+            "baseline_aug_long",
+            "baseline_h128_long",
+            "baseline_h128_aug_long",
+            "improved",
+            "dast_dense",
+        ],
+    )
+    fig_curves(all_runs, FIG_DIR / "fig_curves_all.png")
     fig_error_dist(headline, FIG_DIR / "fig_error_dist.png")
     fig_metric_table(all_runs, FIG_DIR / "metrics_table.tsv")
     print("Figures written to", FIG_DIR)
