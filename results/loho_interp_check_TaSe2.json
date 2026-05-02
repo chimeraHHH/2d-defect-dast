@@ -1,0 +1,13 @@
+{
+  "n_samples_used": 80,
+  "model": "loho_TaSe2 (trained without any TaSe2 sample)",
+  "test_set": "TaSe2 hosts (OOD samples; up to 80 sampled)",
+  "incoming_attn_to_defect_mean": 0.7299382669851184,
+  "incoming_attn_to_random_other_mean": 0.007953951558738482,
+  "ratio_defect_over_other_attn": 91.77051954549351,
+  "occlusion_abs_delta_at_defect_mean": 5.854283108474188,
+  "occlusion_abs_delta_at_other_mean": 0.02813704369529828,
+  "ratio_defect_over_other_delta": 208.06319142378285,
+  "fraction_attribution_at_defect_atom_mean": 0.8677452209636123,
+  "fraction_attribution_at_defect_atom_std": 0.12430226790649777
+}
