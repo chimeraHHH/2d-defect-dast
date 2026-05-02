@@ -528,6 +528,22 @@ $k = 3, 4, 5$ 时随机抽 30 个组合以控制计算量），得到 MAE 随 en
 图 ``paper/figures/fig_ensemble_size_ablation.png`` 给出 MAE / cov90 /
 NLL 三条曲线对 $k$ 的函数关系。
 
+**深度集成 vs MC-Dropout**：作为单模型 UQ 的代表，我们也在同一
+checkpoint 上运行 K=30 次随机 dropout 前推（``scripts/mc_dropout_uq.py``）：
+
+| 方法 | MAE (eV) | mean σ | 原始 NLL | 原始 cov90 | τ | τ 后 cov90 |
+|---|---|---|---|---|---|---|
+| MC-Dropout (K=30) | 0.516 | 0.099 | 76.07 | 30.3% | **10.72** | 94.6% |
+| 4-seed ensemble | 0.464 | 0.329 | 2.86 | 72.5% | 2.60 | 93.4% |
+| 6-mixed ensemble | **0.443** | 0.331 | 1.35 | 78.9% | 1.83 | 92.3% |
+
+MC-Dropout 的两个明显缺陷：(i) **不带来点估计增益**——MC 平均仍是单
+checkpoint 的输出（与 0.516 等同），相比之下深度集成把 MAE 直接降到 0.443；
+(ii) **σ 大幅欠估**：模型的 dropout=0.1 太低导致 σ 远小于真实误差，原始
+cov90 仅 30.3%，需要 τ ≈ 11 才能重缩放到 ~95% 覆盖。**结论：在该任务上
+深度集成全面占优**，MC-Dropout 仅在不能多次训练的极端预算下值得一用。
+图 ``paper/figures/fig_uq_method_compare.png``。
+
 **表 4**：原始集成 vs 温度缩放校准（详细每个指标定义见附录）
 
 | 指标 | 原始集成 | 温度缩放 (τ=2.60) | 理想 |
