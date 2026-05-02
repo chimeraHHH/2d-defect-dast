@@ -1,0 +1,26 @@
+model: baseline
+data_path: data/processed/augmented_dataset_safe.pkl
+output_dir: results/baseline_h192_aug_long_safe
+seed: 42
+batch_size: 48
+epochs: 60
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+optimizer:
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  factor: 0.5
+  patience: 6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 192
+  n_local_layers: 4
+  n_global_layers: 3
+  num_heads: 6
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
