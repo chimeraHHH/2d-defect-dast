@@ -30,14 +30,22 @@ per-run,baseline_long,baseline,cleaned_dataset.pkl,0.198,60,42,0.7371,1.3285
 per-run,dast_dense,improved,cleaned_dataset.pkl,0.202,30,42,1.4857,2.1149
 per-run,dast_dense_aug,improved,augmented_dataset.pkl,0.202,30,42,0.515,0.7444
 per-run,improved,improved,cleaned_dataset.pkl,0.202,30,42,1.8269,2.5538
+per-run,loho_C2H2,baseline,loho_C2H2.pkl,0.747,50,42,2.3987,4.3098
+per-run,loho_Cr2I6,baseline,loho_Cr2I6.pkl,0.747,50,42,0.8401,1.3113
 per-run,loho_MoS2,baseline,loho_MoS2.pkl,0.747,50,42,0.5163,1.0047
+per-run,loho_MoSSe,baseline,loho_MoSSe.pkl,0.747,50,42,0.4479,1.02
+per-run,loho_TaSe2,baseline,loho_TaSe2.pkl,0.747,50,42,0.6364,1.2436
 multi-seed mean ± std,baseline_h128_aug_long_safe  (4 seeds),baseline,augmented_dataset_safe.pkl,0.747,50,mean,0.5365 ± 0.0135,1.1692 ± 0.0251
 multi-seed mean ± std,baseline_h128_aug_xlong_safe  (2 seeds),baseline,augmented_dataset_safe.pkl,0.747,100,mean,0.4908 ± 0.0128,1.1547 ± 0.0090
 ensemble (raw),deep ensemble (4 long seeds),ensemble,leak_free_v1,n×0.747,—,—,0.4644,1.1016
 "ensemble (τ=2.60, eval-half)",deep ensemble (4 long seeds),ensemble + τ,leak_free_v1,n×0.747,—,—,0.4834,1.2014
 ensemble (raw),deep ensemble (4 long + 2 xlong),ensemble,leak_free_v1,n×0.747,—,—,0.4428,1.0943
 "ensemble (τ=1.83, eval-half)",deep ensemble (4 long + 2 xlong),ensemble + τ,leak_free_v1,n×0.747,—,—,0.4582,1.192
-LOHO (raw),loho_MoS2,baseline h128,loho_MoS2.pkl,0.747,50,42,0.5163,1.0047
+LOHO,loho_MoS2,baseline h128,loho_MoS2.pkl,0.747,50,42,0.5163,1.0047
+LOHO,loho_Cr2I6,baseline h128,loho_Cr2I6.pkl,0.747,50,42,0.8401,1.3113
+LOHO,loho_C2H2,baseline h128,loho_C2H2.pkl,0.747,50,42,2.3987,4.3098
+LOHO,loho_TaSe2,baseline h128,loho_TaSe2.pkl,0.747,50,42,0.6364,1.2436
+LOHO,loho_MoSSe,baseline h128,loho_MoSSe.pkl,0.747,50,42,0.4479,1.02
 UQ method comparison,MC-Dropout (K=30),various,leak_free_v1,—,—,—,0.5155,1.1433
 UQ method comparison,4-seed ensemble,various,leak_free_v1,—,—,—,0.4644,1.1016
 UQ method comparison,6-member mixed ensemble,various,leak_free_v1,—,—,—,0.4428,1.0943

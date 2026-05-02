@@ -10,6 +10,7 @@
 | baseline_h128_aug_long_seed2 | baseline | augmented_dataset.pkl | 0.747 | 50 | 2 | 0.2965 | 0.4281 |
 | baseline_h128_aug_long_seed0 | baseline | augmented_dataset.pkl | 0.747 | 50 | 0 | 0.3172 | 0.4731 |
 | baseline_aug_long | baseline | augmented_dataset.pkl | 0.198 | 50 | 42 | 0.4156 | 0.5955 |
+| loho_MoSSe | baseline | loho_MoSSe.pkl | 0.747 | 50 | 42 | 0.4479 | 1.02 |
 | baseline_aug_seed2 | baseline | augmented_dataset.pkl | 0.198 | 30 | 2 | 0.4761 | 0.7158 |
 | baseline_h128_aug_xlong_safe | baseline | augmented_dataset_safe.pkl | 0.747 | 100 | 42 | 0.478 | 1.1458 |
 | baseline_h128_aug_xlong_safe_seed0 | baseline | augmented_dataset_safe.pkl | 0.747 | 100 | 0 | 0.5036 | 1.1637 |
@@ -24,10 +25,12 @@
 | baseline_h128_aug_long_safe_seed2 | baseline | augmented_dataset_safe.pkl | 0.747 | 50 | 2 | 0.5517 | 1.1735 |
 | baseline_h128_long | baseline | cleaned_dataset.pkl | 0.747 | 60 | 42 | 0.6221 | 1.1667 |
 | baseline_aug_long_safe | baseline | augmented_dataset_safe.pkl | 0.198 | 50 | 42 | 0.6277 | 1.2516 |
+| loho_TaSe2 | baseline | loho_TaSe2.pkl | 0.747 | 50 | 42 | 0.6364 | 1.2436 |
 | baseline_aug_safe | baseline | augmented_dataset_safe.pkl | 0.198 | 30 | 42 | 0.6718 | 1.2461 |
 | baseline_h192_aug_long_safe | baseline | augmented_dataset_safe.pkl | 2.338 | 60 | 42 | 0.6736 | 1.291 |
 | baseline_aug_seed0 | baseline | augmented_dataset.pkl | 0.198 | 30 | 0 | 0.6815 | 0.961 |
 | baseline_long | baseline | cleaned_dataset.pkl | 0.198 | 60 | 42 | 0.7371 | 1.3285 |
+| loho_Cr2I6 | baseline | loho_Cr2I6.pkl | 0.747 | 50 | 42 | 0.8401 | 1.3113 |
 | baseline | baseline | cleaned_dataset.pkl | 0.198 | 30 | 42 | 0.8621 | 1.5216 |
 | ablate_local_only | baseline | cleaned_dataset.pkl | 0.093 | 30 | 42 | 1.3973 | 2.0274 |
 | baseline_h128_aug | baseline | augmented_dataset.pkl | 1.06 | 30 | 42 | 1.4734 | 1.9917 |
@@ -36,6 +39,7 @@
 | ablate_no_virtual | improved | cleaned_dataset.pkl | 0.202 | 30 | 42 | 1.6826 | 2.3339 |
 | baseline_h128 | baseline | cleaned_dataset.pkl | 1.06 | 30 | 42 | 1.8156 | 2.506 |
 | improved | improved | cleaned_dataset.pkl | 0.202 | 30 | 42 | 1.8269 | 2.5538 |
+| loho_C2H2 | baseline | loho_C2H2.pkl | 0.747 | 50 | 42 | 2.3987 | 4.3098 |
 
 ## multi-seed mean ± std
 
@@ -63,11 +67,15 @@
 |---|---|---|---|---|---|---|---|
 | deep ensemble (4 long + 2 xlong) | ensemble + τ | leak_free_v1 | n×0.747 | — | — | 0.4582 | 1.192 |
 
-## LOHO (raw)
+## LOHO
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
 |---|---|---|---|---|---|---|---|
+| loho_MoSSe | baseline h128 | loho_MoSSe.pkl | 0.747 | 50 | 42 | 0.4479 | 1.02 |
 | loho_MoS2 | baseline h128 | loho_MoS2.pkl | 0.747 | 50 | 42 | 0.5163 | 1.0047 |
+| loho_TaSe2 | baseline h128 | loho_TaSe2.pkl | 0.747 | 50 | 42 | 0.6364 | 1.2436 |
+| loho_Cr2I6 | baseline h128 | loho_Cr2I6.pkl | 0.747 | 50 | 42 | 0.8401 | 1.3113 |
+| loho_C2H2 | baseline h128 | loho_C2H2.pkl | 0.747 | 50 | 42 | 2.3987 | 4.3098 |
 
 ## UQ method comparison
 
