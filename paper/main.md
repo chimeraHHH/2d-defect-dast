@@ -314,8 +314,50 @@ Seed 0 表现明显差于其它种子，提示 30-epoch 对该任务而言已接
 
 ### 5.5 误差分布与 parity 图
 
-[占位 4：parity scatter（图 1）+ 误差直方图（图 2）+ 验证 MAE 训练曲线
-（图 3）由 ``scripts/make_figures.py`` 生成。]
+**图 1**（``paper/figures/fig_parity.png``）展示 baseline → baseline_aug →
+baseline_h128_aug_long 三阶段的 (DFT, 预测) 散点图：从最朴素的版本
+（左，MAE 0.86）到加增强（中，0.51）再到加增强 + 加宽 + 长训练
+（右，0.21），散点逐步向 y=x 线收紧。
+
+**图 2**（``paper/figures/fig_error_dist.png``）显示三个版本在测试集上
+的预测误差分布。h128_aug_long 的分布峰值在 0 附近，σ ≈ 0.31 eV，
+P95 |error| 仅 0.58 eV；相比之下原始基线 P95 已超过 2.6 eV。
+
+**图 3**（``paper/figures/fig_curves_core.png``）以 log y-轴展示 8 个核心
+配置的验证 MAE 随 epoch 变化曲线，可见：
+- DAST 类（``improved``、``dast_dense``）始终在高位徘徊；
+- baseline 30 epoch 内已收敛到 ≈ 0.8；
+- 加增强后曲线整体下移；
+- baseline_h128_aug_long（红线）至 50 epoch 仍稳定下降，最终几乎压到
+  log-y 图底部。
+
+### 5.6 误差按物理类别分解
+
+我们对 ``baseline_h128_aug_long`` 的测试预测做了按物理类别的细分分析，
+量化模型在哪些样本上还有提升空间（``scripts/error_analysis.py``）：
+
+**按缺陷类型**：吸附（adsorbate）平均 MAE 0.190 eV，间隙（interstitial）
+0.235 eV。间隙缺陷因为引入了额外原子，需要更细致的弛豫建模。
+
+**按超胞尺寸**：≤25 / 26-50 / 51-75 / >75 原子四档分别为 0.197 / 0.202 /
+0.210 / 0.239 eV。模型在最大超胞上仍只损失 0.04 eV，**说明所提架构具备
+良好的尺寸外推能力**。
+
+**最容易的宿主**（n ≥ 30 中前五）：MoSe₂、As₂、MoTe₂、MoSSe、WSe₂，
+MAE ≈ 0.15 eV。这些都是常规 TMD 体系，电子结构较为"简单"。
+
+**最困难的宿主**（n ≥ 30 中后五）：C₂H₂（石墨烯类）、W₂Se₄、Cr₂I₆
+（磁性 2D 半导体）、NiSe₂、TaSe₂，MAE ≈ 0.24-0.27 eV。困难来源主要是
+磁性耦合与重元素 d 电子相关性，DFT 自身在这些体系上误差也偏大。
+
+**最容易的掺杂元素**：As、Lu、Au、Rb、Ge（MAE ≈ 0.13-0.15 eV，
+主族或 4f 元素，价带行为可预测）。
+**最困难的掺杂元素**：Ta、Hg、Cr、Hf、Sc（MAE ≈ 0.27-0.31 eV，5d / 3d
+过渡金属，d-d 杂化与磁矩交互复杂）。
+
+这一分解为后续工作指明方向：要把 MAE 压到 0.1 eV 以下，重点应放在
+**磁性体系 + 重过渡金属掺杂**这一窄类样本上，例如引入显式自旋特征或
+专门为这类体系做"硬样本采样"。
 
 ## 6. 讨论
 
