@@ -614,6 +614,33 @@ NLL 三条曲线对 $k$ 的函数关系。
 
 图 ``paper/figures/fig_occlusion_localisation.png`` 给出某 49 原子超胞中
 $\Delta_i$ 的二维空间分布与按距离的衰减图。
+``paper/figures/fig_interp_panel.png`` 进一步展示在 3 个对比鲜明的样本
+（间隙 + 大体系 / 吸附 + TMD / 吸附 + MXene 类）上，缺陷-枢纽现象保持
+高度一致：缺陷归因占总归因的比例介于 92.3% 至 98.2% 之间。
+
+**(c) 特征重要性 (permutation)**：把 9 维元素特征逐列在 Z=1..100 间打乱，
+重新评估 1065 测试样本（5 重复）。ΔMAE 排序如下：
+
+| 维度 | ΔMAE (eV) | 物理含义 |
+|---|---|---|
+| group | **+1.148** | 元素族号 / 价电子构型 |
+| valence_electrons | +0.634 | 价电子数 |
+| electronegativity | +0.402 | Pauling 电负性 |
+| atomic_mass | +0.374 | 原子量 |
+| period | +0.357 | 周期数 |
+| covalent_radius | +0.314 | 共价半径 |
+| ionisation_energy | +0.138 | 第一电离能 |
+| vdW_radius | +0.079 | 范德华半径 |
+| electron_affinity | +0.019 | 电子亲和能 |
+
+**模型的化学先验集中于 (group, valence_electrons, electronegativity)**——
+这三者本质上都是"周期表中元素位置 + 化学键合倾向"的不同侧面，且它们
+彼此显著相关（pgroup 在表中线性独立但在元素行内决定 valence_electrons）。
+最末三项（IE / vdW / EA）对预测影响微乎其微，可作为模型简化的依据：
+**未来版本可剔除这三个维度（缩减输入 33%）几乎不损精度**。
+
+图 ``paper/figures/fig_feature_importance.png`` 给出所有 9 维的横向条
+形图。
 
 ## 6. 讨论
 
