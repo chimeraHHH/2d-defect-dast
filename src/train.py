@@ -106,11 +106,12 @@ def main() -> None:
     metrics_path = out_dir / "metrics.json"
     ckpt_path = out_dir / "best.pt"
 
-    # MPS softmax + masked_fill currently produces sporadic NaNs after training,
-    # so the default device is CPU on Apple Silicon. Override with --device mps
-    # if a future torch release fixes the issue.
+    # CUDA preferred when available; otherwise CPU. The MPS backend is skipped
+    # because PyTorch 2.x has known NaN bugs in softmax+masked_fill(-inf).
     if args.device is not None:
         device = torch.device(args.device)
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
     else:
         device = torch.device("cpu")
 
