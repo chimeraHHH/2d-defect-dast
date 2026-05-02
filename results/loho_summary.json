@@ -44,10 +44,21 @@
       "id_reference_rmse": 1.1314056166755828,
       "degradation_factor_mae": 1.2331091129964533,
       "degradation_factor_rmse": 1.0991738371562916
+    },
+    {
+      "host": "MoSSe",
+      "n_test": 464,
+      "loho_mae": 0.4478672742843628,
+      "loho_rmse": 1.0200195977447786,
+      "loho_r2": 0.8522786504734627,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 0.8678037967303031,
+      "degradation_factor_rmse": 0.9015507636791741
     }
   ],
   "in_distribution_test_mae": 0.5160927803863382,
   "in_distribution_test_rmse": 1.1314056166755828,
-  "avg_loho_mae": 1.0978674445256535,
-  "avg_degradation_factor": 2.127267588792482
+  "avg_loho_mae": 0.9678674104773954,
+  "avg_degradation_factor": 1.8753748303800464
 }
