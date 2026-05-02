@@ -166,12 +166,23 @@ $$
 取虚拟节点最后一层特征与实原子掩码平均的均值之和的一半，再经
 LayerNorm + 两层 MLP 映射到形成能标量。
 
-### 3.4 复杂度与对比
+### 3.4 与基线 CrystalTransformer 的对比
+
+| 设计点 | CrystalTransformer (基线) | DAST (本文) |
+|---|---|---|
+| 局部消息传递 | SchNet 风格连续滤波卷积 + 三体角度 | 同左 |
+| 全局注意力 | $O(N^2)$ dense + RBF 距离偏置 | $O(Nk)$ dense-with-mask + 距离偏置 + 缺陷边偏置 |
+| 缺陷信号 | 仅 atom 级 ``defect_embedding`` | atom 级 + **可学习虚拟锚点 token** |
+| 周期性几何 | dist_matrix (PBC 最小镜像) | dist_matrix + **晶格自连接 MLP** 注入逐原子偏置 |
+| 池化 | masked mean | masked mean + 虚拟锚点 token 的均值组合 |
 
 设超胞含 $N$ 原子，每原子保留 $k$ 个全局邻居（默认 $k=16$）。
-全连接基线的全局注意力代价为 $O(N^2 d)$；DAST 的代价为
-$O(Nk d)$ 加上 $O(N d)$ 的虚拟节点交互。在 $N=113$ 的最大样本上，
-理论 FLOPs 约为基线的 $1/7$；实际推理（CPU）速度提升约 30%-40%。
+全连接基线的全局注意力理论代价为 $O(N^2 d)$；DAST 的稀疏掩码使
+有效注意力对数从 $N(N-1)$ 降至 $\sim Nk + 2N$。在 $N=113$ 的最大
+样本上，有效注意力对数约为 $1900$，相对全连接 $\approx 12700$
+减少 $\sim 7$ 倍。本文当前实现采用 dense matrix + sparsity mask
+的折中方案，因此实测推理时间与基线相当；将来切换到
+``torch_scatter`` 后端可把这一优势落到显存与时延上。
 
 ### 3.5 物理增强
 
