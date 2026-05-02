@@ -8,3 +8,4 @@ Epoch 02/30 | train MAE 2.1755 | val MAE 1.9751 RMSE 2.6177 | lr 1.00e-03 | 50.4
 Epoch 03/30 | train MAE 1.9940 | val MAE 1.9042 RMSE 2.5238 | lr 1.00e-03 | 68.9s *
 Epoch 04/30 | train MAE 1.8606 | val MAE 1.8993 RMSE 2.4834 | lr 1.00e-03 | 66.9s *
 Epoch 05/30 | train MAE 1.7728 | val MAE 1.7422 RMSE 2.3738 | lr 1.00e-03 | 63.3s *
+Epoch 06/30 | train MAE 1.5962 | val MAE 1.5708 RMSE 2.1738 | lr 1.00e-03 | 63.3s *

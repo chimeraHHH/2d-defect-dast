@@ -290,6 +290,73 @@ DAST 在 IMP2D 上的形成能预测精度已显著优于 CGCNN，但与 ALIGNN
 平台奠定了基础，并为后续的 E(3) 等变升级与主动学习闭环提供了一个
 干净的代码与实验起点。
 
+## 参考文献
+
+[1] Wu J, Lu W, Wu J, *et al.* Graph transformer model integrating physical
+    features for projected electronic density of states prediction.
+    *J. Phys. Chem. A*, 2025, **129**(25): 5700-5708.
+
+[2] Yan K, Liu Y, Lin Y, *et al.* Periodic graph transformers for crystal
+    material property prediction. *NeurIPS*, 2022, **35**: 15066-15080.
+
+[3] Hua H, Lin W. Local-global associative frames for symmetry-preserving
+    crystal structure modeling. *arXiv:2505.15315*, 2025.
+
+[4] Yan K, Li X, Ling H, *et al.* Invariant tokenization of crystalline
+    materials for language model enabled generation. *NeurIPS*, 2024,
+    **37**: 125050-125072.
+
+[5] Kazeev N, Nong W, Romanov I, *et al.* Wyckoff transformer: Generation of
+    symmetric crystals. *arXiv:2503.02407*, 2025.
+
+[6] Lin Y, Yan K, Luo Y, *et al.* Efficient approximations of complete
+    interatomic potentials for crystal property prediction. *ICML*, 2023:
+    21260-21287.
+
+[7] Taniai T, Igarashi R, Suzuki Y, *et al.* Crystalformer: Infinitely
+    connected attention for periodic structure encoding. *arXiv:2403.11686*,
+    2024.
+
+[8] Hossen M F, Shendokar S, Aravamudhan S. Defects and defect engineering
+    of two-dimensional transition metal dichalcogenide (2D TMDC) materials.
+    *Nanomaterials*, 2024, **14**(5): 410.
+
+[9] Zhang J, Koneru A, Sankaranarayanan S K R S, *et al.* Graph neural
+    network guided evolutionary search of grain boundaries in 2D materials.
+    *ACS Appl. Mater. Interfaces*, 2023, **15**(16): 20520-20530.
+
+[10] Schleberger M, Kotakoski J. 2D material science: Defect engineering by
+     particle irradiation. *Materials*, 2018, **11**(10): 1885.
+
+[11] Reiser P, Neubert M, Eberhard A, *et al.* Graph neural networks for
+     materials science and chemistry. *Communications Materials*, 2022,
+     **3**(1): 93.
+
+[12] Zhang Y, Appleton R J, Lin K, *et al.* Generalizable machine learning
+     potentials for quantum-accurate predictions of non-equilibrium behavior
+     in 2D materials. *Comput. Methods Appl. Mech. Eng.*, 2026, **448**:
+     118502.
+
+[13] Vaswani A, Shazeer N, Parmar N, *et al.* Attention is all you need.
+     *NeurIPS*, 2017, **30**.
+
+[14] Schütt K T, Sauceda H E, Kindermans P-J, *et al.* SchNet: A deep
+     learning architecture for molecules and materials. *J. Chem. Phys.*,
+     2018, **148**(24): 241722.
+
+[15] Choudhary K, DeCost B. Atomistic line graph neural network for improved
+     materials property predictions. *npj Comput. Mater.*, 2021, **7**: 185.
+
+[16] Xie T, Grossman J C. Crystal graph convolutional neural networks for
+     accurate and interpretable prediction of material properties.
+     *Phys. Rev. Lett.*, 2018, **120**: 145301.
+
+[17] Beltagy I, Peters M E, Cohan A. Longformer: The long-document
+     transformer. *arXiv:2004.05150*, 2020.
+
+[18] Pandey A, Bligaard T, Rasmussen S H, *et al.* Computational Materials
+     Repository (CMR) database. https://cmr.fysik.dtu.dk/
+
 ## 复现指南
 
 完整复现需要：

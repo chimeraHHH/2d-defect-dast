@@ -13,6 +13,8 @@ data/processed/*.pkl
 data/processed/*.lmdb
 results/checkpoints/*.pth
 results/checkpoints/*.pt
+results/*/best.pt
+results/*/test_predictions.npz
 
 # Logs
 results/logs/*.log
