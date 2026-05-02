@@ -185,6 +185,12 @@ cd paper && pandoc main.md -o main.pdf --pdf-engine=xelatex \
   -V geometry:margin=1in --toc
 ```
 
+**或一行启动所有 v1.2 分析**（前提：safe checkpoints 已存在）：
+
+```bash
+bash scripts/run_v12_analyses.sh   # ~30 min on CPU laptop
+```
+
 ## 数据来源
 
 - **IMP2D database** (Computational Materials Repository, DTU):
