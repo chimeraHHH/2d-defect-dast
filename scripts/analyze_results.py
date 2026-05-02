@@ -16,7 +16,32 @@ def load(name: str):
     if not p.exists():
         return None
     with open(p, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+    npz = RESULTS / name / "test_predictions.npz"
+    if npz.exists():
+        arr = np.load(npz)
+        data["preds"] = arr["preds"]
+        data["targets"] = arr["targets"]
+    return data
+
+
+def per_run_extras(data) -> dict:
+    """Extra stats beyond MAE/RMSE: R², median |err|, P95 |err|."""
+    if "preds" not in data:
+        return {}
+    p, t = data["preds"], data["targets"]
+    res = p - t
+    abs_err = np.abs(res)
+    ss_res = float((res ** 2).sum())
+    ss_tot = float(((t - t.mean()) ** 2).sum())
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    return {
+        "r2": r2,
+        "median_abs_err": float(np.median(abs_err)),
+        "p95_abs_err": float(np.percentile(abs_err, 95)),
+        "spearman_proxy": float(np.corrcoef(p, t)[0, 1]),
+        "n_samples": int(t.size),
+    }
 
 
 def main():
@@ -34,13 +59,18 @@ def main():
 
     out = ROOT / "results" / "summary.md"
     lines = ["# Experiment summary", ""]
-    lines.append("| Model | Params (M) | Best val MAE | Test MAE | Test RMSE |")
-    lines.append("|---|---|---|---|---|")
+    lines.append("| Model | Params (M) | Best val MAE | Test MAE | Test RMSE | R² | median |err| | P95 |err| |")
+    lines.append("|---|---|---|---|---|---|---|---|")
     for name, data in runs.items():
+        extras = per_run_extras(data)
         params_m = data["n_params"] / 1e6
+        r2 = extras.get("r2", float("nan"))
+        med = extras.get("median_abs_err", float("nan"))
+        p95 = extras.get("p95_abs_err", float("nan"))
         lines.append(
             f"| {name} | {params_m:.3f} | {data['best_val_mae']:.4f} | "
-            f"{data['test_mae']:.4f} | {data['test_rmse']:.4f} |"
+            f"{data['test_mae']:.4f} | {data['test_rmse']:.4f} | "
+            f"{r2:.3f} | {med:.4f} | {p95:.4f} |"
         )
     lines.append("")
     lines.append("## Validation MAE per epoch")
