@@ -1,0 +1,47 @@
+[
+  {
+    "row": 0,
+    "label": "interstitial, Hf2Te6",
+    "host": "Hf2Te6",
+    "dopant": "Ir",
+    "defecttype": "interstitial",
+    "natoms": 73,
+    "defect_idx": 18,
+    "target_ef": 1.2354758977890015,
+    "predicted_ef": 1.5074019485122971,
+    "incoming_attn_to_defect": 0.5264289975166321,
+    "incoming_attn_to_random_other": 0.004756773356348276,
+    "delta_at_defect": -5.001105556098318,
+    "fraction_attribution_at_defect": 0.9632425499654013
+  },
+  {
+    "row": 1,
+    "label": "adsorbate, WSe2",
+    "host": "WSe2",
+    "dopant": "Sr",
+    "defecttype": "adsorbate",
+    "natoms": 49,
+    "defect_idx": 32,
+    "target_ef": 1.1215994358062744,
+    "predicted_ef": 1.0652013800927365,
+    "incoming_attn_to_defect": 0.5455663800239563,
+    "incoming_attn_to_random_other": 0.01112220250070095,
+    "delta_at_defect": -10.699899914381003,
+    "fraction_attribution_at_defect": 0.9818994697635971
+  },
+  {
+    "row": 2,
+    "label": "adsorbate, HfS2",
+    "host": "HfS2",
+    "dopant": "Ir",
+    "defecttype": "adsorbate",
+    "natoms": 28,
+    "defect_idx": 9,
+    "target_ef": 5.66022253036499,
+    "predicted_ef": 5.981742406452544,
+    "incoming_attn_to_defect": 0.5047062635421753,
+    "incoming_attn_to_random_other": 0.0076816813088953495,
+    "delta_at_defect": -3.5114502255267803,
+    "fraction_attribution_at_defect": 0.9227542781021939
+  }
+]
