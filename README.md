@@ -53,6 +53,27 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 50 epoch，用同一基线配置（h128, 0.75 M）。结果详见
 [results/loho_summary.json](results/loho_summary.json) 与 paper §5.8。
 
+### 跨数据集迁移验证 (IMP2D → JARVIS)
+
+使用 JARVIS-DFT 空位缺陷数据库（NIST，70 个 2D + 381 个 3D 构型）作为
+完全独立的外部测试集，验证模型跨 DFT 代码（VASP vs GPAW）、跨缺陷
+类型（空位 vs 杂质）的泛化能力：
+
+| 实验 | 结果 |
+|---|---|
+| 零迁移 (JARVIS-2D) | MAE 2.30 eV (**4.45×** 退化) |
+| 零迁移 (JARVIS-3D) | MAE 2.63 eV (**5.09×** 退化) |
+| 少样本微调 (k=30) | **19.4%** 优于随机初始化 |
+| UQ σ̄ 升高 | 0.46 → 0.86 eV (**1.86×**，模型"知道自己不知道") |
+| 注意力保持率 | 24.1× vs 35.3× (**68%** 保持) |
+| Occlusion 归因保持 | 85.6% vs 89.0% (**96%** 保持) |
+
+脚本：[scripts/prepare_jarvis.py](scripts/prepare_jarvis.py) /
+[scripts/cross_dataset_eval.py](scripts/cross_dataset_eval.py) /
+[scripts/cross_dataset_finetune.py](scripts/cross_dataset_finetune.py) /
+[scripts/cross_dataset_uq.py](scripts/cross_dataset_uq.py) /
+[scripts/cross_dataset_interp.py](scripts/cross_dataset_interp.py)。
+
 ### 物理可解释性
 
 - **自注意力**：每个原子对缺陷的入向注意力是对随机非缺陷原子的 **32 倍**——
@@ -92,6 +113,11 @@ scripts/
 ├── occlusion_attribution.py  # ⭐ per-atom 占位归因
 ├── interp_panel.py           # ⭐ 3-sample 解释性一致性 panel
 ├── loho_summary.py           # ⭐ LOHO 后处理表格 + 图
+├── prepare_jarvis.py         # ⭐ JARVIS-DFT 空位数据 → pkl
+├── cross_dataset_eval.py     # ⭐ 跨数据集零迁移评估
+├── cross_dataset_finetune.py # ⭐ 跨数据集微调迁移学习
+├── cross_dataset_uq.py       # ⭐ 跨数据集 UQ 分析
+├── cross_dataset_interp.py   # ⭐ 跨数据集可解释性
 ├── inspect_attention.py      # DAST 模型的注意力 (legacy)
 ├── make_figures.py           # 老旧的 parity/curves/error_dist
 ├── eval_existing.py          # 从断点 best.pt 补算 metrics
@@ -116,11 +142,15 @@ results/
 ├── occlusion_stats.json                 # ⭐ 100-sample 归因聚合
 ├── interp_panel_meta.json               # ⭐ 3-sample 元数据
 ├── error_decomposition.json             # ⭐ 6 维误差分解
-├── loho_summary.json                    # ⭐ LOHO 后处理 (待填)
+├── loho_summary.json                    # ⭐ LOHO 后处理
+├── cross_dataset_eval.json              # ⭐ 跨数据集零迁移结果
+├── cross_dataset_finetune.json          # ⭐ 跨数据集微调结果
+├── cross_dataset_uq.json               # ⭐ 跨数据集 UQ 分析
+├── cross_dataset_interp.json            # ⭐ 跨数据集可解释性
 ├── summary.md                           # 自动生成的统一指标表
 └── PROGRESS.md                          # 项目时间线与决策记录
 paper/
-├── main.md                              # 论文初稿 v1.2 (~610 行)
+├── main.md                              # 论文 v1.3 (~1200 行)
 ├── main.pdf                             # 中文 PDF
 └── figures/
     ├── fig_parity / fig_curves / fig_error_dist (legacy)
@@ -128,7 +158,11 @@ paper/
     ├── fig_occlusion_localisation / fig_interp_panel       (interp)
     ├── fig_uq_reliability / fig_uq_calibration             (UQ)
     ├── fig_error_by_category                               (decomposition)
-    └── fig_loho_bars                                       (待填)
+    ├── fig_loho_bars                                       (LOHO)
+    ├── fig_cross_dataset_parity / _bars / _error_vs_ef     (跨数据集)
+    ├── fig_cross_dataset_fewshot / _efficiency / _learning  (迁移学习)
+    ├── fig_cross_dataset_uq_*                              (跨数据集 UQ)
+    └── fig_cross_dataset_interp                            (跨数据集可解释性)
 ```
 
 ## 复现
