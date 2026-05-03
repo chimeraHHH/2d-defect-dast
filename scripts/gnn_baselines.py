@@ -35,32 +35,31 @@ from src.dataset import CrystalGraphDataset, split_indices  # noqa: E402
 # ── monkey-patch radius_graph (avoids torch-cluster ABI issue) ─────────
 def _radius_graph_pure(x, r, batch=None, loop=False, max_num_neighbors=32,
                        flow="source_to_target", num_workers=None):
-    """Pure-torch O(N^2) radius graph; fine for our small graphs (< 60 atoms)."""
+    """Vectorized batched radius graph — no torch-cluster needed.
+
+    Computes full pairwise distances within each graph (small graphs ~30 atoms),
+    masks across-graph pairs and beyond-cutoff, then returns edge_index."""
     if batch is None:
         batch = torch.zeros(x.size(0), dtype=torch.long, device=x.device)
-    rows, cols = [], []
-    for b_id in batch.unique():
-        mask = batch == b_id
-        idx = mask.nonzero(as_tuple=False).squeeze(1)
-        pos_b = x[idx]
-        d = torch.cdist(pos_b, pos_b)
-        if not loop:
-            d.fill_diagonal_(float("inf"))
-        # for each row, take indices where d <= r (capped)
-        mm = d <= r
-        # cap neighbors per atom
-        for i in range(pos_b.size(0)):
-            j = mm[i].nonzero(as_tuple=False).squeeze(1)
-            if j.numel() > max_num_neighbors:
-                # keep nearest
-                _, top = torch.topk(d[i], max_num_neighbors, largest=False)
-                j = top
-            rows.append(idx[i].repeat(j.numel()))
-            cols.append(idx[j])
-    if not rows:
-        return torch.empty((2, 0), dtype=torch.long, device=x.device)
-    rows = torch.cat(rows)
-    cols = torch.cat(cols)
+    N = x.size(0)
+    # full pairwise
+    d2 = torch.cdist(x, x)                               # (N, N)
+    # mask: same graph & within cutoff
+    same = batch.unsqueeze(0) == batch.unsqueeze(1)      # (N, N) bool
+    if not loop:
+        eye = torch.eye(N, dtype=torch.bool, device=x.device)
+        same = same & ~eye
+    valid = same & (d2 <= r)
+    # cap neighbors via topk per row (only for rows that exceed)
+    if max_num_neighbors > 0:
+        # rank per row; mark beyond-topk as invalid
+        d_for_sort = torch.where(valid, d2, torch.full_like(d2, float("inf")))
+        _, topk = torch.topk(d_for_sort, k=min(max_num_neighbors, N),
+                              dim=1, largest=False)
+        keep = torch.zeros_like(valid)
+        keep.scatter_(1, topk, True)
+        valid = valid & keep
+    rows, cols = valid.nonzero(as_tuple=True)
     return torch.stack([rows, cols], dim=0)
 
 
@@ -146,6 +145,7 @@ def train_one(model, train_loader, val_loader, device, name, epochs):
     best_state = None
     history = []
     for ep in range(epochs):
+        ep_start = time.time()
         model.train()
         for z, pos, b, y in train_loader:
             z, pos, b, y = z.to(device), pos.to(device), b.to(device), y.to(device)
@@ -158,6 +158,8 @@ def train_one(model, train_loader, val_loader, device, name, epochs):
         sched.step()
         val_mae = evaluate(model, val_loader, device, name)
         history.append({"epoch": ep, "val_mae": val_mae})
+        if ep < 3 or ep % 5 == 0 or ep == epochs - 1:
+            print(f"    ep {ep:2d}  val_mae={val_mae:.4f}  ({time.time()-ep_start:.0f}s)", flush=True)
         if val_mae < best_val - 1e-4:
             best_val = val_mae
             best_state = {k: v.detach().cpu().clone()

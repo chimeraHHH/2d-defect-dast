@@ -1,0 +1,51 @@
+{
+  "results": [
+    {
+      "model": "SchNet",
+      "n_params": 455809,
+      "n_params_M": 0.456,
+      "test_mae": 0.5849371950391312,
+      "wall_sec": 90.76756429672241,
+      "epochs_run": 50,
+      "best_val_mae": 0.5850530078536585
+    },
+    {
+      "model": "DimeNet++",
+      "n_params": 1885830,
+      "n_params_M": 1.886,
+      "error": "ImportError: 'SparseTensor' requires 'torch-sparse'"
+    },
+    {
+      "model": "ViSNet",
+      "n_params": 1687398,
+      "n_params_M": 1.687,
+      "test_mae": 1.421996533031195,
+      "wall_sec": 72.5037100315094,
+      "epochs_run": 14,
+      "best_val_mae": 1.381271403086813
+    },
+    {
+      "model": "CrystalTransformer (ours)",
+      "n_params": 747000,
+      "n_params_M": 0.747,
+      "test_mae": 0.516,
+      "wall_sec": 720,
+      "note": "leak-free aug long"
+    },
+    {
+      "model": "ALIGNN (ref)",
+      "n_params": 4030000,
+      "n_params_M": 4.03,
+      "test_mae": 0.54,
+      "wall_sec": null,
+      "note": "team prior reproduction"
+    }
+  ],
+  "config": {
+    "epochs": 50,
+    "batch_size": 32,
+    "lr": 0.0005,
+    "seed": 42
+  },
+  "wall_time_min": 2.9138195196787517
+}
