@@ -69,3 +69,12 @@ Cross-dataset (zero-shot),zero-shot_jarvis_3d_single,baseline h128,jarvis_3d_sin
 "Cross-dataset (few-shot v2, 3 seeds)",fewshot_k30_scratch,random init,jarvis_2d,0.747,60,3-seed,1.6773,±0.1149
 "Cross-dataset (3D full v2, 3 seeds)",3d_full_ft,baseline h128 (IMP2D pretrained),jarvis_3d,0.747,80,3-seed,1.3159,±0.0451
 "Cross-dataset (3D full v2, 3 seeds)",3d_full_scratch,random init,jarvis_3d,0.747,80,3-seed,1.3255,±0.0311
+Active learning,active_uq_guided,baseline h128 (MC-Dropout),leak_free_v1,0.747,20×15,42,0.5049,AULC=374.3
+Active learning,random_baseline,baseline h128,leak_free_v1,0.747,20×15,3-seed,0.4998,AULC=377.3
+MAML OOD,best_MoS2,naive FT,loho_MoS2,0.747,—,42,0.2002,Δ=5.9%
+MAML OOD,best_Cr2I6,naive FT,loho_Cr2I6,0.747,—,42,0.2543,Δ=4.0%
+MAML OOD,best_C2H2,FOMAML,loho_C2H2,0.747,—,42,0.2764,Δ=7.4%
+MAML OOD,best_TaSe2,FOMAML,loho_TaSe2,0.747,—,42,0.2399,Δ=1.4%
+MAML OOD,best_MoSSe,FOMAML,loho_MoSSe,0.747,—,42,0.218,Δ=-1.0%
+Architecture ablation,local_only,CrystalTransformer (no global),leak_free_v1,0.341,50,42,0.7092,—
+Architecture ablation,rotation_invariance_test,baseline h128,leak_free_v1,0.747,—,42,mean_Δ=0.0476,max_Δ=0.2243

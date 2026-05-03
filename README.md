@@ -98,6 +98,18 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 
 脚本：[scripts/equivariant_baselines.py](scripts/equivariant_baselines.py)
 
+### 主动学习闭环
+
+MC-Dropout σ 引导的迭代选样 vs 随机选样（15 轮 × 50 样本）：
+
+| 指标 | Active (UQ) | Random (3-seed) |
+|---|---|---|
+| AULC | **374.3** | 377.3 |
+| 最优 MAE | **0.491 eV** | 0.498 eV |
+| AULC 降幅 | **0.8%** | — |
+
+脚本：[scripts/active_learning_loop.py](scripts/active_learning_loop.py)
+
 ### 物理可解释性
 
 - **自注意力**：每个原子对缺陷的入向注意力是对随机非缺陷原子的 **32 倍**——

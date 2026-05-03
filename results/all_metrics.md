@@ -124,3 +124,27 @@
 |---|---|---|---|---|---|---|---|
 | 3d_full_ft | baseline h128 (IMP2D pretrained) | jarvis_3d | 0.747 | 80 | 3-seed | 1.3159 | ±0.0451 |
 | 3d_full_scratch | random init | jarvis_3d | 0.747 | 80 | 3-seed | 1.3255 | ±0.0311 |
+
+## Active learning
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| random_baseline | baseline h128 | leak_free_v1 | 0.747 | 20×15 | 3-seed | 0.4998 | AULC=377.3 |
+| active_uq_guided | baseline h128 (MC-Dropout) | leak_free_v1 | 0.747 | 20×15 | 42 | 0.5049 | AULC=374.3 |
+
+## MAML OOD
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| best_MoS2 | naive FT | loho_MoS2 | 0.747 | — | 42 | 0.2002 | Δ=5.9% |
+| best_MoSSe | FOMAML | loho_MoSSe | 0.747 | — | 42 | 0.218 | Δ=-1.0% |
+| best_TaSe2 | FOMAML | loho_TaSe2 | 0.747 | — | 42 | 0.2399 | Δ=1.4% |
+| best_Cr2I6 | naive FT | loho_Cr2I6 | 0.747 | — | 42 | 0.2543 | Δ=4.0% |
+| best_C2H2 | FOMAML | loho_C2H2 | 0.747 | — | 42 | 0.2764 | Δ=7.4% |
+
+## Architecture ablation
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| local_only | CrystalTransformer (no global) | leak_free_v1 | 0.341 | 50 | 42 | 0.7092 | — |
+| rotation_invariance_test | baseline h128 | leak_free_v1 | 0.747 | — | 42 | mean_Δ=0.0476 | max_Δ=0.2243 |

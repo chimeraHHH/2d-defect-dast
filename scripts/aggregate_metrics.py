@@ -250,6 +250,95 @@ def main():
                 "test_rmse": f"±{j3d['sc_MAE_std']:.4f}",
             })
 
+    # ---- Active learning loop ----
+    al = _read_json(RESULTS / "active_learning_loop.json")
+    if al:
+        rows.append({
+            "category": "Active learning",
+            "run": "active_uq_guided",
+            "model": "baseline h128 (MC-Dropout)",
+            "data": "leak_free_v1",
+            "params_M": 0.747,
+            "epochs": f"{al['config']['epochs_per_round']}×{al['config']['n_rounds']}",
+            "seed": al["config"]["global_seed"],
+            "test_mae": round(al["active"]["test_mae"][-1], 4),
+            "test_rmse": f"AULC={al['active']['aulc']:.1f}",
+        })
+        rows.append({
+            "category": "Active learning",
+            "run": "random_baseline",
+            "model": "baseline h128",
+            "data": "leak_free_v1",
+            "params_M": 0.747,
+            "epochs": f"{al['config']['epochs_per_round']}×{al['config']['n_rounds']}",
+            "seed": f"{al['config']['n_random_seeds']}-seed",
+            "test_mae": round(al["random"]["test_mae_mean"][-1], 4),
+            "test_rmse": f"AULC={al['random']['aulc']:.1f}",
+        })
+
+    # ---- MAML OOD ----
+    maml = _read_json(RESULTS / "maml_ood.json")
+    if maml:
+        from collections import defaultdict as _dd
+        host_best = _dd(lambda: {"zero": 99, "naive": 99, "fomaml": 99})
+        for key, entry in maml.items():
+            if not isinstance(entry, dict) or "host" not in entry:
+                continue
+            h = entry["host"]
+            zs = entry.get("zero_shot_mae", 99)
+            nf = entry.get("naive_ft_mae_mean", 99)
+            fm = entry.get("maml_mae_mean", 99)
+            if zs < host_best[h]["zero"]:
+                host_best[h]["zero"] = zs
+            if nf < host_best[h]["naive"]:
+                host_best[h]["naive"] = nf
+            if fm < host_best[h]["fomaml"]:
+                host_best[h]["fomaml"] = fm
+        for h, bests in host_best.items():
+            best_mae = min(bests["naive"], bests["fomaml"])
+            improvement = (bests["zero"] - best_mae) / bests["zero"] * 100
+            rows.append({
+                "category": "MAML OOD",
+                "run": f"best_{h}",
+                "model": "FOMAML" if bests["fomaml"] <= bests["naive"] else "naive FT",
+                "data": f"loho_{h}",
+                "params_M": 0.747,
+                "epochs": "—",
+                "seed": 42,
+                "test_mae": round(best_mae, 4),
+                "test_rmse": f"Δ={improvement:.1f}%",
+            })
+
+    # ---- Equivariant baselines ----
+    eq = _read_json(RESULTS / "equivariant_baselines.json")
+    if eq:
+        lo = eq.get("local_only", {})
+        if lo:
+            rows.append({
+                "category": "Architecture ablation",
+                "run": "local_only",
+                "model": "CrystalTransformer (no global)",
+                "data": "leak_free_v1",
+                "params_M": round(lo.get("n_params", 0) / 1e6, 3),
+                "epochs": lo.get("epochs", 50),
+                "seed": 42,
+                "test_mae": round(lo.get("test_mae", 0), 4),
+                "test_rmse": "—",
+            })
+        inv = eq.get("invariance_analysis", {})
+        if inv:
+            rows.append({
+                "category": "Architecture ablation",
+                "run": "rotation_invariance_test",
+                "model": "baseline h128",
+                "data": "leak_free_v1",
+                "params_M": 0.747,
+                "epochs": "—",
+                "seed": 42,
+                "test_mae": f"mean_Δ={inv.get('mean_delta_pred_eV', 0):.4f}",
+                "test_rmse": f"max_Δ={inv.get('max_delta_pred_eV', 0):.4f}",
+            })
+
     # ---- write CSV ----
     csv_path = RESULTS / "all_metrics.csv"
     with open(csv_path, "w") as f:
