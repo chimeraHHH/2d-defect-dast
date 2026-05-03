@@ -151,6 +151,12 @@
 |---|---|---|---|---|---|---|---|
 | log_MAE = a + alpha*log(N) + beta*log(P) | CrystalTransformer (multi-config) | leak_free_v1 | 0.12-1.65 | 30 | 42 | alpha=-0.401 | beta=-0.010, R²=0.953 |
 
+## HTS workflow
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| top15_uq_guided | 4-seed ensemble + τ scaling | leak_free_v1 | 4×0.747 | — | ensemble | 0.2504 | hit=100% vs rand 60% |
+
 ## Cross-task (dft_2d pristine)
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |

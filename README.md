@@ -135,6 +135,21 @@ JARVIS dft_2d 1.1k 本征 2D 材料 (eV/atom, 不同任务定义) 上的 few-sho
 
 脚本：[scripts/dft2d_transfer.py](scripts/dft2d_transfer.py)
 
+### 高通量筛选 (HTS) 工作流
+
+把 4-seed ensemble + 温度缩放 + 多重物理筛选组合成可部署 HTS 流程：
+
+| 指标 | UQ 引导 top-15 | 随机基线 |
+|---|---|---|
+| 真实低能量 (Ef ≤ 1 eV) 命中率 | **100%** | 60% |
+| Recommendation MAE | 0.250 eV | — |
+| 落入 2σ 置信 | 86.7% | — |
+| 单条最佳预测误差 | **4 meV** (TaS₂:K) | — |
+
+**+67% 命中率提升** —— 把 UQ 从指标转化为 DFT 预算节省工具。
+
+脚本：[scripts/hts_demo.py](scripts/hts_demo.py)
+
 ### 主动学习闭环
 
 MC-Dropout σ 引导的迭代选样 vs 随机选样（15 轮 × 50 样本）：

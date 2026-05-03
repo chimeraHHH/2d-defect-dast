@@ -1,0 +1,186 @@
+{
+  "thresholds": {
+    "ef_max_eV": 1.0,
+    "sigma_max_eV": 0.5,
+    "per_host_top": 3
+  },
+  "tau_calibration": 2.5953441155091057,
+  "pool_size": 1065,
+  "after_ef_sigma_filter": 155,
+  "after_diversification": 98,
+  "recommendations": [
+    {
+      "test_idx": 264,
+      "host": "TiS2",
+      "dopant": "Sr",
+      "site": "int2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -3.5670862197875977,
+      "sigma_cal": 0.3892245888710022,
+      "ef_true": -3.2756094932556152
+    },
+    {
+      "test_idx": 685,
+      "host": "V2CO2",
+      "dopant": "Rb",
+      "site": "ads0",
+      "defecttype": "adsorbate",
+      "natoms": 81,
+      "mu_pred": -2.7890491485595703,
+      "sigma_cal": 0.16639573872089386,
+      "ef_true": -2.2915964126586914
+    },
+    {
+      "test_idx": 582,
+      "host": "Ge2",
+      "dopant": "F",
+      "site": "ads1",
+      "defecttype": "adsorbate",
+      "natoms": 19,
+      "mu_pred": -2.6193411350250244,
+      "sigma_cal": 0.34083861112594604,
+      "ef_true": -3.897026300430298
+    },
+    {
+      "test_idx": 615,
+      "host": "Mo2CO2",
+      "dopant": "K",
+      "site": "ads0",
+      "defecttype": "adsorbate",
+      "natoms": 81,
+      "mu_pred": -2.345491886138916,
+      "sigma_cal": 0.20668691396713257,
+      "ef_true": -2.4133989810943604
+    },
+    {
+      "test_idx": 546,
+      "host": "Nb4C3",
+      "dopant": "As",
+      "site": "ads2",
+      "defecttype": "adsorbate",
+      "natoms": 113,
+      "mu_pred": -2.1160335540771484,
+      "sigma_cal": 0.4788828194141388,
+      "ef_true": -1.829864501953125
+    },
+    {
+      "test_idx": 579,
+      "host": "ZrS2",
+      "dopant": "Cs",
+      "site": "ads1",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.8798463344573975,
+      "sigma_cal": 0.2836642563343048,
+      "ef_true": -2.0647964477539062
+    },
+    {
+      "test_idx": 356,
+      "host": "TaS2",
+      "dopant": "K",
+      "site": "ads2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.8254019021987915,
+      "sigma_cal": 0.13109096884727478,
+      "ef_true": -1.8295766115188599
+    },
+    {
+      "test_idx": 141,
+      "host": "HfSe2",
+      "dopant": "Sr",
+      "site": "int2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.7054580450057983,
+      "sigma_cal": 0.16931460797786713,
+      "ef_true": -1.5566952228546143
+    },
+    {
+      "test_idx": 633,
+      "host": "HfS2",
+      "dopant": "Sr",
+      "site": "ads2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.7051324844360352,
+      "sigma_cal": 0.283784955739975,
+      "ef_true": -1.6831532716751099
+    },
+    {
+      "test_idx": 498,
+      "host": "TaSe2",
+      "dopant": "Sr",
+      "site": "ads2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.6978613138198853,
+      "sigma_cal": 0.20660986006259918,
+      "ef_true": -1.3634543418884277
+    },
+    {
+      "test_idx": 176,
+      "host": "Ge2",
+      "dopant": "Cl",
+      "site": "ads0",
+      "defecttype": "adsorbate",
+      "natoms": 19,
+      "mu_pred": -1.6735446453094482,
+      "sigma_cal": 0.33377137780189514,
+      "ef_true": -1.652144432067871
+    },
+    {
+      "test_idx": 903,
+      "host": "SnSe2",
+      "dopant": "Rb",
+      "site": "ads1",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.5957473516464233,
+      "sigma_cal": 0.29745423793792725,
+      "ef_true": -1.4642488956451416
+    },
+    {
+      "test_idx": 56,
+      "host": "ZrS2",
+      "dopant": "Cs",
+      "site": "ads0",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.5734084844589233,
+      "sigma_cal": 0.29738476872444153,
+      "ef_true": -1.7995882034301758
+    },
+    {
+      "test_idx": 414,
+      "host": "HfS2",
+      "dopant": "Ba",
+      "site": "ads1",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.553604245185852,
+      "sigma_cal": 0.3100508153438568,
+      "ef_true": -1.7082369327545166
+    },
+    {
+      "test_idx": 188,
+      "host": "HfS2",
+      "dopant": "K",
+      "site": "int2",
+      "defecttype": "adsorbate",
+      "natoms": 28,
+      "mu_pred": -1.4956979751586914,
+      "sigma_cal": 0.08945050835609436,
+      "ef_true": -1.6027575731277466
+    }
+  ],
+  "verification": {
+    "n_recommendations": 15,
+    "rec_mae_eV": 0.25038235187530516,
+    "max_err_eV": 1.2776851654052734,
+    "frac_within_2sigma": 0.8666666666666667,
+    "frac_actually_low_ef": 1.0,
+    "random_baseline_low_ef": 0.6
+  }
+}

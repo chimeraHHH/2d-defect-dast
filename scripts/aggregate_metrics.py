@@ -300,6 +300,25 @@ def main():
             "test_rmse": f"beta={fit['beta_params']:.3f}, R²={fit['r2']:.3f}",
         })
 
+    # ---- HTS demo (C16) ----
+    hts = _read_json(RESULTS / "hts_demo.json")
+    if hts:
+        v = hts["verification"]
+        rows.append({
+            "category": "HTS workflow",
+            "run": "top15_uq_guided",
+            "model": "4-seed ensemble + τ scaling",
+            "data": "leak_free_v1",
+            "params_M": "4×0.747",
+            "epochs": "—",
+            "seed": "ensemble",
+            "test_mae": round(v["rec_mae_eV"], 4),
+            "test_rmse": (
+                f"hit={v['frac_actually_low_ef']*100:.0f}% "
+                f"vs rand {v['random_baseline_low_ef']*100:.0f}%"
+            ),
+        })
+
     # ---- dft_2d cross-task transfer (C14) ----
     dt = _read_json(RESULTS / "dft2d_transfer.json")
     if dt:
