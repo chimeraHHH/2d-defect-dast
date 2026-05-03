@@ -125,6 +125,32 @@
 | 3d_full_ft | baseline h128 (IMP2D pretrained) | jarvis_3d | 0.747 | 80 | 3-seed | 1.3159 | ±0.0451 |
 | 3d_full_scratch | random init | jarvis_3d | 0.747 | 80 | 3-seed | 1.3255 | ±0.0311 |
 
+## Classical baseline
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| crystaltransformer_(deep)_—_reference | CrystalTransformer (deep) — reference | leak_free_v1 | — | — | 42 | 0.516 | 0.95 |
+| lightgbm_(n=500) | LightGBM (n=500) | leak_free_v1 | — | — | 42 | 1.1576 | 2.0993 |
+| random_forest_(n=200) | Random Forest (n=200) | leak_free_v1 | — | — | 42 | 1.2349 | 2.2308 |
+| ridge_(alpha=1.0) | Ridge (alpha=1.0) | leak_free_v1 | — | — | 42 | 1.9157 | 2.7776 |
+| linear_regression | Linear regression | leak_free_v1 | — | — | 42 | 1.9169 | 2.7778 |
+| mean-predictor | mean-predictor | leak_free_v1 | — | — | 42 | 2.3021 | 3.2763 |
+
+## GNN baseline (PyG)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| crystaltransformer_(ours) | CrystalTransformer (ours) | leak_free_v1 | 0.747 | — | 42 | 0.516 | — |
+| alignn_(ref) | ALIGNN (ref) | leak_free_v1 | 4.03 | — | 42 | 0.54 | — |
+| schnet | SchNet | leak_free_v1 | 0.456 | 50 | 42 | 0.5849 | — |
+| visnet | ViSNet | leak_free_v1 | 1.687 | 68 | 42 | 0.8625 | — |
+
+## Scaling law fit
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| log_MAE = a + alpha*log(N) + beta*log(P) | CrystalTransformer (multi-config) | leak_free_v1 | 0.12-1.65 | 30 | 42 | alpha=-0.401 | beta=-0.010, R²=0.953 |
+
 ## Active learning
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |

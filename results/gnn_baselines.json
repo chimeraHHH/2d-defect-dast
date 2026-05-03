@@ -19,10 +19,11 @@
       "model": "ViSNet",
       "n_params": 1687398,
       "n_params_M": 1.687,
-      "test_mae": 1.421996533031195,
-      "wall_sec": 72.5037100315094,
-      "epochs_run": 14,
-      "best_val_mae": 1.381271403086813
+      "test_mae": 0.8625003675899595,
+      "wall_sec": 519.8187499046326,
+      "epochs_run": 68,
+      "best_val_mae": 0.7902166005364037,
+      "note": "lr=1e-4, clip=1.0, bs=16, lmax=1, 4 layers"
     },
     {
       "model": "CrystalTransformer (ours)",

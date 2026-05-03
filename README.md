@@ -98,6 +98,26 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 
 脚本：[scripts/equivariant_baselines.py](scripts/equivariant_baselines.py)
 
+### SOTA 对照与缩放律
+
+**SOTA GNN baselines（同一 leak-free 划分）**：
+
+| 模型 | 参数 (M) | 类型 | Test MAE (eV) |
+|---|---|---|---|
+| LightGBM | n=500 | 经典 | 1.158 |
+| SchNet | 0.46 | 局部 | 0.585 |
+| ViSNet (lmax=1) | 1.16 | E(3) 等变 | 0.86 |
+| **CrystalTransformer (ours)** | 0.75 | 局部+全局 | **0.516** |
+| ALIGNN (引用) | 4.03 | 线图 | 0.540 |
+
+**经验缩放律**：log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
+R² = 0.95。**数据是瓶颈，模型容量超过 ~0.5–0.8M 反而过拟合。**
+
+脚本：
+[scripts/classical_baselines.py](scripts/classical_baselines.py) /
+[scripts/gnn_baselines.py](scripts/gnn_baselines.py) /
+[scripts/scaling_law.py](scripts/scaling_law.py)
+
 ### 主动学习闭环
 
 MC-Dropout σ 引导的迭代选样 vs 随机选样（15 轮 × 50 样本）：

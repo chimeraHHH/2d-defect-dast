@@ -250,6 +250,56 @@ def main():
                 "test_rmse": f"±{j3d['sc_MAE_std']:.4f}",
             })
 
+    # ---- Classical baselines (C13) ----
+    cb = _read_json(RESULTS / "classical_baselines.json")
+    if cb:
+        for r in cb["results"]:
+            rows.append({
+                "category": "Classical baseline",
+                "run": r["model"].lower().replace(" ", "_"),
+                "model": r["model"],
+                "data": "leak_free_v1",
+                "params_M": "—",
+                "epochs": "—",
+                "seed": 42,
+                "test_mae": round(r["test_mae"], 4),
+                "test_rmse": round(r.get("test_rmse", 0), 4),
+            })
+
+    # ---- GNN baselines (C12) ----
+    gn = _read_json(RESULTS / "gnn_baselines.json")
+    if gn:
+        for r in gn["results"]:
+            if "test_mae" not in r:
+                continue
+            rows.append({
+                "category": "GNN baseline (PyG)",
+                "run": r["model"].lower().replace("+", "p").replace(" ", "_"),
+                "model": r["model"],
+                "data": "leak_free_v1",
+                "params_M": r.get("n_params_M", "—"),
+                "epochs": r.get("epochs_run", "—"),
+                "seed": 42,
+                "test_mae": round(r["test_mae"], 4),
+                "test_rmse": "—",
+            })
+
+    # ---- Scaling laws (C15) ----
+    sl = _read_json(RESULTS / "scaling_law.json")
+    if sl and "scaling_fit" in sl:
+        fit = sl["scaling_fit"]
+        rows.append({
+            "category": "Scaling law fit",
+            "run": "log_MAE = a + alpha*log(N) + beta*log(P)",
+            "model": "CrystalTransformer (multi-config)",
+            "data": "leak_free_v1",
+            "params_M": "0.12-1.65",
+            "epochs": 30,
+            "seed": 42,
+            "test_mae": f"alpha={fit['alpha_data']:.3f}",
+            "test_rmse": f"beta={fit['beta_params']:.3f}, R²={fit['r2']:.3f}",
+        })
+
     # ---- Active learning loop ----
     al = _read_json(RESULTS / "active_learning_loop.json")
     if al:

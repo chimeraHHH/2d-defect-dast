@@ -69,6 +69,17 @@ Cross-dataset (zero-shot),zero-shot_jarvis_3d_single,baseline h128,jarvis_3d_sin
 "Cross-dataset (few-shot v2, 3 seeds)",fewshot_k30_scratch,random init,jarvis_2d,0.747,60,3-seed,1.6773,±0.1149
 "Cross-dataset (3D full v2, 3 seeds)",3d_full_ft,baseline h128 (IMP2D pretrained),jarvis_3d,0.747,80,3-seed,1.3159,±0.0451
 "Cross-dataset (3D full v2, 3 seeds)",3d_full_scratch,random init,jarvis_3d,0.747,80,3-seed,1.3255,±0.0311
+Classical baseline,mean-predictor,mean-predictor,leak_free_v1,—,—,42,2.3021,3.2763
+Classical baseline,linear_regression,Linear regression,leak_free_v1,—,—,42,1.9169,2.7778
+Classical baseline,ridge_(alpha=1.0),Ridge (alpha=1.0),leak_free_v1,—,—,42,1.9157,2.7776
+Classical baseline,random_forest_(n=200),Random Forest (n=200),leak_free_v1,—,—,42,1.2349,2.2308
+Classical baseline,lightgbm_(n=500),LightGBM (n=500),leak_free_v1,—,—,42,1.1576,2.0993
+Classical baseline,crystaltransformer_(deep)_—_reference,CrystalTransformer (deep) — reference,leak_free_v1,—,—,42,0.516,0.95
+GNN baseline (PyG),schnet,SchNet,leak_free_v1,0.456,50,42,0.5849,—
+GNN baseline (PyG),visnet,ViSNet,leak_free_v1,1.687,68,42,0.8625,—
+GNN baseline (PyG),crystaltransformer_(ours),CrystalTransformer (ours),leak_free_v1,0.747,—,42,0.516,—
+GNN baseline (PyG),alignn_(ref),ALIGNN (ref),leak_free_v1,4.03,—,42,0.54,—
+Scaling law fit,log_MAE = a + alpha*log(N) + beta*log(P),CrystalTransformer (multi-config),leak_free_v1,0.12-1.65,30,42,alpha=-0.401,"beta=-0.010, R²=0.953"
 Active learning,active_uq_guided,baseline h128 (MC-Dropout),leak_free_v1,0.747,20×15,42,0.5049,AULC=374.3
 Active learning,random_baseline,baseline h128,leak_free_v1,0.747,20×15,3-seed,0.4998,AULC=377.3
 MAML OOD,best_MoS2,naive FT,loho_MoS2,0.747,—,42,0.2002,Δ=5.9%
