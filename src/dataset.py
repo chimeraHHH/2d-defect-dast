@@ -53,7 +53,8 @@ class CrystalGraphDataset(Dataset):
 
         # build defect-mark cache once: which atom index is the dopant?
         for sample in self.data:
-            sample["defect_mask"] = self._compute_defect_mask(sample)
+            if "defect_mask" not in sample:
+                sample["defect_mask"] = self._compute_defect_mask(sample)
 
     # ------------------------------------------------------------------ helpers
     def _compute_defect_mask(self, sample: Dict[str, Any]) -> np.ndarray:
