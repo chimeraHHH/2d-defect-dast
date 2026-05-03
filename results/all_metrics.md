@@ -98,3 +98,29 @@
 | perm-electronegativity | baseline h128 | leak_free_v1 | 0.747 | — | — | 0.9187 | — |
 | perm-valence_electrons | baseline h128 | leak_free_v1 | 0.747 | — | — | 1.1503 | — |
 | perm-group | baseline h128 | leak_free_v1 | 0.747 | — | — | 1.6644 | — |
+
+## Cross-dataset (zero-shot)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| zero-shot_imp2d_test_single | baseline h128 | imp2d_test_single | 0.747 | — | 42 | 0.5164 | 1.1436 |
+| zero-shot_jarvis_2d_single | baseline h128 | jarvis_2d_single | 0.747 | — | 42 | 2.2967 | 2.9406 |
+| zero-shot_jarvis_3d_single | baseline h128 | jarvis_3d_single | 0.747 | — | 42 | 2.6261 | 3.3906 |
+
+## Cross-dataset (few-shot v2, 3 seeds)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| fewshot_k30_ft | baseline h128 (IMP2D pretrained) | jarvis_2d | 0.747 | 60 | 3-seed | 1.5495 | ±0.0053 |
+| fewshot_k10_ft | baseline h128 (IMP2D pretrained) | jarvis_2d | 0.747 | 60 | 3-seed | 1.5856 | ±0.0010 |
+| fewshot_k30_scratch | random init | jarvis_2d | 0.747 | 60 | 3-seed | 1.6773 | ±0.1149 |
+| fewshot_k20_ft | baseline h128 (IMP2D pretrained) | jarvis_2d | 0.747 | 60 | 3-seed | 1.7639 | ±0.0357 |
+| fewshot_k20_scratch | random init | jarvis_2d | 0.747 | 60 | 3-seed | 1.8015 | ±0.0667 |
+| fewshot_k10_scratch | random init | jarvis_2d | 0.747 | 60 | 3-seed | 1.8671 | ±0.1209 |
+
+## Cross-dataset (3D full v2, 3 seeds)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| 3d_full_ft | baseline h128 (IMP2D pretrained) | jarvis_3d | 0.747 | 80 | 3-seed | 1.3159 | ±0.0451 |
+| 3d_full_scratch | random init | jarvis_3d | 0.747 | 80 | 3-seed | 1.3255 | ±0.0311 |

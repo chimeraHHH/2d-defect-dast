@@ -182,6 +182,74 @@ def main():
                 "test_rmse": "—",
             })
 
+    # ---- Cross-dataset transfer ----
+    xd_eval = _read_json(RESULTS / "cross_dataset_eval.json")
+    if xd_eval:
+        for name, vals in xd_eval.items():
+            if isinstance(vals, dict) and "MAE" in vals:
+                rows.append({
+                    "category": "Cross-dataset (zero-shot)",
+                    "run": f"zero-shot_{name}",
+                    "model": "baseline h128",
+                    "data": name,
+                    "params_M": 0.747,
+                    "epochs": "—",
+                    "seed": 42,
+                    "test_mae": round(vals["MAE"], 4),
+                    "test_rmse": round(vals.get("RMSE", 0), 4),
+                })
+
+    xd_ft2 = _read_json(RESULTS / "cross_dataset_finetune_v2.json")
+    if xd_ft2:
+        fs = xd_ft2.get("jarvis_2d_few_shot_v2", {})
+        for k, v in fs.items():
+            rows.append({
+                "category": "Cross-dataset (few-shot v2, 3 seeds)",
+                "run": f"fewshot_{k}_ft",
+                "model": "baseline h128 (IMP2D pretrained)",
+                "data": "jarvis_2d",
+                "params_M": 0.747,
+                "epochs": 60,
+                "seed": "3-seed",
+                "test_mae": round(v["ft_MAE_mean"], 4),
+                "test_rmse": f"±{v['ft_MAE_std']:.4f}",
+            })
+            rows.append({
+                "category": "Cross-dataset (few-shot v2, 3 seeds)",
+                "run": f"fewshot_{k}_scratch",
+                "model": "random init",
+                "data": "jarvis_2d",
+                "params_M": 0.747,
+                "epochs": 60,
+                "seed": "3-seed",
+                "test_mae": round(v["sc_MAE_mean"], 4),
+                "test_rmse": f"±{v['sc_MAE_std']:.4f}",
+            })
+        j3d = xd_ft2.get("jarvis_3d_full_v2")
+        if j3d:
+            rows.append({
+                "category": "Cross-dataset (3D full v2, 3 seeds)",
+                "run": "3d_full_ft",
+                "model": "baseline h128 (IMP2D pretrained)",
+                "data": "jarvis_3d",
+                "params_M": 0.747,
+                "epochs": 80,
+                "seed": "3-seed",
+                "test_mae": round(j3d["ft_MAE_mean"], 4),
+                "test_rmse": f"±{j3d['ft_MAE_std']:.4f}",
+            })
+            rows.append({
+                "category": "Cross-dataset (3D full v2, 3 seeds)",
+                "run": "3d_full_scratch",
+                "model": "random init",
+                "data": "jarvis_3d",
+                "params_M": 0.747,
+                "epochs": 80,
+                "seed": "3-seed",
+                "test_mae": round(j3d["sc_MAE_mean"], 4),
+                "test_rmse": f"±{j3d['sc_MAE_std']:.4f}",
+            })
+
     # ---- write CSV ----
     csv_path = RESULTS / "all_metrics.csv"
     with open(csv_path, "w") as f:

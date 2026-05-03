@@ -58,7 +58,22 @@ for h in MoS2 Cr2I6 C2H2 TaSe2 MoSSe; do
   fi
 done
 
+echo "===== Cross-dataset: prepare JARVIS data ====="
+$PY scripts/prepare_jarvis.py
+
+echo "===== Cross-dataset: zero-shot evaluation ====="
+$PY scripts/cross_dataset_eval.py
+
+echo "===== Cross-dataset: interpretability transfer ====="
+$PY scripts/cross_dataset_interp.py
+
+echo "===== Cross-dataset: UQ behavior ====="
+$PY scripts/cross_dataset_uq.py
+
+echo "===== Cross-dataset: fine-tuning v2 (GPU recommended) ====="
+$PY scripts/cross_dataset_finetune_v2.py
+
 echo "===== Aggregate metrics ====="
 $PY scripts/aggregate_metrics.py
 
-echo "===== All v1.2 analyses done. Outputs in results/*.json + paper/figures/. ====="
+echo "===== All v1.3 analyses done. Outputs in results/*.json + paper/figures/. ====="
