@@ -104,35 +104,34 @@ def download_dft2d() -> list:
             edge_dist = dd.astype(np.float32)
             edge_offset = oo.astype(np.float32)
 
-            # triplets (for angle features) - construct from edges
-            # group by source
+            # triplets: (center, neighbor1, neighbor2) - atom indices, like IMP2D
             triplet_index = []
             angles = []
             from collections import defaultdict
-            inc = defaultdict(list)
+            inc = defaultdict(list)  # center_atom -> list of (neighbor_idx, edge_id)
             for k, (u, v, d, o) in enumerate(zip(ii, jj, dd, oo)):
-                inc[u].append(k)
-            for u, edge_ks in inc.items():
-                if len(edge_ks) < 2:
+                inc[u].append((v, k))
+            for u, neigh_list in inc.items():
+                if len(neigh_list) < 2:
                     continue
-                # take up to 6 random edges to avoid explosion
-                if len(edge_ks) > 6:
-                    edge_ks = list(np.random.default_rng(0).choice(
-                        edge_ks, 6, replace=False))
-                for a in range(len(edge_ks)):
-                    for b in range(a + 1, len(edge_ks)):
-                        ka, kb = edge_ks[a], edge_ks[b]
-                        triplet_index.append([ka, kb])
-                        # angle between (jj[ka], u) and (jj[kb], u) using offsets
-                        v_a = (coords[jj[ka]] + oo[ka] @ cell - coords[u])
-                        v_b = (coords[jj[kb]] + oo[kb] @ cell - coords[u])
+                if len(neigh_list) > 6:
+                    chosen = list(np.random.default_rng(0).choice(
+                        len(neigh_list), 6, replace=False))
+                    neigh_list = [neigh_list[i] for i in chosen]
+                for a in range(len(neigh_list)):
+                    for b in range(a + 1, len(neigh_list)):
+                        v_a_atom, ka = neigh_list[a]
+                        v_b_atom, kb = neigh_list[b]
+                        triplet_index.append([u, v_a_atom, v_b_atom])
+                        v_a = (coords[v_a_atom] + oo[ka] @ cell - coords[u])
+                        v_b = (coords[v_b_atom] + oo[kb] @ cell - coords[u])
                         cos = float(np.dot(v_a, v_b)
                                     / (np.linalg.norm(v_a) * np.linalg.norm(v_b)
                                        + 1e-9))
                         cos = max(-1.0, min(1.0, cos))
                         angles.append(np.arccos(cos))
             if not triplet_index:
-                triplet_index = np.zeros((0, 2), dtype=np.int64)
+                triplet_index = np.zeros((0, 3), dtype=np.int64)
                 angles = np.zeros((0,), dtype=np.float32)
             else:
                 triplet_index = np.asarray(triplet_index, dtype=np.int64)
@@ -284,9 +283,29 @@ def main():
     from src.dataset import get_atom_feature_table
     cls.atom_features = get_atom_feature_table(None)
     cls.defect_mark_neighbors = 0
+    # validate + fix: drop samples with malformed indices
+    valid_data = []
     for s in cls.data:
+        n = len(s["numbers"])
         if "defect_mask" not in s:
-            s["defect_mask"] = np.zeros(len(s["numbers"]), dtype=np.float32)
+            s["defect_mask"] = np.zeros(n, dtype=np.int64)
+        else:
+            s["defect_mask"] = s["defect_mask"].astype(np.int64)
+        # sanity: edge_index must be < n
+        ei = s["edge_index"]
+        if ei.size == 0 or ei.max() >= n:
+            continue
+        # triplet_index references atom indices (must be < n)
+        ti = s["triplet_index"]
+        if ti.size > 0 and ti.max() >= n:
+            continue
+        # check Z values are in [1, 100]
+        if (s["numbers"] < 1).any() or (s["numbers"] > 100).any():
+            continue
+        valid_data.append(s)
+    cls.data = valid_data
+    print(f"After validation: {len(cls.data)}/{len(samples)} samples remain")
+    samples = cls.data
 
     # split
     n = len(samples)

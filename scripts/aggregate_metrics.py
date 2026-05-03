@@ -300,6 +300,33 @@ def main():
             "test_rmse": f"beta={fit['beta_params']:.3f}, R²={fit['r2']:.3f}",
         })
 
+    # ---- dft_2d cross-task transfer (C14) ----
+    dt = _read_json(RESULTS / "dft2d_transfer.json")
+    if dt:
+        rows.append({
+            "category": "Cross-task (dft_2d pristine)",
+            "run": "zero-shot",
+            "model": "baseline h128 (IMP2D pretrained)",
+            "data": "jarvis_dft_2d",
+            "params_M": 0.747,
+            "epochs": 0,
+            "seed": 42,
+            "test_mae": round(dt["k_zero_shot"], 4),
+            "test_rmse": f"mean_pred_baseline={dt['mean_predictor_mae']:.3f}",
+        })
+        for k_str, v in dt.get("few_shot", {}).items():
+            rows.append({
+                "category": "Cross-task (dft_2d pristine)",
+                "run": f"{k_str}_ft_vs_sc",
+                "model": "FT (IMP2D pretrained)",
+                "data": "jarvis_dft_2d",
+                "params_M": 0.747,
+                "epochs": 60,
+                "seed": 42,
+                "test_mae": round(v["ft_mae"], 4),
+                "test_rmse": f"SC={v['scratch_mae']:.4f}, Δ={v['improvement_pct']:.1f}%",
+            })
+
     # ---- Active learning loop ----
     al = _read_json(RESULTS / "active_learning_loop.json")
     if al:

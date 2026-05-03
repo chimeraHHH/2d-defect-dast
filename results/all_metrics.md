@@ -151,6 +151,16 @@
 |---|---|---|---|---|---|---|---|
 | log_MAE = a + alpha*log(N) + beta*log(P) | CrystalTransformer (multi-config) | leak_free_v1 | 0.12-1.65 | 30 | 42 | alpha=-0.401 | beta=-0.010, R²=0.953 |
 
+## Cross-task (dft_2d pristine)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| k=300_ft_vs_sc | FT (IMP2D pretrained) | jarvis_dft_2d | 0.747 | 60 | 42 | 0.2743 | SC=0.2251, Δ=-21.9% |
+| k=100_ft_vs_sc | FT (IMP2D pretrained) | jarvis_dft_2d | 0.747 | 60 | 42 | 0.3231 | SC=0.2837, Δ=-13.9% |
+| k=30_ft_vs_sc | FT (IMP2D pretrained) | jarvis_dft_2d | 0.747 | 60 | 42 | 0.5354 | SC=0.3726, Δ=-43.7% |
+| k=10_ft_vs_sc | FT (IMP2D pretrained) | jarvis_dft_2d | 0.747 | 60 | 42 | 0.74 | SC=0.5739, Δ=-28.9% |
+| zero-shot | baseline h128 (IMP2D pretrained) | jarvis_dft_2d | 0.747 | 0 | 42 | 0.8856 | mean_pred_baseline=0.683 |
+
 ## Active learning
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
