@@ -36,13 +36,11 @@ def load_model(run_dir: str, device="cpu"):
     ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
     cfg = ckpt.get("config", {})
     model_kwargs = cfg.get("model_kwargs", {
-        "node_dim": 9,
+        "atom_fea_len": 9,
         "hidden_dim": 128,
         "n_local_layers": 3,
         "n_global_layers": 2,
         "num_heads": 4,
-        "num_rbf": 64,
-        "cutoff": 5.0,
     })
     model = CrystalTransformer(**model_kwargs)
     model.load_state_dict(ckpt["model"])
