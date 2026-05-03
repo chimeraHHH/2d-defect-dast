@@ -1,0 +1,13 @@
+{
+  "n_samples_used": 80,
+  "model": "loho_C2H2 (trained without any C2H2 sample)",
+  "test_set": "C2H2 hosts (OOD samples; up to 80 sampled)",
+  "incoming_attn_to_defect_mean": 0.9313873127102852,
+  "incoming_attn_to_random_other_mean": 0.0013599185023736027,
+  "ratio_defect_over_other_attn": 684.8846538117109,
+  "occlusion_abs_delta_at_defect_mean": 1.9528112754134217,
+  "occlusion_abs_delta_at_other_mean": 0.005176652344608669,
+  "ratio_defect_over_other_delta": 377.23438728645107,
+  "fraction_attribution_at_defect_atom_mean": 0.789002085962562,
+  "fraction_attribution_at_defect_atom_std": 0.17953735385348796
+}

@@ -1,0 +1,57 @@
+Config: {"model": "baseline", "data_path": "data/processed/augmented_dataset.pkl", "output_dir": "results/baseline_h128_aug_long_seed1", "seed": 1, "batch_size": 64, "epochs": 50, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "mse", "grad_clip": 5.0, "optimizer": {"lr": 0.0003, "weight_decay": 0.0001}, "scheduler": {"factor": 0.5, "patience": 6}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 128, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.1}}
+Device: cuda
+Model: CrystalTransformer | params=0.747M
+Train/Val/Test sizes: 25538/3192/3193
+Target stats: mean=2.6065 std=3.1894
+Epoch 01/50 | train MAE 2.0516 | val MAE 1.7348 RMSE 2.4570 | lr 3.00e-04 | 15.6s *
+Epoch 02/50 | train MAE 1.6020 | val MAE 1.3233 RMSE 1.9073 | lr 3.00e-04 | 14.9s *
+Epoch 03/50 | train MAE 1.2062 | val MAE 1.2617 RMSE 1.8298 | lr 3.00e-04 | 14.8s *
+Epoch 04/50 | train MAE 1.0645 | val MAE 1.0384 RMSE 1.5309 | lr 3.00e-04 | 14.9s *
+Epoch 05/50 | train MAE 0.9691 | val MAE 0.8934 RMSE 1.3382 | lr 3.00e-04 | 14.9s *
+Epoch 06/50 | train MAE 0.8886 | val MAE 1.0125 RMSE 1.4384 | lr 3.00e-04 | 15.0s 
+Epoch 07/50 | train MAE 0.8240 | val MAE 0.7702 RMSE 1.2075 | lr 3.00e-04 | 14.8s *
+Epoch 08/50 | train MAE 0.7993 | val MAE 0.8138 RMSE 1.2218 | lr 3.00e-04 | 14.7s 
+Epoch 09/50 | train MAE 0.7464 | val MAE 0.7460 RMSE 1.1286 | lr 3.00e-04 | 14.8s *
+Epoch 10/50 | train MAE 0.7210 | val MAE 0.7269 RMSE 1.1056 | lr 3.00e-04 | 15.0s *
+Epoch 11/50 | train MAE 0.6931 | val MAE 0.6628 RMSE 1.0195 | lr 3.00e-04 | 14.9s *
+Epoch 12/50 | train MAE 0.6400 | val MAE 0.6391 RMSE 0.9843 | lr 3.00e-04 | 15.0s *
+Epoch 13/50 | train MAE 0.6300 | val MAE 0.6529 RMSE 0.9928 | lr 3.00e-04 | 14.7s 
+Epoch 14/50 | train MAE 0.6013 | val MAE 0.6971 RMSE 1.0208 | lr 3.00e-04 | 14.9s 
+Epoch 15/50 | train MAE 0.5725 | val MAE 0.5595 RMSE 0.8490 | lr 3.00e-04 | 14.8s *
+Epoch 16/50 | train MAE 0.5562 | val MAE 0.6320 RMSE 0.9370 | lr 3.00e-04 | 14.9s 
+Epoch 17/50 | train MAE 0.5515 | val MAE 0.6279 RMSE 0.9087 | lr 3.00e-04 | 14.8s 
+Epoch 18/50 | train MAE 0.5525 | val MAE 0.6212 RMSE 0.9383 | lr 3.00e-04 | 14.9s 
+Epoch 19/50 | train MAE 0.5122 | val MAE 0.5739 RMSE 0.8528 | lr 3.00e-04 | 15.1s 
+Epoch 20/50 | train MAE 0.4693 | val MAE 0.5269 RMSE 0.8497 | lr 3.00e-04 | 14.8s *
+Epoch 21/50 | train MAE 0.5730 | val MAE 0.5771 RMSE 0.8766 | lr 3.00e-04 | 14.7s 
+Epoch 22/50 | train MAE 0.4693 | val MAE 0.4518 RMSE 0.7279 | lr 3.00e-04 | 14.8s *
+Epoch 23/50 | train MAE 0.4386 | val MAE 0.4877 RMSE 0.7527 | lr 3.00e-04 | 14.8s 
+Epoch 24/50 | train MAE 0.4338 | val MAE 0.4539 RMSE 0.7180 | lr 3.00e-04 | 14.8s 
+Epoch 25/50 | train MAE 0.4475 | val MAE 0.5852 RMSE 0.8695 | lr 3.00e-04 | 14.9s 
+Epoch 26/50 | train MAE 0.5554 | val MAE 0.4758 RMSE 0.7777 | lr 3.00e-04 | 14.8s 
+Epoch 27/50 | train MAE 0.4176 | val MAE 0.4369 RMSE 0.6995 | lr 3.00e-04 | 14.8s *
+Epoch 28/50 | train MAE 0.3907 | val MAE 0.4578 RMSE 0.7382 | lr 3.00e-04 | 14.9s 
+Epoch 29/50 | train MAE 0.4437 | val MAE 0.5005 RMSE 0.7781 | lr 3.00e-04 | 14.7s 
+Epoch 30/50 | train MAE 0.4206 | val MAE 0.4814 RMSE 0.7372 | lr 3.00e-04 | 14.8s 
+Epoch 31/50 | train MAE 0.3844 | val MAE 0.4381 RMSE 0.6959 | lr 3.00e-04 | 15.0s 
+Epoch 32/50 | train MAE 0.4443 | val MAE 0.4425 RMSE 0.7062 | lr 3.00e-04 | 14.7s 
+Epoch 33/50 | train MAE 0.3910 | val MAE 0.4436 RMSE 0.6988 | lr 3.00e-04 | 14.9s 
+Epoch 34/50 | train MAE 0.4189 | val MAE 0.4452 RMSE 0.7103 | lr 1.50e-04 | 14.9s 
+Epoch 35/50 | train MAE 0.3003 | val MAE 0.2963 RMSE 0.5383 | lr 1.50e-04 | 14.8s *
+Epoch 36/50 | train MAE 0.2694 | val MAE 0.3261 RMSE 0.5831 | lr 1.50e-04 | 14.9s 
+Epoch 37/50 | train MAE 0.2811 | val MAE 0.3169 RMSE 0.5551 | lr 1.50e-04 | 15.0s 
+Epoch 38/50 | train MAE 0.2686 | val MAE 0.3107 RMSE 0.5565 | lr 1.50e-04 | 14.8s 
+Epoch 39/50 | train MAE 0.2855 | val MAE 0.3437 RMSE 0.5928 | lr 1.50e-04 | 15.0s 
+Epoch 40/50 | train MAE 0.2644 | val MAE 0.2909 RMSE 0.5171 | lr 1.50e-04 | 15.0s *
+Epoch 41/50 | train MAE 0.2565 | val MAE 0.2852 RMSE 0.5160 | lr 1.50e-04 | 14.8s *
+Epoch 42/50 | train MAE 0.2733 | val MAE 0.3785 RMSE 0.6404 | lr 1.50e-04 | 14.7s 
+Epoch 43/50 | train MAE 0.2697 | val MAE 0.3549 RMSE 0.5678 | lr 1.50e-04 | 14.9s 
+Epoch 44/50 | train MAE 0.2658 | val MAE 0.2951 RMSE 0.5143 | lr 1.50e-04 | 15.1s 
+Epoch 45/50 | train MAE 0.2482 | val MAE 0.3787 RMSE 0.5941 | lr 1.50e-04 | 14.8s 
+Epoch 46/50 | train MAE 0.2871 | val MAE 0.2815 RMSE 0.5648 | lr 1.50e-04 | 14.8s *
+Epoch 47/50 | train MAE 0.2602 | val MAE 0.2662 RMSE 0.4922 | lr 1.50e-04 | 14.9s *
+Epoch 48/50 | train MAE 0.2368 | val MAE 0.2598 RMSE 0.4791 | lr 1.50e-04 | 14.8s *
+Epoch 49/50 | train MAE 0.2315 | val MAE 0.2997 RMSE 0.5266 | lr 1.50e-04 | 14.8s 
+Epoch 50/50 | train MAE 0.2370 | val MAE 0.2700 RMSE 0.4857 | lr 1.50e-04 | 15.0s 
+
+[Final] Test MAE 0.2604 | RMSE 0.4970

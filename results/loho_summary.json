@@ -1,0 +1,64 @@
+{
+  "in_distribution_reference": "baseline_h128_aug_long_safe",
+  "hosts": [
+    {
+      "host": "MoS2",
+      "n_test": 308,
+      "loho_mae": 0.5162575399720823,
+      "loho_rmse": 1.0046708891679013,
+      "loho_r2": 0.9484812568326259,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 1.0003192441204483,
+      "degradation_factor_rmse": 0.8879847106645385
+    },
+    {
+      "host": "Cr2I6",
+      "n_test": 334,
+      "loho_mae": 0.8400641801114568,
+      "loho_rmse": 1.3113157152139852,
+      "loho_r2": 0.6549902218153985,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 1.6277386780776106,
+      "degradation_factor_rmse": 1.159014676864548
+    },
+    {
+      "host": "C2H2",
+      "n_test": 231,
+      "loho_mae": 2.3987493473730046,
+      "loho_rmse": 4.309791223995634,
+      "loho_r2": 0.032084644076500246,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 4.647903319975416,
+      "degradation_factor_rmse": 3.809236192992505
+    },
+    {
+      "host": "TaSe2",
+      "n_test": 222,
+      "loho_mae": 0.6363987106460709,
+      "loho_rmse": 1.2436114530614808,
+      "loho_r2": 0.7010641304364268,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 1.2331091129964533,
+      "degradation_factor_rmse": 1.0991738371562916
+    },
+    {
+      "host": "MoSSe",
+      "n_test": 464,
+      "loho_mae": 0.4478672742843628,
+      "loho_rmse": 1.0200195977447786,
+      "loho_r2": 0.8522786504734627,
+      "id_reference_mae": 0.5160927803863382,
+      "id_reference_rmse": 1.1314056166755828,
+      "degradation_factor_mae": 0.8678037967303031,
+      "degradation_factor_rmse": 0.9015507636791741
+    }
+  ],
+  "in_distribution_test_mae": 0.5160927803863382,
+  "in_distribution_test_rmse": 1.1314056166755828,
+  "avg_loho_mae": 0.9678674104773954,
+  "avg_degradation_factor": 1.8753748303800464
+}

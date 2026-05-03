@@ -1,0 +1,26 @@
+model: baseline
+data_path: data/processed/augmented_dataset.pkl
+output_dir: results/baseline_aug_seed0
+seed: 0
+batch_size: 64
+epochs: 30
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+optimizer:
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+scheduler:
+  factor: 0.5
+  patience: 4
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 64
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.0

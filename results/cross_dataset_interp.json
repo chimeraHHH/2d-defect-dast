@@ -1,0 +1,24 @@
+{
+  "IMP2D_test": {
+    "n_samples": 50,
+    "attn_to_defect_mean": 0.5180683381482959,
+    "attn_to_other_mean": 0.014660152699798345,
+    "attn_ratio": 35.33853628655738,
+    "occlusion_defect_mean": 6.466441653921139,
+    "occlusion_other_mean": 0.016745527884420373,
+    "occlusion_ratio": 386.15931958390854,
+    "fraction_at_defect_mean": 0.8902225386891636,
+    "fraction_at_defect_std": 0.16163719072845917
+  },
+  "JARVIS_2D": {
+    "n_samples": 60,
+    "attn_to_defect_mean": 0.4868625704703542,
+    "attn_to_other_mean": 0.020206871504584948,
+    "attn_ratio": 24.093911339015783,
+    "occlusion_defect_mean": 5.996817131469553,
+    "occlusion_other_mean": 0.020331018244222822,
+    "occlusion_ratio": 294.95901579713467,
+    "fraction_at_defect_mean": 0.8561559685464071,
+    "fraction_at_defect_std": 0.16837133996083406
+  }
+}

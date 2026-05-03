@@ -1,0 +1,13 @@
+{
+  "n_samples_used": 80,
+  "model": "loho_MoS2 (trained without any MoS2 sample)",
+  "test_set": "MoS2 hosts (308 OOD samples; 80 sampled)",
+  "incoming_attn_to_defect_mean": 0.6110819984227419,
+  "incoming_attn_to_random_other_mean": 0.011463507779262727,
+  "ratio_defect_over_other_attn": 53.30671991414163,
+  "occlusion_abs_delta_at_defect_mean": 6.13374223058232,
+  "occlusion_abs_delta_at_other_mean": 0.009751306023352044,
+  "ratio_defect_over_other_delta": 629.0175096436801,
+  "fraction_attribution_at_defect_atom_mean": 0.9026061503214058,
+  "fraction_attribution_at_defect_atom_std": 0.15681078941936405
+}

@@ -47,3 +47,29 @@ A8CA35F0B827306D4263B8A0329CFA09.gif
 *training_log.txt
 *.png
 *.jpg
+
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.egg-info/
+.pytest_cache/
+
+# Data and large artifacts
+data/raw/*.db
+data/processed/*.pkl
+data/processed/*.lmdb
+results/checkpoints/*.pth
+results/checkpoints/*.pt
+results/*/best.pt
+results/*/test_predictions.npz
+
+# Logs
+results/logs/*.log
+results/logs/*.txt
+
+# Editor / OS
+.vscode/
+.idea/

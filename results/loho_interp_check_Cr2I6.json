@@ -1,0 +1,13 @@
+{
+  "n_samples_used": 80,
+  "model": "loho_Cr2I6 (trained without any Cr2I6 sample)",
+  "test_set": "Cr2I6 hosts (OOD samples; up to 80 sampled)",
+  "incoming_attn_to_defect_mean": 0.49886851077899336,
+  "incoming_attn_to_random_other_mean": 0.01950933990883641,
+  "ratio_defect_over_other_attn": 25.570752937316946,
+  "occlusion_abs_delta_at_defect_mean": 7.14186629395022,
+  "occlusion_abs_delta_at_other_mean": 0.020119365284217205,
+  "ratio_defect_over_other_delta": 354.9747317104836,
+  "fraction_attribution_at_defect_atom_mean": 0.9102918976919347,
+  "fraction_attribution_at_defect_atom_std": 0.048358847515909346
+}

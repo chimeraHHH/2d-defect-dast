@@ -1,0 +1,100 @@
+"""Aggregate metrics across all runs and write a markdown summary."""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parent.parent
+RESULTS = ROOT / "results"
+
+
+def load(name: str):
+    p = RESULTS / name / "metrics.json"
+    if not p.exists():
+        return None
+    with open(p, "r") as f:
+        data = json.load(f)
+    npz = RESULTS / name / "test_predictions.npz"
+    if npz.exists():
+        arr = np.load(npz)
+        data["preds"] = arr["preds"]
+        data["targets"] = arr["targets"]
+    return data
+
+
+def per_run_extras(data) -> dict:
+    """Extra stats beyond MAE/RMSE: R², median |err|, P95 |err|."""
+    if "preds" not in data:
+        return {}
+    p, t = data["preds"], data["targets"]
+    res = p - t
+    abs_err = np.abs(res)
+    ss_res = float((res ** 2).sum())
+    ss_tot = float(((t - t.mean()) ** 2).sum())
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    return {
+        "r2": r2,
+        "median_abs_err": float(np.median(abs_err)),
+        "p95_abs_err": float(np.percentile(abs_err, 95)),
+        "spearman_proxy": float(np.corrcoef(p, t)[0, 1]),
+        "n_samples": int(t.size),
+    }
+
+
+def main():
+    # Auto-discover every results/<dir>/metrics.json
+    runs = {}
+    for d in sorted(RESULTS.iterdir()):
+        if not d.is_dir():
+            continue
+        data = load(d.name)
+        if data is None:
+            continue
+        runs[d.name] = data
+    # Sort by test MAE ascending so the strongest configurations appear first
+    runs = dict(
+        sorted(runs.items(), key=lambda kv: kv[1].get("test_mae", float("inf")))
+    )
+    if not runs:
+        print("No metrics.json files found.", file=sys.stderr)
+        return
+
+    out = ROOT / "results" / "summary.md"
+    lines = ["# Experiment summary", ""]
+    lines.append("| Model | Params (M) | Best val MAE | Test MAE | Test RMSE | R² | median |err| | P95 |err| |")
+    lines.append("|---|---|---|---|---|---|---|---|")
+    for name, data in runs.items():
+        extras = per_run_extras(data)
+        params_m = data["n_params"] / 1e6
+        r2 = extras.get("r2", float("nan"))
+        med = extras.get("median_abs_err", float("nan"))
+        p95 = extras.get("p95_abs_err", float("nan"))
+        lines.append(
+            f"| {name} | {params_m:.3f} | {data['best_val_mae']:.4f} | "
+            f"{data['test_mae']:.4f} | {data['test_rmse']:.4f} | "
+            f"{r2:.3f} | {med:.4f} | {p95:.4f} |"
+        )
+    lines.append("")
+    lines.append("## Validation MAE per epoch")
+    for name, data in runs.items():
+        history = data.get("history") or []
+        if not history:
+            continue
+        lines.append(f"### {name}")
+        lines.append("epoch | train MAE | val MAE | val RMSE | lr")
+        for h in history:
+            lines.append(
+                f"{h['epoch']} | {h['train_mae']:.4f} | {h['val_mae']:.4f} | "
+                f"{h['val_rmse']:.4f} | {h['lr']:.2e}"
+            )
+        lines.append("")
+
+    out.write_text("\n".join(lines))
+    print("Wrote", out)
+
+
+if __name__ == "__main__":
+    main()

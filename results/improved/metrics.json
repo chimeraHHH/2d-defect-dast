@@ -1,0 +1,45 @@
+{
+  "config": {
+    "model": "improved",
+    "data_path": "data/processed/cleaned_dataset.pkl",
+    "output_dir": "results/improved",
+    "seed": 42,
+    "batch_size": 64,
+    "epochs": 30,
+    "train_ratio": 0.8,
+    "val_ratio": 0.1,
+    "loss": "mse",
+    "grad_clip": 5.0,
+    "optimizer": {
+      "lr": 0.001,
+      "weight_decay": 1e-05
+    },
+    "scheduler": {
+      "factor": 0.5,
+      "patience": 4
+    },
+    "model_kwargs": {
+      "atom_fea_len": 9,
+      "hidden_dim": 64,
+      "n_local_layers": 3,
+      "n_global_layers": 2,
+      "num_heads": 4,
+      "n_rbf_edge": 32,
+      "n_rbf_dist": 32,
+      "rcut_local": 5.0,
+      "r_global": 8.0,
+      "k_global": 16,
+      "dmax_global": 12.0,
+      "defect_embedding": true,
+      "dropout": 0.0,
+      "use_lattice_self_loop": true,
+      "use_virtual_node": true
+    }
+  },
+  "n_params": 202065,
+  "history": [],
+  "best_val_mae": NaN,
+  "test_mae": 1.826860118024226,
+  "test_rmse": 2.5537927295565095,
+  "note": "metrics produced post-hoc by eval_existing.py from an interrupted run"
+}

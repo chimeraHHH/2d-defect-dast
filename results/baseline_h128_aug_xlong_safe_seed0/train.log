@@ -1,0 +1,23 @@
+Config: {"model": "baseline", "data_path": "data/processed/augmented_dataset_safe.pkl", "output_dir": "results/baseline_h128_aug_xlong_safe_seed0", "seed": 0, "batch_size": 64, "epochs": 100, "train_ratio": 0.8, "val_ratio": 0.1, "loss": "mse", "grad_clip": 5.0, "optimizer": {"lr": 0.0003, "weight_decay": 0.0001}, "scheduler": {"factor": 0.5, "patience": 8}, "model_kwargs": {"atom_fea_len": 9, "hidden_dim": 128, "n_local_layers": 3, "n_global_layers": 2, "num_heads": 4, "rcut_local": 5.0, "dmax_global": 12.0, "defect_embedding": true, "dropout": 0.1}}
+Device: cuda
+Model: CrystalTransformer | params=0.747M
+Train/Val/Test sizes: 25536/1064/1065
+Target stats: mean=2.6040 std=3.1767
+Epoch 01/100 | train MAE 2.0595 | val MAE 1.8319 RMSE 2.4473 | lr 3.00e-04 | 14.8s *
+Epoch 02/100 | train MAE 1.5423 | val MAE 1.2596 RMSE 1.9065 | lr 3.00e-04 | 14.4s *
+Epoch 03/100 | train MAE 1.1634 | val MAE 1.1079 RMSE 1.7150 | lr 3.00e-04 | 14.3s *
+Epoch 04/100 | train MAE 1.0407 | val MAE 1.0566 RMSE 1.6231 | lr 3.00e-04 | 14.2s *
+Epoch 05/100 | train MAE 0.9421 | val MAE 0.9471 RMSE 1.4933 | lr 3.00e-04 | 14.7s *
+Epoch 06/100 | train MAE 0.8867 | val MAE 0.9442 RMSE 1.4077 | lr 3.00e-04 | 14.1s *
+Epoch 07/100 | train MAE 0.8282 | val MAE 0.9499 RMSE 1.4361 | lr 3.00e-04 | 14.3s 
+Epoch 08/100 | train MAE 0.8024 | val MAE 0.9515 RMSE 1.4447 | lr 3.00e-04 | 14.4s 
+Epoch 09/100 | train MAE 0.7709 | val MAE 0.8669 RMSE 1.3414 | lr 3.00e-04 | 14.3s *
+Epoch 10/100 | train MAE 0.6939 | val MAE 0.8724 RMSE 1.2977 | lr 3.00e-04 | 14.2s 
+Epoch 11/100 | train MAE 0.6654 | val MAE 0.7635 RMSE 1.2729 | lr 3.00e-04 | 14.3s *
+Epoch 12/100 | train MAE 0.6368 | val MAE 0.7844 RMSE 1.2718 | lr 3.00e-04 | 14.3s 
+Epoch 13/100 | train MAE 0.6096 | val MAE 0.7683 RMSE 1.2325 | lr 3.00e-04 | 14.3s 
+Epoch 14/100 | train MAE 0.5689 | val MAE 0.7159 RMSE 1.2442 | lr 3.00e-04 | 14.6s *
+Epoch 15/100 | train MAE 0.5643 | val MAE 0.7450 RMSE 1.2199 | lr 3.00e-04 | 14.3s 
+Epoch 16/100 | train MAE 0.5260 | val MAE 0.6997 RMSE 1.2193 | lr 3.00e-04 | 14.3s *
+Epoch 17/100 | train MAE 0.5045 | val MAE 0.7394 RMSE 1.2007 | lr 3.00e-04 | 14.2s 
+Epoch 18/100 | train MAE 0.5012 | val MAE 0.6846 RMSE 1.1548 | lr 3.00e-04 | 14.3s *

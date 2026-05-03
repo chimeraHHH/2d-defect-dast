@@ -1,3 +1,4 @@
+
 ase
 fastapi
 torch
@@ -6,3 +7,10 @@ uvicorn
 python-multipart
 pytest
 httpx
+torch>=2.0
+numpy>=1.24
+ase>=3.22
+matplotlib>=3.7
+scipy>=1.10
+tqdm>=4.65
+pyyaml>=6.0

@@ -1,0 +1,27 @@
+{
+  "MoS2": {
+    "n_samples_in_host": 308,
+    "id_reference_mae": 0.21540163457393646,
+    "id_reference_rmse": 0.3235848546028137
+  },
+  "Cr2I6": {
+    "n_samples_in_host": 334,
+    "id_reference_mae": 0.2740747034549713,
+    "id_reference_rmse": 0.3868306279182434
+  },
+  "C2H2": {
+    "n_samples_in_host": 231,
+    "id_reference_mae": 0.31393715739250183,
+    "id_reference_rmse": 0.5369819402694702
+  },
+  "TaSe2": {
+    "n_samples_in_host": 222,
+    "id_reference_mae": 0.2632085978984833,
+    "id_reference_rmse": 0.4021955132484436
+  },
+  "MoSSe": {
+    "n_samples_in_host": 464,
+    "id_reference_mae": 0.21526078879833221,
+    "id_reference_rmse": 0.5694980025291443
+  }
+}
