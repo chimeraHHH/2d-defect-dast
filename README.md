@@ -74,6 +74,30 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 [scripts/cross_dataset_uq.py](scripts/cross_dataset_uq.py) /
 [scripts/cross_dataset_interp.py](scripts/cross_dataset_interp.py)。
 
+### FOMAML OOD 适应
+
+在 5 个 LOHO 宿主上比较零迁移 / 朴素全模型微调 / FOMAML（仅读出头适应）：
+
+| 宿主 | 最优方法 | 提升 |
+|---|---|---|
+| C2H2 (远 OOD) | FOMAML k=5, N=10 | **+7.4%** |
+| Cr2I6 | 朴素微调 k=20, N=10 | +4.0% |
+| MoSSe (近 OOD) | FOMAML 避免过拟合 | 0.0% (vs 朴素微调 −3.7%) |
+
+脚本：[scripts/maml_ood.py](scripts/maml_ood.py)
+
+### 架构消融与等变性
+
+| 模型 | 参数量 | Test MAE |
+|---|---|---|
+| CrystalTransformer | 0.75M | **0.516 eV** |
+| Local-only (无全局层) | 0.34M | 0.709 eV (+37%) |
+| ALIGNN | 4.03M | 0.540 eV |
+
+旋转不变性测试：mean |Δ| = 0.048 eV（SO(3) 旋转后预测变化极小）。
+
+脚本：[scripts/equivariant_baselines.py](scripts/equivariant_baselines.py)
+
 ### 物理可解释性
 
 - **自注意力**：每个原子对缺陷的入向注意力是对随机非缺陷原子的 **32 倍**——

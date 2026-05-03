@@ -73,7 +73,16 @@ $PY scripts/cross_dataset_uq.py
 echo "===== Cross-dataset: fine-tuning v2 (GPU recommended) ====="
 $PY scripts/cross_dataset_finetune_v2.py
 
+echo "===== C7: MAML OOD adaptation ====="
+$PY scripts/maml_ood.py
+
+echo "===== C8: Active learning loop ====="
+$PY scripts/active_learning_loop.py
+
+echo "===== C10: Equivariant baselines ====="
+$PY scripts/equivariant_baselines.py
+
 echo "===== Aggregate metrics ====="
 $PY scripts/aggregate_metrics.py
 
-echo "===== All v1.3 analyses done. Outputs in results/*.json + paper/figures/. ====="
+echo "===== All v1.4 analyses done. Outputs in results/*.json + paper/figures/. ====="
