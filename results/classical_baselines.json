@@ -1,0 +1,51 @@
+{
+  "n_features": 34,
+  "n_train": 9576,
+  "n_test": 1065,
+  "results": [
+    {
+      "model": "mean-predictor",
+      "test_mae": 2.30214524269104,
+      "test_rmse": 3.276281318733173,
+      "test_r2": -2.2649765014648438e-06,
+      "fit_time_sec": 0.0
+    },
+    {
+      "model": "Linear regression",
+      "test_mae": 1.9168850183486938,
+      "test_rmse": 2.777787700211499,
+      "test_r2": 0.281152606010437,
+      "fit_time_sec": 0.0035881996154785156
+    },
+    {
+      "model": "Ridge (alpha=1.0)",
+      "test_mae": 1.9156557321548462,
+      "test_rmse": 2.777616720828694,
+      "test_r2": 0.28124111890792847,
+      "fit_time_sec": 0.0004899501800537109
+    },
+    {
+      "model": "Random Forest (n=200)",
+      "test_mae": 1.2348879125146137,
+      "test_rmse": 2.2308461311275716,
+      "test_r2": 0.5363632450321634,
+      "fit_time_sec": 8.904835939407349
+    },
+    {
+      "model": "LightGBM (n=500)",
+      "test_mae": 1.157572619342452,
+      "test_rmse": 2.0993016835282603,
+      "test_r2": 0.5894289413867548,
+      "fit_time_sec": 0.4648761749267578
+    },
+    {
+      "model": "CrystalTransformer (deep) \u2014 reference",
+      "test_mae": 0.516,
+      "test_rmse": 0.95,
+      "test_r2": 0.92,
+      "fit_time_sec": 720.0,
+      "note": "best single seed, baseline_h128_aug_long_safe"
+    }
+  ],
+  "wall_time_sec": 10.198927164077759
+}
