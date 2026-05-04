@@ -13,22 +13,25 @@
       "wall_sec": 18.468111753463745
     },
     {
-      "ok": false,
+      "ok": true,
       "element": "Ir",
-      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
-      "wall_sec": 336.28965044021606
+      "e_per_atom_eV": -0.601867299011664,
+      "smear": true,
+      "wall_sec": 36.01345610618591
     },
     {
-      "ok": false,
+      "ok": true,
       "element": "La",
-      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
-      "wall_sec": 361.3231039047241
+      "e_per_atom_eV": -0.18931025602004467,
+      "smear": true,
+      "wall_sec": 78.27663826942444
     },
     {
-      "ok": false,
+      "ok": true,
       "element": "Pb",
-      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
-      "wall_sec": 338.98926734924316
+      "e_per_atom_eV": 0.08091756564196514,
+      "smear": true,
+      "wall_sec": 15.251471281051636
     },
     {
       "ok": true,
@@ -49,5 +52,5 @@
       "wall_sec": 10.187669038772583
     }
   ],
-  "wall_min": 19.489116032918293
+  "wall_min": 2.1716497898101808
 }

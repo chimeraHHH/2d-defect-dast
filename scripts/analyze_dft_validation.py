@@ -32,7 +32,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 DFT_VAL = ROOT / "results" / "dft_validation.json"
 DFT_PRI = ROOT / "results" / "dft_pristine.json"
-DFT_MU = ROOT / "results" / "dft_mu_atoms.json"
+DFT_MU_ATOM = ROOT / "results" / "dft_mu_atoms.json"
+DFT_MU_BULK = ROOT / "results" / "dft_mu_bulk.json"
 OUT_JSON = ROOT / "results" / "dft_analysis.json"
 OUT_FIG = ROOT / "paper" / "figures" / "fig_dft_validation.png"
 
@@ -42,10 +43,23 @@ def load_json(p):
         return json.load(f)
 
 
+def load_mu():
+    """Prefer bulk mu, fall back to atomic mu per element. Returns
+    {element: (mu_eV, source)} where source is 'bulk' or 'atom'."""
+    mu_atom = {r["element"]: r["e_per_atom_eV"]
+               for r in load_json(DFT_MU_ATOM)["results"] if r.get("ok")}
+    out = {el: (v, "atom") for el, v in mu_atom.items()}
+    if DFT_MU_BULK.exists():
+        for r in load_json(DFT_MU_BULK)["results"]:
+            if r.get("ok"):
+                out[r["element"]] = (r["e_per_atom_eV"], "bulk")
+    return out
+
+
 def main():
     dv = load_json(DFT_VAL)["results"]
     dp = {r["host"]: r for r in load_json(DFT_PRI)["results"]}
-    mu = {r["element"]: r["e_per_atom_eV"] for r in load_json(DFT_MU)["results"]}
+    mu = load_mu()
 
     rows = []
     for r in dv:
@@ -57,7 +71,7 @@ def main():
             continue
         e_doped = r["e_total_eV"]
         e_pristine = dp[host]["e_total_eV"]
-        mu_dop = mu[dop]
+        mu_dop, mu_src = mu[dop]
         ef_dft = e_doped - e_pristine - mu_dop
         ef_pred = r["model_pred_Ef_eV"]
         sigma = r["model_sigma_cal_eV"]
@@ -69,6 +83,7 @@ def main():
             "dft_e_doped_eV": e_doped,
             "dft_e_pristine_eV": e_pristine,
             "dft_mu_dopant_eV": mu_dop,
+            "dft_mu_source": mu_src,
             "dft_Ef_eV": ef_dft,
             "abs_error_eV": abs(ef_dft - ef_pred),
             "wall_sec": r["wall_sec"],
