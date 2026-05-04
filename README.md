@@ -48,7 +48,7 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 
 **进行中（自主队列）**：
 
-- 5-host LOHO + multi-source（MoS₂/Cr₂I₆/C₂H₂/TaSe₂/MoSSe，~2.5 h）
+- 5-host LOHO + multi-source（MoS₂/Cr₂I₆/C₂H₂/TaSe₂/MoSSe）—— **3/5 完成后于 2026-05-04 23:33 取消**：完成的 3 个 host 显示 v2 多源 LOHO 比 v1 单源 LOHO 恶化 +22-65%（val→test 间隙 1.32-1.76×），存在 ID/OOD 权衡，需要重新设计 fair comparison（详 [results/V2_LOHO_FINDINGS.md](results/V2_LOHO_FINDINGS.md)）
 - 4-seed UQ 校准 + 温度缩放
 - 注意力 + occlusion 在 v2-PFA backbone 上重测
 - 论文 v2.0 重写

@@ -1,0 +1,258 @@
+[2026-05-04 13:28:53] starting v2 LOHO multi-source queue (5 hosts)
+[2026-05-04 13:28:53] >>> START host=MoS2
+Device: cuda  host=MoS2  seed=42
+  loho IMP2D split: train 27900 val 1033 test 308 (host=MoS2)
+  loaded JARVIS-2D: 70 samples
+  loaded JARVIS-3D: 381 samples
+  loaded DFT-3D: 19902 samples
+  IMP2D: n=27900 mean=2.5614 std=3.1422
+  JARVIS-2D: n=70 mean=3.1108 std=2.3537
+  JARVIS-3D: n=381 mean=2.5204 std=1.9383
+  DFT-3D: n=19902 mean=-0.8146 std=1.0845
+
+Dataset sizes: train 48253  val 1033  test 308
+
+Model params: 0.8199M (819,861)
+
+Training v2-PFA multi-source LOHO (host=MoS2) for up to 50 epochs...
+  ep  0  loss=0.2970  val_mae_imp2d=1.7505  (42s)  *
+  ep  1  loss=0.1920  val_mae_imp2d=1.1361  (42s)  *
+  ep  2  loss=0.1245  val_mae_imp2d=1.0437  (42s)  *
+  ep  3  loss=0.1029  val_mae_imp2d=0.9011  (42s)  *
+  ep  4  loss=0.0836  val_mae_imp2d=0.9335  (42s)
+  ep  5  loss=0.0707  val_mae_imp2d=0.7428  (42s)  *
+  ep  6  loss=0.0613  val_mae_imp2d=0.8485  (42s)
+  ep  7  loss=0.0566  val_mae_imp2d=0.7503  (42s)
+  ep  8  loss=0.0503  val_mae_imp2d=0.7143  (42s)  *
+  ep  9  loss=0.0465  val_mae_imp2d=0.7057  (42s)  *
+  ep 10  loss=0.0432  val_mae_imp2d=0.7247  (42s)
+  ep 11  loss=0.0406  val_mae_imp2d=0.6659  (42s)  *
+  ep 12  loss=0.0359  val_mae_imp2d=0.6546  (42s)  *
+  ep 13  loss=0.0350  val_mae_imp2d=0.6434  (42s)  *
+  ep 14  loss=0.0329  val_mae_imp2d=0.6629  (42s)
+  ep 15  loss=0.0303  val_mae_imp2d=0.6665  (42s)
+  ep 16  loss=0.0286  val_mae_imp2d=0.5847  (42s)  *
+  ep 17  loss=0.0268  val_mae_imp2d=0.6244  (42s)
+  ep 18  loss=0.0254  val_mae_imp2d=0.5902  (42s)
+  ep 19  loss=0.0239  val_mae_imp2d=0.6087  (41s)
+  ep 20  loss=0.0216  val_mae_imp2d=0.5471  (42s)  *
+  ep 21  loss=0.0212  val_mae_imp2d=0.5693  (42s)
+  ep 22  loss=0.0193  val_mae_imp2d=0.5751  (42s)
+  ep 23  loss=0.0180  val_mae_imp2d=0.5604  (42s)
+  ep 24  loss=0.0171  val_mae_imp2d=0.5483  (42s)
+  ep 25  loss=0.0160  val_mae_imp2d=0.5313  (43s)  *
+  ep 26  loss=0.0148  val_mae_imp2d=0.5237  (42s)  *
+  ep 27  loss=0.0140  val_mae_imp2d=0.5108  (42s)  *
+  ep 28  loss=0.0133  val_mae_imp2d=0.4951  (42s)  *
+  ep 29  loss=0.0124  val_mae_imp2d=0.5173  (42s)
+  ep 30  loss=0.0119  val_mae_imp2d=0.4953  (42s)
+  ep 31  loss=0.0110  val_mae_imp2d=0.5044  (42s)
+  ep 32  loss=0.0104  val_mae_imp2d=0.5033  (42s)
+  ep 33  loss=0.0099  val_mae_imp2d=0.4973  (42s)
+  ep 34  loss=0.0091  val_mae_imp2d=0.4968  (42s)
+  ep 35  loss=0.0085  val_mae_imp2d=0.4905  (42s)  *
+  ep 36  loss=0.0081  val_mae_imp2d=0.4817  (42s)  *
+  ep 37  loss=0.0077  val_mae_imp2d=0.4859  (42s)
+  ep 38  loss=0.0071  val_mae_imp2d=0.4945  (42s)
+  ep 39  loss=0.0068  val_mae_imp2d=0.4828  (42s)
+  ep 40  loss=0.0065  val_mae_imp2d=0.4841  (42s)
+  ep 41  loss=0.0063  val_mae_imp2d=0.4965  (42s)
+  ep 42  loss=0.0060  val_mae_imp2d=0.4818  (42s)
+  ep 43  loss=0.0058  val_mae_imp2d=0.4862  (42s)
+  ep 44  loss=0.0056  val_mae_imp2d=0.4871  (42s)
+  ep 45  loss=0.0054  val_mae_imp2d=0.4851  (42s)
+  ep 46  loss=0.0054  val_mae_imp2d=0.4843  (42s)
+  ep 47  loss=0.0053  val_mae_imp2d=0.4864  (42s)
+  ep 48  loss=0.0053  val_mae_imp2d=0.4848  (42s)
+  early stop at ep 48, best=0.4817
+
+LOHO MoS2 test MAE: 0.8496  RMSE: 1.3597  (N=308)
+
+Written /root/2d-defect-dast/results/v2_loho_multi_MoS2.json
+Wall time: 34.7 min
+[2026-05-04 14:03:39] <<< DONE host=MoS2
+[2026-05-04 14:03:39] >>> START host=MoSSe
+Device: cuda  host=MoSSe  seed=42
+  loho IMP2D split: train 27480 val 1017 test 464 (host=MoSSe)
+  loaded JARVIS-2D: 70 samples
+  loaded JARVIS-3D: 381 samples
+  loaded DFT-3D: 19902 samples
+  IMP2D: n=27480 mean=2.5904 std=3.2250
+  JARVIS-2D: n=70 mean=3.1108 std=2.3537
+  JARVIS-3D: n=381 mean=2.5204 std=1.9383
+  DFT-3D: n=19902 mean=-0.8146 std=1.0845
+
+Dataset sizes: train 47833  val 1017  test 464
+
+Model params: 0.8199M (819,861)
+
+Training v2-PFA multi-source LOHO (host=MoSSe) for up to 50 epochs...
+  ep  0  loss=0.3367  val_mae_imp2d=2.0870  (42s)  *
+  ep  1  loss=0.3269  val_mae_imp2d=2.0675  (41s)  *
+  ep  2  loss=0.3065  val_mae_imp2d=1.9174  (42s)  *
+  ep  3  loss=0.2675  val_mae_imp2d=1.8142  (42s)  *
+  ep  4  loss=0.2510  val_mae_imp2d=1.8497  (42s)
+  ep  5  loss=0.2233  val_mae_imp2d=1.6832  (42s)  *
+  ep  6  loss=0.1935  val_mae_imp2d=1.4173  (42s)  *
+  ep  7  loss=0.1448  val_mae_imp2d=1.1479  (42s)  *
+  ep  8  loss=0.1074  val_mae_imp2d=1.0085  (42s)  *
+  ep  9  loss=0.0927  val_mae_imp2d=1.0004  (42s)  *
+  ep 10  loss=0.0846  val_mae_imp2d=0.8500  (42s)  *
+  ep 11  loss=0.0780  val_mae_imp2d=0.9238  (42s)
+  ep 12  loss=0.0720  val_mae_imp2d=0.8987  (41s)
+  ep 13  loss=0.0671  val_mae_imp2d=0.9299  (42s)
+  ep 14  loss=0.0617  val_mae_imp2d=0.7647  (42s)  *
+  ep 15  loss=0.0566  val_mae_imp2d=0.8131  (42s)
+  ep 16  loss=0.0526  val_mae_imp2d=0.7808  (42s)
+  ep 17  loss=0.0488  val_mae_imp2d=0.7201  (41s)  *
+  ep 18  loss=0.0462  val_mae_imp2d=0.7147  (41s)  *
+  ep 19  loss=0.0431  val_mae_imp2d=0.7646  (42s)
+  ep 20  loss=0.0410  val_mae_imp2d=0.7537  (41s)
+  ep 21  loss=0.0388  val_mae_imp2d=0.7128  (41s)  *
+  ep 22  loss=0.0373  val_mae_imp2d=0.6742  (41s)  *
+  ep 23  loss=0.0347  val_mae_imp2d=0.6676  (42s)  *
+  ep 24  loss=0.0330  val_mae_imp2d=0.6366  (42s)  *
+  ep 25  loss=0.0308  val_mae_imp2d=0.6342  (42s)  *
+  ep 26  loss=0.0297  val_mae_imp2d=0.6220  (42s)  *
+  ep 27  loss=0.0278  val_mae_imp2d=0.6774  (42s)
+  ep 28  loss=0.0268  val_mae_imp2d=0.6281  (42s)
+  ep 29  loss=0.0251  val_mae_imp2d=0.6010  (42s)  *
+  ep 30  loss=0.0239  val_mae_imp2d=0.6050  (42s)
+  ep 31  loss=0.0233  val_mae_imp2d=0.6243  (42s)
+  ep 32  loss=0.0220  val_mae_imp2d=0.5983  (41s)  *
+  ep 33  loss=0.0208  val_mae_imp2d=0.5963  (42s)  *
+  ep 34  loss=0.0196  val_mae_imp2d=0.5706  (42s)  *
+  ep 35  loss=0.0189  val_mae_imp2d=0.5832  (42s)
+  ep 36  loss=0.0181  val_mae_imp2d=0.5654  (41s)  *
+  ep 37  loss=0.0173  val_mae_imp2d=0.5654  (42s)
+  ep 38  loss=0.0167  val_mae_imp2d=0.5662  (42s)
+  ep 39  loss=0.0163  val_mae_imp2d=0.5588  (42s)  *
+  ep 40  loss=0.0156  val_mae_imp2d=0.5535  (41s)  *
+  ep 41  loss=0.0152  val_mae_imp2d=0.5540  (43s)
+  ep 42  loss=0.0149  val_mae_imp2d=0.5616  (42s)
+  ep 43  loss=0.0145  val_mae_imp2d=0.5581  (42s)
+  ep 44  loss=0.0143  val_mae_imp2d=0.5522  (42s)  *
+  ep 45  loss=0.0139  val_mae_imp2d=0.5582  (42s)
+  ep 46  loss=0.0138  val_mae_imp2d=0.5522  (42s)
+  ep 47  loss=0.0137  val_mae_imp2d=0.5537  (42s)
+  ep 48  loss=0.0136  val_mae_imp2d=0.5517  (42s)  *
+  ep 49  loss=0.0136  val_mae_imp2d=0.5521  (42s)
+
+LOHO MoSSe test MAE: 0.7280  RMSE: 1.4397  (N=464)
+
+Written /root/2d-defect-dast/results/v2_loho_multi_MoSSe.json
+Wall time: 35.0 min
+[2026-05-04 14:38:44] <<< DONE host=MoSSe
+[2026-05-04 14:38:44] >>> START host=TaSe2
+Device: cuda  host=TaSe2  seed=42
+  loho IMP2D split: train 28134 val 1041 test 222 (host=TaSe2)
+  loaded JARVIS-2D: 70 samples
+  loaded JARVIS-3D: 381 samples
+  loaded DFT-3D: 19902 samples
+  IMP2D: n=28134 mean=2.6139 std=3.1976
+  JARVIS-2D: n=70 mean=3.1108 std=2.3537
+  JARVIS-3D: n=381 mean=2.5204 std=1.9383
+  DFT-3D: n=19902 mean=-0.8146 std=1.0845
+
+Dataset sizes: train 48487  val 1041  test 222
+
+Model params: 0.8199M (819,861)
+
+Training v2-PFA multi-source LOHO (host=TaSe2) for up to 50 epochs...
+  ep  0  loss=0.3313  val_mae_imp2d=2.2791  (44s)  *
+  ep  1  loss=0.3227  val_mae_imp2d=2.2085  (42s)  *
+  ep  2  loss=0.2930  val_mae_imp2d=1.9892  (42s)  *
+  ep  3  loss=0.2763  val_mae_imp2d=1.9248  (42s)  *
+  ep  4  loss=0.2432  val_mae_imp2d=2.0845  (42s)
+  ep  5  loss=0.2240  val_mae_imp2d=1.5938  (42s)  *
+  ep  6  loss=0.1776  val_mae_imp2d=1.4454  (42s)  *
+  ep  7  loss=0.1508  val_mae_imp2d=1.3774  (42s)  *
+  ep  8  loss=0.1292  val_mae_imp2d=1.2004  (42s)  *
+  ep  9  loss=0.1159  val_mae_imp2d=1.1444  (43s)  *
+  ep 10  loss=0.1010  val_mae_imp2d=1.0264  (42s)  *
+  ep 11  loss=0.0948  val_mae_imp2d=0.9757  (42s)  *
+  ep 12  loss=0.0868  val_mae_imp2d=0.9255  (42s)  *
+  ep 13  loss=0.0809  val_mae_imp2d=0.9362  (43s)
+  ep 14  loss=0.0764  val_mae_imp2d=0.9084  (42s)  *
+  ep 15  loss=0.0709  val_mae_imp2d=0.8319  (42s)  *
+  ep 16  loss=0.0644  val_mae_imp2d=0.8319  (42s)
+  ep 17  loss=0.0594  val_mae_imp2d=0.8027  (42s)  *
+  ep 18  loss=0.0556  val_mae_imp2d=0.8042  (42s)
+  ep 19  loss=0.0523  val_mae_imp2d=0.7542  (42s)  *
+  ep 20  loss=0.0504  val_mae_imp2d=0.8153  (42s)
+  ep 21  loss=0.0474  val_mae_imp2d=0.7177  (42s)  *
+  ep 22  loss=0.0446  val_mae_imp2d=0.7695  (43s)
+  ep 23  loss=0.0416  val_mae_imp2d=0.7456  (42s)
+  ep 24  loss=0.0396  val_mae_imp2d=0.6702  (42s)  *
+  ep 25  loss=0.0372  val_mae_imp2d=0.6732  (43s)
+  ep 26  loss=0.0346  val_mae_imp2d=0.8393  (43s)
+  ep 27  loss=0.0335  val_mae_imp2d=0.7016  (43s)
+  ep 28  loss=0.0309  val_mae_imp2d=0.6644  (43s)  *
+  ep 29  loss=0.0293  val_mae_imp2d=0.6421  (43s)  *
+  ep 30  loss=0.0280  val_mae_imp2d=0.6361  (43s)  *
+  ep 31  loss=0.0267  val_mae_imp2d=0.6541  (42s)
+  ep 32  loss=0.0251  val_mae_imp2d=0.6228  (42s)  *
+  ep 33  loss=0.0239  val_mae_imp2d=0.6271  (42s)
+  ep 34  loss=0.0233  val_mae_imp2d=0.5955  (43s)  *
+  ep 35  loss=0.0217  val_mae_imp2d=0.6135  (43s)
+  ep 36  loss=0.0209  val_mae_imp2d=0.5925  (43s)  *
+  ep 37  loss=0.0201  val_mae_imp2d=0.5969  (43s)
+  ep 38  loss=0.0192  val_mae_imp2d=0.5884  (43s)  *
+  ep 39  loss=0.0186  val_mae_imp2d=0.5725  (43s)  *
+  ep 40  loss=0.0180  val_mae_imp2d=0.5676  (43s)  *
+  ep 41  loss=0.0173  val_mae_imp2d=0.5675  (43s)  *
+  ep 42  loss=0.0167  val_mae_imp2d=0.5704  (43s)
+  ep 43  loss=0.0165  val_mae_imp2d=0.5682  (43s)
+  ep 44  loss=0.0162  val_mae_imp2d=0.5669  (43s)  *
+  ep 45  loss=0.0160  val_mae_imp2d=0.5641  (43s)  *
+  ep 46  loss=0.0156  val_mae_imp2d=0.5643  (43s)
+  ep 47  loss=0.0154  val_mae_imp2d=0.5634  (42s)  *
+  ep 48  loss=0.0154  val_mae_imp2d=0.5623  (43s)  *
+  ep 49  loss=0.0154  val_mae_imp2d=0.5620  (43s)  *
+
+LOHO TaSe2 test MAE: 0.7738  RMSE: 1.3578  (N=222)
+
+Written /root/2d-defect-dast/results/v2_loho_multi_TaSe2.json
+Wall time: 35.8 min
+[2026-05-04 15:14:34] <<< DONE host=TaSe2
+[2026-05-04 15:14:34] >>> START host=Cr2I6
+Device: cuda  host=Cr2I6  seed=42
+  loho IMP2D split: train 27831 val 1030 test 334 (host=Cr2I6)
+  loaded JARVIS-2D: 70 samples
+  loaded JARVIS-3D: 381 samples
+  loaded DFT-3D: 19902 samples
+  IMP2D: n=27831 mean=2.6417 std=3.2348
+  JARVIS-2D: n=70 mean=3.1108 std=2.3537
+  JARVIS-3D: n=381 mean=2.5204 std=1.9383
+  DFT-3D: n=19902 mean=-0.8146 std=1.0845
+
+Dataset sizes: train 48184  val 1030  test 334
+
+Model params: 0.8199M (819,861)
+
+Training v2-PFA multi-source LOHO (host=Cr2I6) for up to 50 epochs...
+  ep  0  loss=0.3330  val_mae_imp2d=2.2492  (43s)  *
+  ep  1  loss=0.3225  val_mae_imp2d=2.0874  (42s)  *
+  ep  2  loss=0.2981  val_mae_imp2d=1.9424  (42s)  *
+  ep  3  loss=0.2589  val_mae_imp2d=1.7778  (42s)  *
+  ep  4  loss=0.2338  val_mae_imp2d=1.6766  (42s)  *
+  ep  5  loss=0.2197  val_mae_imp2d=1.6316  (42s)  *
+  ep  6  loss=0.2104  val_mae_imp2d=1.5948  (42s)  *
+  ep  7  loss=0.1942  val_mae_imp2d=1.5858  (42s)  *
+  ep  8  loss=0.1725  val_mae_imp2d=1.5153  (42s)  *
+  ep  9  loss=0.1636  val_mae_imp2d=1.4779  (42s)  *
+  ep 10  loss=0.1367  val_mae_imp2d=1.1911  (43s)  *
+  ep 11  loss=0.1025  val_mae_imp2d=1.1439  (42s)  *
+  ep 12  loss=0.0863  val_mae_imp2d=0.9998  (42s)  *
+  ep 13  loss=0.0763  val_mae_imp2d=1.0747  (42s)
+  ep 14  loss=0.0712  val_mae_imp2d=0.9395  (42s)  *
+  ep 15  loss=0.0647  val_mae_imp2d=0.9045  (42s)  *
+  ep 16  loss=0.0596  val_mae_imp2d=0.8488  (42s)  *
+  ep 17  loss=0.0561  val_mae_imp2d=0.8089  (42s)  *
+  ep 18  loss=0.0526  val_mae_imp2d=0.8145  (42s)
+  ep 19  loss=0.0479  val_mae_imp2d=0.9224  (43s)
+  ep 20  loss=0.0459  val_mae_imp2d=0.8342  (42s)
+  ep 21  loss=0.0430  val_mae_imp2d=0.7782  (43s)  *
+  ep 22  loss=0.0396  val_mae_imp2d=0.7616  (43s)  *
+  ep 23  loss=0.0376  val_mae_imp2d=0.7057  (43s)  *
+  ep 24  loss=0.0349  val_mae_imp2d=0.7280  (42s)

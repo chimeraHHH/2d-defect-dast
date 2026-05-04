@@ -14,6 +14,8 @@
 
 ## 关键里程碑
 
+- 2026-05-04 23:33 (v2 LOHO 取消) 多源 LOHO 3/5 hosts (MoS2/MoSSe/TaSe2) 均比 v1 单源 LOHO 恶化 22-65%；val→test gap 1.32-1.76× 显示 OOD 泛化崩溃。Cr2I6 + C2H2 取消，待补 v2 单源 LOHO + v1 多源 LOHO 控制实验。详 [V2_LOHO_FINDINGS.md](V2_LOHO_FINDINGS.md)
+- 2026-05-04 22:09 (paper draft commit e91ba3d) LaTeX v2.0 草稿 + 4 张 v2 图 + v2_summary.csv 推送 GitHub
 - 2026-05-04 21:28 (v2 phase 1 + multi-source) 4-seed v2-PFA-only 多源 mean 0.486 ± 0.025 eV，比 v1 多源 0.555 改善 −12.5% (seed=42 头条 0.4929)
 - 2026-05-04 11:39 (v2 phase 1 ablation) 5 个 v2 单源变体全部在 baseline ± 2σ 内；单源任务上 PFA + 多尺度 + 缺陷偏置无统计显著赢面
 - 2026-05-04 09:15 (v2 phase 1 headline) v2 full 单源 50ep test MAE 0.5193 (持平 baseline 0.516)

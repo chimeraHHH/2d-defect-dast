@@ -25,6 +25,23 @@ test, which differs from the leak-free 1065 sample set used by single-source
 baselines. Apples-to-apples comparison only holds against v1 multi-source.
 A leak-free re-evaluation of v2 multi-source is on the to-do list.
 
+## v2 multi-source LOHO — incomplete; ID/OOD trade-off discovered (2026-05-04)
+
+The 5-host LOHO run was cancelled at 3/5 (MoS₂, MoSSe, TaSe₂ done; Cr₂I₆
+in-progress and C₂H₂ not yet started). The completed hosts show that
+v2-multi-source **degrades** leave-one-host-out test MAE by 22-65% vs the
+v1-single-source LOHO baselines, with a 1.32-1.76× val→test gap, signalling
+poor OOD generalisation. The hypothesis is that the ~18 k JARVIS DFT-3D
+bulk-pristine samples in the multi-source corpus pull the shared backbone
+toward a 3D-bulk representation that doesn't transfer to held-out 2D hosts.
+
+The fair comparison for v2-multi-LOHO is **v2-single-LOHO** (using the
+already-prepared `configs/v2_loho_*.yaml`) and/or **v1-multi-LOHO** — neither
+exists on disk yet. Until those controls are run, the v2-multi-LOHO numbers
+are treated as a methodological observation rather than a publishable
+result. See [results/V2_LOHO_FINDINGS.md](results/V2_LOHO_FINDINGS.md) for
+the full record + cancellation receipt.
+
 ## GPAW + CUDA on RTX 5090 (sm_120)
 
 **Status (2026-05-04):** all C18 DFT validation runs used **CPU-only** GPAW

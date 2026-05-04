@@ -450,13 +450,61 @@ direct reference point for our v2 multi-source seed=42 result of
 multi-source on the canonical 1065 sample test set is a natural
 follow-up.
 
-\subsection{Out-of-distribution: leave-one-host-out}\label{sec:loho}
-\TBD\ The 5-host LOHO queue (MoS$_2$, Cr$_2$I$_6$, C$_2$H$_2$, TaSe$_2$,
-MoSSe) is in progress at the time of writing. The v1 single-source
-LOHO baselines~\cite{ourPaperV12} reported degradation factors of
-$\{1.00, 1.63, 4.65, 1.23, 0.87\}$ vs.\ in-distribution; the v2
-multi-source variant is expected to flatten this profile by drawing on
-JARVIS chemistry. Final numbers will populate this section.
+\subsection{Out-of-distribution: leave-one-host-out (preliminary)}\label{sec:loho}
+
+A partial 5-host LOHO run, cancelled at 3/5 hosts, exposes an
+unexpected \emph{ID/OOD trade-off}. Table~\ref{tab:loho} reports the
+v2-multi-source LOHO test MAE on the three completed hosts (MoS$_2$,
+MoSSe, TaSe$_2$) against the v1-single-source LOHO baseline
+of~\cite{ourPaperV12}. The v2 multi-source variant degrades OOD test
+MAE by 22--65\% on every completed host, with a val$\to$test ratio of
+1.32--1.76$\times$ that signals a backbone biased toward the
+non-host training distribution.
+
+\begin{table}[h]
+\centering
+\caption{Partial multi-source LOHO results (3/5 hosts). The
+remaining two hosts (Cr$_2$I$_6$, C$_2$H$_2$) were cancelled pending
+fair single-source controls. Note that this comparison is \emph{not}
+apples-to-apples: the v1 reference is single-source while v2 is
+multi-source, so the percentage change conflates two effects (PFA
+vs.\ baseline architecture, and single-source vs.\ multi-source data).}
+\label{tab:loho}
+\begin{tabular}{lrrrrr}
+\toprule
+Host & $n_{\mathrm{test}}$ & v2-multi MAE (eV) & v1-single MAE (eV) & $\Delta$ & val$\to$test gap \\
+\midrule
+MoS$_2$  & 308 & 0.8496 & 0.5163 & $+64.6\%$ & 1.76$\times$ \\
+MoSSe    & 464 & 0.7280 & 0.4479 & $+62.5\%$ & 1.32$\times$ \\
+TaSe$_2$ & 222 & 0.7738 & 0.6364 & $+21.6\%$ & 1.38$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We hypothesise that the $\sim 18\,000$ JARVIS DFT-3D pristine 3D-bulk
+samples in the multi-source corpus pull the shared encoder toward a
+bulk-pristine representation that does not generalise to held-out 2D
+defect chemistry. Two control experiments are required to confirm
+this picture: (i) v2 with a single-source LOHO setup (i.e.\ the
+pure PFA backbone trained only on non-host IMP2D, isolating the
+backbone effect from the multi-source effect), using the
+already-staged \texttt{configs/v2\_loho\_*.yaml}; and (ii) v1 with the
+same multi-source LOHO setup (i.e.\ replacing the PFA encoder with the
+v1 baseline encoder while keeping the multi-source heads and source
+mix). Neither has yet been carried out. Until those controls land,
+\emph{the v2 multi-source recipe of \Cref{sec:multi} is shown to
+improve in-distribution accuracy at a measurable cost in
+out-of-distribution generalisation.}
+
+\paragraph{Implication for high-throughput deployment.}
+For applications that prioritise out-of-distribution generalisation —
+e.g.\ extending high-throughput screening into chemistry families not
+covered by the IMP2D training set — a single-source v2 backbone is
+preferable to the multi-source recipe. For in-distribution
+applications (recommending defect configurations within the IMP2D
+chemistry families), the multi-source recipe gives the lowest MAE in
+the present study (\Cref{sec:multi}). The choice is therefore
+application-specific, not a default.
 
 \subsection{Calibrated uncertainty}\label{sec:uq}
 \TBD\ A 4-seed deep-ensemble uncertainty calibration with
