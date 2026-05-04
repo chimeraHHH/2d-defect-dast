@@ -304,6 +304,51 @@ balance the influence of large auxiliary sources on the headline
 target. The total parameter count is 0.820~M (only 73~k
 above the v1 baseline).
 
+\subsection{Pristine--defect cross-attention (v3, dual-stream)}\label{sec:dualstream}
+
+The defect formation energy is, by physical definition, a
+\emph{difference}:
+\[
+E_{\mathrm{f}} \;=\; E_{\mathrm{defect}} \;-\; E_{\mathrm{host}} \;+\; \Delta\mu .
+\]
+Predicting $E_{\mathrm{f}}$ from the defect supercell alone forces the
+network to implicitly recover $E_{\mathrm{host}}$ from a single
+structure. We instead make the host pristine reference an explicit
+input: for every IMP2D sample we construct an unrelaxed pristine
+supercell by removing the dopant atom from the defect supercell (this
+is exact for adsorbate and interstitial defects, the only two types
+present in IMP2D), then run the same PFA encoder on both supercells
+with weights tied across the two streams. Two cross-attention blocks
+let the defect tokens (queries) attend to the pristine tokens
+(keys/values), with a distance bias on the defect--pristine pair
+distance. The graph-level representation is the difference of pooled
+features:
+\[
+\Delta\mathbf{z} \;=\; \mathrm{pool}_{\mathrm{def}}(h^{\mathrm{xattn}}_{\mathrm{def}})
+\;-\; \mathrm{pool}_{\mathrm{pri}}(h_{\mathrm{pri}}) ,
+\]
+which is passed through a bias-free linear readout so that
+$f(\mathbf{0}) = 0$ holds by construction. We additionally apply a
+soft invariance auxiliary loss
+\[
+\mathcal{L}_{\mathrm{inv}} \;=\; \lambda \,\bigl\| f(x_{\mathrm{pri}}, x_{\mathrm{pri}}) \bigr\|^2 ,
+\]
+with $\lambda = 0.05$, that drives the model toward the
+$\Delta\mathbf{z}=0 \Rightarrow E_{\mathrm{f}}=0$ identity at every step.
+The total parameter count of the dual-stream model is 1.142~M
+(154\,\% of the v2 single-stream PFA backbone).
+
+\paragraph{Routing under multi-source training.}
+For sources that have a natural pristine reference (IMP2D defects,
+JARVIS-2D vacancies, JARVIS-3D vacancies) we feed the (defect,
+pristine) pair to the dual-stream architecture; for the JARVIS DFT-3D
+pristine 3D bulk corpus, no defect counterpart exists, and the
+dual-stream is bypassed via the source-specific readout head — the
+encoder still receives gradient from these samples but the
+cross-attention layer does not. This routing keeps the chemistry of
+the bulk-pristine corpus from polluting the cross-attention pathway,
+which is reserved for actual defect physics.
+
 % =====================================================================
 \section{Experiments}\label{sec:exp}
 
@@ -449,6 +494,16 @@ direct reference point for our v2 multi-source seed=42 result of
 11.2~\% improvement. A leak-free re-evaluation of v2
 multi-source on the canonical 1065 sample test set is a natural
 follow-up.
+
+\subsection{Pristine--defect dual-stream cross-attention}\label{sec:exp:dualstream}
+
+\TBD\ The dual-stream model of Sec.~\ref{sec:dualstream} is being
+trained on the same single-source IMP2D split as the v2 single-stream
+baseline (h=128, 60 epoch, no augmentation, seed=42). The headline
+test MAE will populate this section together with a 4-seed scatter and
+the value of the invariance auxiliary loss $\mathcal{L}_{\mathrm{inv}}$
+at convergence (a measurable proxy for how well the model has learned
+the $E_f(\mathrm{pristine})=0$ identity).
 
 \subsection{Out-of-distribution: leave-one-host-out (preliminary)}\label{sec:loho}
 
