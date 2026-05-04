@@ -300,6 +300,21 @@ def main():
             "test_rmse": f"beta={fit['beta_params']:.3f}, R²={fit['r2']:.3f}",
         })
 
+    # ---- MACE baseline (C11) ----
+    mace = _read_json(RESULTS / "mace_baseline.json")
+    if mace:
+        rows.append({
+            "category": "GNN baseline (PyG)",
+            "run": "mace_lmax2",
+            "model": mace["model"],
+            "data": "leak_free_v1",
+            "params_M": mace["n_params_M"],
+            "epochs": mace["config"]["epochs"],
+            "seed": 42,
+            "test_mae": round(mace["test_mae_eV"], 4),
+            "test_rmse": round(mace["test_rmse_eV"], 4),
+        })
+
     # ---- HTS demo (C16) ----
     hts = _read_json(RESULTS / "hts_demo.json")
     if hts:

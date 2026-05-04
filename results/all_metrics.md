@@ -144,6 +144,7 @@
 | alignn_(ref) | ALIGNN (ref) | leak_free_v1 | 4.03 | — | 42 | 0.54 | — |
 | schnet | SchNet | leak_free_v1 | 0.456 | 50 | 42 | 0.5849 | — |
 | visnet | ViSNet | leak_free_v1 | 1.687 | 68 | 42 | 0.8625 | — |
+| mace_lmax2 | MACE (small, max_ell=2, 2 interactions) | leak_free_v1 | 0.44 | 60 | 42 | 1.4642 | 2.1559 |
 
 ## Scaling law fit
 
