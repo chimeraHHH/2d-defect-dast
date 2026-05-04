@@ -1,0 +1,74 @@
+{
+  "config": {
+    "pw_cutoff_eV": 300,
+    "kpts": [
+      2,
+      2,
+      1
+    ],
+    "xc": "PBE"
+  },
+  "results": [
+    {
+      "host": "Pd2Se4",
+      "from_candidate_idx": 247,
+      "from_dopant": "Pb",
+      "n_atoms_doped": 25,
+      "n_atoms_pristine": 24,
+      "ok": true,
+      "e_total_eV": -90.64821133365919,
+      "n_atoms": 24,
+      "wall_sec": 171.94953393936157,
+      "e_per_atom_eV": -3.777008805569133
+    },
+    {
+      "host": "Ge2",
+      "from_candidate_idx": 199,
+      "from_dopant": "La",
+      "n_atoms_doped": 19,
+      "n_atoms_pristine": 18,
+      "ok": true,
+      "e_total_eV": -72.03714838280285,
+      "n_atoms": 18,
+      "wall_sec": 60.91195487976074,
+      "e_per_atom_eV": -4.002063799044603
+    },
+    {
+      "host": "BiITe",
+      "from_candidate_idx": 54,
+      "from_dopant": "S",
+      "n_atoms_doped": 28,
+      "n_atoms_pristine": 27,
+      "ok": true,
+      "e_total_eV": -87.50590181943858,
+      "n_atoms": 27,
+      "wall_sec": 227.05742025375366,
+      "e_per_atom_eV": -3.240959326645873
+    },
+    {
+      "host": "SnSe2",
+      "from_candidate_idx": 259,
+      "from_dopant": "Ir",
+      "n_atoms_doped": 28,
+      "n_atoms_pristine": 27,
+      "ok": true,
+      "e_total_eV": -99.0804211746707,
+      "n_atoms": 27,
+      "wall_sec": 192.01711344718933,
+      "e_per_atom_eV": -3.6696452286915076
+    },
+    {
+      "host": "Mo2CO2",
+      "from_candidate_idx": 32,
+      "from_dopant": "In",
+      "n_atoms_doped": 81,
+      "n_atoms_pristine": 80,
+      "ok": true,
+      "e_total_eV": -507.50489706932046,
+      "n_atoms": 80,
+      "wall_sec": 1096.0591497421265,
+      "e_per_atom_eV": -6.343811213366505
+    }
+  ],
+  "wall_min": 29.1464173634847
+}

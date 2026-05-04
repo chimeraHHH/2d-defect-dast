@@ -1,0 +1,53 @@
+{
+  "results": [
+    {
+      "ok": true,
+      "element": "Bi",
+      "e_per_atom_eV": -1.6010225217929677,
+      "wall_sec": 15.148269414901733
+    },
+    {
+      "ok": true,
+      "element": "In",
+      "e_per_atom_eV": 0.043186794122910974,
+      "wall_sec": 18.468111753463745
+    },
+    {
+      "ok": false,
+      "element": "Ir",
+      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
+      "wall_sec": 336.28965044021606
+    },
+    {
+      "ok": false,
+      "element": "La",
+      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
+      "wall_sec": 361.3231039047241
+    },
+    {
+      "ok": false,
+      "element": "Pb",
+      "error": "KohnShamConvergenceError: Did not converge!  See text output for help.",
+      "wall_sec": 338.98926734924316
+    },
+    {
+      "ok": true,
+      "element": "Rh",
+      "e_per_atom_eV": -1.3880759377116942,
+      "wall_sec": 61.203025579452515
+    },
+    {
+      "ok": true,
+      "element": "Ru",
+      "e_per_atom_eV": -2.152664111901395,
+      "wall_sec": 26.955989360809326
+    },
+    {
+      "ok": true,
+      "element": "S",
+      "e_per_atom_eV": -1.0059149005619794,
+      "wall_sec": 10.187669038772583
+    }
+  ],
+  "wall_min": 19.489116032918293
+}

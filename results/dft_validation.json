@@ -1,0 +1,225 @@
+{
+  "config": {
+    "top_n": 10,
+    "pw_cutoff_eV": 300,
+    "kpts": [
+      2,
+      2,
+      1
+    ],
+    "xc": "PBE"
+  },
+  "results": [
+    {
+      "rank": 1,
+      "candidate_idx": 247,
+      "host": "Pd2Se4",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "n_atoms": 25,
+      "model_pred_Ef_eV": 2.4256,
+      "model_sigma_cal_eV": 11.8642,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -91.12344599315875,
+      "wall_sec": 187.30234026908875,
+      "e_per_atom_eV": -3.6449378397263503
+    },
+    {
+      "rank": 2,
+      "candidate_idx": 199,
+      "host": "Ge2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "n_atoms": 19,
+      "model_pred_Ef_eV": 3.9834,
+      "model_sigma_cal_eV": 11.4875,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -75.93891171345805,
+      "wall_sec": 111.5040385723114,
+      "e_per_atom_eV": -3.996784827024108
+    },
+    {
+      "rank": 3,
+      "candidate_idx": 54,
+      "host": "BiITe",
+      "dopant": "S",
+      "defect_type": "interstitial",
+      "n_atoms": 28,
+      "model_pred_Ef_eV": 3.9411,
+      "model_sigma_cal_eV": 10.2135,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -90.91967554691966,
+      "wall_sec": 224.21688771247864,
+      "e_per_atom_eV": -3.247131269532845
+    },
+    {
+      "rank": 4,
+      "candidate_idx": 70,
+      "host": "BiITe",
+      "dopant": "Rh",
+      "defect_type": "interstitial",
+      "n_atoms": 28,
+      "model_pred_Ef_eV": 4.23,
+      "model_sigma_cal_eV": 9.6623,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -93.80109762708301,
+      "wall_sec": 229.12116312980652,
+      "e_per_atom_eV": -3.35003920096725
+    },
+    {
+      "rank": 5,
+      "candidate_idx": 259,
+      "host": "SnSe2",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "n_atoms": 28,
+      "model_pred_Ef_eV": 3.8983,
+      "model_sigma_cal_eV": 9.3334,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -107.854936958,
+      "wall_sec": 166.2767734527588,
+      "e_per_atom_eV": -3.8519620342142855
+    },
+    {
+      "rank": 6,
+      "candidate_idx": 32,
+      "host": "Mo2CO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "n_atoms": 81,
+      "model_pred_Ef_eV": 4.3271,
+      "model_sigma_cal_eV": 9.6953,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -507.90471847276035,
+      "wall_sec": 1196.4802017211914,
+      "e_per_atom_eV": -6.270428623120498
+    },
+    {
+      "rank": 7,
+      "candidate_idx": 34,
+      "host": "Mo2CO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "n_atoms": 81,
+      "model_pred_Ef_eV": 4.3402,
+      "model_sigma_cal_eV": 9.6731,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -507.5027378748742,
+      "wall_sec": 1137.0317170619965,
+      "e_per_atom_eV": -6.265465899689805
+    },
+    {
+      "rank": 8,
+      "candidate_idx": 69,
+      "host": "BiITe",
+      "dopant": "Ru",
+      "defect_type": "interstitial",
+      "n_atoms": 28,
+      "model_pred_Ef_eV": 4.8115,
+      "model_sigma_cal_eV": 9.7763,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -94.30127121696925,
+      "wall_sec": 227.13693118095398,
+      "e_per_atom_eV": -3.3679025434631877
+    },
+    {
+      "rank": 9,
+      "candidate_idx": 260,
+      "host": "SnSe2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "n_atoms": 28,
+      "model_pred_Ef_eV": 4.2566,
+      "model_sigma_cal_eV": 9.7511,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -99.63953345498906,
+      "wall_sec": 182.08473348617554,
+      "e_per_atom_eV": -3.5585547662496095
+    },
+    {
+      "rank": 10,
+      "candidate_idx": 33,
+      "host": "Mo2CO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "n_atoms": 81,
+      "model_pred_Ef_eV": 4.3092,
+      "model_sigma_cal_eV": 9.6551,
+      "dft_pw_cutoff_eV": 300,
+      "dft_kpts": [
+        2,
+        2,
+        1
+      ],
+      "dft_xc": "PBE",
+      "ok": true,
+      "e_total_eV": -512.1994002776238,
+      "wall_sec": 1148.7133419513702,
+      "e_per_atom_eV": -6.323449386143504
+    }
+  ],
+  "wall_time_min": 80.18112488190333
+}
