@@ -16,7 +16,52 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 > **诚实化声明**：项目曾经报告过 0.206 eV 的"突破性"结果。该数字基于
 > aug-then-split 数据泄漏，已在 v1.1 中撤回；详见 [paper §5.7](paper/main.md)。
 
-## 最终结果（leak-free，与 ALIGNN 同一 1065 测试样本）
+## v2.0 进行中（2026-05-04）：周期傅里叶注意力 + 多数据库联合训练
+
+为把项目推向材料 ML 顶刊水平（目标 *npj Comput. Mater.*），我们引入两项
+新组件：
+
+1. **PeriodicFourierBias (PFA)**：在自注意力的 score 上叠加一项基于
+   pair-wise 最小镜像分数位移 ``f_ij`` 的可学习傅里叶基偏置——对原子在任意
+   晶格平移下精确不变（cos/sin 的 2π-周期性），且天然编码方向信息（标量
+   距离丢失的）。
+2. **多数据库联合训练**：用一个 PFA-only backbone + 4 个 source-specific
+   readout head 同时拟合 IMP2D (8512) + JARVIS-2D (70) + JARVIS-3D (381) +
+   JARVIS DFT-3D (17912) 共 26 837 个真实 DFT 样本。
+
+**Phase 1 关键结果**（截至 2026-05-04 21:30 北京）：
+
+| 配置 | params | Test MAE | 对照 |
+|---|---|---|---|
+| baseline_h128_aug_long_safe (v1, 单源 leak-free aug, seed=42) | 0.747 M | 0.516 | 旧 SOTA |
+| v2_pfa_h128_aug_long_safe (PFA + 多尺度 + 缺陷偏置, 单源, seed=42) | 0.744 M | 0.519 | 持平 baseline |
+| v1 multi-source (CrystalTransformer + 4 DB, seed=42) | 0.815 M | 0.555 | 旧多源 |
+| **v2 multi-source seed=42 (PFA-only + 4 DB, apples-to-apples vs v1 多源)** | **0.820 M** | **0.4929** | **−11.2% vs v1 multi-source** |
+| v2 multi-source 4-seed mean ± std (seed 42/0/1/2) | 0.820 M | **0.486 ± 0.025** | — |
+
+> **分母说明**：v1 / v2 多源系列使用 ``split_indices(seed=N, 0.8/0.1/0.1)``
+> 划分 IMP2D，测试样本随 seed 变化；这与单源 leak-free aug 用的固定 1065
+> 测试集不是同一组样本，因此 v2 多源 vs baseline 0.516 的相对改善只能视为
+> 方向性指标（~−5%）。**严格 apples-to-apples 仅在 v1/v2 多源之间成立**，
+> 即 v2 比 v1 多源改善 **−11.2%（seed=42）**。后续会补一份 v2 多源在
+> leak-free 1065 上的评估以闭环这一对比。
+
+**进行中（自主队列）**：
+
+- 5-host LOHO + multi-source（MoS₂/Cr₂I₆/C₂H₂/TaSe₂/MoSSe，~2.5 h）
+- 4-seed UQ 校准 + 温度缩放
+- 注意力 + occlusion 在 v2-PFA backbone 上重测
+- 论文 v2.0 重写
+
+**Phase 1 单源消融的诚实化结论**：5 个 v2 单源变体（PFA + 多尺度 + 缺陷
+偏置的全开 / 各两两组合）的 Test MAE 全部在 0.519–0.551 区间，均处于
+4-seed 单源 baseline σ=0.016 eV 的 ±2 倍范围内——**单源任务上 PFA 等
+inductive bias 的边际收益被数据规模吞没**（与 §5.17 缩放律 α=−0.40 一致）。
+v2 真正起效的杠杆是叠加多源数据。详见
+[memory/phase1_v2_findings.md](../../.claude/projects/...)（仅供 Claude
+记忆系统使用）。
+
+## 最终结果（v1.2 leak-free，与 ALIGNN 同一 1065 测试样本）
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|

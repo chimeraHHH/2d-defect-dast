@@ -1,0 +1,30 @@
+model: periodic
+data_path: data/processed/augmented_dataset_safe.pkl
+output_dir: results/v2_ablate_no_defect_bias
+seed: 42
+batch_size: 64
+epochs: 50
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+optimizer:
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  factor: 0.5
+  patience: 6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  use_pfa: true               # keep PFA
+  k_max: 2
+  use_long_range: true        # keep multi-scale distance
+  use_defect_bias: false      # ablate: no per-pair defect categorical bias

@@ -123,6 +123,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     defect_mask = torch.zeros(batch_size, n_max, dtype=torch.long)
     atom_mask = torch.zeros(batch_size, n_max, dtype=torch.bool)
     dist_matrix = torch.zeros(batch_size, n_max, n_max, dtype=torch.float32)
+    positions = torch.zeros(batch_size, n_max, 3, dtype=torch.float32)
     target = torch.zeros(batch_size, dtype=torch.float32)
     num_atoms = torch.zeros(batch_size, dtype=torch.long)
 
@@ -136,6 +137,8 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         defect_mask[i, :n] = item["defect_mask"]
         atom_mask[i, :n] = True
         dist_matrix[i, :n, :n] = item["dist_matrix"]
+        if "positions" in item:
+            positions[i, :n] = item["positions"]
         target[i] = item["target"]
         num_atoms[i] = n
         cell[i] = item["cell"]
@@ -149,6 +152,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "defect_mask": defect_mask,
         "atom_mask": atom_mask,
         "dist_matrix": dist_matrix,
+        "positions": positions,
         "cell": cell,
         "target": target,
         "num_atoms": num_atoms,

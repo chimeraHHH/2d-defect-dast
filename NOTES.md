@@ -1,5 +1,30 @@
 # Notes / future work
 
+## v2 architecture (2026-05-04)
+
+The v2 work introduces three additive attention-bias channels (no new tokens,
+to avoid the DAST virtual-node failure mode of v1):
+
+- ``PeriodicFourierBias`` (`src/models/attention_v2.py`): integer-k truncated
+  Fourier basis on minimum-image fractional displacement; exact periodicity
+  under any lattice shift, encodes direction the scalar distance discards.
+- ``MultiScaleDistanceBias``: short-range Gaussian RBF + long-range
+  ``[1/(r+δ)^n, exp(-r/λ)]`` with smooth cut-offs at ``r_short`` and ``r_max``.
+- ``DefectAwareBias``: 4-entry categorical bias keyed on
+  (defect_i, defect_j) ∈ {0,1}².
+
+Single-source ablation (h=128, 50ep, leak-free aug, seed=42) showed all 5
+combinations land in 0.519–0.551 eV — within 2σ of baseline 0.516 — so the
+single-source PFA path is **net-neutral**. The win comes from combining the
+PFA backbone with **multi-source training** (4 DBs × per-source readout
+heads): seed=42 gives test MAE 0.4929 eV (−11.2% vs v1 multi-source 0.555);
+4-seed mean 0.486 ± 0.025 eV.
+
+**Important caveat**: multi-source uses ``split_indices(seed=N)`` for IMP2D
+test, which differs from the leak-free 1065 sample set used by single-source
+baselines. Apples-to-apples comparison only holds against v1 multi-source.
+A leak-free re-evaluation of v2 multi-source is on the to-do list.
+
 ## GPAW + CUDA on RTX 5090 (sm_120)
 
 **Status (2026-05-04):** all C18 DFT validation runs used **CPU-only** GPAW

@@ -1,0 +1,27 @@
+model: periodic
+data_path: data/processed/smoke.pkl
+output_dir: results/v2_smoke
+seed: 0
+batch_size: 8
+epochs: 1
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+optimizer:
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 32
+  n_local_layers: 1
+  n_global_layers: 1
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.0
+  use_pfa: true
+  k_max: 2
+  use_long_range: true
+  use_defect_bias: true

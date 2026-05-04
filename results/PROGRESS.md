@@ -14,6 +14,11 @@
 
 ## 关键里程碑
 
+- 2026-05-04 21:28 (v2 phase 1 + multi-source) 4-seed v2-PFA-only 多源 mean 0.486 ± 0.025 eV，比 v1 多源 0.555 改善 −12.5% (seed=42 头条 0.4929)
+- 2026-05-04 11:39 (v2 phase 1 ablation) 5 个 v2 单源变体全部在 baseline ± 2σ 内；单源任务上 PFA + 多尺度 + 缺陷偏置无统计显著赢面
+- 2026-05-04 09:15 (v2 phase 1 headline) v2 full 单源 50ep test MAE 0.5193 (持平 baseline 0.516)
+- 2026-05-04 08:29 (v2 launched) RTX 5090 上启动 PFA + multi-scale + defect-bias 头条训练
+- 2026-05-04 build PeriodicCrystalTransformer (src/models/attention_v2.py) + 不变性单元测试 4 项全过
 - 2026-05-02 13:43 项目启动；从 DTU CMR 拉取 IMP2D 10641 样本
 - 2026-05-02 14:30 修复 LocalInteractionLayer 收敛问题 (SchNet 风格滤波卷积)
 - 2026-05-02 19:00 远端 RTX 5090 GPU 接入

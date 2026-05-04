@@ -21,12 +21,17 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
-from src.models import CrystalTransformer, DefectAwareTransformer
+from src.models import (
+    CrystalTransformer,
+    DefectAwareTransformer,
+    PeriodicCrystalTransformer,
+)
 
 
 MODEL_REGISTRY = {
     "baseline": CrystalTransformer,
     "improved": DefectAwareTransformer,
+    "periodic": PeriodicCrystalTransformer,
 }
 
 
