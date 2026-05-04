@@ -151,6 +151,29 @@ JARVIS dft_2d 1.1k 本征 2D 材料 (eV/atom, 不同任务定义) 上的 few-sho
 
 脚本：[scripts/hts_demo.py](scripts/hts_demo.py)
 
+### 生成式对抗主动学习（C17）
+
+测试用 ensemble σ 引导生成 + 伪标签训练能否突破 §5.17 数据瓶颈：
+
+| 策略 | n 真+伪 | Test MAE (eV) | Δ |
+|---|---|---|---|
+| A 无增强 | 8512+0 | 0.869 | 0% |
+| B 随机 100 伪 | 8512+100 | 1.538 | **+77%** |
+| **C 对抗 top-σ 100** | 8512+100 | **0.770** | **−11%** |
+| D 置信过滤 (σ<2) 20 | 8512+20 | 1.103 | +27% |
+
+关键发现：
+- MACE-MP-0 基础模型作伪 oracle **失败** (r=0.04)
+- 287 候选 σ 中位数 4.4 eV → 全部深度 OOD
+- 对抗 top-σ 帮助源于"输入多样化"，不是伪标签信息
+- **真正突破必须做 DFT** —— 输出 σ 排序的 287-样本优先队列
+
+脚本：
+[mace_mp_validation.py](scripts/mace_mp_validation.py) /
+[generate_candidates.py](scripts/generate_candidates.py) /
+[c17_augmented_training.py](scripts/c17_augmented_training.py) /
+[c17_priority_queue.py](scripts/c17_priority_queue.py)
+
 ### 主动学习闭环
 
 MC-Dropout σ 引导的迭代选样 vs 随机选样（15 轮 × 50 样本）：

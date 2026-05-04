@@ -152,6 +152,16 @@
 |---|---|---|---|---|---|---|---|
 | log_MAE = a + alpha*log(N) + beta*log(P) | CrystalTransformer (multi-config) | leak_free_v1 | 0.12-1.65 | 30 | 42 | alpha=-0.401 | beta=-0.010, R²=0.953 |
 
+## Generative AL (C17)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| C_adversarial100 | baseline h128 + pseudo aug | leak_free_v1 + 287 pseudo | 0.747 | 60 | 42 | 0.7702 | n_pseudo=100 |
+| A_baseline | baseline h128 + pseudo aug | leak_free_v1 + 287 pseudo | 0.747 | 60 | 42 | 0.8687 | n_pseudo=0 |
+| D_conf_filtered | baseline h128 + pseudo aug | leak_free_v1 + 287 pseudo | 0.747 | 60 | 42 | 1.1033 | n_pseudo=20 |
+| B_random100 | baseline h128 + pseudo aug | leak_free_v1 + 287 pseudo | 0.747 | 60 | 42 | 1.5381 | n_pseudo=100 |
+| MACE-MP-0_validation | MACE-MP-0 foundation | 100 IMP2D samples | — | — | 42 | 2.6203 | r=0.039 |
+
 ## HTS workflow
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |

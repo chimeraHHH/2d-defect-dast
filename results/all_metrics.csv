@@ -81,6 +81,11 @@ GNN baseline (PyG),crystaltransformer_(ours),CrystalTransformer (ours),leak_free
 GNN baseline (PyG),alignn_(ref),ALIGNN (ref),leak_free_v1,4.03,—,42,0.54,—
 Scaling law fit,log_MAE = a + alpha*log(N) + beta*log(P),CrystalTransformer (multi-config),leak_free_v1,0.12-1.65,30,42,alpha=-0.401,"beta=-0.010, R²=0.953"
 GNN baseline (PyG),mace_lmax2,"MACE (small, max_ell=2, 2 interactions)",leak_free_v1,0.44,60,42,1.4642,2.1559
+Generative AL (C17),A_baseline,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,0.8687,n_pseudo=0
+Generative AL (C17),B_random100,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,1.5381,n_pseudo=100
+Generative AL (C17),C_adversarial100,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,0.7702,n_pseudo=100
+Generative AL (C17),D_conf_filtered,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,1.1033,n_pseudo=20
+Generative AL (C17),MACE-MP-0_validation,MACE-MP-0 foundation,100 IMP2D samples,—,—,42,2.6203,r=0.039
 HTS workflow,top15_uq_guided,4-seed ensemble + τ scaling,leak_free_v1,4×0.747,—,ensemble,0.2504,hit=100% vs rand 60%
 Cross-task (dft_2d pristine),zero-shot,baseline h128 (IMP2D pretrained),jarvis_dft_2d,0.747,0,42,0.8856,mean_pred_baseline=0.683
 Cross-task (dft_2d pristine),k=10_ft_vs_sc,FT (IMP2D pretrained),jarvis_dft_2d,0.747,60,42,0.74,"SC=0.5739, Δ=-28.9%"

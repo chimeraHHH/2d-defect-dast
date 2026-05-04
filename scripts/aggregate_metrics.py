@@ -315,6 +315,36 @@ def main():
             "test_rmse": round(mace["test_rmse_eV"], 4),
         })
 
+    # ---- Generative AL (C17) ----
+    c17 = _read_json(RESULTS / "c17_augmented_training.json")
+    if c17:
+        for name, r in c17["results"].items():
+            rows.append({
+                "category": "Generative AL (C17)",
+                "run": name,
+                "model": "baseline h128 + pseudo aug",
+                "data": "leak_free_v1 + 287 pseudo",
+                "params_M": 0.747,
+                "epochs": c17["config"]["epochs"],
+                "seed": c17["config"]["seed"],
+                "test_mae": round(r["test_mae_eV"], 4),
+                "test_rmse": f"n_pseudo={r['n_pseudo']}",
+            })
+
+    mace_mp = _read_json(RESULTS / "mace_mp_validation.json")
+    if mace_mp:
+        rows.append({
+            "category": "Generative AL (C17)",
+            "run": "MACE-MP-0_validation",
+            "model": "MACE-MP-0 foundation",
+            "data": "100 IMP2D samples",
+            "params_M": "—",
+            "epochs": "—",
+            "seed": 42,
+            "test_mae": round(mace_mp["mae_total_eV"], 4),
+            "test_rmse": f"r={mace_mp['pearson_total']:.3f}",
+        })
+
     # ---- HTS demo (C16) ----
     hts = _read_json(RESULTS / "hts_demo.json")
     if hts:
