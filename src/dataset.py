@@ -247,11 +247,19 @@ def make_splits(
     encoded in the meta: train_section + val_section + test_section. Otherwise
     fall back to a deterministic random shuffle.
     """
+    # Use ordered split for any meta that publishes explicit n_train/n_val/n_test
+    # boundaries — this is the leak-free contract regardless of the version
+    # string ("leak_free_v1", "with_pristine_v1", "leak_free_aug_pristine_v1",
+    # any future schema that follows the same convention).
     if (
         dataset.meta is not None
-        and dataset.meta.get("version") == "leak_free_v1"
+        and "n_train" in dataset.meta
+        and "n_val" in dataset.meta
+        and "n_test" in dataset.meta
     ):
-        n_tr, n_va, n_te = dataset.meta["n_train"], dataset.meta["n_val"], dataset.meta["n_test"]
+        n_tr, n_va, n_te = (
+            dataset.meta["n_train"], dataset.meta["n_val"], dataset.meta["n_test"]
+        )
         train_idx = list(range(n_tr))
         val_idx = list(range(n_tr, n_tr + n_va))
         test_idx = list(range(n_tr + n_va, n_tr + n_va + n_te))
