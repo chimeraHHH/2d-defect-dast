@@ -96,7 +96,7 @@ class CrystalGraphDataset(Dataset):
         numbers = torch.from_numpy(sample["numbers"])
         x = self.atom_features[numbers]
         defect_mask = torch.from_numpy(sample["defect_mask"]).long()
-        return {
+        item = {
             "x": x,
             "defect_mask": defect_mask,
             "edge_index": torch.from_numpy(sample["edge_index"]),
@@ -109,6 +109,21 @@ class CrystalGraphDataset(Dataset):
             "target": torch.tensor(sample["target"], dtype=torch.float32),
             "num_atoms": numbers.numel(),
         }
+        if "pristine" in sample:
+            p = sample["pristine"]
+            p_numbers = torch.from_numpy(p["numbers"])
+            item.update({
+                "pristine_x": self.atom_features[p_numbers],
+                "pristine_edge_index": torch.from_numpy(p["edge_index"]),
+                "pristine_edge_dist": torch.from_numpy(p["edge_dist"]),
+                "pristine_triplet_index": torch.from_numpy(p["triplet_index"]),
+                "pristine_angles": torch.from_numpy(p["angles"]),
+                "pristine_dist_matrix": torch.from_numpy(p["dist_matrix"]),
+                "pristine_positions": torch.from_numpy(p["positions"]),
+                "pristine_cell": torch.from_numpy(p["cell"]),
+                "pristine_num_atoms": p_numbers.numel(),
+            })
+        return item
 
 
 # --------------------------------------------------------------------- collate
@@ -147,7 +162,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         triplet_index_list.append(item["triplet_index"])
         angles_list.append(item["angles"])
 
-    return {
+    out = {
         "x": x,
         "defect_mask": defect_mask,
         "atom_mask": atom_mask,
@@ -162,6 +177,42 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "triplet_index_list": triplet_index_list,
         "angles_list": angles_list,
     }
+
+    # Optional pristine stream (dual-stream architecture)
+    if "pristine_x" in batch[0]:
+        p_natoms_list = [item["pristine_num_atoms"] for item in batch]
+        p_max = max(p_natoms_list)
+        p_x = torch.zeros(batch_size, p_max, feat_dim, dtype=torch.float32)
+        p_atom_mask = torch.zeros(batch_size, p_max, dtype=torch.bool)
+        p_dist = torch.zeros(batch_size, p_max, p_max, dtype=torch.float32)
+        p_positions = torch.zeros(batch_size, p_max, 3, dtype=torch.float32)
+        p_cell = torch.zeros(batch_size, 3, 3, dtype=torch.float32)
+        p_edge_index_list, p_edge_dist_list = [], []
+        p_triplet_index_list, p_angles_list = [], []
+        for i, item in enumerate(batch):
+            n = item["pristine_num_atoms"]
+            p_x[i, :n] = item["pristine_x"]
+            p_atom_mask[i, :n] = True
+            p_dist[i, :n, :n] = item["pristine_dist_matrix"]
+            p_positions[i, :n] = item["pristine_positions"]
+            p_cell[i] = item["pristine_cell"]
+            p_edge_index_list.append(item["pristine_edge_index"])
+            p_edge_dist_list.append(item["pristine_edge_dist"])
+            p_triplet_index_list.append(item["pristine_triplet_index"])
+            p_angles_list.append(item["pristine_angles"])
+        out.update({
+            "pristine_x": p_x,
+            "pristine_atom_mask": p_atom_mask,
+            "pristine_dist_matrix": p_dist,
+            "pristine_positions": p_positions,
+            "pristine_cell": p_cell,
+            "pristine_num_atoms_list": p_natoms_list,
+            "pristine_edge_index_list": p_edge_index_list,
+            "pristine_edge_dist_list": p_edge_dist_list,
+            "pristine_triplet_index_list": p_triplet_index_list,
+            "pristine_angles_list": p_angles_list,
+        })
+    return out
 
 
 # --------------------------------------------------------------------- split

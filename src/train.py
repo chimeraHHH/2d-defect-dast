@@ -25,6 +25,8 @@ from src.models import (
     CrystalTransformer,
     DefectAwareTransformer,
     PeriodicCrystalTransformer,
+    DualStreamPeriodicTransformer,
+    compute_invariance_loss,
 )
 
 
@@ -32,6 +34,7 @@ MODEL_REGISTRY = {
     "baseline": CrystalTransformer,
     "improved": DefectAwareTransformer,
     "periodic": PeriodicCrystalTransformer,
+    "dualstream": DualStreamPeriodicTransformer,
 }
 
 
@@ -194,16 +197,31 @@ def main() -> None:
         logf.write(msg)
         logf.flush()
 
+        # Optional invariance regulariser for dualstream models:
+        #   λ * MSE(model(x_pristine, x_pristine), 0)
+        # ensures predicted Ef → 0 as defect → pristine.
+        invariance_lambda = float(cfg.get("invariance_lambda", 0.0))
+        is_dualstream = (cfg["model"] == "dualstream")
+        if is_dualstream and invariance_lambda <= 0:
+            # default to 0.05 for dualstream unless explicitly disabled
+            invariance_lambda = 0.05
+
         global_step = 0
         for epoch in range(1, epochs + 1):
             t0 = time.time()
             model.train()
-            train_loss, train_abs, n_seen = 0.0, 0.0, 0
+            train_loss, train_abs, train_inv, n_seen = 0.0, 0.0, 0.0, 0
             for it, batch in enumerate(train_loader, start=1):
                 batch = move_batch(batch, device)
                 target_norm = normalizer.norm(batch["target"])
                 preds_norm = model(batch)
-                loss = criterion(preds_norm, target_norm)
+                task_loss = criterion(preds_norm, target_norm)
+                if is_dualstream and invariance_lambda > 0 and "pristine_x" in batch:
+                    inv_loss = compute_invariance_loss(model, batch)
+                    loss = task_loss + invariance_lambda * inv_loss
+                    train_inv += float(inv_loss.detach().item()) * int(batch["target"].numel())
+                else:
+                    loss = task_loss
                 optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 if grad_clip:
@@ -214,7 +232,7 @@ def main() -> None:
                     preds = normalizer.denorm(preds_norm)
                     abs_err = (preds - batch["target"]).abs().sum().item()
                 bs = int(batch["target"].numel())
-                train_loss += loss.item() * bs
+                train_loss += task_loss.item() * bs
                 train_abs += abs_err
                 n_seen += bs
                 global_step += 1
@@ -240,9 +258,11 @@ def main() -> None:
                 )
 
             dt = time.time() - t0
+            train_inv_avg = train_inv / max(n_seen, 1) if is_dualstream else 0.0
             row = {
                 "epoch": epoch,
                 "train_mae": train_mae,
+                "train_inv": train_inv_avg,
                 "val_mae": val_metrics["mae"],
                 "val_rmse": val_metrics["rmse"],
                 "lr": optimizer.param_groups[0]["lr"],
@@ -250,8 +270,10 @@ def main() -> None:
                 "best": improved,
             }
             history.append(row)
+            inv_str = f"inv {train_inv_avg:.4f} | " if is_dualstream else ""
             line = (
                 f"Epoch {epoch:02d}/{epochs} | train MAE {train_mae:.4f} | "
+                f"{inv_str}"
                 f"val MAE {val_metrics['mae']:.4f} RMSE {val_metrics['rmse']:.4f} | "
                 f"lr {row['lr']:.2e} | {dt:.1f}s {'*' if improved else ''}"
             )
