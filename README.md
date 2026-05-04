@@ -16,7 +16,31 @@ ALIGNN（4.03 M）在统计意义上完全持平；6-成员深度集成 + 温度
 > **诚实化声明**：项目曾经报告过 0.206 eV 的"突破性"结果。该数字基于
 > aug-then-split 数据泄漏，已在 v1.1 中撤回；详见 [paper §5.7](paper/main.md)。
 
-## v2.0 进行中（2026-05-04）：周期傅里叶注意力 + 多数据库联合训练
+## v3.0 进行中（2026-05-05）：缺陷-Pristine 双流交叉注意力
+
+物理动机：缺陷形成能 $E_f = E_{\text{defect}} - E_{\text{host}} + \Delta\mu$
+是一个**差分量**，但 v1/v2 让模型从单一缺陷结构去隐式推断 host 能量——
+这种设计浪费容量。**v3 把 host pristine supercell 作为显式参考输入**：
+
+- 共享 PFA encoder 同时编码 (defect, pristine) 两个超胞，权重 tied
+- 2 层 cross-attention：defect tokens (Q) attend to pristine tokens (K, V)
+- 读出 $\Delta z = \text{pool}(h_{\text{def}}) - \text{pool}(h_{\text{pri}})$
+  → bias-free linear → $E_f$
+- **软不变性损失** $\mathcal{L}_{\text{inv}} = \lambda \cdot \text{MSE}(f(x_p, x_p), 0)$
+  $\lambda=0.05$ 强制 $E_f(\text{pristine})=0$ identity
+
+参数 1.142 M（v2 PFA-only 0.744 M 的 1.54×）。Pristine supercell 通过
+"defect 减去 dopant 原子"重建（IMP2D 仅有 adsorbate / interstitial 两类
+缺陷，此规则严格成立——5 例 spot-check 全部 cell_diff = pos_diff = 0 验证）。
+
+代码：`src/models/dualstream.py`、`scripts/build_pristine_pairs.py`、
+`scripts/test_dualstream.py`（6 项不变性单元测试全过）。
+当前正在 RTX 5090 上跑 60 epoch headline (h=128, seed=42)，
+进度见 `results/dualstream_h128_imp2d/train.log`。
+
+---
+
+## v2.0（2026-05-04）：周期傅里叶注意力 + 多数据库联合训练
 
 为把项目推向材料 ML 顶刊水平（目标 *npj Comput. Mater.*），我们引入两项
 新组件：
