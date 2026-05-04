@@ -1,0 +1,108 @@
+{
+  "n_validate": 100,
+  "pearson_per_atom": 0.11596249755649711,
+  "calibration_a": 0.007321096406649617,
+  "calibration_b": 0.13160701646254866,
+  "mae_total_eV": 2.620305516272992,
+  "rmse_total_eV": 3.2472064612693474,
+  "pearson_total": 0.039317483315411635,
+  "decision_use_pseudo_dft": false,
+  "per_host": {
+    "Cr2I6": {
+      "n": 5,
+      "pearson_per_atom": -0.019049377121502398,
+      "true_mean_eV": 3.7391412489999993
+    },
+    "Ge2": {
+      "n": 4,
+      "pearson_per_atom": 0.6848508280565264,
+      "true_mean_eV": 1.7897357918749977
+    },
+    "Hf2Te6": {
+      "n": 4,
+      "pearson_per_atom": -0.8434837839038679,
+      "true_mean_eV": 2.7008027696874626
+    },
+    "HfSe2": {
+      "n": 3,
+      "pearson_per_atom": -0.9939927408215258,
+      "true_mean_eV": 2.282111563333342
+    },
+    "MoS2": {
+      "n": 4,
+      "pearson_per_atom": 0.7444758608697252,
+      "true_mean_eV": 7.744900107916655
+    },
+    "MoSSe": {
+      "n": 3,
+      "pearson_per_atom": -0.590302859750994,
+      "true_mean_eV": 2.840126762777802
+    },
+    "NbS2": {
+      "n": 3,
+      "pearson_per_atom": 0.6004302657059982,
+      "true_mean_eV": 4.122325836666666
+    },
+    "NiSe2": {
+      "n": 4,
+      "pearson_per_atom": -0.9426556560936521,
+      "true_mean_eV": 0.8218074481250011
+    },
+    "PtS2": {
+      "n": 4,
+      "pearson_per_atom": 0.8274786959466229,
+      "true_mean_eV": 6.283658638749997
+    },
+    "Re4Se8": {
+      "n": 3,
+      "pearson_per_atom": -0.9635538216712436,
+      "true_mean_eV": 1.5647827787499864
+    },
+    "SnSe2": {
+      "n": 4,
+      "pearson_per_atom": -0.974540413300408,
+      "true_mean_eV": 1.0800416175000016
+    },
+    "TaS2": {
+      "n": 3,
+      "pearson_per_atom": -0.8710832342907529,
+      "true_mean_eV": 2.378073371666667
+    },
+    "V2CO2": {
+      "n": 5,
+      "pearson_per_atom": 0.7577367402121095,
+      "true_mean_eV": 1.6755898069999848
+    },
+    "W2Se4": {
+      "n": 3,
+      "pearson_per_atom": 0.9528510556668633,
+      "true_mean_eV": 2.9493984808333273
+    },
+    "W2Te4": {
+      "n": 3,
+      "pearson_per_atom": 0.31682778969946646,
+      "true_mean_eV": 4.2019196691666645
+    },
+    "WSe2": {
+      "n": 3,
+      "pearson_per_atom": -0.30216121349024155,
+      "true_mean_eV": 2.6560262483333257
+    },
+    "WTe2": {
+      "n": 5,
+      "pearson_per_atom": -0.8945546435198932,
+      "true_mean_eV": 3.8770780510000065
+    },
+    "ZrS2": {
+      "n": 4,
+      "pearson_per_atom": -0.1968912028822881,
+      "true_mean_eV": 3.3822948231249983
+    },
+    "ZrSe2": {
+      "n": 3,
+      "pearson_per_atom": -0.20263328465351305,
+      "true_mean_eV": 4.175307354999993
+    }
+  },
+  "wall_time_min": 0.10971288283665975
+}

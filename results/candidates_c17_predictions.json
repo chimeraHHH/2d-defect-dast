@@ -1,0 +1,2878 @@
+{
+  "tau": 2.5953441155091057,
+  "n_candidates": 287,
+  "n_seeds": 4,
+  "predictions": [
+    {
+      "id": 0,
+      "host": "SnS2",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.2245195209980011,
+      "sigma_raw": 1.8345028162002563,
+      "sigma_cal": 4.761166095733643
+    },
+    {
+      "id": 1,
+      "host": "SnS2",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.17351877689361572,
+      "sigma_raw": 2.169384717941284,
+      "sigma_cal": 5.6302995681762695
+    },
+    {
+      "id": 2,
+      "host": "SnS2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.1506008505821228,
+      "sigma_raw": 2.1496975421905518,
+      "sigma_cal": 5.579204559326172
+    },
+    {
+      "id": 3,
+      "host": "SnS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.4673330783843994,
+      "sigma_raw": 1.7780711650848389,
+      "sigma_cal": 4.614706516265869
+    },
+    {
+      "id": 4,
+      "host": "SnS2",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.05222401022911072,
+      "sigma_raw": 2.1860551834106445,
+      "sigma_cal": 5.67356538772583
+    },
+    {
+      "id": 5,
+      "host": "SnS2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.402357816696167,
+      "sigma_raw": 2.526185989379883,
+      "sigma_cal": 6.556321620941162
+    },
+    {
+      "id": 6,
+      "host": "WS2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 0.7630043625831604,
+      "sigma_raw": 0.3661509156227112,
+      "sigma_cal": 0.9502875804901123
+    },
+    {
+      "id": 7,
+      "host": "WS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 1.0345516204833984,
+      "sigma_raw": 0.5426701903343201,
+      "sigma_cal": 1.4084159135818481
+    },
+    {
+      "id": 8,
+      "host": "WS2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 2.530877113342285,
+      "sigma_raw": 1.0109024047851562,
+      "sigma_cal": 2.6236395835876465
+    },
+    {
+      "id": 9,
+      "host": "WS2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 2.1448874473571777,
+      "sigma_raw": 0.1948520839214325,
+      "sigma_cal": 0.5057082176208496
+    },
+    {
+      "id": 10,
+      "host": "MoS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 7.105823516845703,
+      "sigma_raw": 3.8367373943328857,
+      "sigma_cal": 9.957653999328613
+    },
+    {
+      "id": 11,
+      "host": "MoTe2",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7830078601837158,
+      "sigma_raw": 2.5747437477111816,
+      "sigma_cal": 6.682345867156982
+    },
+    {
+      "id": 12,
+      "host": "MoTe2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.6152081489562988,
+      "sigma_raw": 0.7535327672958374,
+      "sigma_cal": 1.955676794052124
+    },
+    {
+      "id": 13,
+      "host": "MoTe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.9072436094284058,
+      "sigma_raw": 3.0066304206848145,
+      "sigma_cal": 7.8032402992248535
+    },
+    {
+      "id": 14,
+      "host": "MoTe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.8041627407073975,
+      "sigma_raw": 0.6337881684303284,
+      "sigma_cal": 1.6448984146118164
+    },
+    {
+      "id": 15,
+      "host": "WTe2",
+      "dopant": "Sc",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.07932925224304199,
+      "sigma_raw": 1.6964538097381592,
+      "sigma_cal": 4.402881145477295
+    },
+    {
+      "id": 16,
+      "host": "WTe2",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.861981987953186,
+      "sigma_raw": 1.2481672763824463,
+      "sigma_cal": 3.2394235134124756
+    },
+    {
+      "id": 17,
+      "host": "WTe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.6771849989891052,
+      "sigma_raw": 2.32889723777771,
+      "sigma_cal": 6.044289588928223
+    },
+    {
+      "id": 18,
+      "host": "WTe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.3454983234405518,
+      "sigma_raw": 2.139808416366577,
+      "sigma_cal": 5.553539276123047
+    },
+    {
+      "id": 19,
+      "host": "MoSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 1.9950389862060547,
+      "sigma_raw": 2.753994941711426,
+      "sigma_cal": 7.14756441116333
+    },
+    {
+      "id": 20,
+      "host": "MoSe2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 2.2953507900238037,
+      "sigma_raw": 2.7493035793304443,
+      "sigma_cal": 7.1353888511657715
+    },
+    {
+      "id": 21,
+      "host": "MoSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 3.267207145690918,
+      "sigma_raw": 1.8464678525924683,
+      "sigma_cal": 4.792219161987305
+    },
+    {
+      "id": 22,
+      "host": "NbS2",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.5696688890457153,
+      "sigma_raw": 0.7057381868362427,
+      "sigma_cal": 1.831633448600769
+    },
+    {
+      "id": 23,
+      "host": "NbS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.4790377616882324,
+      "sigma_raw": 1.557337999343872,
+      "sigma_cal": 4.041828155517578
+    },
+    {
+      "id": 24,
+      "host": "NbS2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.4733604192733765,
+      "sigma_raw": 2.965869665145874,
+      "sigma_cal": 7.697452068328857
+    },
+    {
+      "id": 25,
+      "host": "NbSe2",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.30813759565353394,
+      "sigma_raw": 0.9769769906997681,
+      "sigma_cal": 2.5355913639068604
+    },
+    {
+      "id": 26,
+      "host": "NbSe2",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.2680131494998932,
+      "sigma_raw": 0.8576355576515198,
+      "sigma_cal": 2.2258594036102295
+    },
+    {
+      "id": 27,
+      "host": "NbSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.10362499952316284,
+      "sigma_raw": 0.9205827116966248,
+      "sigma_cal": 2.3892288208007812
+    },
+    {
+      "id": 28,
+      "host": "NbSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.068294882774353,
+      "sigma_raw": 0.9790042042732239,
+      "sigma_cal": 2.5408527851104736
+    },
+    {
+      "id": 29,
+      "host": "WSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 7.749848365783691,
+      "sigma_raw": 2.488668203353882,
+      "sigma_cal": 6.458950042724609
+    },
+    {
+      "id": 30,
+      "host": "WSe2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 9.668773651123047,
+      "sigma_raw": 1.0861968994140625,
+      "sigma_cal": 2.81905460357666
+    },
+    {
+      "id": 31,
+      "host": "WSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 9.448282241821289,
+      "sigma_raw": 1.2347666025161743,
+      "sigma_cal": 3.204644203186035
+    },
+    {
+      "id": 32,
+      "host": "Mo2CO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.32712984085083,
+      "sigma_raw": 3.735639810562134,
+      "sigma_cal": 9.695270538330078
+    },
+    {
+      "id": 33,
+      "host": "Mo2CO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.3091912269592285,
+      "sigma_raw": 3.7201695442199707,
+      "sigma_cal": 9.655119895935059
+    },
+    {
+      "id": 34,
+      "host": "Mo2CO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.340169906616211,
+      "sigma_raw": 3.7271077632904053,
+      "sigma_cal": 9.673127174377441
+    },
+    {
+      "id": 35,
+      "host": "Nb2CO2",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.438746690750122,
+      "sigma_raw": 0.6057465672492981,
+      "sigma_cal": 1.5721207857131958
+    },
+    {
+      "id": 36,
+      "host": "Nb2CO2",
+      "dopant": "Ti",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.1566267013549805,
+      "sigma_raw": 0.563785970211029,
+      "sigma_cal": 1.4632185697555542
+    },
+    {
+      "id": 37,
+      "host": "Nb2CO2",
+      "dopant": "Ge",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.0518798828125,
+      "sigma_raw": 0.9772778153419495,
+      "sigma_cal": 2.536372184753418
+    },
+    {
+      "id": 38,
+      "host": "Nb2CO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.953770637512207,
+      "sigma_raw": 1.1854887008666992,
+      "sigma_cal": 3.0767509937286377
+    },
+    {
+      "id": 39,
+      "host": "Nb2CO2",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.885468006134033,
+      "sigma_raw": 1.2576334476470947,
+      "sigma_cal": 3.263991594314575
+    },
+    {
+      "id": 40,
+      "host": "Nb2CO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 5.219881057739258,
+      "sigma_raw": 0.9709324240684509,
+      "sigma_cal": 2.5199036598205566
+    },
+    {
+      "id": 41,
+      "host": "Nb2CO2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 5.7744140625,
+      "sigma_raw": 1.5898808240890503,
+      "sigma_cal": 4.126287937164307
+    },
+    {
+      "id": 42,
+      "host": "Nb2CO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 5.451051235198975,
+      "sigma_raw": 1.3868311643600464,
+      "sigma_cal": 3.599303960800171
+    },
+    {
+      "id": 43,
+      "host": "As2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 1.701113224029541,
+      "sigma_raw": 1.2433899641036987,
+      "sigma_cal": 3.227024793624878
+    },
+    {
+      "id": 44,
+      "host": "As2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 3.378755569458008,
+      "sigma_raw": 1.5006828308105469,
+      "sigma_cal": 3.8947882652282715
+    },
+    {
+      "id": 45,
+      "host": "BiITe",
+      "dopant": "H",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.733830690383911,
+      "sigma_raw": 2.1698598861694336,
+      "sigma_cal": 5.631533145904541
+    },
+    {
+      "id": 46,
+      "host": "BiITe",
+      "dopant": "Li",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.635777473449707,
+      "sigma_raw": 2.2362115383148193,
+      "sigma_cal": 5.803738117218018
+    },
+    {
+      "id": 47,
+      "host": "BiITe",
+      "dopant": "C",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.141879081726074,
+      "sigma_raw": 3.0045228004455566,
+      "sigma_cal": 7.7977705001831055
+    },
+    {
+      "id": 48,
+      "host": "BiITe",
+      "dopant": "N",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.6416678428649902,
+      "sigma_raw": 2.66178035736084,
+      "sigma_cal": 6.908236026763916
+    },
+    {
+      "id": 49,
+      "host": "BiITe",
+      "dopant": "O",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.106671333312988,
+      "sigma_raw": 3.1839005947113037,
+      "sigma_cal": 8.263317108154297
+    },
+    {
+      "id": 50,
+      "host": "BiITe",
+      "dopant": "F",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.499843120574951,
+      "sigma_raw": 3.6710805892944336,
+      "sigma_cal": 9.527717590332031
+    },
+    {
+      "id": 51,
+      "host": "BiITe",
+      "dopant": "Mg",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.305899620056152,
+      "sigma_raw": 2.226881980895996,
+      "sigma_cal": 5.779524803161621
+    },
+    {
+      "id": 52,
+      "host": "BiITe",
+      "dopant": "Si",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 7.2318434715271,
+      "sigma_raw": 4.44894552230835,
+      "sigma_cal": 11.546544075012207
+    },
+    {
+      "id": 53,
+      "host": "BiITe",
+      "dopant": "P",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 7.11325216293335,
+      "sigma_raw": 3.00496506690979,
+      "sigma_cal": 7.7989182472229
+    },
+    {
+      "id": 54,
+      "host": "BiITe",
+      "dopant": "S",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.9411168098449707,
+      "sigma_raw": 3.9353067874908447,
+      "sigma_cal": 10.213475227355957
+    },
+    {
+      "id": 55,
+      "host": "BiITe",
+      "dopant": "K",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.367493629455566,
+      "sigma_raw": 3.813019037246704,
+      "sigma_cal": 9.896096229553223
+    },
+    {
+      "id": 56,
+      "host": "BiITe",
+      "dopant": "Sc",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.3096113204956055,
+      "sigma_raw": 2.2759201526641846,
+      "sigma_cal": 5.906795978546143
+    },
+    {
+      "id": 57,
+      "host": "BiITe",
+      "dopant": "V",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.773120880126953,
+      "sigma_raw": 3.2594194412231445,
+      "sigma_cal": 8.459315299987793
+    },
+    {
+      "id": 58,
+      "host": "BiITe",
+      "dopant": "Cr",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.787405014038086,
+      "sigma_raw": 2.6416189670562744,
+      "sigma_cal": 6.855910301208496
+    },
+    {
+      "id": 59,
+      "host": "BiITe",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.892785549163818,
+      "sigma_raw": 2.0368504524230957,
+      "sigma_cal": 5.286327838897705
+    },
+    {
+      "id": 60,
+      "host": "BiITe",
+      "dopant": "Co",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.920811653137207,
+      "sigma_raw": 2.966221332550049,
+      "sigma_cal": 7.698364734649658
+    },
+    {
+      "id": 61,
+      "host": "BiITe",
+      "dopant": "Ni",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.62230920791626,
+      "sigma_raw": 3.2395472526550293,
+      "sigma_cal": 8.407739639282227
+    },
+    {
+      "id": 62,
+      "host": "BiITe",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.98501443862915,
+      "sigma_raw": 2.8475918769836426,
+      "sigma_cal": 7.3904805183410645
+    },
+    {
+      "id": 63,
+      "host": "BiITe",
+      "dopant": "As",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 10.462902069091797,
+      "sigma_raw": 3.753932237625122,
+      "sigma_cal": 9.742745399475098
+    },
+    {
+      "id": 64,
+      "host": "BiITe",
+      "dopant": "Se",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.337362766265869,
+      "sigma_raw": 3.2694003582000732,
+      "sigma_cal": 8.48521900177002
+    },
+    {
+      "id": 65,
+      "host": "BiITe",
+      "dopant": "Sr",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.31424617767334,
+      "sigma_raw": 3.6740033626556396,
+      "sigma_cal": 9.535303115844727
+    },
+    {
+      "id": 66,
+      "host": "BiITe",
+      "dopant": "Y",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 7.7394561767578125,
+      "sigma_raw": 2.7401206493377686,
+      "sigma_cal": 7.111556053161621
+    },
+    {
+      "id": 67,
+      "host": "BiITe",
+      "dopant": "Zr",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.714234828948975,
+      "sigma_raw": 2.3346128463745117,
+      "sigma_cal": 6.059123516082764
+    },
+    {
+      "id": 68,
+      "host": "BiITe",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.962566375732422,
+      "sigma_raw": 3.4712841510772705,
+      "sigma_cal": 9.009176254272461
+    },
+    {
+      "id": 69,
+      "host": "BiITe",
+      "dopant": "Ru",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.811527252197266,
+      "sigma_raw": 3.76684308052063,
+      "sigma_cal": 9.776253700256348
+    },
+    {
+      "id": 70,
+      "host": "BiITe",
+      "dopant": "Rh",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.2299580574035645,
+      "sigma_raw": 3.7229323387145996,
+      "sigma_cal": 9.662290573120117
+    },
+    {
+      "id": 71,
+      "host": "BiITe",
+      "dopant": "Pd",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.931954860687256,
+      "sigma_raw": 3.3644490242004395,
+      "sigma_cal": 8.731903076171875
+    },
+    {
+      "id": 72,
+      "host": "BiITe",
+      "dopant": "Sb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.222637176513672,
+      "sigma_raw": 3.417734384536743,
+      "sigma_cal": 8.870196342468262
+    },
+    {
+      "id": 73,
+      "host": "BiITe",
+      "dopant": "Te",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.737818241119385,
+      "sigma_raw": 3.4979214668273926,
+      "sigma_cal": 9.078310012817383
+    },
+    {
+      "id": 74,
+      "host": "BiITe",
+      "dopant": "Ba",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.941750526428223,
+      "sigma_raw": 4.389256000518799,
+      "sigma_cal": 11.391629219055176
+    },
+    {
+      "id": 75,
+      "host": "BiITe",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.8067045211792,
+      "sigma_raw": 4.071930408477783,
+      "sigma_cal": 10.568060874938965
+    },
+    {
+      "id": 76,
+      "host": "BiITe",
+      "dopant": "Hf",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 7.93745231628418,
+      "sigma_raw": 3.3538713455200195,
+      "sigma_cal": 8.704449653625488
+    },
+    {
+      "id": 77,
+      "host": "BiITe",
+      "dopant": "Ta",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.769160270690918,
+      "sigma_raw": 3.756009101867676,
+      "sigma_cal": 9.748135566711426
+    },
+    {
+      "id": 78,
+      "host": "BiITe",
+      "dopant": "Os",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 5.314625263214111,
+      "sigma_raw": 3.867990255355835,
+      "sigma_cal": 10.038765907287598
+    },
+    {
+      "id": 79,
+      "host": "BiITe",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 6.190866947174072,
+      "sigma_raw": 4.0437211990356445,
+      "sigma_cal": 10.494848251342773
+    },
+    {
+      "id": 80,
+      "host": "BiITe",
+      "dopant": "Au",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 8.655085563659668,
+      "sigma_raw": 4.7061686515808105,
+      "sigma_cal": 12.214126586914062
+    },
+    {
+      "id": 81,
+      "host": "BiITe",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 7.966474533081055,
+      "sigma_raw": 4.054136753082275,
+      "sigma_cal": 10.521880149841309
+    },
+    {
+      "id": 82,
+      "host": "Nb4C3",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 3.615206241607666,
+      "sigma_raw": 1.8327746391296387,
+      "sigma_cal": 4.756680965423584
+    },
+    {
+      "id": 83,
+      "host": "Nb4C3",
+      "dopant": "Ge",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 4.170139312744141,
+      "sigma_raw": 1.8212909698486328,
+      "sigma_cal": 4.726876735687256
+    },
+    {
+      "id": 84,
+      "host": "Nb4C3",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 3.713628053665161,
+      "sigma_raw": 1.375891089439392,
+      "sigma_cal": 3.570910692214966
+    },
+    {
+      "id": 85,
+      "host": "Nb4C3",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 3.364882469177246,
+      "sigma_raw": 1.7788265943527222,
+      "sigma_cal": 4.6166672706604
+    },
+    {
+      "id": 86,
+      "host": "Nb4C3",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 4.6084794998168945,
+      "sigma_raw": 1.9588316679000854,
+      "sigma_cal": 5.0838422775268555
+    },
+    {
+      "id": 87,
+      "host": "Nb4C3",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 113,
+      "mu": 4.743007183074951,
+      "sigma_raw": 2.5063343048095703,
+      "sigma_cal": 6.504799842834473
+    },
+    {
+      "id": 88,
+      "host": "Bi2I6",
+      "dopant": "H",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.3721823692321777,
+      "sigma_raw": 1.379799246788025,
+      "sigma_cal": 3.5810537338256836
+    },
+    {
+      "id": 89,
+      "host": "Bi2I6",
+      "dopant": "B",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.673713684082031,
+      "sigma_raw": 2.118032217025757,
+      "sigma_cal": 5.4970221519470215
+    },
+    {
+      "id": 90,
+      "host": "Bi2I6",
+      "dopant": "C",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.5468966960906982,
+      "sigma_raw": 1.501876711845398,
+      "sigma_cal": 3.8978867530822754
+    },
+    {
+      "id": 91,
+      "host": "Bi2I6",
+      "dopant": "O",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.1416172981262207,
+      "sigma_raw": 1.7263145446777344,
+      "sigma_cal": 4.480380058288574
+    },
+    {
+      "id": 92,
+      "host": "Bi2I6",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.6666829586029053,
+      "sigma_raw": 1.6520533561706543,
+      "sigma_cal": 4.287646770477295
+    },
+    {
+      "id": 93,
+      "host": "Bi2I6",
+      "dopant": "Al",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.4257242679595947,
+      "sigma_raw": 0.8177569508552551,
+      "sigma_cal": 2.1223607063293457
+    },
+    {
+      "id": 94,
+      "host": "Bi2I6",
+      "dopant": "Si",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 5.5020623207092285,
+      "sigma_raw": 2.2805583477020264,
+      "sigma_cal": 5.9188337326049805
+    },
+    {
+      "id": 95,
+      "host": "Bi2I6",
+      "dopant": "S",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.425287961959839,
+      "sigma_raw": 2.0168073177337646,
+      "sigma_cal": 5.23430871963501
+    },
+    {
+      "id": 96,
+      "host": "Bi2I6",
+      "dopant": "Ca",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.6990222930908203,
+      "sigma_raw": 1.7512403726577759,
+      "sigma_cal": 4.545071125030518
+    },
+    {
+      "id": 97,
+      "host": "Bi2I6",
+      "dopant": "Sc",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.8911837339401245,
+      "sigma_raw": 1.1017389297485352,
+      "sigma_cal": 2.859391689300537
+    },
+    {
+      "id": 98,
+      "host": "Bi2I6",
+      "dopant": "V",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.662522554397583,
+      "sigma_raw": 1.4668246507644653,
+      "sigma_cal": 3.8069145679473877
+    },
+    {
+      "id": 99,
+      "host": "Bi2I6",
+      "dopant": "Cr",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.284254550933838,
+      "sigma_raw": 1.9800333976745605,
+      "sigma_cal": 5.1388678550720215
+    },
+    {
+      "id": 100,
+      "host": "Bi2I6",
+      "dopant": "Mn",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.99806022644043,
+      "sigma_raw": 2.1920764446258545,
+      "sigma_cal": 5.689192771911621
+    },
+    {
+      "id": 101,
+      "host": "Bi2I6",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.84355354309082,
+      "sigma_raw": 2.396637201309204,
+      "sigma_cal": 6.22009801864624
+    },
+    {
+      "id": 102,
+      "host": "Bi2I6",
+      "dopant": "Co",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.015300750732422,
+      "sigma_raw": 2.1155152320861816,
+      "sigma_cal": 5.490489959716797
+    },
+    {
+      "id": 103,
+      "host": "Bi2I6",
+      "dopant": "Ni",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.3620824813842773,
+      "sigma_raw": 1.9249039888381958,
+      "sigma_cal": 4.995788097381592
+    },
+    {
+      "id": 104,
+      "host": "Bi2I6",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.8399533033370972,
+      "sigma_raw": 1.6285709142684937,
+      "sigma_cal": 4.226701736450195
+    },
+    {
+      "id": 105,
+      "host": "Bi2I6",
+      "dopant": "Ga",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.301206111907959,
+      "sigma_raw": 0.8029901385307312,
+      "sigma_cal": 2.084035634994507
+    },
+    {
+      "id": 106,
+      "host": "Bi2I6",
+      "dopant": "As",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 6.315242767333984,
+      "sigma_raw": 2.3506383895874023,
+      "sigma_cal": 6.100715160369873
+    },
+    {
+      "id": 107,
+      "host": "Bi2I6",
+      "dopant": "Se",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.3625404834747314,
+      "sigma_raw": 2.023090124130249,
+      "sigma_cal": 5.250615119934082
+    },
+    {
+      "id": 108,
+      "host": "Bi2I6",
+      "dopant": "Br",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.7419943809509277,
+      "sigma_raw": 2.4123120307922363,
+      "sigma_cal": 6.260779857635498
+    },
+    {
+      "id": 109,
+      "host": "Bi2I6",
+      "dopant": "Rb",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 5.690374851226807,
+      "sigma_raw": 2.6761417388916016,
+      "sigma_cal": 6.9455084800720215
+    },
+    {
+      "id": 110,
+      "host": "Bi2I6",
+      "dopant": "Sr",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.2219953536987305,
+      "sigma_raw": 2.121095895767212,
+      "sigma_cal": 5.504973411560059
+    },
+    {
+      "id": 111,
+      "host": "Bi2I6",
+      "dopant": "Zr",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.8771233558654785,
+      "sigma_raw": 1.1147665977478027,
+      "sigma_cal": 2.893202781677246
+    },
+    {
+      "id": 112,
+      "host": "Bi2I6",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.375154495239258,
+      "sigma_raw": 0.9702960252761841,
+      "sigma_cal": 2.51825213432312
+    },
+    {
+      "id": 113,
+      "host": "Bi2I6",
+      "dopant": "Mo",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.7213780879974365,
+      "sigma_raw": 1.637009859085083,
+      "sigma_cal": 4.248603820800781
+    },
+    {
+      "id": 114,
+      "host": "Bi2I6",
+      "dopant": "Pd",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.1403183937072754,
+      "sigma_raw": 1.39078688621521,
+      "sigma_cal": 3.6095705032348633
+    },
+    {
+      "id": 115,
+      "host": "Bi2I6",
+      "dopant": "Cd",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.399466037750244,
+      "sigma_raw": 1.5894423723220825,
+      "sigma_cal": 4.125149726867676
+    },
+    {
+      "id": 116,
+      "host": "Bi2I6",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.7496023178100586,
+      "sigma_raw": 0.8745757341384888,
+      "sigma_cal": 2.269824981689453
+    },
+    {
+      "id": 117,
+      "host": "Bi2I6",
+      "dopant": "Sb",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 8.417835235595703,
+      "sigma_raw": 1.7327213287353516,
+      "sigma_cal": 4.497007846832275
+    },
+    {
+      "id": 118,
+      "host": "Bi2I6",
+      "dopant": "I",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.2609710693359375,
+      "sigma_raw": 2.79248046875,
+      "sigma_cal": 7.247447490692139
+    },
+    {
+      "id": 119,
+      "host": "Bi2I6",
+      "dopant": "Cs",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 6.408092498779297,
+      "sigma_raw": 3.100248098373413,
+      "sigma_cal": 8.046210289001465
+    },
+    {
+      "id": 120,
+      "host": "Bi2I6",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.529561996459961,
+      "sigma_raw": 2.3224592208862305,
+      "sigma_cal": 6.027580738067627
+    },
+    {
+      "id": 121,
+      "host": "Bi2I6",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.6034579277038574,
+      "sigma_raw": 1.1934963464736938,
+      "sigma_cal": 3.097533702850342
+    },
+    {
+      "id": 122,
+      "host": "Bi2I6",
+      "dopant": "Pt",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.997053623199463,
+      "sigma_raw": 2.148298978805542,
+      "sigma_cal": 5.57557487487793
+    },
+    {
+      "id": 123,
+      "host": "Bi2I6",
+      "dopant": "Au",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.5483479499816895,
+      "sigma_raw": 2.468228816986084,
+      "sigma_cal": 6.405902862548828
+    },
+    {
+      "id": 124,
+      "host": "Bi2I6",
+      "dopant": "Hg",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 2.6965720653533936,
+      "sigma_raw": 2.078226089477539,
+      "sigma_cal": 5.393711566925049
+    },
+    {
+      "id": 125,
+      "host": "Bi2I6",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 3.8483450412750244,
+      "sigma_raw": 0.35892707109451294,
+      "sigma_cal": 0.9315392374992371
+    },
+    {
+      "id": 126,
+      "host": "Bi2I6",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 4.953031539916992,
+      "sigma_raw": 1.3741519451141357,
+      "sigma_cal": 3.566397190093994
+    },
+    {
+      "id": 127,
+      "host": "C2H2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 65,
+      "mu": 5.8275957107543945,
+      "sigma_raw": 2.7781898975372314,
+      "sigma_cal": 7.210358619689941
+    },
+    {
+      "id": 128,
+      "host": "Ti2CO2",
+      "dopant": "H",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.938165545463562,
+      "sigma_raw": 0.7315038442611694,
+      "sigma_cal": 1.8985041379928589
+    },
+    {
+      "id": 129,
+      "host": "Ti2CO2",
+      "dopant": "Li",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.9978723526000977,
+      "sigma_raw": 2.004033327102661,
+      "sigma_cal": 5.201156139373779
+    },
+    {
+      "id": 130,
+      "host": "Ti2CO2",
+      "dopant": "B",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.031264305114746,
+      "sigma_raw": 1.0026049613952637,
+      "sigma_cal": 2.602104902267456
+    },
+    {
+      "id": 131,
+      "host": "Ti2CO2",
+      "dopant": "C",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.398900032043457,
+      "sigma_raw": 0.7271907925605774,
+      "sigma_cal": 1.887310266494751
+    },
+    {
+      "id": 132,
+      "host": "Ti2CO2",
+      "dopant": "N",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.2190351486206055,
+      "sigma_raw": 0.7826924920082092,
+      "sigma_cal": 2.0313563346862793
+    },
+    {
+      "id": 133,
+      "host": "Ti2CO2",
+      "dopant": "O",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.7566156387329102,
+      "sigma_raw": 1.2327280044555664,
+      "sigma_cal": 3.1993532180786133
+    },
+    {
+      "id": 134,
+      "host": "Ti2CO2",
+      "dopant": "F",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.1746509075164795,
+      "sigma_raw": 2.0534815788269043,
+      "sigma_cal": 5.329491138458252
+    },
+    {
+      "id": 135,
+      "host": "Ti2CO2",
+      "dopant": "Mg",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.6691426634788513,
+      "sigma_raw": 1.44120454788208,
+      "sigma_cal": 3.740421772003174
+    },
+    {
+      "id": 136,
+      "host": "Ti2CO2",
+      "dopant": "Al",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.7238932847976685,
+      "sigma_raw": 1.0474330186843872,
+      "sigma_cal": 2.718449115753174
+    },
+    {
+      "id": 137,
+      "host": "Ti2CO2",
+      "dopant": "Si",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.1945605278015137,
+      "sigma_raw": 1.2170594930648804,
+      "sigma_cal": 3.1586880683898926
+    },
+    {
+      "id": 138,
+      "host": "Ti2CO2",
+      "dopant": "P",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.1597506999969482,
+      "sigma_raw": 0.9806696176528931,
+      "sigma_cal": 2.545175075531006
+    },
+    {
+      "id": 139,
+      "host": "Ti2CO2",
+      "dopant": "S",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.9787958860397339,
+      "sigma_raw": 1.1724556684494019,
+      "sigma_cal": 3.0429258346557617
+    },
+    {
+      "id": 140,
+      "host": "Ti2CO2",
+      "dopant": "Cl",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.039886951446533,
+      "sigma_raw": 1.6501120328903198,
+      "sigma_cal": 4.282608509063721
+    },
+    {
+      "id": 141,
+      "host": "Ti2CO2",
+      "dopant": "K",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.374734401702881,
+      "sigma_raw": 2.7939486503601074,
+      "sigma_cal": 7.25125789642334
+    },
+    {
+      "id": 142,
+      "host": "Ti2CO2",
+      "dopant": "Ca",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.9699653387069702,
+      "sigma_raw": 2.93858003616333,
+      "sigma_cal": 7.626626491546631
+    },
+    {
+      "id": 143,
+      "host": "Ti2CO2",
+      "dopant": "Sc",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.6888519525527954,
+      "sigma_raw": 1.7106845378875732,
+      "sigma_cal": 4.439815044403076
+    },
+    {
+      "id": 144,
+      "host": "Ti2CO2",
+      "dopant": "Ti",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.646824300289154,
+      "sigma_raw": 1.0537961721420288,
+      "sigma_cal": 2.7349636554718018
+    },
+    {
+      "id": 145,
+      "host": "Ti2CO2",
+      "dopant": "V",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.5545196533203125,
+      "sigma_raw": 0.9364159107208252,
+      "sigma_cal": 2.430321455001831
+    },
+    {
+      "id": 146,
+      "host": "Ti2CO2",
+      "dopant": "Cr",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.30796217918396,
+      "sigma_raw": 0.8920208215713501,
+      "sigma_cal": 2.315100908279419
+    },
+    {
+      "id": 147,
+      "host": "Ti2CO2",
+      "dopant": "Mn",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.6929285526275635,
+      "sigma_raw": 1.0349026918411255,
+      "sigma_cal": 2.6859285831451416
+    },
+    {
+      "id": 148,
+      "host": "Ti2CO2",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.068436622619629,
+      "sigma_raw": 1.5102914571762085,
+      "sigma_cal": 3.9197258949279785
+    },
+    {
+      "id": 149,
+      "host": "Ti2CO2",
+      "dopant": "Co",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.882766008377075,
+      "sigma_raw": 1.394174337387085,
+      "sigma_cal": 3.6183621883392334
+    },
+    {
+      "id": 150,
+      "host": "Ti2CO2",
+      "dopant": "Ni",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.9212265014648438,
+      "sigma_raw": 1.149885892868042,
+      "sigma_cal": 2.984349489212036
+    },
+    {
+      "id": 151,
+      "host": "Ti2CO2",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.5329338312149048,
+      "sigma_raw": 1.0747917890548706,
+      "sigma_cal": 2.789454460144043
+    },
+    {
+      "id": 152,
+      "host": "Ti2CO2",
+      "dopant": "Zn",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.9906718730926514,
+      "sigma_raw": 0.907422661781311,
+      "sigma_cal": 2.355073928833008
+    },
+    {
+      "id": 153,
+      "host": "Ti2CO2",
+      "dopant": "Ga",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.5794859528541565,
+      "sigma_raw": 0.9061436057090759,
+      "sigma_cal": 2.3517544269561768
+    },
+    {
+      "id": 154,
+      "host": "Ti2CO2",
+      "dopant": "Ge",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.4521279335021973,
+      "sigma_raw": 1.6882468461990356,
+      "sigma_cal": 4.3815813064575195
+    },
+    {
+      "id": 155,
+      "host": "Ti2CO2",
+      "dopant": "As",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.088560581207275,
+      "sigma_raw": 1.314958095550537,
+      "sigma_cal": 3.412768602371216
+    },
+    {
+      "id": 156,
+      "host": "Ti2CO2",
+      "dopant": "Se",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.7813293933868408,
+      "sigma_raw": 1.3357949256896973,
+      "sigma_cal": 3.4668474197387695
+    },
+    {
+      "id": 157,
+      "host": "Ti2CO2",
+      "dopant": "Br",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.190326690673828,
+      "sigma_raw": 1.6285239458084106,
+      "sigma_cal": 4.2265801429748535
+    },
+    {
+      "id": 158,
+      "host": "Ti2CO2",
+      "dopant": "Rb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.486952304840088,
+      "sigma_raw": 2.735630989074707,
+      "sigma_cal": 7.099903583526611
+    },
+    {
+      "id": 159,
+      "host": "Ti2CO2",
+      "dopant": "Sr",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.2668638229370117,
+      "sigma_raw": 2.872903823852539,
+      "sigma_cal": 7.456173896789551
+    },
+    {
+      "id": 160,
+      "host": "Ti2CO2",
+      "dopant": "Y",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.7024588584899902,
+      "sigma_raw": 2.9732182025909424,
+      "sigma_cal": 7.716524124145508
+    },
+    {
+      "id": 161,
+      "host": "Ti2CO2",
+      "dopant": "Zr",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.5747336745262146,
+      "sigma_raw": 1.756277084350586,
+      "sigma_cal": 4.558143138885498
+    },
+    {
+      "id": 162,
+      "host": "Ti2CO2",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.9253206253051758,
+      "sigma_raw": 0.7685703039169312,
+      "sigma_cal": 1.9947043657302856
+    },
+    {
+      "id": 163,
+      "host": "Ti2CO2",
+      "dopant": "Mo",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.5026867389678955,
+      "sigma_raw": 0.6299753785133362,
+      "sigma_cal": 1.635002851486206
+    },
+    {
+      "id": 164,
+      "host": "Ti2CO2",
+      "dopant": "Ru",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.726797342300415,
+      "sigma_raw": 1.3165929317474365,
+      "sigma_cal": 3.4170117378234863
+    },
+    {
+      "id": 165,
+      "host": "Ti2CO2",
+      "dopant": "Rh",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.8666430711746216,
+      "sigma_raw": 1.107615351676941,
+      "sigma_cal": 2.874642848968506
+    },
+    {
+      "id": 166,
+      "host": "Ti2CO2",
+      "dopant": "Pd",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.4487402439117432,
+      "sigma_raw": 1.1103911399841309,
+      "sigma_cal": 2.8818471431732178
+    },
+    {
+      "id": 167,
+      "host": "Ti2CO2",
+      "dopant": "Ag",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.7022214531898499,
+      "sigma_raw": 0.8294232487678528,
+      "sigma_cal": 2.1526386737823486
+    },
+    {
+      "id": 168,
+      "host": "Ti2CO2",
+      "dopant": "Cd",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.48679056763648987,
+      "sigma_raw": 0.8469251394271851,
+      "sigma_cal": 2.1980621814727783
+    },
+    {
+      "id": 169,
+      "host": "Ti2CO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.23860478401184082,
+      "sigma_raw": 1.0136802196502686,
+      "sigma_cal": 2.6308488845825195
+    },
+    {
+      "id": 170,
+      "host": "Ti2CO2",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.998647928237915,
+      "sigma_raw": 1.093648910522461,
+      "sigma_cal": 2.838395118713379
+    },
+    {
+      "id": 171,
+      "host": "Ti2CO2",
+      "dopant": "Sb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 4.220439910888672,
+      "sigma_raw": 2.3491480350494385,
+      "sigma_cal": 6.0968475341796875
+    },
+    {
+      "id": 172,
+      "host": "Ti2CO2",
+      "dopant": "Te",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.1145517826080322,
+      "sigma_raw": 1.4422756433486938,
+      "sigma_cal": 3.743201494216919
+    },
+    {
+      "id": 173,
+      "host": "Ti2CO2",
+      "dopant": "I",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.3166165351867676,
+      "sigma_raw": 1.7240221500396729,
+      "sigma_cal": 4.474430561065674
+    },
+    {
+      "id": 174,
+      "host": "Ti2CO2",
+      "dopant": "Cs",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.4613122940063477,
+      "sigma_raw": 2.7498021125793457,
+      "sigma_cal": 7.136682510375977
+    },
+    {
+      "id": 175,
+      "host": "Ti2CO2",
+      "dopant": "Ba",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.4510974884033203,
+      "sigma_raw": 2.758173704147339,
+      "sigma_cal": 7.158409595489502
+    },
+    {
+      "id": 176,
+      "host": "Ti2CO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.2265074253082275,
+      "sigma_raw": 2.8864598274230957,
+      "sigma_cal": 7.491356372833252
+    },
+    {
+      "id": 177,
+      "host": "Ti2CO2",
+      "dopant": "Hf",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.706444263458252,
+      "sigma_raw": 1.8580048084259033,
+      "sigma_cal": 4.822161674499512
+    },
+    {
+      "id": 178,
+      "host": "Ti2CO2",
+      "dopant": "Ta",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.5199960470199585,
+      "sigma_raw": 0.2610776126384735,
+      "sigma_cal": 0.6775862574577332
+    },
+    {
+      "id": 179,
+      "host": "Ti2CO2",
+      "dopant": "W",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.696195125579834,
+      "sigma_raw": 0.5008216500282288,
+      "sigma_cal": 1.299804449081421
+    },
+    {
+      "id": 180,
+      "host": "Ti2CO2",
+      "dopant": "Re",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.409397602081299,
+      "sigma_raw": 1.3234361410140991,
+      "sigma_cal": 3.434772253036499
+    },
+    {
+      "id": 181,
+      "host": "Ti2CO2",
+      "dopant": "Os",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.0728464126586914,
+      "sigma_raw": 0.7526066303253174,
+      "sigma_cal": 1.9532731771469116
+    },
+    {
+      "id": 182,
+      "host": "Ti2CO2",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.720902442932129,
+      "sigma_raw": 1.2762722969055176,
+      "sigma_cal": 3.312365770339966
+    },
+    {
+      "id": 183,
+      "host": "Ti2CO2",
+      "dopant": "Pt",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.2431559562683105,
+      "sigma_raw": 1.6359126567840576,
+      "sigma_cal": 4.245756149291992
+    },
+    {
+      "id": 184,
+      "host": "Ti2CO2",
+      "dopant": "Au",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.421297550201416,
+      "sigma_raw": 2.1246049404144287,
+      "sigma_cal": 5.514081001281738
+    },
+    {
+      "id": 185,
+      "host": "Ti2CO2",
+      "dopant": "Hg",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.976518988609314,
+      "sigma_raw": 2.338596820831299,
+      "sigma_cal": 6.06946325302124
+    },
+    {
+      "id": 186,
+      "host": "Ti2CO2",
+      "dopant": "Tl",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 0.06981781125068665,
+      "sigma_raw": 0.8036587238311768,
+      "sigma_cal": 2.085770845413208
+    },
+    {
+      "id": 187,
+      "host": "Ti2CO2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.5533173084259033,
+      "sigma_raw": 0.9179427027702332,
+      "sigma_cal": 2.3823771476745605
+    },
+    {
+      "id": 188,
+      "host": "Ti2CO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.6433892250061035,
+      "sigma_raw": 1.7032132148742676,
+      "sigma_cal": 4.420424461364746
+    },
+    {
+      "id": 189,
+      "host": "Hf2Te6",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 73,
+      "mu": 3.2239274978637695,
+      "sigma_raw": 2.862894296646118,
+      "sigma_cal": 7.4301958084106445
+    },
+    {
+      "id": 190,
+      "host": "Cr2I6",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.009018898010254,
+      "sigma_raw": 0.4179860055446625,
+      "sigma_cal": 1.0848175287246704
+    },
+    {
+      "id": 191,
+      "host": "Cr2I6",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 33,
+      "mu": 1.4350018501281738,
+      "sigma_raw": 1.068089246749878,
+      "sigma_cal": 2.772059202194214
+    },
+    {
+      "id": 192,
+      "host": "Ge2H2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 37,
+      "mu": 1.899625539779663,
+      "sigma_raw": 1.121747374534607,
+      "sigma_cal": 2.911320447921753
+    },
+    {
+      "id": 193,
+      "host": "HfSe2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.2855381965637207,
+      "sigma_raw": 1.1209251880645752,
+      "sigma_cal": 2.909186601638794
+    },
+    {
+      "id": 194,
+      "host": "HfSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.2030537128448486,
+      "sigma_raw": 1.6318323612213135,
+      "sigma_cal": 4.235166549682617
+    },
+    {
+      "id": 195,
+      "host": "HfS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.2280493974685669,
+      "sigma_raw": 1.7688088417053223,
+      "sigma_cal": 4.590667724609375
+    },
+    {
+      "id": 196,
+      "host": "Ge2",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 2.819370985031128,
+      "sigma_raw": 1.2015397548675537,
+      "sigma_cal": 3.1184091567993164
+    },
+    {
+      "id": 197,
+      "host": "Ge2",
+      "dopant": "Cu",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 0.9453592300415039,
+      "sigma_raw": 1.0383957624435425,
+      "sigma_cal": 2.6949942111968994
+    },
+    {
+      "id": 198,
+      "host": "Ge2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 1.9797029495239258,
+      "sigma_raw": 1.3848730325698853,
+      "sigma_cal": 3.594222068786621
+    },
+    {
+      "id": 199,
+      "host": "Ge2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 3.9833755493164062,
+      "sigma_raw": 4.426208972930908,
+      "sigma_cal": 11.48753547668457
+    },
+    {
+      "id": 200,
+      "host": "Ge2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 5.296751499176025,
+      "sigma_raw": 2.7598493099212646,
+      "sigma_cal": 7.1627583503723145
+    },
+    {
+      "id": 201,
+      "host": "V2CO2",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.216418504714966,
+      "sigma_raw": 3.4251692295074463,
+      "sigma_cal": 8.889492988586426
+    },
+    {
+      "id": 202,
+      "host": "V2CO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.6577248573303223,
+      "sigma_raw": 1.749908685684204,
+      "sigma_cal": 4.541615009307861
+    },
+    {
+      "id": 203,
+      "host": "V2CO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 3.275733232498169,
+      "sigma_raw": 3.406480073928833,
+      "sigma_cal": 8.840988159179688
+    },
+    {
+      "id": 204,
+      "host": "V2CO2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 1.6074687242507935,
+      "sigma_raw": 2.0332303047180176,
+      "sigma_cal": 5.276932239532471
+    },
+    {
+      "id": 205,
+      "host": "V2CO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 81,
+      "mu": 2.1042981147766113,
+      "sigma_raw": 2.190734624862671,
+      "sigma_cal": 5.6857099533081055
+    },
+    {
+      "id": 206,
+      "host": "PbI2",
+      "dopant": "B",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.572946310043335,
+      "sigma_raw": 1.6191949844360352,
+      "sigma_cal": 4.202368259429932
+    },
+    {
+      "id": 207,
+      "host": "PbI2",
+      "dopant": "C",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.6761959791183472,
+      "sigma_raw": 1.5188928842544556,
+      "sigma_cal": 3.942049741744995
+    },
+    {
+      "id": 208,
+      "host": "PbI2",
+      "dopant": "Al",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.3503410816192627,
+      "sigma_raw": 1.661733627319336,
+      "sigma_cal": 4.312770366668701
+    },
+    {
+      "id": 209,
+      "host": "PbI2",
+      "dopant": "Si",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.5894043445587158,
+      "sigma_raw": 1.5672389268875122,
+      "sigma_cal": 4.067524433135986
+    },
+    {
+      "id": 210,
+      "host": "PbI2",
+      "dopant": "K",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7559492588043213,
+      "sigma_raw": 1.2959418296813965,
+      "sigma_cal": 3.363415002822876
+    },
+    {
+      "id": 211,
+      "host": "PbI2",
+      "dopant": "Ca",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.5133576393127441,
+      "sigma_raw": 1.3777751922607422,
+      "sigma_cal": 3.575800657272339
+    },
+    {
+      "id": 212,
+      "host": "PbI2",
+      "dopant": "Cr",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7291557788848877,
+      "sigma_raw": 1.429352045059204,
+      "sigma_cal": 3.709660291671753
+    },
+    {
+      "id": 213,
+      "host": "PbI2",
+      "dopant": "Mn",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7577565908432007,
+      "sigma_raw": 1.4982329607009888,
+      "sigma_cal": 3.888430118560791
+    },
+    {
+      "id": 214,
+      "host": "PbI2",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.8269062042236328,
+      "sigma_raw": 1.5292048454284668,
+      "sigma_cal": 3.9688127040863037
+    },
+    {
+      "id": 215,
+      "host": "PbI2",
+      "dopant": "Co",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.6234415769577026,
+      "sigma_raw": 1.4328972101211548,
+      "sigma_cal": 3.7188613414764404
+    },
+    {
+      "id": 216,
+      "host": "PbI2",
+      "dopant": "Ni",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.376490592956543,
+      "sigma_raw": 1.3756165504455566,
+      "sigma_cal": 3.5701982975006104
+    },
+    {
+      "id": 217,
+      "host": "PbI2",
+      "dopant": "Ge",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.6795220375061035,
+      "sigma_raw": 1.6064590215682983,
+      "sigma_cal": 4.169313907623291
+    },
+    {
+      "id": 218,
+      "host": "PbI2",
+      "dopant": "As",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.149661064147949,
+      "sigma_raw": 1.2976127862930298,
+      "sigma_cal": 3.3677515983581543
+    },
+    {
+      "id": 219,
+      "host": "PbI2",
+      "dopant": "Y",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.480615496635437,
+      "sigma_raw": 1.4409664869308472,
+      "sigma_cal": 3.7398037910461426
+    },
+    {
+      "id": 220,
+      "host": "PbI2",
+      "dopant": "Zr",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.306373953819275,
+      "sigma_raw": 1.5424433946609497,
+      "sigma_cal": 4.003171443939209
+    },
+    {
+      "id": 221,
+      "host": "PbI2",
+      "dopant": "Mo",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.96022367477417,
+      "sigma_raw": 1.3158751726150513,
+      "sigma_cal": 3.4151487350463867
+    },
+    {
+      "id": 222,
+      "host": "PbI2",
+      "dopant": "Ru",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7499396800994873,
+      "sigma_raw": 1.2908827066421509,
+      "sigma_cal": 3.3502848148345947
+    },
+    {
+      "id": 223,
+      "host": "PbI2",
+      "dopant": "Ag",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.4690887928009033,
+      "sigma_raw": 1.3536040782928467,
+      "sigma_cal": 3.513068199157715
+    },
+    {
+      "id": 224,
+      "host": "PbI2",
+      "dopant": "Cd",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.635555624961853,
+      "sigma_raw": 1.2455544471740723,
+      "sigma_cal": 3.232642412185669
+    },
+    {
+      "id": 225,
+      "host": "PbI2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.4536149501800537,
+      "sigma_raw": 1.4834411144256592,
+      "sigma_cal": 3.8500401973724365
+    },
+    {
+      "id": 226,
+      "host": "PbI2",
+      "dopant": "Sn",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.6099543571472168,
+      "sigma_raw": 1.3137450218200684,
+      "sigma_cal": 3.4096202850341797
+    },
+    {
+      "id": 227,
+      "host": "PbI2",
+      "dopant": "Te",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.9301187992095947,
+      "sigma_raw": 1.3124606609344482,
+      "sigma_cal": 3.4062869548797607
+    },
+    {
+      "id": 228,
+      "host": "PbI2",
+      "dopant": "Cs",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.9593534469604492,
+      "sigma_raw": 1.2957069873809814,
+      "sigma_cal": 3.3628053665161133
+    },
+    {
+      "id": 229,
+      "host": "PbI2",
+      "dopant": "Ba",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.9400336742401123,
+      "sigma_raw": 1.2966644763946533,
+      "sigma_cal": 3.365290403366089
+    },
+    {
+      "id": 230,
+      "host": "PbI2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.8859212398529053,
+      "sigma_raw": 1.3606942892074585,
+      "sigma_cal": 3.5314698219299316
+    },
+    {
+      "id": 231,
+      "host": "PbI2",
+      "dopant": "Os",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.944831371307373,
+      "sigma_raw": 1.2861130237579346,
+      "sigma_cal": 3.3379058837890625
+    },
+    {
+      "id": 232,
+      "host": "PbI2",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.670823335647583,
+      "sigma_raw": 1.3770452737808228,
+      "sigma_cal": 3.573906183242798
+    },
+    {
+      "id": 233,
+      "host": "PbI2",
+      "dopant": "Tl",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.944697618484497,
+      "sigma_raw": 1.4445405006408691,
+      "sigma_cal": 3.749079704284668
+    },
+    {
+      "id": 234,
+      "host": "PbI2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.454516649246216,
+      "sigma_raw": 1.3816256523132324,
+      "sigma_cal": 3.585793972015381
+    },
+    {
+      "id": 235,
+      "host": "PbI2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.274172782897949,
+      "sigma_raw": 1.2576744556427002,
+      "sigma_cal": 3.2640979290008545
+    },
+    {
+      "id": 236,
+      "host": "PtSe2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.04637622833251953,
+      "sigma_raw": 0.48249003291130066,
+      "sigma_cal": 1.2522276639938354
+    },
+    {
+      "id": 237,
+      "host": "PtSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.40173137187957764,
+      "sigma_raw": 1.080251693725586,
+      "sigma_cal": 2.8036248683929443
+    },
+    {
+      "id": 238,
+      "host": "PtSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.7546379566192627,
+      "sigma_raw": 2.608008861541748,
+      "sigma_cal": 6.768680095672607
+    },
+    {
+      "id": 239,
+      "host": "PtS2",
+      "dopant": "Zn",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.5386155843734741,
+      "sigma_raw": 1.207417368888855,
+      "sigma_cal": 3.1336634159088135
+    },
+    {
+      "id": 240,
+      "host": "PtS2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.27918487787246704,
+      "sigma_raw": 1.297989010810852,
+      "sigma_cal": 3.3687281608581543
+    },
+    {
+      "id": 241,
+      "host": "PtS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.3248815536499023,
+      "sigma_raw": 1.709523320198059,
+      "sigma_cal": 4.436801433563232
+    },
+    {
+      "id": 242,
+      "host": "MoSSe",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 0.7400394678115845,
+      "sigma_raw": 1.9996602535247803,
+      "sigma_cal": 5.1898064613342285
+    },
+    {
+      "id": 243,
+      "host": "P4",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 65,
+      "mu": 1.8186101913452148,
+      "sigma_raw": 0.5292172431945801,
+      "sigma_cal": 1.3735008239746094
+    },
+    {
+      "id": 244,
+      "host": "Pd2Se4",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 25,
+      "mu": -0.6205642223358154,
+      "sigma_raw": 1.5535383224487305,
+      "sigma_cal": 4.031966686248779
+    },
+    {
+      "id": 245,
+      "host": "Pd2Se4",
+      "dopant": "Ti",
+      "defect_type": "interstitial",
+      "natoms": 25,
+      "mu": -0.2434980273246765,
+      "sigma_raw": 1.7418633699417114,
+      "sigma_cal": 4.520734786987305
+    },
+    {
+      "id": 246,
+      "host": "Pd2Se4",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 25,
+      "mu": -0.06738877296447754,
+      "sigma_raw": 1.745687484741211,
+      "sigma_cal": 4.5306596755981445
+    },
+    {
+      "id": 247,
+      "host": "Pd2Se4",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 25,
+      "mu": 2.4256153106689453,
+      "sigma_raw": 4.571333408355713,
+      "sigma_cal": 11.86418342590332
+    },
+    {
+      "id": 248,
+      "host": "Pd2Se4",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 25,
+      "mu": 1.5867550373077393,
+      "sigma_raw": 2.7822389602661133,
+      "sigma_cal": 7.220867156982422
+    },
+    {
+      "id": 249,
+      "host": "TiO2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 0.4601263403892517,
+      "sigma_raw": 1.3986060619354248,
+      "sigma_cal": 3.629863977432251
+    },
+    {
+      "id": 250,
+      "host": "TiO2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 0.6734740138053894,
+      "sigma_raw": 1.7093000411987305,
+      "sigma_cal": 4.436221599578857
+    },
+    {
+      "id": 251,
+      "host": "TiO2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 1.240220546722412,
+      "sigma_raw": 2.1432034969329834,
+      "sigma_cal": 5.562350273132324
+    },
+    {
+      "id": 252,
+      "host": "TiO2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 1.509052038192749,
+      "sigma_raw": 2.397496461868286,
+      "sigma_cal": 6.222328186035156
+    },
+    {
+      "id": 253,
+      "host": "Re4S8",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 3.512244462966919,
+      "sigma_raw": 2.160822629928589,
+      "sigma_cal": 5.6080780029296875
+    },
+    {
+      "id": 254,
+      "host": "NiSe2",
+      "dopant": "Na",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.9435857534408569,
+      "sigma_raw": 1.8214654922485352,
+      "sigma_cal": 4.727329730987549
+    },
+    {
+      "id": 255,
+      "host": "NiSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.5540764331817627,
+      "sigma_raw": 2.1189563274383545,
+      "sigma_cal": 5.499420642852783
+    },
+    {
+      "id": 256,
+      "host": "NiSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.2866744995117188,
+      "sigma_raw": 2.9508121013641357,
+      "sigma_cal": 7.65837287902832
+    },
+    {
+      "id": 257,
+      "host": "SnSe2",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 2.7947068214416504,
+      "sigma_raw": 2.6447486877441406,
+      "sigma_cal": 6.864032745361328
+    },
+    {
+      "id": 258,
+      "host": "SnSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.607985019683838,
+      "sigma_raw": 3.305298328399658,
+      "sigma_cal": 8.578386306762695
+    },
+    {
+      "id": 259,
+      "host": "SnSe2",
+      "dopant": "Ir",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.8983426094055176,
+      "sigma_raw": 3.596200942993164,
+      "sigma_cal": 9.333378791809082
+    },
+    {
+      "id": 260,
+      "host": "SnSe2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.256563186645508,
+      "sigma_raw": 3.757159471511841,
+      "sigma_cal": 9.751121520996094
+    },
+    {
+      "id": 261,
+      "host": "ZrS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.5383992195129395,
+      "sigma_raw": 1.0784766674041748,
+      "sigma_cal": 2.799017906188965
+    },
+    {
+      "id": 262,
+      "host": "TiS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.9830079674720764,
+      "sigma_raw": 2.234020233154297,
+      "sigma_cal": 5.798051357269287
+    },
+    {
+      "id": 263,
+      "host": "TiS2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.3724086284637451,
+      "sigma_raw": 2.352356195449829,
+      "sigma_cal": 6.105173587799072
+    },
+    {
+      "id": 264,
+      "host": "TiS2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -0.08029049634933472,
+      "sigma_raw": 2.9148433208465576,
+      "sigma_cal": 7.565021514892578
+    },
+    {
+      "id": 265,
+      "host": "Re4Se8",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 49,
+      "mu": 4.467111587524414,
+      "sigma_raw": 2.6526660919189453,
+      "sigma_cal": 6.884581089019775
+    },
+    {
+      "id": 266,
+      "host": "TaS2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": -1.8941681385040283,
+      "sigma_raw": 0.7539764642715454,
+      "sigma_cal": 1.9568283557891846
+    },
+    {
+      "id": 267,
+      "host": "TaS2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.04038137197494507,
+      "sigma_raw": 2.524261474609375,
+      "sigma_cal": 6.551327228546143
+    },
+    {
+      "id": 268,
+      "host": "TaSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 3.6707310676574707,
+      "sigma_raw": 2.203737735748291,
+      "sigma_cal": 5.719457626342773
+    },
+    {
+      "id": 269,
+      "host": "TaSe2",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.931641101837158,
+      "sigma_raw": 2.352421522140503,
+      "sigma_cal": 6.105343341827393
+    },
+    {
+      "id": 270,
+      "host": "TaSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 4.671022415161133,
+      "sigma_raw": 2.5299317836761475,
+      "sigma_cal": 6.566043376922607
+    },
+    {
+      "id": 271,
+      "host": "Sn2",
+      "dopant": "Fe",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 3.7087008953094482,
+      "sigma_raw": 2.359513521194458,
+      "sigma_cal": 6.123749256134033
+    },
+    {
+      "id": 272,
+      "host": "Sn2",
+      "dopant": "Nb",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 2.2178471088409424,
+      "sigma_raw": 2.560974597930908,
+      "sigma_cal": 6.646610260009766
+    },
+    {
+      "id": 273,
+      "host": "Sn2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 1.597888708114624,
+      "sigma_raw": 2.5417544841766357,
+      "sigma_cal": 6.59672737121582
+    },
+    {
+      "id": 274,
+      "host": "Sn2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 4.5679612159729,
+      "sigma_raw": 2.8692712783813477,
+      "sigma_cal": 7.446746349334717
+    },
+    {
+      "id": 275,
+      "host": "W2Te4",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 55,
+      "mu": 2.1144533157348633,
+      "sigma_raw": 2.0044994354248047,
+      "sigma_cal": 5.202365875244141
+    },
+    {
+      "id": 276,
+      "host": "W2Te4",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 55,
+      "mu": 5.709672451019287,
+      "sigma_raw": 1.6174391508102417,
+      "sigma_cal": 4.197811126708984
+    },
+    {
+      "id": 277,
+      "host": "W2Te4",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 55,
+      "mu": 5.435933589935303,
+      "sigma_raw": 1.5341475009918213,
+      "sigma_cal": 3.981640577316284
+    },
+    {
+      "id": 278,
+      "host": "ZrSe2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 0.35766494274139404,
+      "sigma_raw": 1.2657889127731323,
+      "sigma_cal": 3.2851576805114746
+    },
+    {
+      "id": 279,
+      "host": "ZrSe2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.0636667013168335,
+      "sigma_raw": 1.3378839492797852,
+      "sigma_cal": 3.472269058227539
+    },
+    {
+      "id": 280,
+      "host": "ZrSe2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 28,
+      "mu": 1.9062199592590332,
+      "sigma_raw": 1.7202587127685547,
+      "sigma_cal": 4.464663028717041
+    },
+    {
+      "id": 281,
+      "host": "W2Se4",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 97,
+      "mu": 2.6171348094940186,
+      "sigma_raw": 0.912428081035614,
+      "sigma_cal": 2.3680648803710938
+    },
+    {
+      "id": 282,
+      "host": "W2Se4",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 97,
+      "mu": 4.908783912658691,
+      "sigma_raw": 1.1811233758926392,
+      "sigma_cal": 3.0654215812683105
+    },
+    {
+      "id": 283,
+      "host": "W2Se4",
+      "dopant": "Pb",
+      "defect_type": "interstitial",
+      "natoms": 97,
+      "mu": 6.1175537109375,
+      "sigma_raw": 1.5546040534973145,
+      "sigma_cal": 4.034732341766357
+    },
+    {
+      "id": 284,
+      "host": "Si2",
+      "dopant": "In",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 1.9735205173492432,
+      "sigma_raw": 1.9773871898651123,
+      "sigma_cal": 5.131999969482422
+    },
+    {
+      "id": 285,
+      "host": "Si2",
+      "dopant": "La",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 4.740848064422607,
+      "sigma_raw": 2.0869905948638916,
+      "sigma_cal": 5.416458606719971
+    },
+    {
+      "id": 286,
+      "host": "Si2",
+      "dopant": "Bi",
+      "defect_type": "interstitial",
+      "natoms": 19,
+      "mu": 4.139990329742432,
+      "sigma_raw": 1.3807092905044556,
+      "sigma_cal": 3.5834157466888428
+    }
+  ],
+  "wall_time_min": 0.056995165348052976
+}
