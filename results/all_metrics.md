@@ -152,6 +152,12 @@
 |---|---|---|---|---|---|---|---|
 | log_MAE = a + alpha*log(N) + beta*log(P) | CrystalTransformer (multi-config) | leak_free_v1 | 0.12-1.65 | 30 | 42 | alpha=-0.401 | beta=-0.010, R²=0.953 |
 
+## Multi-source (Plan A)
+
+| run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |
+|---|---|---|---|---|---|---|---|
+| multi_head_4sources | shared CrystalTransformer + 4 heads | IMP2D + JARVIS-2D/3D + DFT-3D | 0.815 | 60 | 42 | 0.5546 | Δ=+7.5% |
+
 ## Generative AL (C17)
 
 | run | model | data | params (M) | epochs | seed | Test MAE | Test RMSE |

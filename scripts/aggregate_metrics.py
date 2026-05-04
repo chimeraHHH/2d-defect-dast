@@ -315,6 +315,21 @@ def main():
             "test_rmse": round(mace["test_rmse_eV"], 4),
         })
 
+    # ---- Multi-source training (Plan A) ----
+    ms = _read_json(RESULTS / "multi_source_train.json")
+    if ms:
+        rows.append({
+            "category": "Multi-source (Plan A)",
+            "run": "multi_head_4sources",
+            "model": "shared CrystalTransformer + 4 heads",
+            "data": "IMP2D + JARVIS-2D/3D + DFT-3D",
+            "params_M": round(ms["n_params"] / 1e6, 3),
+            "epochs": ms["config"]["epochs"],
+            "seed": ms["config"]["seed"],
+            "test_mae": round(ms["test_mae_imp2d_eV"], 4),
+            "test_rmse": f"Δ={ms['delta_pct']:+.1f}%",
+        })
+
     # ---- Generative AL (C17) ----
     c17 = _read_json(RESULTS / "c17_augmented_training.json")
     if c17:

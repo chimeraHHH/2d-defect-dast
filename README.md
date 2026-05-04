@@ -174,6 +174,31 @@ JARVIS dft_2d 1.1k 本征 2D 材料 (eV/atom, 不同任务定义) 上的 few-sho
 [c17_augmented_training.py](scripts/c17_augmented_training.py) /
 [c17_priority_queue.py](scripts/c17_priority_queue.py)
 
+### 多数据库整合 (Plan A) — 突破数据瓶颈
+
+整合 4 个真实 DFT 数据库通过多头架构联合训练：
+
+| 数据源 | 样本 | 任务 | Loss 权重 |
+|---|---|---|---|
+| IMP2D (主) | 8512 | 缺陷 Ef (eV/cell) | 1.0 |
+| JARVIS-2D | 70 | 2D vacancy (eV) | 0.5 |
+| JARVIS-3D | 381 | 3D vacancy (eV) | 0.5 |
+| **JARVIS DFT-3D** | **19902** | 3D pristine (eV/atom) | 0.3 |
+
+总训练样本: **26830** (3.15× 单源 8512)
+
+| 配置 | Aug | Test MAE | Δ |
+|---|---|---|---|
+| 单源 | 无 | 0.869 | 0% |
+| **多源** | 无 | **0.555** | **−36.1%** |
+| 单源 | 有 | 0.516 | −40.6% |
+
+**完美吻合 §5.17 缩放律预测** (α=−0.40 → −37%)。
+对照 §5.20 伪标签 −11% 形成 3.3× 差距，量化"真信息 vs 伪信息"价值。
+
+脚本：[fetch_dft_3d.py](scripts/fetch_dft_3d.py) /
+[multi_source_train.py](scripts/multi_source_train.py)
+
 ### 主动学习闭环
 
 MC-Dropout σ 引导的迭代选样 vs 随机选样（15 轮 × 50 样本）：

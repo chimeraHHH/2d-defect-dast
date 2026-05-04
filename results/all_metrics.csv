@@ -81,6 +81,7 @@ GNN baseline (PyG),crystaltransformer_(ours),CrystalTransformer (ours),leak_free
 GNN baseline (PyG),alignn_(ref),ALIGNN (ref),leak_free_v1,4.03,—,42,0.54,—
 Scaling law fit,log_MAE = a + alpha*log(N) + beta*log(P),CrystalTransformer (multi-config),leak_free_v1,0.12-1.65,30,42,alpha=-0.401,"beta=-0.010, R²=0.953"
 GNN baseline (PyG),mace_lmax2,"MACE (small, max_ell=2, 2 interactions)",leak_free_v1,0.44,60,42,1.4642,2.1559
+Multi-source (Plan A),multi_head_4sources,shared CrystalTransformer + 4 heads,IMP2D + JARVIS-2D/3D + DFT-3D,0.815,60,42,0.5546,Δ=+7.5%
 Generative AL (C17),A_baseline,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,0.8687,n_pseudo=0
 Generative AL (C17),B_random100,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,1.5381,n_pseudo=100
 Generative AL (C17),C_adversarial100,baseline h128 + pseudo aug,leak_free_v1 + 287 pseudo,0.747,60,42,0.7702,n_pseudo=100
