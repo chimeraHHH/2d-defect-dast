@@ -738,6 +738,35 @@ test sample set differs across seeds and from the leak-free
 multi-source seed=42 result (0.4929), giving a clean 11.2\,\%
 improvement on a fixed test partition.
 
+\paragraph{Augmentation does not substitute for chemistry diversity.}
+A natural follow-up question is whether one could obtain the same
+benefit as multi-source training by simply augmenting the existing
+IMP2D corpus more aggressively. We tested this directly: we extended
+the leak-free $3\times$ rotation+perturbation augmentation from
+IMP2D-only to all four sources (the IMP2D head, the JARVIS-2D head,
+the JARVIS-3D head and the DFT-3D head), trebling the joint training
+corpus from 26\,837 to 74\,379 samples, and reduced the DFT-3D loss
+weight from 0.30 to 0.10 to keep its share of the total gradient
+proportional. The resulting test MAE (single seed=42) was
+\textbf{0.8233 eV}, a \emph{67\,\% regression} relative to the
+unaugmented v2 multi-source baseline of 0.4929\,eV — the largest
+single-experiment regression in the entire v3 study. The full record
+is preserved in \texttt{results/V3\_AUGMULTI\_FINDINGS.md} in the
+repository.
+
+The interpretation is consistent with the central thesis of the
+paper. The v2 multi-source $-12\,\%$ improvement was driven by the
+\emph{qualitative} diversity of four DFT databases covering distinct
+chemistry; trebling that corpus through augmentation, even though it
+nominally moves $N_{\mathrm{train}}$ from 26\,837 to 74\,379, does
+\emph{not} give the same benefit because the new samples are
+augmentation copies highly correlated with the originals. This is a
+clean experimental confirmation that for the present scaling regime
+the relevant data quantity is ``effective'' (independent) sample
+count, not literal sample count, and that augmentation
+factor $K_{\mathrm{aug}}$ contributes far less than $\log K_{\mathrm{aug}}$
+in the empirical MAE scaling.
+
 \subsection{Methodology audit: a self-caught augmentation leak}\label{sec:leak}
 
 In the course of extending the leak-free augmentation pipeline to
