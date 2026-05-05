@@ -296,12 +296,85 @@ def fig_v2_summary():
     print(f"  wrote {out}")
 
 
+def fig_v3_dualstream():
+    """4-seed dualstream + aug vs v1 baseline + v2 multi-source (apples-to-apples)."""
+    seed_data = []
+    for s in (42, 0, 1, 2):
+        f = RESULTS / ("dualstream_h128_aug" if s == 42 else f"dualstream_h128_aug_seed{s}") / "metrics.json"
+        if not f.exists():
+            continue
+        m = json.load(open(f))
+        seed_data.append((s, m["test_mae"]))
+    seed_data.sort(key=lambda x: x[0])
+    if not seed_data:
+        return
+    seeds, maes = zip(*seed_data)
+    mean = float(np.mean(maes))
+    std = float(np.std(maes, ddof=1))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 4.5),
+                                    gridspec_kw={"width_ratios": [3, 1.2]})
+
+    labels = [
+        "ALIGNN\n(team repro)",
+        "v1 baseline\n4-seed",
+        "v2 PFA full\n(seed=42)",
+        "v3 dualstream + aug\n4-seed",
+        "v2 multi-source\n4-seed (different test)",
+    ]
+    vals = [0.540, 0.537, 0.519, mean, 0.486]
+    errs = [0, 0.014, 0, std, 0.025]
+    cols = ["#777777", "#888888", "#1f77b4", "#9467bd", "#2ca02c"]
+    xs = np.arange(len(labels))
+    bars = ax1.bar(xs, vals, yerr=errs, color=cols, alpha=0.85,
+                   edgecolor="black", linewidth=0.8, capsize=6)
+    for x, v, e in zip(xs, vals, errs):
+        ax1.text(x, v + (e if e > 0 else 0) + 0.012,
+                 f"{v:.4f}" + (f"\n±{e:.4f}" if e > 0 else ""),
+                 ha="center", va="bottom", fontsize=9, fontweight="bold")
+    ax1.axhline(0.537, color="grey", linestyle="--", alpha=0.55, lw=1)
+    ax1.set_xticks(xs)
+    ax1.set_xticklabels(labels, fontsize=9)
+    ax1.set_ylabel("Test MAE (eV)")
+    ax1.set_title("v3 dualstream + leak-free aug: 4-seed verification\n"
+                  "Statistically tied with v1 baseline; v2 multi-source remains the lowest reported MAE",
+                  loc="left", fontsize=11)
+    ax1.set_ylim(0, 0.62)
+    ax1.spines["top"].set_visible(False)
+    ax1.spines["right"].set_visible(False)
+
+    # right: per-seed scatter
+    ys = list(maes)
+    ax2.scatter(np.zeros(len(ys)) + 1, ys, s=130, color="#9467bd",
+                alpha=0.85, edgecolor="black", zorder=3)
+    for s, y in zip(seeds, ys):
+        ax2.text(1.04, y, f"seed={s}: {y:.4f}", va="center", fontsize=9)
+    ax2.errorbar([0.85], [mean], yerr=std, fmt="s", color="black",
+                 ms=10, capsize=8, mfc="orange", zorder=2,
+                 label=f"mean = {mean:.4f}\nstd = {std:.4f}")
+    ax2.set_xlim(0.6, 1.4)
+    ax2.set_xticks([])
+    ax2.set_ylabel("Test MAE (eV)")
+    ax2.set_title("Per-seed scatter", loc="left", fontsize=11)
+    ax2.legend(loc="upper right", framealpha=0.9, fontsize=9)
+    ax2.spines["top"].set_visible(False)
+    ax2.spines["right"].set_visible(False)
+    ax2.set_ylim(min(ys) - 0.04, max(ys) + 0.04)
+
+    plt.tight_layout()
+    out = FIG / "fig_v3_dualstream.png"
+    plt.savefig(out, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  wrote {out}")
+
+
 def main():
-    print("Generating v2 figures ...")
+    print("Generating v2/v3 figures ...")
     fig_v2_ablation()
     fig_v2_multi_source()
     fig_v2_training_curves()
     fig_v2_summary()
+    fig_v3_dualstream()
     print("\nDone.")
 
 

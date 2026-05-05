@@ -18,6 +18,11 @@ SINGLE_RUNS = [
     ("v2_ablate_no_long_range", "v2 - long-range"),
     ("v2_ablate_no_pfa", "v2 - PFA"),
     ("v2_ablate_no_defect_bias", "v2 - defect bias"),
+    ("dualstream_h128_imp2d", "v3 dualstream (no aug, seed=42)"),
+    ("dualstream_h128_aug", "v3 dualstream + leak-free aug (seed=42)"),
+    ("dualstream_h128_aug_seed0", "v3 dualstream + leak-free aug (seed=0)"),
+    ("dualstream_h128_aug_seed1", "v3 dualstream + leak-free aug (seed=1)"),
+    ("dualstream_h128_aug_seed2", "v3 dualstream + leak-free aug (seed=2)"),
 ]
 
 MULTI_RUNS = [
