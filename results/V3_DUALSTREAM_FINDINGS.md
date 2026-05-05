@@ -47,7 +47,51 @@ a 3× augmented training set with the v1 backbone. The natural next step is
 to combine both: train dual-stream on a leak-free augmented (defect, pristine)
 paired dataset.
 
-### Phase 2: dualstream WITH leak-free joint augmentation (in progress)
+### Phase 2: dualstream WITH leak-free joint augmentation — FINAL (4 seeds)
+
+| seed | test_mae (eV) | best_val | RMSE  |
+|------|---------------|----------|-------|
+| 42   | 0.5088        | 0.4979   | 1.170 |
+| 0    | 0.5344        | 0.5423   | 1.223 |
+| 1    | 0.5571        | 0.5621   | 1.128 |
+| 2    | 0.5118        | 0.5369   | 1.131 |
+| **mean ± std** | **0.5280 ± 0.0225** | — | — |
+
+**Comparison vs the v1 baseline** (`baseline_h128_aug_long_safe`,
+4-seed mean 0.537 ± 0.014 eV per the v1.2 paper):
+
+  Δ_mean   = 0.5280 − 0.537 = −0.009 eV (−1.7 %)
+  combined std = sqrt(0.0225² + 0.014²) = 0.0265 eV
+  → |Δ| / σ_pooled ≈ 0.34 — **statistically indistinguishable.**
+
+The dual-stream architecture, while it learns the
+$f(\mathrm{pristine},\mathrm{pristine})=0$ identity to within 1e-3 by
+the end of training (a clean interpretability result), does NOT yield
+a statistically significant accuracy improvement over the v1 baseline
+on single-source IMP2D under leak-free augmentation.
+
+**Routing decision** (per the rule fixed in advance: <0.50 publish as
+headline; 0.50–0.52 acknowledge match; >0.52 architectural neutral):
+4-seed mean 0.528 falls in the "architectural neutral" band, so we
+pivot the paper headline back to v2 multi-source 0.4929 / 4-seed
+0.486 ± 0.025 eV. The dual-stream result is folded into the
+methodology section as an honest negative architectural ablation
+that reinforces the same "data is the bottleneck" lesson reported in
+the v2 single-source ablation (Phase 1) and in the v1.2 scaling-law
+analysis (α = −0.40).
+
+The dual-stream module (\texttt{src/models/dualstream.py}) and the
+leak-free joint-augmentation builder
+(\texttt{scripts/build\_pristine\_pairs\_aug.py}) remain in the codebase
+as a documented, unit-tested implementation of the
+defect/pristine cross-attention idea, available for re-use should
+future work find a regime where it pays off — e.g., very small data
+($\le 2 000$ samples) or task-transfer to a defect property where the
+absolute energy of the host is highly variable across hosts.
+
+### (Cancelled / superseded entries below)
+
+
 
 `scripts/build_pristine_pairs_aug.py` constructs the joint-augmented
 dataset:

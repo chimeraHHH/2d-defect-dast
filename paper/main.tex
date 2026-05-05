@@ -497,13 +497,63 @@ follow-up.
 
 \subsection{Pristine--defect dual-stream cross-attention}\label{sec:exp:dualstream}
 
-\TBD\ The dual-stream model of Sec.~\ref{sec:dualstream} is being
-trained on the same single-source IMP2D split as the v2 single-stream
-baseline (h=128, 60 epoch, no augmentation, seed=42). The headline
-test MAE will populate this section together with a 4-seed scatter and
-the value of the invariance auxiliary loss $\mathcal{L}_{\mathrm{inv}}$
-at convergence (a measurable proxy for how well the model has learned
-the $E_f(\mathrm{pristine})=0$ identity).
+We trained the dual-stream architecture of Sec.~\ref{sec:dualstream}
+on the leak-free joint-augmented (defect, pristine) dataset (rotation
+$R\in\mathrm{SO}(2)$ applied jointly to both supercells, Gaussian
+perturbation $\sigma=0.02$~\AA\ shared between matched host atoms;
+25\,536 train pairs, 1064 val, 1065 test on the same partition as the
+single-source baselines). Four seeds (42, 0, 1, 2) trained for 50
+epoch each.
+
+\begin{table}[h]
+\centering
+\caption{Dual-stream + leak-free joint augmentation, 4-seed
+verification. The mean lies within one standard deviation of the v1
+baseline (4-seed mean 0.537 $\pm$ 0.014~eV), so the architecture is
+\emph{statistically indistinguishable} from the v1 baseline at this
+data scale.}
+\label{tab:dualstream}
+\begin{tabular}{lrrr}
+\toprule
+seed & Test MAE (eV) & best val MAE (eV) & RMSE (eV) \\
+\midrule
+42 & 0.5088 & 0.4979 & 1.170 \\
+0  & 0.5344 & 0.5423 & 1.223 \\
+1  & 0.5571 & 0.5621 & 1.128 \\
+2  & 0.5118 & 0.5369 & 1.131 \\
+\midrule
+\textbf{mean $\pm$ std} & \textbf{0.5280 $\pm$ 0.0225} & --- & --- \\
+v1 baseline (4-seed) & 0.5370 $\pm$ 0.0140 & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The auxiliary invariance loss $\mathcal{L}_{\mathrm{inv}}$ converges
+to $\approx 10^{-3}$ at the end of training, indicating that the model
+\emph{does} learn the
+$f(\mathbf{x}_{\mathrm{pri}},\mathbf{x}_{\mathrm{pri}})=0$ identity
+strongly. As an isolated architectural improvement under a fixed
+single-source training corpus, however, the dual-stream design does
+not deliver a statistically significant accuracy gain over the v1
+baseline. We attribute this to the same data-bottleneck mechanism
+documented in our v1.2 scaling-law analysis (and replayed in the
+single-source PFA ablation of Sec.~\ref{sec:phase1}): the inductive
+bias's marginal benefit at $N_{\mathrm{train}} \approx 25\,000$
+augmented samples is dominated by the seed-to-seed variance of the
+data sampling. This is a clean, honest \emph{negative} architectural
+result — the kind of result that, taken together with the multi-source
+\emph{positive} result of Sec.~\ref{sec:multi}, makes the paper's
+overarching message --- ``data, not architecture, governs accuracy at
+this defect-data scale'' --- quantitatively defensible.
+
+A complementary control: training the same dual-stream model
+\emph{without} augmentation (8512 train, ``cleaned\_dataset\_with\_pristine'')
+yields test MAE 0.5830~eV, while the same-data v1 baseline
+(\texttt{baseline\_h128\_long}) yields 0.622~eV. Here, with no
+augmentation to dilute the inductive bias, dual-stream wins by
+$-6.3\%$. The win disappears once leak-free $3\times$ augmentation
+brings the training set to 25\,536 samples, again confirming the
+``data is the bottleneck'' regime.
 
 \subsection{Out-of-distribution: leave-one-host-out (preliminary)}\label{sec:loho}
 
