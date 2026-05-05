@@ -1,0 +1,47 @@
+&CONTROL
+    calculation = 'scf'
+    prefix      = 'atom_Tl'
+    pseudo_dir  = '/root/qe_pseudos'
+    outdir      = '/root/qe_scratch'
+    verbosity   = 'low'
+    tprnfor     = .true.
+    tstress     = .true.
+    nstep       = 60
+    forc_conv_thr = 1.0d-3
+    etot_conv_thr = 1.0d-5
+/
+&SYSTEM
+    ibrav   = 0
+    nat     = 1
+    ntyp    = 1
+    ecutwfc = 50.0
+    ecutrho = 400.0
+    occupations = 'smearing'
+    smearing    = 'mp'
+    degauss     = 0.01
+    nspin = 2
+    starting_magnetization(1) = 0.5
+/
+&ELECTRONS
+    conv_thr        = 1.0d-7
+    mixing_beta     = 0.4
+    electron_maxstep = 200
+    diagonalization = 'david'
+/
+&IONS
+    ion_dynamics = 'bfgs'
+/
+
+CELL_PARAMETERS angstrom
+     15.00000000     0.00000000     0.00000000
+      0.00000000    15.00000000     0.00000000
+      0.00000000     0.00000000    15.00000000
+
+ATOMIC_SPECIES
+  Tl   204.3800  Tl_pbe_v1.2.uspp.F.UPF
+
+ATOMIC_POSITIONS angstrom
+  Tl      7.50000000     7.50000000     7.50000000
+
+K_POINTS automatic
+  1 1 1 0 0 0

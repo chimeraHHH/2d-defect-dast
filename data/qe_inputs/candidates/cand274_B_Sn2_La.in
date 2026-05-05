@@ -1,0 +1,65 @@
+&CONTROL
+    calculation = 'scf'
+    prefix      = 'cand274_B_Sn2_La'
+    pseudo_dir  = '/root/qe_pseudos'
+    outdir      = '/root/qe_scratch'
+    verbosity   = 'low'
+    tprnfor     = .true.
+    tstress     = .true.
+    nstep       = 60
+    forc_conv_thr = 1.0d-3
+    etot_conv_thr = 1.0d-5
+/
+&SYSTEM
+    ibrav   = 0
+    nat     = 19
+    ntyp    = 2
+    ecutwfc = 50.0
+    ecutrho = 400.0
+    occupations = 'smearing'
+    smearing    = 'mp'
+    degauss     = 0.01
+
+/
+&ELECTRONS
+    conv_thr        = 1.0d-7
+    mixing_beta     = 0.4
+    electron_maxstep = 200
+    diagonalization = 'david'
+/
+&IONS
+    ion_dynamics = 'bfgs'
+/
+
+CELL_PARAMETERS angstrom
+     14.01417732     0.00000000     0.00000000
+     -7.00708866    12.13663292     0.00000000
+      0.00000000     0.00000000    15.19999981
+
+ATOMIC_SPECIES
+  La   138.9055  La.pbe-spfn-kjpaw_psl.1.0.0.UPF
+  Sn   118.7100  Sn_pbe_v1.uspp.F.UPF
+
+ATOMIC_POSITIONS angstrom
+  Sn      0.00449870    -0.01388373     8.04893780
+  Sn      4.63765574     8.11056614     8.04200459
+  Sn      9.34445667     5.39309311     7.15974283
+  Sn      7.02317524     4.04332590     8.06673145
+  Sn     11.66894436     1.35473514     7.14105701
+  Sn      9.34591007    -0.00932249     8.03617477
+  Sn      2.31417394     9.45202923     7.16101456
+  Sn      0.00963584     8.09304333     8.03617668
+  Sn      7.01539898     9.38873768     7.13308334
+  Sn      4.71960068     5.41229534     7.13308191
+  Sn      7.01019573     1.33855617     7.14384508
+  Sn      4.67313957    -0.00100926     8.05366898
+  Sn     -2.32552028     9.44189167     7.14384747
+  Sn     -4.66142797     8.07826614     8.06673145
+  Sn     -0.01015575     5.39920712     7.14105654
+  Sn     -2.35296297     4.05551338     8.04370403
+  Sn      2.34845591     1.34114790     7.00172043
+  Sn      2.34997010     4.04859161     8.04894066
+  La      1.11650026     2.05242085     9.81929493
+
+K_POINTS automatic
+  2 2 1 0 0 0

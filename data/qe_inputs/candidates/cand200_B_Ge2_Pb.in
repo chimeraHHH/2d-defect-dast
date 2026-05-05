@@ -1,0 +1,65 @@
+&CONTROL
+    calculation = 'scf'
+    prefix      = 'cand200_B_Ge2_Pb'
+    pseudo_dir  = '/root/qe_pseudos'
+    outdir      = '/root/qe_scratch'
+    verbosity   = 'low'
+    tprnfor     = .true.
+    tstress     = .true.
+    nstep       = 60
+    forc_conv_thr = 1.0d-3
+    etot_conv_thr = 1.0d-5
+/
+&SYSTEM
+    ibrav   = 0
+    nat     = 19
+    ntyp    = 2
+    ecutwfc = 50.0
+    ecutrho = 400.0
+    occupations = 'smearing'
+    smearing    = 'mp'
+    degauss     = 0.01
+
+/
+&ELECTRONS
+    conv_thr        = 1.0d-7
+    mixing_beta     = 0.4
+    electron_maxstep = 200
+    diagonalization = 'david'
+/
+&IONS
+    ion_dynamics = 'bfgs'
+/
+
+CELL_PARAMETERS angstrom
+     12.14074516     0.00000000     0.00000000
+     -6.07037258    10.51419353     0.00000000
+      0.00000000     0.00000000    15.19999981
+
+ATOMIC_SPECIES
+  Ge    72.6300  ge_pbe_v1.4.uspp.F.UPF
+  Pb   207.2000  Pb.pbe-dn-kjpaw_psl.0.2.2.UPF
+
+ATOMIC_POSITIONS angstrom
+  Ge      0.00036943     0.02111802     7.96018267
+  Ge      4.04200697     7.01907396     8.02203655
+  Ge      8.07352257     4.68137455     7.22666693
+  Ge      6.07220745     3.49601388     7.94749117
+  Ge     10.11334133     1.15065753     7.19323683
+  Ge      8.09230042    -0.00742596     7.95950127
+  Ge      2.03274298     8.18301773     7.21824694
+  Ge      0.00032770     7.02016830     8.02964211
+  Ge      6.07035780     8.14097595     7.27750158
+  Ge      4.06766558     4.68028307     7.22499704
+  Ge      6.07065725     1.12972116     7.23036957
+  Ge      4.04819775    -0.00860511     7.95787382
+  Ge     -2.03290701     8.18256092     7.21622753
+  Ge     -4.04318666     7.02180386     8.02202034
+  Ge     -0.00175662     4.67671776     7.22741985
+  Ge     -2.16220617     3.42290521     8.20623684
+  Ge      2.02746129     1.15031052     7.19692945
+  Ge      2.16284895     3.42206812     8.20821285
+  Pb     -0.00059568     3.72134852     9.61930466
+
+K_POINTS automatic
+  2 2 1 0 0 0
