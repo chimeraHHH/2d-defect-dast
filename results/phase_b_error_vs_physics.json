@@ -1,0 +1,229 @@
+{
+  "n_test": 1065,
+  "baseline_test_mae": 0.5160927772521973,
+  "spearman_correlations_with_abs_error": [
+    {
+      "feature": "defect_type_int",
+      "spearman": 0.2474876700315094,
+      "pearson": 0.19829060936914644
+    },
+    {
+      "feature": "bond_strain_mean_global",
+      "spearman": 0.24746457712592393,
+      "pearson": 0.11791539377166305
+    },
+    {
+      "feature": "bond_strain_max_global",
+      "spearman": 0.24533934970906168,
+      "pearson": 0.11204364053364183
+    },
+    {
+      "feature": "coord_change_at_defect",
+      "spearman": 0.2104229450392844,
+      "pearson": 0.10214250321959138
+    },
+    {
+      "feature": "n_strained",
+      "spearman": 0.2032137668434311,
+      "pearson": 0.15029121999775988
+    },
+    {
+      "feature": "bond_strain_mean_mid",
+      "spearman": 0.1967484654892063,
+      "pearson": 0.12432226382978473
+    },
+    {
+      "feature": "frac_strained",
+      "spearman": 0.1958169886470493,
+      "pearson": 0.12969325075200178
+    },
+    {
+      "feature": "bond_strain_mean_far",
+      "spearman": 0.1865967316928242,
+      "pearson": 0.0991942508942624
+    },
+    {
+      "feature": "bond_strain_mean_near",
+      "spearman": 0.14110658327518358,
+      "pearson": 0.03032683729842004
+    },
+    {
+      "feature": "chi_dopant",
+      "spearman": 0.07406330581497655,
+      "pearson": 0.08607273508431683
+    },
+    {
+      "feature": "rcov_dopant",
+      "spearman": -0.06900641137080121,
+      "pearson": -0.03959279319920587
+    },
+    {
+      "feature": "z_dopant",
+      "spearman": -0.026270261462640318,
+      "pearson": 0.0010200448641589956
+    },
+    {
+      "feature": "n_atoms",
+      "spearman": 0.00941204982057471,
+      "pearson": 0.0880227239836359
+    },
+    {
+      "feature": "angle_distortion_max_global",
+      "spearman": NaN,
+      "pearson": NaN
+    },
+    {
+      "feature": "bond_strain_mean_very_far",
+      "spearman": 0.17329446606995186,
+      "pearson": 0.10208621509901379
+    },
+    {
+      "feature": "coord_change_max_other",
+      "spearman": 0.10161113653594317,
+      "pearson": 0.04796739755246568
+    },
+    {
+      "feature": "delta_rcov",
+      "spearman": 0.06845400044521352,
+      "pearson": 0.03491074279305488
+    },
+    {
+      "feature": "delta_valence",
+      "spearman": -0.06716364939480347,
+      "pearson": -0.03910408361445361
+    },
+    {
+      "feature": "delta_chi",
+      "spearman": 0.06015832971524806,
+      "pearson": 0.04656053220618012
+    },
+    {
+      "feature": "dopant_block",
+      "spearman": -0.011773309083453441,
+      "pearson": 0.012956533400694359
+    },
+    {
+      "feature": "host_natoms",
+      "spearman": 0.00941204982057471,
+      "pearson": 0.0880227239836359
+    },
+    {
+      "feature": "valence_dopant",
+      "spearman": -0.006778641929796491,
+      "pearson": 0.014128764647944997
+    }
+  ],
+  "lightgbm_predicting_abs_error_test_r2": 0.007391098022509257,
+  "failure_modes_by_category": [
+    {
+      "by": "defect_type_int (0=ads, 1=int)",
+      "groups": {
+        "0.0": {
+          "n": 699,
+          "mean_abs_err": 0.3716270923614502,
+          "p90_abs_err": 0.7403044104576111
+        },
+        "1.0": {
+          "n": 366,
+          "mean_abs_err": 0.7919984459877014,
+          "p90_abs_err": 1.7326797246932983
+        }
+      }
+    },
+    {
+      "by": "dopant_block (0=s,1=p,2=d,3=f)",
+      "groups": {
+        "0.0": {
+          "n": 197,
+          "mean_abs_err": 0.4415971636772156,
+          "p90_abs_err": 0.9236485362052917
+        },
+        "1.0": {
+          "n": 382,
+          "mean_abs_err": 0.5643494129180908,
+          "p90_abs_err": 1.2462539672851562
+        },
+        "2.0": {
+          "n": 465,
+          "mean_abs_err": 0.5080433487892151,
+          "p90_abs_err": 0.9450722932815552
+        },
+        "3.0": {
+          "n": 21,
+          "mean_abs_err": 0.5153582692146301,
+          "p90_abs_err": 1.001520037651062
+        }
+      }
+    },
+    {
+      "by": "n_atoms quartile (0=small)",
+      "groups": {
+        "0": {
+          "n": 563,
+          "mean_abs_err": 0.4665739834308624,
+          "p90_abs_err": 0.9880561828613281
+        },
+        "2": {
+          "n": 298,
+          "mean_abs_err": 0.5310821533203125,
+          "p90_abs_err": 0.9839890599250793
+        },
+        "3": {
+          "n": 204,
+          "mean_abs_err": 0.6308587193489075,
+          "p90_abs_err": 1.384875774383545
+        }
+      }
+    },
+    {
+      "by": "delta_chi quartile (0=close, 3=far)",
+      "groups": {
+        "0": {
+          "n": 269,
+          "mean_abs_err": 0.5054008364677429,
+          "p90_abs_err": 0.8888054490089417
+        },
+        "1": {
+          "n": 264,
+          "mean_abs_err": 0.5143996477127075,
+          "p90_abs_err": 0.9865792393684387
+        },
+        "2": {
+          "n": 266,
+          "mean_abs_err": 0.44718384742736816,
+          "p90_abs_err": 1.076384425163269
+        },
+        "3": {
+          "n": 266,
+          "mean_abs_err": 0.5974946022033691,
+          "p90_abs_err": 1.132527232170105
+        }
+      }
+    },
+    {
+      "by": "delta_rcov quartile (0=close, 3=far)",
+      "groups": {
+        "0": {
+          "n": 267,
+          "mean_abs_err": 0.4059353470802307,
+          "p90_abs_err": 0.8659883141517639
+        },
+        "1": {
+          "n": 267,
+          "mean_abs_err": 0.5944738388061523,
+          "p90_abs_err": 1.216560959815979
+        },
+        "2": {
+          "n": 265,
+          "mean_abs_err": 0.482841819524765,
+          "p90_abs_err": 1.0061191320419312
+        },
+        "3": {
+          "n": 266,
+          "mean_abs_err": 0.5811144709587097,
+          "p90_abs_err": 1.3036377429962158
+        }
+      }
+    }
+  ]
+}

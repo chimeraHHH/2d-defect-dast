@@ -1,0 +1,125 @@
+{
+  "n_train": 8512,
+  "n_val": 1064,
+  "n_test": 1065,
+  "test_mae_eV": 0.7973932245048921,
+  "test_rmse_eV": 1.5867907692651764,
+  "val_mae_eV": 0.7591640840055689,
+  "mean_predictor_mae_eV": 2.3010803836219487,
+  "v1_baseline_test_mae": 0.5161,
+  "v2_multi_source_4seed_mean": 0.486,
+  "feature_importances": [
+    [
+      "bond_strain_mean_far",
+      6486
+    ],
+    [
+      "bond_strain_mean_mid",
+      6436
+    ],
+    [
+      "bond_strain_mean_very_far",
+      6396
+    ],
+    [
+      "bond_strain_max_global",
+      6268
+    ],
+    [
+      "bond_strain_mean_near",
+      5888
+    ],
+    [
+      "delta_chi",
+      5860
+    ],
+    [
+      "delta_rcov",
+      5726
+    ],
+    [
+      "bond_strain_mean_global",
+      5599
+    ],
+    [
+      "z_dopant",
+      4220
+    ],
+    [
+      "delta_valence",
+      3929
+    ],
+    [
+      "frac_strained",
+      3642
+    ],
+    [
+      "coord_change_at_defect",
+      3522
+    ],
+    [
+      "n_strained",
+      3294
+    ],
+    [
+      "chi_dopant",
+      2976
+    ],
+    [
+      "rcov_dopant",
+      2524
+    ],
+    [
+      "n_atoms",
+      1754
+    ],
+    [
+      "valence_dopant",
+      1637
+    ],
+    [
+      "defect_type_int",
+      1121
+    ],
+    [
+      "dopant_block",
+      557
+    ],
+    [
+      "host_natoms",
+      156
+    ],
+    [
+      "coord_change_max_other",
+      5
+    ],
+    [
+      "angle_distortion_max_global",
+      0
+    ]
+  ],
+  "feature_names": [
+    "n_atoms",
+    "bond_strain_max_global",
+    "bond_strain_mean_global",
+    "angle_distortion_max_global",
+    "coord_change_at_defect",
+    "coord_change_max_other",
+    "bond_strain_mean_near",
+    "bond_strain_mean_mid",
+    "bond_strain_mean_far",
+    "bond_strain_mean_very_far",
+    "n_strained",
+    "frac_strained",
+    "delta_chi",
+    "delta_rcov",
+    "delta_valence",
+    "dopant_block",
+    "z_dopant",
+    "defect_type_int",
+    "host_natoms",
+    "chi_dopant",
+    "rcov_dopant",
+    "valence_dopant"
+  ]
+}

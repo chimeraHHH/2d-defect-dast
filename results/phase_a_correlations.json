@@ -1,0 +1,110 @@
+{
+  "n_atoms_aligned": 23620,
+  "n_atoms_excluding_defect": 23030,
+  "overall_correlations": [
+    {
+      "label": "1/dist_to_defect",
+      "n": 23620,
+      "spearman": 0.13576098629215744,
+      "pearson": 0.8828175667816354
+    },
+    {
+      "label": "-distance_to_defect",
+      "n": 23620,
+      "spearman": 0.13576098629215744,
+      "pearson": 0.3733297791402849
+    },
+    {
+      "label": "bond_strain_max",
+      "n": 23620,
+      "spearman": 0.09342879135719215,
+      "pearson": 0.11485598594627996
+    },
+    {
+      "label": "bond_strain_mean",
+      "n": 23620,
+      "spearman": 0.121421605785734,
+      "pearson": 0.302473400446063
+    },
+    {
+      "label": "coord_change",
+      "n": 23620,
+      "spearman": 0.17638717528107847,
+      "pearson": 0.6492830002790456
+    }
+  ],
+  "excluding_defect_correlations": [
+    {
+      "label": "1/dist_to_defect",
+      "n": 23030,
+      "spearman": 0.06789142289577534,
+      "pearson": 0.018812834477788535
+    },
+    {
+      "label": "-distance_to_defect",
+      "n": 23030,
+      "spearman": 0.06789142289577534,
+      "pearson": 0.012336740004818353
+    },
+    {
+      "label": "bond_strain_max",
+      "n": 23030,
+      "spearman": 0.0615190296301679,
+      "pearson": 0.06536097297672444
+    },
+    {
+      "label": "bond_strain_mean",
+      "n": 23030,
+      "spearman": 0.08254260614215204,
+      "pearson": 0.20587765744543263
+    },
+    {
+      "label": "coord_change",
+      "n": 23030,
+      "spearman": 0.06575634447219213,
+      "pearson": 0.016967828894134257
+    }
+  ],
+  "per_shell_correlations": [
+    {
+      "shell": "0-3 \u00c5",
+      "n": 1914,
+      "spearman_bond_strain_max": 0.047912621841909135,
+      "spearman_inv_dist": 0.05132941928121436,
+      "pearson_bond_strain_max": 0.011166056033928323,
+      "pearson_inv_dist": -0.003502468589720382
+    },
+    {
+      "shell": "3-5 \u00c5",
+      "n": 6297,
+      "spearman_bond_strain_max": -0.03526941336192413,
+      "spearman_inv_dist": -0.0005985188068604718,
+      "pearson_bond_strain_max": 0.015615456213759243,
+      "pearson_inv_dist": 0.02836738860396745
+    },
+    {
+      "shell": "5-7 \u00c5",
+      "n": 8332,
+      "spearman_bond_strain_max": 0.03741190295440973,
+      "spearman_inv_dist": 0.02982601386990006,
+      "pearson_bond_strain_max": -0.047291646431927965,
+      "pearson_inv_dist": 0.020579685532071578
+    },
+    {
+      "shell": "7-9 \u00c5",
+      "n": 4431,
+      "spearman_bond_strain_max": 0.06426279792803535,
+      "spearman_inv_dist": 0.03437707484857965,
+      "pearson_bond_strain_max": 0.21210807581328558,
+      "pearson_inv_dist": -0.03019003310851931
+    },
+    {
+      "shell": ">9 \u00c5",
+      "n": 2056,
+      "spearman_bond_strain_max": 0.20946363934257034,
+      "spearman_inv_dist": 0.14069638330073048,
+      "pearson_bond_strain_max": 0.11128252521966348,
+      "pearson_inv_dist": 0.03543757496832715
+    }
+  ]
+}

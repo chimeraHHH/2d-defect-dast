@@ -1,0 +1,1279 @@
+{
+  "MoS2": {
+    "n_holdout": 308,
+    "n_train": 10333,
+    "v1_loho_degradation_factor": 1.0,
+    "max_abs_cohen_d": 1.0201222193186275,
+    "sum_abs_cohen_d": 6.614933340999896,
+    "top_5_shifted_features": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.44220677776046047,
+        "train_std": 0.3307357155977258,
+        "holdout_mean": 0.17565597667638483,
+        "holdout_std": 0.16450901309279156,
+        "cohen_d": -1.0201222193186275,
+        "ks_stat": 0.4319325550091059
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.012555431327503279,
+        "train_std": 0.018390323116817583,
+        "holdout_mean": 0.002911300255158045,
+        "holdout_std": 0.0017916618842651931,
+        "cohen_d": -0.738091062558221,
+        "ks_stat": 0.5156757256099169
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.181360689054486,
+        "train_std": 21.120751511212955,
+        "holdout_mean": 8.607142857142858,
+        "holdout_std": 8.060941641546787,
+        "cohen_d": -0.7238696407750154,
+        "ks_stat": 0.28270193466651417
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.016176986837767433,
+        "train_std": 0.01862733952934639,
+        "holdout_mean": 0.006321572077361558,
+        "holdout_std": 0.0050532195657495135,
+        "cohen_d": -0.7220233589751978,
+        "ks_stat": 0.36557756576144274
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.01973346460540286,
+        "train_std": 0.019119298928407674,
+        "holdout_mean": 0.009827135946048279,
+        "holdout_std": 0.007565668117236206,
+        "cohen_d": -0.681166140920564,
+        "ks_stat": 0.310862876598868
+      }
+    ],
+    "feature_full_table": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.44220677776046047,
+        "train_std": 0.3307357155977258,
+        "holdout_mean": 0.17565597667638483,
+        "holdout_std": 0.16450901309279156,
+        "cohen_d": -1.0201222193186275,
+        "ks_stat": 0.4319325550091059
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.012555431327503279,
+        "train_std": 0.018390323116817583,
+        "holdout_mean": 0.002911300255158045,
+        "holdout_std": 0.0017916618842651931,
+        "cohen_d": -0.738091062558221,
+        "ks_stat": 0.5156757256099169
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.181360689054486,
+        "train_std": 21.120751511212955,
+        "holdout_mean": 8.607142857142858,
+        "holdout_std": 8.060941641546787,
+        "cohen_d": -0.7238696407750154,
+        "ks_stat": 0.28270193466651417
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.016176986837767433,
+        "train_std": 0.01862733952934639,
+        "holdout_mean": 0.006321572077361558,
+        "holdout_std": 0.0050532195657495135,
+        "cohen_d": -0.7220233589751978,
+        "ks_stat": 0.36557756576144274
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.01973346460540286,
+        "train_std": 0.019119298928407674,
+        "holdout_mean": 0.009827135946048279,
+        "holdout_std": 0.007565668117236206,
+        "cohen_d": -0.681166140920564,
+        "ks_stat": 0.310862876598868
+      },
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.013319479358710787,
+        "train_std": 0.018667810528696805,
+        "holdout_mean": 0.004145373096281373,
+        "holdout_std": 0.0042985545744747555,
+        "cohen_d": -0.6771907831784264,
+        "ks_stat": 0.4166665619293123
+      },
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.22907190554534,
+        "train_std": 21.72819075248833,
+        "holdout_mean": 49.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.44067520814066147,
+        "ks_stat": 0.5905351785541469
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 41.22907190554534,
+        "train_std": 21.72819075248833,
+        "holdout_mean": 48.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.44067520814066147,
+        "ks_stat": 0.5905351785541469
+      },
+      {
+        "feature": "coord_change_at_defect",
+        "train_mean": 3.346946675699216,
+        "train_std": 2.8101514449718494,
+        "holdout_mean": 4.133116883116883,
+        "holdout_std": 3.3832773474421156,
+        "cohen_d": 0.2525440518443229,
+        "ks_stat": 0.20786164865812595
+      },
+      {
+        "feature": "delta_chi",
+        "train_mean": 0.6195292797463512,
+        "train_std": 0.46612186766194347,
+        "holdout_mean": 0.699025974025974,
+        "holdout_std": 0.4455417969527028,
+        "cohen_d": 0.17421493642147887,
+        "ks_stat": 0.12969605638723997
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.14265700902876446,
+        "train_std": 0.15271112674186899,
+        "holdout_mean": 0.1198719390531905,
+        "holdout_std": 0.10442455549814228,
+        "cohen_d": -0.17408164078206964,
+        "ks_stat": 0.11778679077624202
+      },
+      {
+        "feature": "defect_type_int",
+        "train_mean": 0.3438498016065034,
+        "train_std": 0.4749917004976736,
+        "holdout_mean": 0.41883116883116883,
+        "holdout_std": 0.49336763254867644,
+        "cohen_d": 0.15470051767052242,
+        "ks_stat": 0.07498136722466531
+      },
+      {
+        "feature": "bond_strain_mean_near",
+        "train_mean": 0.05376030784612773,
+        "train_std": 0.05263061178679128,
+        "holdout_mean": 0.04872525127622746,
+        "holdout_std": 0.04048715066939328,
+        "cohen_d": -0.10716770323959701,
+        "ks_stat": 0.04890962129905321
+      },
+      {
+        "feature": "z_dopant",
+        "train_mean": 35.69573212039098,
+        "train_std": 23.539407075223114,
+        "holdout_mean": 33.53896103896104,
+        "holdout_std": 22.662582330387657,
+        "cohen_d": -0.09327050133620904,
+        "ks_stat": 0.048183791433573764
+      },
+      {
+        "feature": "coord_change_max_other",
+        "train_mean": 0.8846414400464531,
+        "train_std": 0.3194541635336607,
+        "holdout_mean": 0.9058441558441559,
+        "holdout_std": 0.2920454094265899,
+        "cohen_d": 0.06922393762232737,
+        "ks_stat": 0.021202715797702734
+      },
+      {
+        "feature": "delta_rcov",
+        "train_mean": 0.3383526496246423,
+        "train_std": 0.29568426070523923,
+        "holdout_mean": 0.3245454545454546,
+        "holdout_std": 0.2656303777302851,
+        "cohen_d": -0.04908854880127964,
+        "ks_stat": 0.11225980058845636
+      },
+      {
+        "feature": "delta_valence",
+        "train_mean": 2.5991764711304053,
+        "train_std": 1.8770114118466896,
+        "holdout_mean": 2.5194805194805197,
+        "holdout_std": 1.7589134013693264,
+        "cohen_d": -0.04378050433371289,
+        "ks_stat": 0.08278859435348357
+      },
+      {
+        "feature": "chi_dopant",
+        "train_mean": 1.9005787283460758,
+        "train_std": 0.7049849968995983,
+        "holdout_mean": 1.9181168831168833,
+        "holdout_std": 0.6875844878244263,
+        "cohen_d": 0.025165630483590308,
+        "ks_stat": 0.023970609860477277
+      },
+      {
+        "feature": "rcov_dopant",
+        "train_mean": 1.3412793961095517,
+        "train_std": 0.43124899756211466,
+        "holdout_mean": 1.331948051948052,
+        "holdout_std": 0.4197132260324836,
+        "cohen_d": -0.021911365528761682,
+        "ks_stat": 0.021535780584459596
+      },
+      {
+        "feature": "valence_dopant",
+        "train_mean": 5.405013064937578,
+        "train_std": 3.1210926653106505,
+        "holdout_mean": 5.415584415584416,
+        "holdout_std": 3.074193588065004,
+        "cohen_d": 0.0034097926923162855,
+        "ks_stat": 0.011902667157675378
+      },
+      {
+        "feature": "dopant_block",
+        "train_mean": 1.2942030388077035,
+        "train_std": 0.7764574469000028,
+        "holdout_mean": 1.2922077922077921,
+        "holdout_std": 0.7806534448641359,
+        "cohen_d": -0.0025605882363331314,
+        "ks_stat": 0.004768796479819426
+      },
+      {
+        "feature": "angle_distortion_max_global",
+        "train_mean": 0.0,
+        "train_std": 0.0,
+        "holdout_mean": 0.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.0,
+        "ks_stat": 0.0
+      }
+    ]
+  },
+  "Cr2I6": {
+    "n_holdout": 334,
+    "n_train": 10307,
+    "v1_loho_degradation_factor": 1.628,
+    "max_abs_cohen_d": 0.9095099469747285,
+    "sum_abs_cohen_d": 7.243046389343698,
+    "top_5_shifted_features": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.4416122443667305,
+        "train_std": 0.33236456375023116,
+        "holdout_mean": 0.21475231355470878,
+        "holdout_std": 0.11795294006476124,
+        "cohen_d": -0.9095099469747285,
+        "ks_stat": 0.4489440639435207
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.259823420976037,
+        "train_std": 21.144804667344733,
+        "holdout_mean": 7.086826347305389,
+        "holdout_std": 3.8924470221371212,
+        "cohen_d": -0.8663982142822249,
+        "ks_stat": 0.4424436273470329
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.012566608385644829,
+        "train_std": 0.018410546389577686,
+        "holdout_mean": 0.0033171250144874366,
+        "holdout_std": 0.0025961048649905225,
+        "cohen_d": -0.703488437129042,
+        "ks_stat": 0.4229394127239844
+      },
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.013332710747031568,
+        "train_std": 0.018697983277716983,
+        "holdout_mean": 0.0044512139447869924,
+        "holdout_std": 0.002887262585763259,
+        "cohen_d": -0.6638251313090694,
+        "ks_stat": 0.4061015448485972
+      },
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.7304744348501,
+        "train_std": 21.717818759974147,
+        "holdout_mean": 33.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.6335949984413444,
+        "ks_stat": 0.5324536722615698
+      }
+    ],
+    "feature_full_table": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.4416122443667305,
+        "train_std": 0.33236456375023116,
+        "holdout_mean": 0.21475231355470878,
+        "holdout_std": 0.11795294006476124,
+        "cohen_d": -0.9095099469747285,
+        "ks_stat": 0.4489440639435207
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.259823420976037,
+        "train_std": 21.144804667344733,
+        "holdout_mean": 7.086826347305389,
+        "holdout_std": 3.8924470221371212,
+        "cohen_d": -0.8663982142822249,
+        "ks_stat": 0.4424436273470329
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.012566608385644829,
+        "train_std": 0.018410546389577686,
+        "holdout_mean": 0.0033171250144874366,
+        "holdout_std": 0.0025961048649905225,
+        "cohen_d": -0.703488437129042,
+        "ks_stat": 0.4229394127239844
+      },
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.013332710747031568,
+        "train_std": 0.018697983277716983,
+        "holdout_mean": 0.0044512139447869924,
+        "holdout_std": 0.002887262585763259,
+        "cohen_d": -0.6638251313090694,
+        "ks_stat": 0.4061015448485972
+      },
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.7304744348501,
+        "train_std": 21.717818759974147,
+        "holdout_mean": 33.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.6335949984413444,
+        "ks_stat": 0.5324536722615698
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 41.7304744348501,
+        "train_std": 21.717818759974147,
+        "holdout_mean": 32.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.6335949984413444,
+        "ks_stat": 0.5324536722615698
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.01972295178878863,
+        "train_std": 0.019172379963327286,
+        "holdout_mean": 0.010922705245407822,
+        "holdout_std": 0.00560170999658344,
+        "cohen_d": -0.622981062092508,
+        "ks_stat": 0.3755095804316466
+      },
+      {
+        "feature": "coord_change_at_defect",
+        "train_mean": 3.402541961773552,
+        "train_std": 2.8577892990819276,
+        "holdout_mean": 2.356287425149701,
+        "holdout_std": 1.5268081421761956,
+        "cohen_d": -0.4564947743453015,
+        "ks_stat": 0.22782929338761104
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.016077131666818206,
+        "train_std": 0.018647711435927944,
+        "holdout_mean": 0.01017021887599697,
+        "holdout_std": 0.008961215208252129,
+        "cohen_d": -0.4036395420383211,
+        "ks_stat": 0.2325667864813693
+      },
+      {
+        "feature": "defect_type_int",
+        "train_mean": 0.3403512176190938,
+        "train_std": 0.47382725363184214,
+        "holdout_mean": 0.5209580838323353,
+        "holdout_std": 0.4995605656195021,
+        "cohen_d": 0.37065824675372055,
+        "ks_stat": 0.1806068662132415
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.1432952579165121,
+        "train_std": 0.15303458761955474,
+        "holdout_mean": 0.10194972508118494,
+        "holdout_std": 0.0873397208528636,
+        "cohen_d": -0.33170502860772355,
+        "ks_stat": 0.1984820501618283
+      },
+      {
+        "feature": "delta_rcov",
+        "train_mean": 0.3399813649530832,
+        "train_std": 0.295119244773673,
+        "holdout_mean": 0.27535928143712574,
+        "holdout_std": 0.2798208734462998,
+        "cohen_d": -0.2245510447760143,
+        "ks_stat": 0.1726804468098827
+      },
+      {
+        "feature": "coord_change_max_other",
+        "train_mean": 0.8865819346075483,
+        "train_std": 0.3171031501500502,
+        "holdout_mean": 0.844311377245509,
+        "holdout_std": 0.3625598922927091,
+        "cohen_d": -0.12400148604213301,
+        "ks_stat": 0.04227055736203929
+      },
+      {
+        "feature": "delta_chi",
+        "train_mean": 0.6207185454175849,
+        "train_std": 0.46588773583497306,
+        "holdout_mean": 0.6561377245508984,
+        "holdout_std": 0.4595061058043397,
+        "cohen_d": 0.07648910502394375,
+        "ks_stat": 0.10669337564320278
+      },
+      {
+        "feature": "delta_valence",
+        "train_mean": 2.5934598308130856,
+        "train_std": 1.8765644684439968,
+        "holdout_mean": 2.7020958083832336,
+        "holdout_std": 1.7813559836600186,
+        "cohen_d": 0.059333835646536465,
+        "ks_stat": 0.11420120852696475
+      },
+      {
+        "feature": "valence_dopant",
+        "train_mean": 5.4011836615892115,
+        "train_std": 3.1192480672165916,
+        "holdout_mean": 5.532934131736527,
+        "holdout_std": 3.13237762641476,
+        "cohen_d": 0.04211633772689426,
+        "ks_stat": 0.022262644595353875
+      },
+      {
+        "feature": "z_dopant",
+        "train_mean": 35.602794217522074,
+        "train_std": 23.524884363048482,
+        "holdout_mean": 36.5748502994012,
+        "holdout_std": 23.261313565874243,
+        "cohen_d": 0.04152062673417314,
+        "ks_stat": 0.02632912113097957
+      },
+      {
+        "feature": "dopant_block",
+        "train_mean": 1.2931987969341225,
+        "train_std": 0.7768325626999986,
+        "holdout_mean": 1.3233532934131738,
+        "holdout_std": 0.7681493514167462,
+        "cohen_d": 0.03900488820232597,
+        "ks_stat": 0.016276944510125957
+      },
+      {
+        "feature": "rcov_dopant",
+        "train_mean": 1.340781022605996,
+        "train_std": 0.43086856044949357,
+        "holdout_mean": 1.348053892215569,
+        "holdout_std": 0.43251747058944356,
+        "cohen_d": 0.01683419923160556,
+        "ks_stat": 0.0161915424027273
+      },
+      {
+        "feature": "bond_strain_mean_near",
+        "train_mean": 0.053634936220094416,
+        "train_std": 0.05260647535116882,
+        "holdout_mean": 0.05298608007964896,
+        "holdout_std": 0.04275408072273125,
+        "cohen_d": -0.013527953097241073,
+        "ks_stat": 0.05114191913059492
+      },
+      {
+        "feature": "chi_dopant",
+        "train_mean": 1.9008702823323955,
+        "train_std": 0.7045513855303727,
+        "holdout_mean": 1.9077544910179638,
+        "holdout_std": 0.7026728608009406,
+        "cohen_d": 0.009776532447501948,
+        "ks_stat": 0.028871141001203193
+      },
+      {
+        "feature": "angle_distortion_max_global",
+        "train_mean": 0.0,
+        "train_std": 0.0,
+        "holdout_mean": 0.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.0,
+        "ks_stat": 0.0
+      }
+    ]
+  },
+  "C2H2": {
+    "n_holdout": 231,
+    "n_train": 10410,
+    "v1_loho_degradation_factor": 4.648,
+    "max_abs_cohen_d": 10.338024081226724,
+    "sum_abs_cohen_d": 54.88573699525145,
+    "top_5_shifted_features": [
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.010912706948847202,
+        "train_std": 0.011690587856039365,
+        "holdout_mean": 0.10954838004205134,
+        "holdout_std": 0.006721911473994081,
+        "cohen_d": 10.338024081226724,
+        "ks_stat": 0.999135446685879
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.010187943481868038,
+        "train_std": 0.011694609281368269,
+        "holdout_mean": 0.1063872759282847,
+        "holdout_std": 0.006036450703706463,
+        "cohen_d": 10.332248173929788,
+        "ks_stat": 0.9978866474543708
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.013738702856653748,
+        "train_std": 0.011505849385318246,
+        "holdout_mean": 0.11291754310265248,
+        "holdout_std": 0.00958464644808888,
+        "cohen_d": 9.357698863450764,
+        "ks_stat": 0.9946143193981811
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.017356043862314957,
+        "train_std": 0.012839731558676928,
+        "holdout_mean": 0.11366333780221609,
+        "holdout_std": 0.007198242401941307,
+        "cohen_d": 9.24761763203833,
+        "ks_stat": 0.9988472622478386
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 18.84774255523535,
+        "train_std": 20.065353530179102,
+        "holdout_mean": 64.84848484848484,
+        "holdout_std": 0.3585502898848253,
+        "cohen_d": 3.241473990711278,
+        "ks_stat": 0.9263208453410182
+      }
+    ],
+    "feature_full_table": [
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.010912706948847202,
+        "train_std": 0.011690587856039365,
+        "holdout_mean": 0.10954838004205134,
+        "holdout_std": 0.006721911473994081,
+        "cohen_d": 10.338024081226724,
+        "ks_stat": 0.999135446685879
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.010187943481868038,
+        "train_std": 0.011694609281368269,
+        "holdout_mean": 0.1063872759282847,
+        "holdout_std": 0.006036450703706463,
+        "cohen_d": 10.332248173929788,
+        "ks_stat": 0.9978866474543708
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.013738702856653748,
+        "train_std": 0.011505849385318246,
+        "holdout_mean": 0.11291754310265248,
+        "holdout_std": 0.00958464644808888,
+        "cohen_d": 9.357698863450764,
+        "ks_stat": 0.9946143193981811
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.017356043862314957,
+        "train_std": 0.012839731558676928,
+        "holdout_mean": 0.11366333780221609,
+        "holdout_std": 0.007198242401941307,
+        "cohen_d": 9.24761763203833,
+        "ks_stat": 0.9988472622478386
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 18.84774255523535,
+        "train_std": 20.065353530179102,
+        "holdout_mean": 64.84848484848484,
+        "holdout_std": 0.3585502898848253,
+        "cohen_d": 3.241473990711278,
+        "ks_stat": 0.9263208453410182
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.1306881839080913,
+        "train_std": 0.12880500107025417,
+        "holdout_mean": 0.6516512425946983,
+        "holdout_std": 0.21263199971890676,
+        "cohen_d": 2.958841159063029,
+        "ks_stat": 0.9897214217098943
+      },
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.4219945376516451,
+        "train_std": 0.32283761656766424,
+        "holdout_mean": 0.9976689976689976,
+        "holdout_std": 0.005516158305920368,
+        "cohen_d": 2.5212929613740833,
+        "ks_stat": 0.9749279538904899
+      },
+      {
+        "feature": "n_atoms",
+        "train_mean": 41.92411143131604,
+        "train_std": 21.409802418058003,
+        "holdout_mean": 65.0,
+        "holdout_std": 0.0,
+        "cohen_d": 1.5241928186151366,
+        "ks_stat": 0.8415946205571566
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 40.92411143131604,
+        "train_std": 21.409802418058003,
+        "holdout_mean": 64.0,
+        "holdout_std": 0.0,
+        "cohen_d": 1.5241928186151366,
+        "ks_stat": 0.8415946205571566
+      },
+      {
+        "feature": "delta_rcov",
+        "train_mean": 0.327418629065459,
+        "train_std": 0.2837728116566161,
+        "holdout_mean": 0.8126839826839827,
+        "holdout_std": 0.38191438451929627,
+        "cohen_d": 1.4403068966320685,
+        "ks_stat": 0.6239667153211822
+      },
+      {
+        "feature": "bond_strain_mean_near",
+        "train_mean": 0.051786229994867254,
+        "train_std": 0.049440441027238095,
+        "holdout_mean": 0.13600858926644058,
+        "holdout_std": 0.09502588632893562,
+        "cohen_d": 1.1100271342031027,
+        "ks_stat": 0.6245306086804646
+      },
+      {
+        "feature": "defect_type_int",
+        "train_mean": 0.3516810758885687,
+        "train_std": 0.47749502274937633,
+        "holdout_mean": 0.09090909090909091,
+        "holdout_std": 0.2874797872880344,
+        "cohen_d": -0.6612666771604283,
+        "ks_stat": 0.26077198497947773
+      },
+      {
+        "feature": "delta_valence",
+        "train_mean": 2.580623484744522,
+        "train_std": 1.8475560408838265,
+        "holdout_mean": 3.329004329004329,
+        "holdout_std": 2.7120028788148205,
+        "cohen_d": 0.32204097041961666,
+        "ks_stat": 0.16145938595506326
+      },
+      {
+        "feature": "coord_change_at_defect",
+        "train_mean": 3.3624399615754084,
+        "train_std": 2.7949713665723426,
+        "holdout_mean": 3.696969696969697,
+        "holdout_std": 4.141850538370332,
+        "cohen_d": 0.09453967604042073,
+        "ks_stat": 0.07913719325823065
+      },
+      {
+        "feature": "delta_chi",
+        "train_mean": 0.6210543753716664,
+        "train_std": 0.4659056592237587,
+        "holdout_mean": 0.6567965367965364,
+        "holdout_std": 0.4563630429833174,
+        "cohen_d": 0.07742080215903539,
+        "ks_stat": 0.11402747108798983
+      },
+      {
+        "feature": "dopant_block",
+        "train_mean": 1.2950048030739674,
+        "train_std": 0.7767663858771255,
+        "holdout_mean": 1.2554112554112553,
+        "holdout_std": 0.7671015215008377,
+        "cohen_d": -0.05123415473457758,
+        "ks_stat": 0.029353643474680946
+      },
+      {
+        "feature": "chi_dopant",
+        "train_mean": 1.9005802113352546,
+        "train_std": 0.7042788325099436,
+        "holdout_mean": 1.923896103896104,
+        "holdout_std": 0.7137289841380082,
+        "cohen_d": 0.03284775391145751,
+        "ks_stat": 0.020598325785645688
+      },
+      {
+        "feature": "rcov_dopant",
+        "train_mean": 1.3412747358309316,
+        "train_std": 0.43107746341857095,
+        "holdout_mean": 1.329047619047619,
+        "holdout_std": 0.42369734397429004,
+        "cohen_d": -0.028576705148670088,
+        "ks_stat": 0.023520091819803635
+      },
+      {
+        "feature": "z_dopant",
+        "train_mean": 35.62747358309318,
+        "train_std": 23.49308836687828,
+        "holdout_mean": 35.896103896103895,
+        "holdout_std": 24.580771221113128,
+        "cohen_d": 0.011159946377429909,
+        "ks_stat": 0.03397083224172562
+      },
+      {
+        "feature": "coord_change_max_other",
+        "train_mean": 0.8852065321805955,
+        "train_std": 0.31877253263949795,
+        "holdout_mean": 0.8874458874458875,
+        "holdout_std": 0.31604696534102134,
+        "cohen_d": 0.00704726713421482,
+        "ks_stat": 0.0022393552652918564
+      },
+      {
+        "feature": "valence_dopant",
+        "train_mean": 5.405571565802114,
+        "train_std": 3.118284166501374,
+        "holdout_mean": 5.393939393939394,
+        "holdout_std": 3.184888232356665,
+        "cohen_d": -0.0036865123061525207,
+        "ks_stat": 0.020119265940591657
+      },
+      {
+        "feature": "angle_distortion_max_global",
+        "train_mean": 0.0,
+        "train_std": 0.0,
+        "holdout_mean": 0.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.0,
+        "ks_stat": 0.0
+      }
+    ]
+  },
+  "TaSe2": {
+    "n_holdout": 222,
+    "n_train": 10419,
+    "v1_loho_degradation_factor": 1.233,
+    "max_abs_cohen_d": 0.9661377891347394,
+    "sum_abs_cohen_d": 3.8251062103067106,
+    "top_5_shifted_features": [
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.7324119397255,
+        "train_std": 21.563980973121637,
+        "holdout_mean": 28.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.9661377891347394,
+        "ks_stat": 0.49457721470390636
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 41.7324119397255,
+        "train_std": 21.563980973121637,
+        "holdout_mean": 27.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.9661377891347394,
+        "ks_stat": 0.49457721470390636
+      },
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.43233821079492346,
+        "train_std": 0.32935905760473405,
+        "holdout_mean": 0.5355534105534105,
+        "holdout_std": 0.3508699060604934,
+        "cohen_d": 0.3029493713224608,
+        "ks_stat": 0.16030873949100266
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 19.949707265572513,
+        "train_std": 21.109283437873987,
+        "holdout_mean": 14.995495495495495,
+        "holdout_std": 9.824357369693816,
+        "cohen_d": -0.30078067518303053,
+        "ks_stat": 0.22065457337556382
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.14264686344207433,
+        "train_std": 0.15243868371060557,
+        "holdout_mean": 0.11152144738573681,
+        "holdout_std": 0.09872804763878472,
+        "cohen_d": -0.24219687999817074,
+        "ks_stat": 0.11822216688326687
+      }
+    ],
+    "feature_full_table": [
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.7324119397255,
+        "train_std": 21.563980973121637,
+        "holdout_mean": 28.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.9661377891347394,
+        "ks_stat": 0.49457721470390636
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 41.7324119397255,
+        "train_std": 21.563980973121637,
+        "holdout_mean": 27.0,
+        "holdout_std": 0.0,
+        "cohen_d": -0.9661377891347394,
+        "ks_stat": 0.49457721470390636
+      },
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.43233821079492346,
+        "train_std": 0.32935905760473405,
+        "holdout_mean": 0.5355534105534105,
+        "holdout_std": 0.3508699060604934,
+        "cohen_d": 0.3029493713224608,
+        "ks_stat": 0.16030873949100266
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 19.949707265572513,
+        "train_std": 21.109283437873987,
+        "holdout_mean": 14.995495495495495,
+        "holdout_std": 9.824357369693816,
+        "cohen_d": -0.30078067518303053,
+        "ks_stat": 0.22065457337556382
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.14264686344207433,
+        "train_std": 0.15243868371060557,
+        "holdout_mean": 0.11152144738573681,
+        "holdout_std": 0.09872804763878472,
+        "cohen_d": -0.24219687999817074,
+        "ks_stat": 0.11822216688326687
+      },
+      {
+        "feature": "delta_rcov",
+        "train_mean": 0.33913631460838484,
+        "train_std": 0.29505263507037865,
+        "holdout_mean": 0.2824174174174174,
+        "holdout_std": 0.2804335124264374,
+        "cohen_d": -0.19683668834054321,
+        "ks_stat": 0.17694803931486908
+      },
+      {
+        "feature": "bond_strain_mean_near",
+        "train_mean": 0.05376799882679124,
+        "train_std": 0.05254179202924249,
+        "holdout_mean": 0.04641377743593677,
+        "holdout_std": 0.040258851136595816,
+        "cohen_d": -0.15698863866049764,
+        "ks_stat": 0.08398118821384007
+      },
+      {
+        "feature": "delta_chi",
+        "train_mean": 0.6230651739724588,
+        "train_std": 0.4661091438610771,
+        "holdout_mean": 0.5638738738738738,
+        "holdout_std": 0.44371115344985856,
+        "cohen_d": -0.12993410921699045,
+        "ks_stat": 0.08588519414894308
+      },
+      {
+        "feature": "coord_change_at_defect",
+        "train_mean": 3.374892024186582,
+        "train_std": 2.8387186235855886,
+        "holdout_mean": 3.126126126126126,
+        "holdout_std": 2.4535949617539674,
+        "cohen_d": -0.09366918390876011,
+        "ks_stat": 0.09033522436920083
+      },
+      {
+        "feature": "delta_valence",
+        "train_mean": 2.5996375668993,
+        "train_std": 1.8758871447849959,
+        "holdout_mean": 2.466966966966967,
+        "holdout_std": 1.765439516550059,
+        "cohen_d": -0.07275675377877865,
+        "ks_stat": 0.09649989753646532
+      },
+      {
+        "feature": "z_dopant",
+        "train_mean": 35.66349937613975,
+        "train_std": 23.529260288456285,
+        "holdout_mean": 34.21621621621622,
+        "holdout_std": 22.902616163321206,
+        "cohen_d": -0.06226436201152461,
+        "ks_stat": 0.0360438180766427
+      },
+      {
+        "feature": "defect_type_int",
+        "train_mean": 0.34552260293694215,
+        "train_std": 0.47553836206621897,
+        "holdout_mean": 0.36936936936936937,
+        "holdout_std": 0.4826340625577972,
+        "cohen_d": 0.04971594351784954,
+        "ks_stat": 0.023846766432427224
+      },
+      {
+        "feature": "coord_change_max_other",
+        "train_mean": 0.8855936270275458,
+        "train_std": 0.318304185953848,
+        "holdout_mean": 0.8693693693693694,
+        "holdout_std": 0.33699594800483046,
+        "cohen_d": -0.04943670301437727,
+        "ks_stat": 0.016224257658176464
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.012261765691980028,
+        "train_std": 0.018334769067615865,
+        "holdout_mean": 0.012957728112342994,
+        "holdout_std": 0.009696446702596544,
+        "cohen_d": 0.04742882041179247,
+        "ks_stat": 0.27307569590898123
+      },
+      {
+        "feature": "rcov_dopant",
+        "train_mean": 1.3413830501967559,
+        "train_std": 0.43101134705326627,
+        "holdout_mean": 1.3234684684684683,
+        "holdout_std": 0.4263527981205494,
+        "cohen_d": -0.04174159375648414,
+        "ks_stat": 0.04235894402896989
+      },
+      {
+        "feature": "chi_dopant",
+        "train_mean": 1.9005086860543239,
+        "train_std": 0.7043301486134812,
+        "holdout_mean": 1.928198198198198,
+        "holdout_std": 0.7115915396321353,
+        "cohen_d": 0.03906558280360032,
+        "ks_stat": 0.02209840130945806
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.01943387664485989,
+        "train_std": 0.01907191217662435,
+        "holdout_mean": 0.02004994088385321,
+        "holdout_std": 0.012433027973349779,
+        "cohen_d": 0.038241542265992676,
+        "ks_stat": 0.10921186086749002
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.015881042989493433,
+        "train_std": 0.018588693180071957,
+        "holdout_mean": 0.01639307336462242,
+        "holdout_std": 0.009955503060087778,
+        "cohen_d": 0.03432145824130666,
+        "ks_stat": 0.17197920638749892
+      },
+      {
+        "feature": "valence_dopant",
+        "train_mean": 5.404357423937038,
+        "train_std": 3.1202265344604725,
+        "holdout_mean": 5.45045045045045,
+        "holdout_std": 3.096754298371406,
+        "cohen_d": 0.014811024263935638,
+        "ks_stat": 0.017770289725371813
+      },
+      {
+        "feature": "dopant_block",
+        "train_mean": 1.2943660620021116,
+        "train_std": 0.7768719462742305,
+        "holdout_mean": 1.2837837837837838,
+        "holdout_std": 0.7626460032174304,
+        "cohen_d": -0.013731361880246838,
+        "ks_stat": 0.011583567443054887
+      },
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.013052135025329318,
+        "train_std": 0.018628299054712024,
+        "holdout_mean": 0.013138559902284026,
+        "holdout_std": 0.008554416763229463,
+        "cohen_d": 0.005959939460888993,
+        "ks_stat": 0.20364692362964748
+      },
+      {
+        "feature": "angle_distortion_max_global",
+        "train_mean": 0.0,
+        "train_std": 0.0,
+        "holdout_mean": 0.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.0,
+        "ks_stat": 0.0
+      }
+    ]
+  },
+  "MoSSe": {
+    "n_holdout": 464,
+    "n_train": 10177,
+    "v1_loho_degradation_factor": 0.868,
+    "max_abs_cohen_d": 1.2555579389823968,
+    "sum_abs_cohen_d": 7.838770882789414,
+    "top_5_shifted_features": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.44846785186954785,
+        "train_std": 0.329388972989811,
+        "holdout_mean": 0.12794686840253344,
+        "holdout_std": 0.14758964454178544,
+        "cohen_d": -1.2555579389823968,
+        "ks_stat": 0.4892482795892022
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.465363073597327,
+        "train_std": 21.157870915307296,
+        "holdout_mean": 6.269396551724138,
+        "holdout_std": 7.231892582547485,
+        "cohen_d": -0.8977305668919336,
+        "ks_stat": 0.37594088936174536
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.02000600805617303,
+        "train_std": 0.019131015829771503,
+        "holdout_mean": 0.007179964765814005,
+        "holdout_std": 0.007548960086834854,
+        "cohen_d": -0.8817893098378545,
+        "ks_stat": 0.47558452460416145
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.01274476765690019,
+        "train_std": 0.018453541523222074,
+        "holdout_mean": 0.0020009740116526294,
+        "holdout_std": 0.0037823777466734674,
+        "cohen_d": -0.8065239058160962,
+        "ks_stat": 0.6400521120986131
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.016376255654962434,
+        "train_std": 0.018658755478056784,
+        "holdout_mean": 0.005264429728287786,
+        "holdout_std": 0.0072410708136858735,
+        "cohen_d": -0.7850090230378567,
+        "ks_stat": 0.503889348192171
+      }
+    ],
+    "feature_full_table": [
+      {
+        "feature": "frac_strained",
+        "train_mean": 0.44846785186954785,
+        "train_std": 0.329388972989811,
+        "holdout_mean": 0.12794686840253344,
+        "holdout_std": 0.14758964454178544,
+        "cohen_d": -1.2555579389823968,
+        "ks_stat": 0.4892482795892022
+      },
+      {
+        "feature": "n_strained",
+        "train_mean": 20.465363073597327,
+        "train_std": 21.157870915307296,
+        "holdout_mean": 6.269396551724138,
+        "holdout_std": 7.231892582547485,
+        "cohen_d": -0.8977305668919336,
+        "ks_stat": 0.37594088936174536
+      },
+      {
+        "feature": "bond_strain_mean_global",
+        "train_mean": 0.02000600805617303,
+        "train_std": 0.019131015829771503,
+        "holdout_mean": 0.007179964765814005,
+        "holdout_std": 0.007548960086834854,
+        "cohen_d": -0.8817893098378545,
+        "ks_stat": 0.47558452460416145
+      },
+      {
+        "feature": "bond_strain_mean_very_far",
+        "train_mean": 0.01274476765690019,
+        "train_std": 0.018453541523222074,
+        "holdout_mean": 0.0020009740116526294,
+        "holdout_std": 0.0037823777466734674,
+        "cohen_d": -0.8065239058160962,
+        "ks_stat": 0.6400521120986131
+      },
+      {
+        "feature": "bond_strain_mean_mid",
+        "train_mean": 0.016376255654962434,
+        "train_std": 0.018658755478056784,
+        "holdout_mean": 0.005264429728287786,
+        "holdout_std": 0.0072410708136858735,
+        "cohen_d": -0.7850090230378567,
+        "ks_stat": 0.503889348192171
+      },
+      {
+        "feature": "bond_strain_mean_far",
+        "train_mean": 0.013502239948769352,
+        "train_std": 0.018737071918595267,
+        "holdout_mean": 0.0032212482081627842,
+        "holdout_std": 0.005076140577459634,
+        "cohen_d": -0.7488876130171066,
+        "ks_stat": 0.5706869868838795
+      },
+      {
+        "feature": "n_atoms",
+        "train_mean": 42.12528249975435,
+        "train_std": 21.877788742212413,
+        "holdout_mean": 49.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.4443703688621837,
+        "ks_stat": 0.5995873047066915
+      },
+      {
+        "feature": "host_natoms",
+        "train_mean": 41.12528249975435,
+        "train_std": 21.877788742212413,
+        "holdout_mean": 48.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.4443703688621837,
+        "ks_stat": 0.5995873047066915
+      },
+      {
+        "feature": "bond_strain_max_global",
+        "train_mean": 0.1439235163967192,
+        "train_std": 0.15331548077471815,
+        "holdout_mean": 0.09975389041636813,
+        "holdout_std": 0.09742251524327687,
+        "cohen_d": -0.34375804158283624,
+        "ks_stat": 0.19292276702368086
+      },
+      {
+        "feature": "bond_strain_mean_near",
+        "train_mean": 0.05416621399504766,
+        "train_std": 0.0527942071699886,
+        "holdout_mean": 0.041515255473094495,
+        "holdout_std": 0.038786260443840065,
+        "cohen_d": -0.27299236791927634,
+        "ks_stat": 0.13471913510180156
+      },
+      {
+        "feature": "defect_type_int",
+        "train_mean": 0.3509875208804166,
+        "train_std": 0.4772790389977709,
+        "holdout_mean": 0.23706896551724138,
+        "holdout_std": 0.4252849293189525,
+        "cohen_d": -0.2518881225778718,
+        "ks_stat": 0.1139185553631753
+      },
+      {
+        "feature": "delta_chi",
+        "train_mean": 0.6184490564625181,
+        "train_std": 0.46620161534529314,
+        "holdout_mean": 0.6959913793103449,
+        "holdout_std": 0.4488960212083843,
+        "cohen_d": 0.16935075811305478,
+        "ks_stat": 0.12972562370185647
+      },
+      {
+        "feature": "coord_change_at_defect",
+        "train_mean": 3.387835314925813,
+        "train_std": 2.8391107185180897,
+        "holdout_mean": 2.9719827586206895,
+        "holdout_std": 2.626389523802061,
+        "cohen_d": -0.15197883432716464,
+        "ks_stat": 0.06887615075237263
+      },
+      {
+        "feature": "coord_change_max_other",
+        "train_mean": 0.8872948806131473,
+        "train_std": 0.31623199624776743,
+        "holdout_mean": 0.8405172413793104,
+        "holdout_std": 0.36612567285486075,
+        "cohen_d": -0.13665350953753727,
+        "ks_stat": 0.04677763923383696
+      },
+      {
+        "feature": "delta_rcov",
+        "train_mean": 0.33926447825863176,
+        "train_std": 0.2961077071590721,
+        "holdout_mean": 0.30918821839080457,
+        "holdout_std": 0.26456125940155373,
+        "cohen_d": -0.10706338993551161,
+        "ks_stat": 0.09254471712753226
+      },
+      {
+        "feature": "delta_valence",
+        "train_mean": 2.6017775843755993,
+        "train_std": 1.8790736292563877,
+        "holdout_mean": 2.4892241379310347,
+        "holdout_std": 1.7493509391722626,
+        "cohen_d": -0.0619675393897563,
+        "ks_stat": 0.0891790735024548
+      },
+      {
+        "feature": "z_dopant",
+        "train_mean": 35.67937506141299,
+        "train_std": 23.54226128282651,
+        "holdout_mean": 34.622844827586206,
+        "holdout_std": 22.93896501686349,
+        "cohen_d": -0.04543165321962881,
+        "ks_stat": 0.027673328634886696
+      },
+      {
+        "feature": "chi_dopant",
+        "train_mean": 1.9005591038616487,
+        "train_std": 0.7049554323568378,
+        "holdout_mean": 1.9126508620689655,
+        "holdout_std": 0.6941843381581613,
+        "cohen_d": 0.017274436530207115,
+        "ks_stat": 0.016916525769737678
+      },
+      {
+        "feature": "dopant_block",
+        "train_mean": 1.2938980053060822,
+        "train_std": 0.7771138725615014,
+        "holdout_mean": 1.2995689655172413,
+        "holdout_std": 0.7647400868374635,
+        "cohen_d": 0.007351702553920771,
+        "ks_stat": 0.008386049679297125
+      },
+      {
+        "feature": "valence_dopant",
+        "train_mean": 5.404637909010514,
+        "train_std": 3.1228443655398475,
+        "holdout_mean": 5.420258620689655,
+        "holdout_std": 3.050950095435761,
+        "cohen_d": 0.00505719122237159,
+        "ks_stat": 0.013665449136490995
+      },
+      {
+        "feature": "rcov_dopant",
+        "train_mean": 1.3409393730961974,
+        "train_std": 0.4314075009946333,
+        "holdout_mean": 1.342543103448276,
+        "holdout_std": 0.4201359568996967,
+        "cohen_d": 0.0037642405726652076,
+        "ks_stat": 0.014939451027163986
+      },
+      {
+        "feature": "angle_distortion_max_global",
+        "train_mean": 0.0,
+        "train_std": 0.0,
+        "holdout_mean": 0.0,
+        "holdout_std": 0.0,
+        "cohen_d": 0.0,
+        "ks_stat": 0.0
+      }
+    ]
+  },
+  "__cross_host_correlation__": {
+    "spearman_degradation_vs_sum_abs_d": 0.3,
+    "pearson_degradation_vs_sum_abs_d": 0.9788434815740036,
+    "spearman_degradation_vs_max_abs_d": 0.0,
+    "pearson_degradation_vs_max_abs_d": 0.9778040542090961,
+    "n_hosts_compared": 5
+  }
+}
