@@ -181,14 +181,22 @@ opposite. This is a testable deployment-relevant prediction that
 the test-fold $\sigma$ calibration of Sec.~\ref{sec:exp} alone could
 not have surfaced.
 
-\textbf{(iii) The IMP2D test MAE materially overstates OOD
-performance.} Per-dopant-corrected MAE on this 37-candidate
-prospective set is 2.66\,eV, $5.5\times$ the in-distribution test
-MAE of 0.486\,eV (Sec.~\ref{sec:headline}). Together with the
+\textbf{(iii) On this OOD subset, MAE is materially larger than the
+IMP2D test-fold MAE.} Per-dopant-corrected MAE on this specific
+37-candidate prospective set is 2.66\,eV (95\% bootstrap CI
+$[1.59, 3.97]$), a factor of $\sim 5.5\times$ the
+in-distribution IMP2D test MAE of 0.486\,eV (Sec.~\ref{sec:headline}).
+This factor is a property of \emph{this specific OOD subset}
+(287 v1.2-generated candidates filtered by predicted-$\mu$ and
+predicted-$\sigma_{\mathrm{cal}}$); we do not claim it as a
+universal upper bound on \modelname's OOD performance, only as a
+concrete deployment-relevant data point. Combined with the
 preliminary LOHO observations (Sec.~\ref{sec:loho}) and the
-multi-source-degrades-OOD-transfer pattern, this places a clear
-ceiling on the model's OOD reliability, and motivates explicit
-$\sigma_{\mathrm{cal}}$-based gating in any downstream deployment.
+multi-source-degrades-OOD-transfer pattern, the lesson is that
+the IMP2D test MAE \emph{understates the residual uncertainty
+on chemistry not in the training distribution}, and motivates
+explicit $\sigma_{\mathrm{cal}}$-based gating in any downstream
+deployment.
 
 These three findings, taken together, argue for the deployment
 recipe of Sec.~\ref{sec:deploy}: \emph{rank candidates by $\mu$,
@@ -206,10 +214,11 @@ to a held-out host (3/5 hosts: $+22$\% to $+65$\% MAE
 degradation, val$\to$test gap 1.32--1.76$\times$); the prospective
 DFT validation here measures the cost of a chemistry-shift to a
 held-out (host, dopant) interstitial pair drawn by the model's own
-$\sigma_{\mathrm{cal}}$-aware ranking (overall MAE 2.66\,eV,
-$5.5\times$ the in-distribution 0.486\,eV). The two bounds are
-qualitatively consistent: \modelname's IMP2D test-fold MAE
-underestimates the true deployment ceiling by a factor of
-$\sim 5\times$ on the chemistry distributions of practical
-interest. We make this ceiling an explicit limitation
-(Sec.~\ref{sec:discuss}) rather than a hidden one.
+$\sigma_{\mathrm{cal}}$-aware ranking (overall MAE
+2.66\,eV, 95\% CI $[1.59, 3.97]$, on this 37-candidate subset
+versus the in-distribution 0.486\,eV). The two bounds are
+qualitatively consistent: on the chemistry distributions of
+practical interest tested here, \modelname's residual is several
+times the IMP2D test-fold MAE. We make the existence of this gap
+an explicit limitation (Sec.~\ref{sec:discuss}) rather than a
+hidden one.

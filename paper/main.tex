@@ -78,9 +78,10 @@ Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) is $-0.288$
 negative but the CI weakly straddles zero, placing a candidate
 deployment caveat that $\sigma_{\mathrm{cal}}$ may be useful as
 an in-vs-OOD bucket gate but not as a sample-level reliability
-score on truly unseen chemistry. The OOD MAE on this subset is
-$5.5\times$ the in-distribution test MAE, an explicit deployment
-ceiling. \emph{Third}, we release the full pipeline, including
+score on truly unseen chemistry. On this 37-candidate OOD
+subset specifically, the per-dopant-corrected MAE is $\sim 5.5\times$
+the in-distribution IMP2D test MAE, a concrete deployment-relevant
+gap that we do not extrapolate to a universal bound. \emph{Third}, we release the full pipeline, including
 125 Quantum-ESPRESSO SCF outputs, leak-free augmentation contracts,
 and the calibrated ensemble, to enable direct reuse for downstream
 2D defect screening.
@@ -200,8 +201,9 @@ Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$
 $\sigma_{\mathrm{cal}}$ may be informative for in-vs-OOD bucket
 triage but not for sample-level error ranking on OOD, though the
 within-bucket sample size warrants confirmation at larger N.
-The OOD MAE on this subset is $5.5\times$ the in-distribution
-test MAE, an explicit deployment ceiling.
+On this 37-candidate OOD subset, the per-dopant-corrected MAE
+is $\sim 5.5\times$ the in-distribution test MAE: a concrete
+deployment-relevant gap, not a universal upper bound.
 
 \item We release the full pipeline as \textbf{open infrastructure}:
 the trained \modelname\ ensemble, leak-free augmentation contracts
@@ -244,19 +246,51 @@ potentials. These methods all face the same challenge for defect
 supercells: the fixed real-space cut-off truncates the long-range
 elastic / electronic field that a defect introduces.
 
-\paragraph{Transformers for crystals.}
+\paragraph{Transformers for crystals, and what \modelname\ adds.}
 Matformer~\cite{Yan2022Matformer} encodes periodicity through
 explicit periodic-image nodes;
 Crystalformer~\cite{Taniai2024Crystalformer} introduces an
 infinitely-connected attention via reciprocal-space expansion;
 PotNet~\cite{Lin2023PotNet} uses an Ewald-style summation to
-approximate the full inter-atomic interaction. Our PFA is closest in
-spirit to Crystalformer / PotNet: it expands the per-pair
-interaction in a reciprocal-space basis. Where Crystalformer and
-PotNet \emph{replace} the dense self-attention, our PFA enters as
-an additive bias on a vanilla scaled-dot-product attention --- the
-ablation cost (turning PFA off) is a single-line code change and the
-parameter overhead is $\sim 2$\,k.
+approximate the full inter-atomic interaction. \modelname's
+\emph{Periodic Fourier Bias} (PFA) is closest in spirit to
+Crystalformer / PotNet --- both expand per-pair interaction in a
+reciprocal-space basis --- but differs in three ways that matter
+for our setting.
+
+\textit{(1)} Where Crystalformer and PotNet \emph{replace} the
+dense self-attention, PFA enters as an \emph{additive bias} on
+vanilla scaled-dot-product attention. The ablation cost (turning
+PFA off) is a single-line code change, the parameter overhead is
+$\sim 2$\,k, and the rest of the architecture (layer norm, residual,
+feed-forward) is the same as a standard Crystal Transformer. This
+makes the controlled comparison of Sec.~\ref{sec:phase1} possible.
+
+\textit{(2)} PFA's translation invariance is \emph{exact} by the
+$2\pi$-periodicity of cos/sin on the minimum-image fractional
+displacement, not approximate via finite truncation. This matters
+specifically for the multi-source training recipe of
+Sec.~\ref{sec:multi}: the four databases (IMP2D + JARVIS-2D +
+JARVIS-3D + JARVIS DFT-3D) use different lattice conventions and
+different cell sizes; an approximately periodic encoder leaks
+cell-convention artefacts into the readout, but PFA does not.
+This coupling --- exact translation invariance enabling stable
+multi-source training through per-source readout heads --- is what
+we identify as the architecturally distinctive design choice of
+\modelname, distinct from both ``yet another Crystal Transformer''
+and a generic transfer-learning recipe.
+
+\textit{(3)} \modelname\ is, to our knowledge, the first 2D-defect
+$E_f$ surrogate that bundles a Crystal-Transformer encoder, a
+6-seed temperature-scaled calibrated $\sigma_{\mathrm{cal}}$, and
+a prospective first-principles DFT validation on the model's own
+out-of-distribution predictions. Crystalformer / Matformer / PotNet
+each report test-fold MAE without uncertainty calibration, and
+none has been validated against fresh DFT on chemistry outside the
+training distribution. The contribution of \modelname\ is therefore
+not a single architectural novelty but a coupled
+encoder--readout--validation \emph{recipe} for 2D defect-property
+deployment.
 
 \paragraph{$\Delta$-learning and dual-stream architectures.}
 Predicting a property as a difference from a cheap reference state
@@ -1032,13 +1066,14 @@ exceeds an in-distribution threshold (e.g.\ the 95th percentile of
 training-fold $\sigma$); do not use it to rank within the rejected
 pool, where there is no positive evidence that higher $\sigma$
 predicts larger error.
-\item \textbf{Validate decision-critical candidates with DFT.} The
-per-dopant-corrected MAE on this OOD validation set is 2.66\,eV,
-$5.5\times$ the IMP2D test-fold MAE of 0.486\,eV. Any deployment
-that uses a single-point \modelname\ prediction without DFT
-follow-up therefore implicitly accepts an absolute uncertainty of
-several eV. The 125-SCF pipeline released with this paper makes
-the DFT loop tractable on a single modern GPU.
+\item \textbf{Validate decision-critical candidates with DFT.} On
+the 37-candidate OOD subset tested here, the per-dopant-corrected
+MAE is 2.66\,eV (95\% CI $[1.59, 3.97]$), a factor of $\sim 5.5\times$
+the IMP2D test-fold MAE of 0.486\,eV. Any deployment that uses a
+single-point \modelname\ prediction without DFT follow-up therefore
+implicitly accepts an absolute uncertainty of order eV on candidates
+that look similar to this OOD subset. The 125-SCF pipeline released
+with this paper makes the DFT loop tractable on a single modern GPU.
 \end{enumerate}
 
 The above recipe is the answer to a question every test-fold MAE
@@ -1113,9 +1148,11 @@ Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$
 (95\,\% CI $[-0.60, +0.09]$): the point estimate suggests
 $\sigma_{\mathrm{cal}}$ is more useful as an in-vs-OOD bucket gate
 than as a sample-level reliability score on OOD, but the within-bucket
-sample size warrants confirmation at larger N. The OOD MAE on
-this subset is $5.5\times$ the in-distribution test MAE, an explicit
-deployment ceiling that no test-fold benchmark could have surfaced.
+sample size warrants confirmation at larger N. On this 37-candidate
+OOD subset, the per-dopant-corrected MAE is $\sim 5.5\times$ the
+in-distribution test MAE: a concrete deployment-relevant gap that
+no test-fold benchmark could have surfaced, but one we report as a
+property of this specific subset, not as a universal upper bound.
 
 To enable downstream 2D-defect screening to build directly on this
 work, we release \modelname\ (4-seed and 6-seed ensembles), the
