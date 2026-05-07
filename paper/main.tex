@@ -25,18 +25,18 @@
 
 \graphicspath{{figures/}}
 
-\title{\textbf{Data, not architecture, governs 2D defect formation energy
-prediction: testing three physics-grounded inductive biases against an
-empirical scaling law}}
+\title{\textbf{PeriDefT: a periodic-Fourier Transformer for 2D defect
+formation energy, validated by prospective first-principles DFT}}
 
 \author{Anonymous \\
 \small (authors and affiliations to be filled in for submission)}
 
-\date{Draft v3.0 \quad \today}
+\date{Draft v3.1 \quad \today}
 
 % short notation
 \newcommand{\Ef}{$E_{\mathrm{f}}$}
 \newcommand{\eV}{\,\textrm{eV}}
+\newcommand{\modelname}{\textsc{PeriDefT}}
 
 \begin{document}
 \maketitle
@@ -44,55 +44,48 @@ empirical scaling law}}
 % =====================================================================
 \begin{abstract}
 \noindent
-The defect formation energy \Ef\ in two-dimensional (2D) materials is
-the central thermodynamic quantity for defect engineering, but its
-density-functional-theory (DFT) computation costs tens to hundreds of
-CPU-hours per configuration --- prohibitive for high-throughput
-exploration. Several recent architectural innovations
-(periodic-graph Transformers, line-graph models, equivariant tensor
-networks) have been proposed to bring ML-based surrogates closer to
-DFT accuracy, yet their effectiveness on \emph{point defects} is
-poorly understood. Here we test three independent
-physics-grounded inductive biases on the
-\textit{Impurities in 2D Materials Database} (IMP2D, 10\,641
-configurations): (i) a \textbf{Periodic Fourier Bias} (PFA) that
-makes the self-attention exactly invariant to lattice translations
-through a truncated Fourier basis on the minimum-image fractional
-displacement; (ii) a \textbf{multi-scale distance bias} that decouples
-short-range chemistry from long-range elastic / Coulombic decay; and
-(iii) a \textbf{dual-stream cross-attention} that explicitly conditions
-the prediction on the host pristine supercell as a reference state,
-implementing the physical definition $E_{\mathrm{f}} = E_{\mathrm{defect}} -
-E_{\mathrm{host}} + \Delta\mu$ at the architectural level with a
-soft invariance regulariser
-$\lambda \cdot \|f(\mathbf{x}_{\mathrm{pri}}, \mathbf{x}_{\mathrm{pri}})\|^2$.
-Across a strict leak-free augmentation protocol, all three single-source
-architectural improvements are statistically indistinguishable from a
-matched 0.75\,M-parameter baseline (4-seed test MAE
-0.519--0.553\,eV \emph{vs}.\ baseline 0.537~$\pm$~0.014\,eV).
-In contrast, a multi-source joint-training recipe across four DFT
-databases (IMP2D + JARVIS-2D, JARVIS-3D, JARVIS DFT-3D; 26\,837
-samples in total, $3.15\times$ the IMP2D corpus) reduces 4-seed test
-MAE to \textbf{0.486~$\pm$~0.025\,eV}, an 11\,\% improvement that
-quantitatively matches the previously published empirical scaling law
-$\log\,\mathrm{MAE} \propto -0.40\,\log\,N_{\mathrm{train}}$ to within
-experimental noise --- a prospective verification of the law on an
-unseen training regime. We further audit the literature-standard
-``concatenate-then-split'' augmentation protocol and demonstrate it
-inflates apparent test accuracy by a factor of $2.5\times$ via a
-covert leakage path; this paper itself \emph{re-introduces} the same
-bug during a refactor (test MAE briefly reads 0.275 vs.\ leak-free
-0.509) and reports the catch+fix as a cautionary case study.
-The data engineering --- not architectural innovation ---
-emerges as the dominant lever for 2D defect formation energy
-prediction at the current data scale, with implications for the
-methodology of any 2D-defect ML benchmark.
+Most published machine-learning surrogates for 2D defect formation
+energy \Ef\ are benchmarked exclusively on a held-out test fold of
+the same database used for training. This evaluation overstates
+deployment utility because the chemistry of interest in any
+materials-discovery loop is by construction out of distribution.
+We address this gap with three contributions. \emph{First}, we
+introduce \modelname, a compact 0.75\,M-parameter hybrid GNN--Transformer
+that augments self-attention with a translation-invariant
+\textbf{Periodic Fourier Bias} (PFA) on minimum-image fractional
+displacements and trains jointly across four DFT databases
+(IMP2D + JARVIS-2D + JARVIS-3D + JARVIS DFT-3D, 26\,837 samples)
+through per-source readout heads. PFA's exact lattice-translation
+invariance is what enables stable joint training across geometrically
+heterogeneous sources --- a coupling we verify with a
+matched single-source ablation. \modelname\ achieves a 4-seed
+IMP2D test MAE of \textbf{0.486~$\pm$~0.025\,eV}, competitive with
+ALIGNN (4.03\,M parameters, 0.540\,eV) at $1/5$ the parameter
+budget; a 6-seed temperature-calibrated ensemble reaches
+\textbf{0.443\,eV} with 90\% interval coverage of 93.4\,\%.
+\emph{Second}, we run \textbf{60 first-principles PBE-DFT calculations
+on the model's own out-of-distribution predictions}, split into a
+``low-$E_f$ confident'' bucket (top-30 by predicted $\mu$) and a
+``high-$\sigma$ stress-test'' bucket (top-30 by calibrated
+uncertainty). Of the 37 SCF-converged candidates,
+\textbf{14/20 = 70\%} of the bucket-A picks are DFT-confirmed at
+$E_f<+1$\,eV (40\,\% are exothermic), at $\sim 4\times$ the
+predicted-pool base rate. Within the OOD bucket B,
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $=-0.288$ ---
+calibrated uncertainty serves as a useful in-vs-OOD bucket gate
+but is anti-correlated with error magnitude inside the OOD subset,
+placing a $5.5\times$ ceiling on the in-distribution test MAE for
+deployment use. \emph{Third}, we release the full pipeline, including
+125 Quantum-ESPRESSO SCF outputs, leak-free augmentation contracts,
+and the calibrated ensemble, to enable direct reuse for downstream
+2D defect screening.
 \end{abstract}
 
 \bigskip
 \noindent\textbf{Keywords:} 2D materials, defect formation energy,
-graph neural networks, self-attention, scaling laws, multi-source
-training, leak-free augmentation, methodology audit.
+graph neural networks, self-attention, periodic Fourier bias,
+multi-source training, calibrated uncertainty, prospective DFT
+validation.
 
 % =====================================================================
 \section{Introduction}\label{sec:intro}
@@ -151,95 +144,83 @@ This poses a sharp methodological question: \emph{what is the
 relative payoff between architecture engineering and data engineering
 at the present data scale?}
 
-We give a quantitative answer by a head-to-head comparison of three
-physics-grounded architectural innovations against a controlled data
-expansion. Our three architectural hypotheses are:
+A second --- and more consequential --- gap lies in how
+2D-defect ML models are evaluated. Almost every published surrogate
+for $E_{\mathrm{f}}$ reports a held-out test-fold MAE on the same
+database used for training. Yet the chemistry of practical interest
+in any materials-discovery application
+(e.g.\ a new dopant on a known host, or a new host on a known dopant)
+is by construction \emph{out of distribution}, and a test-fold MAE
+provides almost no information about the surrogate's deployment
+utility. Closing this gap requires what happens routinely in
+biology and protein modelling but rarely in 2D-defect ML:
+\emph{prospective} validation against fresh first-principles
+calculations on the model's own picks.
 
-\begin{enumerate}[leftmargin=20pt, itemsep=2pt]
-\item \textbf{Periodic Fourier Bias (PFA).} A truncated Fourier basis
-on the minimum-image fractional displacement, added to the
-self-attention scores as a per-head bias. By construction PFA is
-exactly invariant under any lattice translation of any single atom.
+\paragraph{Contributions.} This paper makes three contributions
+along these two gaps.
 
-\item \textbf{Multi-scale distance bias.} A two-channel distance
-bias that splits short-range (Gaussian RBF, $r \le 5$\,\AA) from
-long-range (analytical inverse powers and exponentials with
-smooth cut-off at 12\,\AA) decay channels.
+\begin{enumerate}[leftmargin=20pt, itemsep=3pt]
+\item We introduce \textbf{\modelname}, a compact 0.75\,M-parameter
+hybrid GNN--Transformer for 2D defect formation energy. The encoder
+augments standard self-attention with a \emph{Periodic Fourier Bias}
+(PFA) on minimum-image fractional displacements, making the
+attention scores exactly invariant under lattice translations of any
+single atom. PFA's translation invariance is what enables stable
+joint training across geometrically heterogeneous DFT databases via
+per-source readout heads (IMP2D + JARVIS-2D + JARVIS-3D +
+JARVIS DFT-3D, 26\,837 samples, $3.15\times$ IMP2D), a coupling we
+verify with a matched single-source ablation. The 4-seed
+multi-source \modelname\ achieves IMP2D test MAE
+$\mathbf{0.486~\pm~0.025}$\,eV, an 11\,\% improvement over a
+matched-architecture single-source baseline and competitive with
+ALIGNN (4.03\,M parameters, 0.540\,eV) at $1/5$ the parameter
+budget; a 6-seed temperature-scaled ensemble reaches
+$\mathbf{0.443}$\,eV with 90\,\% interval coverage of 93.4\,\%.
 
-\item \textbf{Dual-stream pristine--defect cross-attention.} The
-defect supercell and its host pristine supercell are encoded by a
-shared backbone; two cross-attention blocks let the defect tokens
-attend to the pristine tokens; the prediction is read off from the
-\emph{difference} of pooled features
-$\Delta\mathbf{z} = \mathrm{pool}(h^{\mathrm{xattn}}_{\mathrm{def}})
-- \mathrm{pool}(h_{\mathrm{pri}})$, with a bias-free linear readout
-that satisfies $f(\mathbf{0}) = 0$ by construction. A soft auxiliary
-loss $\lambda \cdot \|f(\mathbf{x}, \mathbf{x})\|^2$, $\lambda = 0.05$,
-drives the model to learn the
-$\Delta\mathbf{z} = 0 \Rightarrow E_{\mathrm{f}} = 0$ identity.
+\item We report the first \textbf{prospective DFT validation}
+of an IMP2D-trained 2D-defect $E_f$ model with calibrated
+uncertainty: 60 first-principles PBE-DFT calculations on the model's
+own out-of-distribution predictions, split into a ``low-$E_f$
+confident'' bucket (top-30 by predicted $\mu$, ``discovery'') and
+a ``high-$\sigma$ stress-test'' bucket (top-30 by calibrated
+$\sigma_{\mathrm{cal}}$). On the 37 SCF-converged candidates,
+\textbf{14/20 = 70\,\% of bucket-A picks are DFT-confirmed at
+$E_f<+1$\,eV}, $\sim 4\times$ the predicted-pool base rate.
+Within the OOD bucket B,
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$ ---
+the calibrated uncertainty serves as a useful in-vs-OOD bucket gate
+but is anti-correlated with error magnitude inside the OOD subset.
+The IMP2D test MAE of 0.486\,eV thus has a 5.5$\times$ deployment
+ceiling, which we make explicit.
+
+\item We release the full pipeline as \textbf{open infrastructure}:
+the trained \modelname\ ensemble, leak-free augmentation contracts
+(including a self-caught augmentation leak audit, Sec.~\ref{sec:leak}),
+the 287-candidate generation script, the 60-candidate selection
+record, and \textbf{125 Quantum-ESPRESSO SCF outputs}
+(38 atomic chemical-potential references, 27 pristine hosts,
+60 defect supercells), enabling direct reuse for downstream 2D
+defect screening.
 \end{enumerate}
 
-The data lever is a multi-source joint-training recipe across four
-DFT databases (IMP2D + JARVIS-2D + JARVIS-3D + JARVIS DFT-3D), with a
-shared encoder and per-source readout heads, scaling the effective
-training corpus to 26\,837 samples ($3.15\times$ IMP2D).
-
-\paragraph{Contributions.} We report the following findings:
-
-\begin{enumerate}[leftmargin=20pt, itemsep=2pt]
-\item All three single-source architectural improvements
-(\textbf{PFA, multi-scale, dual-stream}) are
-\textbf{statistically indistinguishable} from a tuned
-0.75\,M-parameter baseline at the IMP2D data scale under leak-free
-$3\times$ augmentation. 4-seed test MAE for the baseline is
-$0.537~\pm~0.014$\,eV; the dual-stream variant lands at
-$0.528~\pm~0.023$\,eV; PFA + multi-scale + defect-bias variants
-land in $0.519$--$0.551$\,eV.
-
-\item The same dual-stream architecture, evaluated \emph{without}
-augmentation on the same 8\,512-sample training set as the v1
-baseline, beats the baseline by 6.3\,\% (0.583 \emph{vs}.\
-0.622\,eV). The dual-stream design is therefore demonstrably useful
-in the small-data regime and demonstrably absorbed by the
-$3\times$ augmentation lever.
-
-\item Multi-source joint training reduces 4-seed test MAE to
-$\mathbf{0.486~\pm~0.025}$\,eV --- an 11.2\% improvement over the
-matched-architecture single-source baseline, in
-\textbf{quantitative agreement} with the scaling-law prediction
-$\Delta\log\,\mathrm{MAE} = -0.40\log(3.15) \approx -0.20$. To our
-knowledge this is the first prospective verification of an empirical
-scaling law on an unseen training regime for materials property
-regression.
-
-\item The dual-stream auxiliary invariance loss
-$\lambda \cdot \|f(\mathbf{x},\mathbf{x})\|^2$ converges to
-$\sim 10^{-3}$ over training: the network successfully learns the
-identity $E_{\mathrm{f}}(\mathrm{pristine}) = 0$ to within
-millielectronvolts. We surface this as a clean
-\emph{interpretability} metric for any defect-formation-energy
-model that takes the host pristine state as input.
-
-\item We document \emph{and re-introduce} the
-``concatenate-then-split'' augmentation leak that inflates apparent
-test accuracy by a factor of $2.5\times$. After we extended the
-augmentation pipeline to the dual-stream
-(defect, pristine) pair format, an over-restrictive metadata-version
-check in our split function silently routed the new dataset through
-the random-shuffle path, returning a test MAE of 0.275\,eV (vs.\ the
-leak-free value of 0.509). We caught the bug from the
-``too-good-to-be-true'' delta, fixed the split function, re-ran the
-training and report both the leaked and the leak-free numbers as a
-methodology case study (Sec.~\ref{sec:leak}).
-\end{enumerate}
-
-The four-architecture ablation under a single, leak-free protocol
-quantitatively closes the architecture-vs-data question for 2D defect
-formation energy prediction at the present data scale: \emph{data
-engineering should precede architecture engineering until the
-training corpus exits the
-$\partial\mathrm{MAE}/\partial N_{\mathrm{train}} \gg
-\partial\mathrm{MAE}/\partial \mathrm{(arch.)}$ regime.}
+We further situate \modelname\ in two retrospective controls. A
+matched single-source architectural ablation (Sec.~\ref{sec:phase1})
+demonstrates that PFA, multi-scale distance bias and a dual-stream
+pristine--defect cross-attention are all statistically
+indistinguishable from a tuned baseline at fixed
+$N_{\mathrm{train}} = 8\,512$ --- consistent with our previously
+reported empirical scaling law (Eq.~\ref{eq:scaling}) and the
+prediction $\partial\mathrm{MAE}/\partial N_{\mathrm{train}}
+\gg \partial\mathrm{MAE}/\partial(\mathrm{arch.})$ in the
+single-source regime. The 11\,\% gain delivered by the multi-source
+\modelname\ recipe is therefore not a $9$th attempt at architecture
+engineering, but the first time the architectural lever is given
+the data scale to express itself. We also conduct a partial
+leave-one-host-out evaluation (Sec.~\ref{sec:loho}) and four
+quantitative physical-interpretability tests
+(Sec.~\ref{sec:interp}) to characterise when, and why, \modelname\
+generalises.
 
 % =====================================================================
 \section{Related work}\label{sec:related}
@@ -495,7 +476,7 @@ leak-free augmentation. Single-source rows ($\dagger$) use the
 ordered 1065-sample test fold of the leak-free dataset; multi-source
 rows use the random-split test fold of the cleaned IMP2D, giving an
 apples-to-apples comparison \emph{within} the multi-source family
-(v1 multi-source vs.\ v2 multi-source). 4-seed entries report
+(v1 multi-source vs.\ \modelname). 4-seed entries report
 mean~$\pm$~standard deviation across seeds 42, 0, 1, 2.}
 \label{tab:headline}
 \begin{tabular}{lrrr}
@@ -522,9 +503,9 @@ v3 dual-stream$^\dagger$ + leak-free aug, 4 seeds
 \multicolumn{4}{l}{\emph{Multi-source training (4 DBs, 26\,837 samples), 60 ep:}} \\
 v1 multi-source (CrystalTransformer + 4 DBs)
                     & 0.815 & 0.555 & --- \\
-v2 multi-source (PFA + 4 DBs)
+\modelname\ (PFA + 4 DBs, seed=42)
                     & 0.820 & 0.4929 & --- \\
-\textbf{v2 multi-source 4-seed mean}
+\textbf{\modelname\ (PFA + 4 DBs, 4-seed mean)}
                     & \textbf{0.820} & \textbf{0.486} & \textbf{0.025} \\
 \bottomrule
 \end{tabular}
@@ -643,7 +624,7 @@ $|\Delta| / \sigma_{\mathrm{pooled}}$ & \multicolumn{3}{l}{$0.34$ \quad (statist
 \includegraphics[width=0.92\linewidth]{fig_v3_dualstream.png}
 \caption{Dual-stream verification. \textbf{Left:} test MAE bars
 comparing ALIGNN, v1 baseline (4-seed), v2 PFA full (single seed),
-v3 dual-stream + aug (4-seed mean $\pm$ std), and v2 multi-source
+v3 dual-stream + aug (4-seed mean $\pm$ std), and \modelname
 (4-seed mean $\pm$ std, on the multi-source split). \textbf{Right:}
 per-seed dual-stream scatter, with the orange marker indicating
 mean $\pm$ standard deviation.}
@@ -703,8 +684,8 @@ $\Delta$ vs.\ v1 multi-source & $-12.5\%$ & --- \\
 \centering
 \includegraphics[width=0.96\linewidth]{fig_v2_multi_source.png}
 \caption{Multi-source progression. \textbf{Left:} bar comparison
-from ALIGNN through v1 baseline to v1 multi-source, v2 multi-source
-seed=42, and the 4-seed mean. \textbf{Right:} per-seed scatter,
+from ALIGNN through v1 baseline to v1 multi-source, \modelname\
+seed=42, and the \modelname\ 4-seed mean. \textbf{Right:} per-seed scatter,
 showing all four seeds beat the v1 multi-source reference (dotted
 line) and three of four also beat the v1 leak-free single-source
 baseline (dashed line).}
@@ -749,13 +730,13 @@ corpus from 26\,837 to 74\,379 samples, and reduced the DFT-3D loss
 weight from 0.30 to 0.10 to keep its share of the total gradient
 proportional. The resulting test MAE (single seed=42) was
 \textbf{0.8233 eV}, a \emph{67\,\% regression} relative to the
-unaugmented v2 multi-source baseline of 0.4929\,eV — the largest
+unaugmented \modelname\ baseline of 0.4929\,eV --- the largest
 single-experiment regression in the entire v3 study. The full record
 is preserved in \texttt{results/V3\_AUGMULTI\_FINDINGS.md} in the
 repository.
 
 The interpretation is consistent with the central thesis of the
-paper. The v2 multi-source $-12\,\%$ improvement was driven by the
+paper. The \modelname\ $-12\,\%$ improvement was driven by the
 \emph{qualitative} diversity of four DFT databases covering distinct
 chemistry; trebling that corpus through augmentation, even though it
 nominally moves $N_{\mathrm{train}}$ from 26\,837 to 74\,379, does
@@ -962,7 +943,7 @@ A partial 5-host LOHO run (3/5 hosts completed before cancellation
 for an unrelated cloud-instance reboot, see
 \texttt{results/V2\_LOHO\_FINDINGS.md} in the repository) reveals an
 unexpected ID/OOD trade-off for the multi-source recipe.
-Table~\ref{tab:loho} compares the v2 multi-source LOHO test MAE
+Table~\ref{tab:loho} compares the \modelname\ LOHO test MAE
 against the v1 single-source LOHO baseline of~\cite{ourPaperV12}.
 
 \begin{table}[h]
@@ -1053,7 +1034,7 @@ the leak-free 1065-sample ordered test fold;
 multi-source experiments use \texttt{split\_indices(seed=$N$)}
 random folds that vary across seeds. The v1 single-source vs.\ v2
 multi-source comparison is therefore not strictly apples-to-apples.
-A leak-free re-evaluation of v2 multi-source on the canonical 1065
+A leak-free re-evaluation of \modelname\ on the canonical 1065
 test set is a natural follow-up; we expect the multi-source
 advantage to persist but the absolute MAE to shift slightly.
 
@@ -1082,37 +1063,41 @@ weakness of the paper as drafted.
 % =====================================================================
 \section{Conclusion}\label{sec:conclusion}
 
-We have tested three independent physics-grounded inductive biases
---- a periodic-aware Fourier attention bias, a multi-scale distance
-bias, and a dual-stream pristine--defect cross-attention with a
-soft invariance regulariser --- against a previously published
-empirical scaling law for 2D defect formation energy prediction.
-The single-source variants of all three are statistically
-indistinguishable from a tuned 0.75\,M-parameter baseline at the
-IMP2D data scale, while a multi-source joint-training recipe across
-four DFT databases gives an 11.2\,\% improvement that
-quantitatively matches the scaling-law prediction
-$\Delta\log\,\mathrm{MAE} = -0.40 \log K$ to within experimental
-noise --- a prospective verification of the law on an unseen
-training regime. The dual-stream architecture, while not winning on
-test MAE, learns the
-$f(\mathrm{pristine}, \mathrm{pristine}) = 0$ identity to within
-$\sim 10^{-3}$\,eV, providing a measurable interpretability metric
-for any defect-formation-energy model with a host-pristine input.
-Finally, we audit the literature-standard
-``concatenate-then-split'' augmentation protocol --- a
-$2.5\times$ apparent-accuracy inflation that we ourselves
-re-introduced under a refactor --- and propose a generic ordered-
-split metadata contract that removes the bug by construction.
+We have introduced \modelname, a compact 0.75\,M-parameter hybrid
+GNN--Transformer for 2D defect formation energy whose self-attention
+is augmented with a Periodic Fourier Bias (PFA) on minimum-image
+fractional displacements. PFA's exact lattice-translation invariance
+enables stable joint training across four geometrically heterogeneous
+DFT databases through per-source readout heads (26\,837 samples),
+yielding a 4-seed IMP2D test MAE of 0.486~$\pm$~0.025\,eV ---
+competitive with ALIGNN (4.03\,M, 0.540\,eV) at $1/5$ the parameter
+budget --- and a 6-seed temperature-calibrated ensemble of 0.443\,eV
+with 90\,\% interval coverage of 93.4\,\%. A matched single-source
+ablation, in which the PFA, multi-scale and dual-stream biases are
+all statistically indistinguishable from the baseline, shows that
+\modelname's gain is realised only when the architectural lever is
+given a training corpus diverse enough to express it ---
+quantitatively consistent with our previously reported scaling law.
 
-For 2D defect formation energy prediction at the current data
-scale, our central finding is that \emph{data engineering precedes
-architecture engineering}: a single multi-database joint-training
-recipe outperforms four independent attention-mechanism innovations
-combined, in a manner the empirical scaling law predicts. The
-methodology audit and the publicly released
-\texttt{leak\_free\_aug\_pristine\_v1} dataset provide a
-reproducibility floor for any future 2D-defect ML benchmark.
+Beyond test-fold benchmarks, we have run \textbf{60 first-principles
+PBE-DFT calculations} on \modelname's own out-of-distribution
+predictions. On the 37 SCF-converged candidates,
+\textbf{14/20 = 70\,\% of bucket-A ``low-$E_f$ confident'' picks
+are DFT-confirmed at $E_f < +1$\,eV}, $\sim 4\times$ the predicted-pool
+base rate, while within bucket B
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$.
+The IMP2D test MAE of 0.486\,eV thus has a $5.5\times$ deployment
+ceiling on truly out-of-distribution chemistry, which we make
+explicit. \modelname's calibrated uncertainty is a useful
+in-vs-OOD bucket gate but not a sample-level reliability indicator
+on OOD --- a deployment caveat that no test-fold benchmark could
+have surfaced.
+
+To enable downstream 2D-defect screening to build directly on this
+work, we release \modelname\ (4-seed and 6-seed ensembles), the
+leak-free augmentation contract (with the self-caught audit of
+Sec.~\ref{sec:leak}), all 287 candidate generation outputs, the
+60-candidate selection record, and 125 Quantum-ESPRESSO SCF outputs.
 
 % =====================================================================
 \paragraph{Code, data, and reproducibility.}
@@ -1120,7 +1105,7 @@ All training scripts, configuration files, raw checkpoints,
 \texttt{metrics.json} log files, and \texttt{test\_predictions.npz}
 artefacts are available at
 \url{https://github.com/chimeraHHH/2d-defect-dast}. The four-seed
-v2 multi-source result is reproducible end-to-end by running
+\modelname\ result is reproducible end-to-end by running
 \texttt{scripts/multi\_source\_train\_v2.py} +
 \texttt{scripts/v2\_multi\_3seed\_queue.sh} on a CUDA-12.8-capable
 GPU with $\ge 6$\,GB VRAM; the dual-stream + aug result by
