@@ -10,6 +10,24 @@ model must in fact answer --- \emph{can it discover anything new?}
 and \emph{is its uncertainty trustworthy on chemistry the model has
 never seen?} --- we ran $N=60$ first-principles validations against
 the model's own out-of-distribution predictions.
+Figure~\ref{fig:prospective_workflow} summarises the pipeline.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_prospective_workflow.png}
+\caption{The prospective DFT validation pipeline: 287 model-generated
+OOD candidates are strategically split into 30 ``low-$E_f$ confident''
+(rank by $\mu$) and 30 ``high-$\sigma$ OOD'' (rank by
+$\sigma_{\mathrm{cal}}$) candidates with a 4-per-host diversity cap;
+the 60 selected candidates plus 27 pristine-host references plus 38
+isolated-atom $\mu$ references give 125 PBE PW SCF runs in
+Quantum~ESPRESSO 7.3.1 with NVHPC 25.5 (CUDA 12.9, cc=120) on a
+single RTX~5090 in $\sim$11\,h wall. Of the 60 defect runs, 22 La/Cs
+candidates are rejected by a known PSL/PAW augmentation-$l_{\max}$
+incompatibility and one Sc@WTe$_2$ run fails SCF convergence,
+yielding $N=37$ valid defect formation energies for the analysis below.}
+\label{fig:prospective_workflow}
+\end{figure}
 
 \paragraph{Candidate pool and split.}
 Starting from the 287 generated candidate (host, dopant, site)
@@ -113,6 +131,8 @@ primary deployment claim.}
 \label{fig:prospective_dft}
 \end{figure}
 
+\input{tables/per_host_breakdown}
+
 \paragraph{Interpretation.}
 Three findings emerge.
 
@@ -148,9 +168,25 @@ ceiling on the model's OOD reliability, and motivates explicit
 $\sigma_{\mathrm{cal}}$-based gating in any downstream deployment.
 
 These three findings, taken together, argue for the deployment
-recipe: \emph{use the model to rank candidates by $\mu$, use
-$\sigma_{\mathrm{cal}}$ only as a binary in-vs-OOD gate, and
+recipe of Sec.~\ref{sec:deploy}: \emph{rank candidates by $\mu$,
+use $\sigma_{\mathrm{cal}}$ only as a binary in-vs-OOD gate, and
 DFT-validate any decision-critical candidate}. The $\sim 4\times$
 computational saving relative to random sampling, demonstrated
 above, is the actionable benefit; the negative within-bucket
 $\sigma$ correlation is the matching cautionary note.
+
+\paragraph{OOD bounds, taken together.}
+This subsection and the LOHO evaluation of Sec.~\ref{sec:loho}
+together place \emph{two complementary} bounds on \modelname's
+deployment behaviour. LOHO measures the cost of a chemistry-shift
+to a held-out host (3/5 hosts: $+22$\% to $+65$\% MAE
+degradation, val$\to$test gap 1.32--1.76$\times$); the prospective
+DFT validation here measures the cost of a chemistry-shift to a
+held-out (host, dopant) interstitial pair drawn by the model's own
+$\sigma_{\mathrm{cal}}$-aware ranking (overall MAE 2.66\,eV,
+$5.5\times$ the in-distribution 0.486\,eV). The two bounds are
+qualitatively consistent: \modelname's IMP2D test-fold MAE
+underestimates the true deployment ceiling by a factor of
+$\sim 5\times$ on the chemistry distributions of practical
+interest. We make this ceiling an explicit limitation
+(Sec.~\ref{sec:discuss}) rather than a hidden one.

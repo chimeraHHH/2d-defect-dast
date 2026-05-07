@@ -892,7 +892,20 @@ remedy. The full episode --- including the leaked and leak-free
 training runs both preserved in the repository --- is reported in
 Appendix~\ref{app:leak} as a methodology case study.
 
-\subsection{Out-of-distribution: leave-one-host-out (preliminary)}\label{sec:loho}
+\subsection{Out-of-distribution bounds: leave-one-host-out}\label{sec:loho}
+
+The IMP2D test-fold MAE of 0.486\,eV (Sec.~\ref{sec:multi})
+characterises in-distribution performance; the deployment use case
+of any 2D-defect ML model is by construction \emph{out of
+distribution}. We give two complementary bounds on \modelname's OOD
+behaviour. The first, in this subsection, is a leave-one-host-out
+(LOHO) evaluation that quantifies host-chemistry transfer; the
+second, in Sec.~\ref{sec:prospective}, is a prospective
+first-principles DFT validation that quantifies discovery utility
+and tests the calibrated uncertainty $\sigma_{\mathrm{cal}}$ on
+candidates that lie outside the training-host distribution.
+
+\paragraph{LOHO setup.}
 
 A partial 5-host LOHO run (3/5 hosts completed before cancellation
 for an unrelated cloud-instance reboot, see

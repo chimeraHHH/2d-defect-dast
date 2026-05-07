@@ -1,0 +1,182 @@
+[
+  {
+    "host": "Bi2I6",
+    "n_A": 0,
+    "n_B": 1,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 0.0,
+    "worst_dopant": "I"
+  },
+  {
+    "host": "BiITe",
+    "n_A": 0,
+    "n_B": 3,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 0.0,
+    "worst_dopant": "Au"
+  },
+  {
+    "host": "Ge2",
+    "n_A": 0,
+    "n_B": 1,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 4.064349650619261,
+    "worst_dopant": "Pb"
+  },
+  {
+    "host": "Mo2CO2",
+    "n_A": 0,
+    "n_B": 2,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 5.006737494402114,
+    "worst_dopant": "Bi"
+  },
+  {
+    "host": "NbS2",
+    "n_A": 1,
+    "n_B": 1,
+    "mean_pred_A": 0.5696688890457153,
+    "mean_dft_corr_A": 8.278293733808823,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 17.392573227831964,
+    "worst_dopant": "Bi"
+  },
+  {
+    "host": "NbSe2",
+    "n_A": 2,
+    "n_B": 0,
+    "mean_pred_A": -0.020062223076820374,
+    "mean_dft_corr_A": -3.3845385257803473,
+    "A_hit_below_1eV": 2,
+    "worst_err_eV": 7.708624844763108,
+    "worst_dopant": "Sn"
+  },
+  {
+    "host": "NiSe2",
+    "n_A": 0,
+    "n_B": 1,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 4.688816225675692,
+    "worst_dopant": "Bi"
+  },
+  {
+    "host": "Pd2Se4",
+    "n_A": 2,
+    "n_B": 2,
+    "mean_pred_A": -0.43203112483024597,
+    "mean_dft_corr_A": 1.105883517312274,
+    "A_hit_below_1eV": 1,
+    "worst_err_eV": 3.7641830133627083,
+    "worst_dopant": "Bi"
+  },
+  {
+    "host": "PtS2",
+    "n_A": 2,
+    "n_B": 0,
+    "mean_pred_A": 0.4089002311229706,
+    "mean_dft_corr_A": 0.6925767640594651,
+    "A_hit_below_1eV": 2,
+    "worst_err_eV": 0.5673530658729891,
+    "worst_dopant": "In"
+  },
+  {
+    "host": "PtSe2",
+    "n_A": 1,
+    "n_B": 0,
+    "mean_pred_A": -0.04637622833251953,
+    "mean_dft_corr_A": -1.2999534467765312,
+    "A_hit_below_1eV": 1,
+    "worst_err_eV": 1.2535772184440117,
+    "worst_dopant": "In"
+  },
+  {
+    "host": "SnS2",
+    "n_A": 3,
+    "n_B": 0,
+    "mean_pred_A": -0.04204756021499634,
+    "mean_dft_corr_A": -0.030995460940868618,
+    "A_hit_below_1eV": 2,
+    "worst_err_eV": 1.7585557643324137,
+    "worst_dopant": "Ir"
+  },
+  {
+    "host": "SnSe2",
+    "n_A": 0,
+    "n_B": 2,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 1.7585557643324137,
+    "worst_dopant": "Ir"
+  },
+  {
+    "host": "TaS2",
+    "n_A": 1,
+    "n_B": 0,
+    "mean_pred_A": 0.04038137197494507,
+    "mean_dft_corr_A": 1.9362163100347969,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 1.8958349380598518,
+    "worst_dopant": "Pb"
+  },
+  {
+    "host": "Ti2CO2",
+    "n_A": 4,
+    "n_B": 3,
+    "mean_pred_A": 0.32880230247974396,
+    "mean_dft_corr_A": -0.5569225977438431,
+    "A_hit_below_1eV": 4,
+    "worst_err_eV": 3.5428996008943483,
+    "worst_dopant": "In"
+  },
+  {
+    "host": "TiO2",
+    "n_A": 1,
+    "n_B": 0,
+    "mean_pred_A": 0.4601263403892517,
+    "mean_dft_corr_A": 13.229917374641186,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 12.769791034251934,
+    "worst_dopant": "In"
+  },
+  {
+    "host": "TiS2",
+    "n_A": 2,
+    "n_B": 0,
+    "mean_pred_A": -0.22634956240653992,
+    "mean_dft_corr_A": -1.2836025359940324,
+    "A_hit_below_1eV": 1,
+    "worst_err_eV": 3.9328364943914496,
+    "worst_dopant": "Bi"
+  },
+  {
+    "host": "V2CO2",
+    "n_A": 0,
+    "n_B": 1,
+    "mean_pred_A": null,
+    "mean_dft_corr_A": null,
+    "A_hit_below_1eV": 0,
+    "worst_err_eV": 4.055501523641093,
+    "worst_dopant": "Na"
+  },
+  {
+    "host": "ZrSe2",
+    "n_A": 1,
+    "n_B": 0,
+    "mean_pred_A": 0.35766494274139404,
+    "mean_dft_corr_A": -1.530815747903294,
+    "A_hit_below_1eV": 1,
+    "worst_err_eV": 1.888480690644688,
+    "worst_dopant": "In"
+  }
+]
