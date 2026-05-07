@@ -1,75 +1,9 @@
 {
-  "n_total": 37,
-  "raw": {
-    "all": {
-      "n": 37,
-      "mae_eV": 4.911535676093564,
-      "median_abs_err_eV": 3.3440814215282444,
-      "rmse_eV": 6.567828529173489,
-      "pearson_pred_vs_dft": -0.040566915729383576,
-      "spearman_pred_vs_dft": 0.10692271218587007,
-      "pearson_sigma_vs_abs_err": 0.3289508529028575,
-      "spearman_sigma_vs_abs_err": 0.43029871977240397
-    },
-    "bucketA": {
-      "n": 20,
-      "mae_eV": 3.224381557479501,
-      "median_abs_err_eV": 1.8141647844577165,
-      "rmse_eV": 4.824666947756324,
-      "pearson_pred_vs_dft": 0.4468305427129656,
-      "spearman_pred_vs_dft": 0.4030075187969925,
-      "pearson_sigma_vs_abs_err": -0.10801339476006215,
-      "spearman_sigma_vs_abs_err": -0.07518796992481201
-    },
-    "bucketB": {
-      "n": 17,
-      "mae_eV": 6.89642287446305,
-      "median_abs_err_eV": 6.728227138057264,
-      "rmse_eV": 8.1547442908793,
-      "pearson_pred_vs_dft": -0.1196727404776645,
-      "spearman_pred_vs_dft": 0.056372549019607844,
-      "pearson_sigma_vs_abs_err": 0.028074717721113248,
-      "spearman_sigma_vs_abs_err": 0.14215686274509806
-    }
-  },
-  "per_dopant_corrected": {
-    "all": {
-      "n": 37,
-      "mae_eV": 2.6580608293983654,
-      "median_abs_err_eV": 1.7253994665100305,
-      "rmse_eV": 4.5471437283311555,
-      "pearson_pred_vs_dft": 0.3540716246407885,
-      "spearman_pred_vs_dft": 0.3494547178757705,
-      "pearson_sigma_vs_abs_err": -0.053721206539483736,
-      "spearman_sigma_vs_abs_err": 0.021100047415836886
-    },
-    "bucketA": {
-      "n": 20,
-      "mae_eV": 2.5312905016892744,
-      "median_abs_err_eV": 1.741977615421222,
-      "rmse_eV": 4.115719399198809,
-      "pearson_pred_vs_dft": 0.18883815244242622,
-      "spearman_pred_vs_dft": 0.037593984962406006,
-      "pearson_sigma_vs_abs_err": -0.0169551575158772,
-      "spearman_sigma_vs_abs_err": 0.193984962406015
-    },
-    "bucketB": {
-      "n": 17,
-      "mae_eV": 2.8072023914090605,
-      "median_abs_err_eV": 1.2075603978999423,
-      "rmse_eV": 5.0073368037600146,
-      "pearson_pred_vs_dft": 0.2766504993815367,
-      "spearman_pred_vs_dft": 0.2622549019607843,
-      "pearson_sigma_vs_abs_err": -0.2881469376402534,
-      "spearman_sigma_vs_abs_err": -0.30147058823529416
-    },
-    "discovery_A": {
-      "frac_dft_below_1eV": 0.7,
-      "frac_dft_below_0eV": 0.4
-    },
-    "median_abs_err_A_eV": 1.741977615421222,
-    "median_abs_err_B_eV": 1.2075603978999423
-  },
+  "n_boot": 5000,
+  "rng_seed": 42,
+  "n_candidates": 37,
+  "n_A": 20,
+  "n_B": 17,
   "per_dopant_offsets": {
     "Na": -2.6727256144161706,
     "Pb": -3.8311111319151676,
@@ -91,7 +25,45 @@
     "Sr": -7.511984783432126,
     "I": -3.9550921512100103
   },
-  "bootstrap_ci_95": {
+  "point_estimate": {
+    "all": {
+      "n": 37,
+      "mae_corr_eV": 2.6580608293983654,
+      "median_err_corr_eV": 1.7253994665100305,
+      "rmse_corr_eV": 4.5471437283311555,
+      "pearson_pred_dft_corr": 0.3540716246407885,
+      "spearman_pred_dft_corr": 0.3494547178757705,
+      "pearson_sig_err_corr": -0.053721206539483736,
+      "spearman_sig_err_corr": 0.021100047415836886,
+      "frac_dft_below_1eV": 0.5135135135135135,
+      "frac_dft_below_0eV": 0.35135135135135137
+    },
+    "bucket_A": {
+      "n": 20,
+      "mae_corr_eV": 2.5312905016892744,
+      "median_err_corr_eV": 1.741977615421222,
+      "rmse_corr_eV": 4.115719399198809,
+      "pearson_pred_dft_corr": 0.18883815244242622,
+      "spearman_pred_dft_corr": 0.037593984962406006,
+      "pearson_sig_err_corr": -0.0169551575158772,
+      "spearman_sig_err_corr": 0.193984962406015,
+      "frac_dft_below_1eV": 0.7,
+      "frac_dft_below_0eV": 0.4
+    },
+    "bucket_B": {
+      "n": 17,
+      "mae_corr_eV": 2.8072023914090605,
+      "median_err_corr_eV": 1.2075603978999423,
+      "rmse_corr_eV": 5.0073368037600146,
+      "pearson_pred_dft_corr": 0.2766504993815367,
+      "spearman_pred_dft_corr": 0.2622549019607843,
+      "pearson_sig_err_corr": -0.2881469376402534,
+      "spearman_sig_err_corr": -0.30147058823529416,
+      "frac_dft_below_1eV": 0.29411764705882354,
+      "frac_dft_below_0eV": 0.29411764705882354
+    }
+  },
+  "ci_95": {
     "all": {
       "mae_corr_eV": [
         1.5911735222593413,
@@ -207,7 +179,7 @@
       ]
     }
   },
-  "bootstrap_sig_at_95": {
+  "sig_at_95": {
     "all": {
       "pearson_pred_dft_corr": true,
       "spearman_pred_dft_corr": true,
@@ -226,6 +198,5 @@
       "pearson_sig_err_corr": false,
       "spearman_sig_err_corr": false
     }
-  },
-  "bootstrap_n": 5000
+  }
 }

@@ -67,15 +67,20 @@ budget; a 6-seed temperature-calibrated ensemble reaches
 on the model's own out-of-distribution predictions}, split into a
 ``low-$E_f$ confident'' bucket (top-30 by predicted $\mu$) and a
 ``high-$\sigma$ stress-test'' bucket (top-30 by calibrated
-uncertainty). Of the 37 SCF-converged candidates,
-\textbf{14/20 = 70\%} of the bucket-A picks are DFT-confirmed at
-$E_f<+1$\,eV (40\,\% are exothermic), at $\sim 4\times$ the
-predicted-pool base rate. Within the OOD bucket B,
-Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $=-0.288$ ---
-calibrated uncertainty serves as a useful in-vs-OOD bucket gate
-but is anti-correlated with error magnitude inside the OOD subset,
-placing a $5.5\times$ ceiling on the in-distribution test MAE for
-deployment use. \emph{Third}, we release the full pipeline, including
+uncertainty). On the 37 SCF-converged candidates, the overall
+predicted--DFT Pearson correlation is $+0.354$ (95\,\% bootstrap
+CI $[+0.06, +0.70]$, excludes zero), and \textbf{14/20 = 70\,\%
+of bucket-A picks are DFT-confirmed at $E_f<+1$\,eV} (95\,\% CI
+$[50\%, 90\%]$), $\sim 4\times$ the predicted-pool base rate.
+Within the OOD bucket B (n=17), the within-bucket
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) is $-0.288$
+(95\,\% CI $[-0.60, +0.09]$): the central tendency is mildly
+negative but the CI weakly straddles zero, placing a candidate
+deployment caveat that $\sigma_{\mathrm{cal}}$ may be useful as
+an in-vs-OOD bucket gate but not as a sample-level reliability
+score on truly unseen chemistry. The OOD MAE on this subset is
+$5.5\times$ the in-distribution test MAE, an explicit deployment
+ceiling. \emph{Third}, we release the full pipeline, including
 125 Quantum-ESPRESSO SCF outputs, leak-free augmentation contracts,
 and the calibrated ensemble, to enable direct reuse for downstream
 2D defect screening.
@@ -186,13 +191,17 @@ confident'' bucket (top-30 by predicted $\mu$, ``discovery'') and
 a ``high-$\sigma$ stress-test'' bucket (top-30 by calibrated
 $\sigma_{\mathrm{cal}}$). On the 37 SCF-converged candidates,
 \textbf{14/20 = 70\,\% of bucket-A picks are DFT-confirmed at
-$E_f<+1$\,eV}, $\sim 4\times$ the predicted-pool base rate.
+$E_f<+1$\,eV} (95\,\% CI $[50\%, 90\%]$), $\sim 4\times$ the
+predicted-pool base rate, with the overall predicted--DFT Pearson
+correlation $+0.354$ (95\,\% CI $[+0.06, +0.70]$, excludes zero).
 Within the OOD bucket B,
-Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$ ---
-the calibrated uncertainty serves as a useful in-vs-OOD bucket gate
-but is anti-correlated with error magnitude inside the OOD subset.
-The IMP2D test MAE of 0.486\,eV thus has a 5.5$\times$ deployment
-ceiling, which we make explicit.
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$
+(95\,\% CI $[-0.60, +0.09]$) --- the point estimate suggests
+$\sigma_{\mathrm{cal}}$ may be informative for in-vs-OOD bucket
+triage but not for sample-level error ranking on OOD, though the
+within-bucket sample size warrants confirmation at larger N.
+The OOD MAE on this subset is $5.5\times$ the in-distribution
+test MAE, an explicit deployment ceiling.
 
 \item We release the full pipeline as \textbf{open infrastructure}:
 the trained \modelname\ ensemble, leak-free augmentation contracts
@@ -1002,21 +1011,27 @@ is not in the IMP2D training distribution:
 \item \textbf{Rank by $\mu$, not by $\sigma_{\mathrm{cal}}$.}
 \modelname's predicted $E_f$ ($\mu$) is the actionable
 ranking signal: the bucket-A discovery rate of 70\,\% at
-$E_f^{\mathrm{DFT}} < +1$\,eV, demonstrated on 20 SCF-converged
-top-$\mu$ candidates spanning 18 hosts, exceeds the predicted-pool
-base rate by $\sim 4\times$ and is the principal computational
-saving over random sampling.
+$E_f^{\mathrm{DFT}} < +1$\,eV (95\,\% CI $[50\%, 90\%]$),
+demonstrated on 20 SCF-converged top-$\mu$ candidates spanning
+18 hosts, exceeds the predicted-pool base rate by $\sim 4\times$
+and is the principal computational saving over random sampling.
+The supporting predicted--DFT correlation Pearson $= +0.354$
+(95\,\% CI $[+0.06, +0.70]$) excludes zero.
 \item \textbf{Use $\sigma_{\mathrm{cal}}$ as a binary in-vs-OOD gate
 at the bucket level.} The bucket-level pattern --- bucket B (high
 $\sigma_{\mathrm{cal}}$, mean 9.0\,eV) yields a per-dopant-corrected
 median residual of 1.21\,eV vs.\ bucket A's (mean $\sigma_{\mathrm{cal}}$
-4.3\,eV) 1.74\,eV --- is real and useful. But within bucket B,
-Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$:
-\emph{higher $\sigma$ does not imply higher error inside the OOD
-subset.} Use $\sigma_{\mathrm{cal}}$ to reject candidates whose
-$\sigma$ exceeds an in-distribution threshold (e.g.\ the 95th
-percentile of training-fold $\sigma$); do not use it to rank within
-the rejected pool.
+4.3\,eV) 1.74\,eV --- is suggestive (the bootstrap CIs overlap;
+larger N would resolve this). What is more clearly testable is
+the within-bucket pattern: Pearson($\sigma_{\mathrm{cal}}$,
+$|\mathrm{error}|$) within bucket B is $-0.288$ (95\,\% CI
+$[-0.60, +0.09]$), so even the central tendency on the OOD subset
+is mildly anti-correlated with $\sigma$. Read pragmatically: use
+$\sigma_{\mathrm{cal}}$ to reject candidates whose $\sigma$
+exceeds an in-distribution threshold (e.g.\ the 95th percentile of
+training-fold $\sigma$); do not use it to rank within the rejected
+pool, where there is no positive evidence that higher $\sigma$
+predicts larger error.
 \item \textbf{Validate decision-critical candidates with DFT.} The
 per-dopant-corrected MAE on this OOD validation set is 2.66\,eV,
 $5.5\times$ the IMP2D test-fold MAE of 0.486\,eV. Any deployment
@@ -1090,15 +1105,17 @@ Beyond test-fold benchmarks, we have run \textbf{60 first-principles
 PBE-DFT calculations} on \modelname's own out-of-distribution
 predictions. On the 37 SCF-converged candidates,
 \textbf{14/20 = 70\,\% of bucket-A ``low-$E_f$ confident'' picks
-are DFT-confirmed at $E_f < +1$\,eV}, $\sim 4\times$ the predicted-pool
-base rate, while within bucket B
-Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$.
-The IMP2D test MAE of 0.486\,eV thus has a $5.5\times$ deployment
-ceiling on truly out-of-distribution chemistry, which we make
-explicit. \modelname's calibrated uncertainty is a useful
-in-vs-OOD bucket gate but not a sample-level reliability indicator
-on OOD --- a deployment caveat that no test-fold benchmark could
-have surfaced.
+are DFT-confirmed at $E_f < +1$\,eV} (95\,\% bootstrap CI
+$[50\%, 90\%]$), $\sim 4\times$ the predicted-pool base rate; the
+overall predicted--DFT Pearson correlation is $+0.354$ (95\,\% CI
+$[+0.06, +0.70]$, excludes zero). Within bucket B,
+Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$
+(95\,\% CI $[-0.60, +0.09]$): the point estimate suggests
+$\sigma_{\mathrm{cal}}$ is more useful as an in-vs-OOD bucket gate
+than as a sample-level reliability score on OOD, but the within-bucket
+sample size warrants confirmation at larger N. The OOD MAE on
+this subset is $5.5\times$ the in-distribution test MAE, an explicit
+deployment ceiling that no test-fold benchmark could have surfaced.
 
 To enable downstream 2D-defect screening to build directly on this
 work, we release \modelname\ (4-seed and 6-seed ensembles), the

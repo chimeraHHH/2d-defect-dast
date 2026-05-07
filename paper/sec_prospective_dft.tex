@@ -101,17 +101,31 @@ Across all 37 SCF-converged candidates, after per-dopant
 chemical-potential offset correction:
 
 \begin{itemize}
-\item \textbf{Overall MAE} $= 2.66$\,eV (median 1.73\,eV);
-  \textbf{Pearson(pred,\,DFT)} $= +0.354$, Spearman $= +0.349$.
+\item \textbf{Overall MAE} $= 2.66$\,eV (95\% CI $[1.59, 3.97]$;
+  median 1.73\,eV);
+  \textbf{Pearson(pred,\,DFT)} $= +0.354$ (95\% CI
+  $[+0.06, +0.70]$, \emph{excludes zero}),
+  Spearman $= +0.349$ (95\% CI $[+0.04, +0.60]$, excludes zero).
 \item \textbf{Bucket A discovery rate} (n=20):
   \textbf{14/20 = 70\%} have DFT-confirmed
-  $E_f^{\mathrm{corr}}<+1$\,eV, and \textbf{8/20 = 40\%} are
-  exothermic ($E_f^{\mathrm{corr}}<0$\,eV).
+  $E_f^{\mathrm{corr}}<+1$\,eV (95\% CI $[50\%, 90\%]$), and
+  \textbf{8/20 = 40\%} are exothermic
+  ($E_f^{\mathrm{corr}}<0$\,eV; 95\% CI $[20\%, 60\%]$).
 \item \textbf{Bucket B uncertainty calibration} (n=17):
   Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{err}|$) within bucket
-  $= -0.288$, Spearman $= -0.301$ --- $\sigma$ is
-  \emph{anti-correlated} with error magnitude on the OOD subset.
+  $= -0.288$ (95\% CI $[-0.60, +0.09]$),
+  Spearman $= -0.301$ (95\% CI $[-0.60, +0.37]$) ---
+  the negative point estimate suggests $\sigma$ is anti-correlated
+  with error magnitude on the OOD subset, but at this sample size
+  the 95\% CIs include zero, so this is reported as a
+  directional finding to be confirmed with larger N rather than a
+  statistically established correlation.
 \end{itemize}
+
+All 95\% CIs are computed by 5\,000-resample stratified-by-bucket
+bootstrap with per-dopant offsets fixed from the full data; the full
+bootstrap distribution is in
+\texttt{results/prospective\_dft\_bootstrap.json}.
 
 \begin{figure}[h]
 \centering
@@ -136,9 +150,12 @@ primary deployment claim.}
 \paragraph{Interpretation.}
 Three findings emerge.
 
-\textbf{(i) The model has real discovery utility.} 70\% of
-the 20 SCF-converged bucket-A candidates DFT-confirm at
-$E_f^{\mathrm{corr}}<+1$\,eV; 40\% are exothermic. Although bucket A
+\textbf{(i) The model has real discovery utility.} 70\%
+(95\% CI $[50\%, 90\%]$) of the 20 SCF-converged bucket-A candidates
+DFT-confirm at $E_f^{\mathrm{corr}}<+1$\,eV; 40\% (95\% CI
+$[20\%, 60\%]$) are exothermic. Even at the lower bound of the CI,
+the bucket-A hit rate ($\ge 50\%$) substantially exceeds the
+$\sim 18\%$ predicted-pool base rate. Although bucket A
 was selected purely by predicted $\mu$ (not by predicted
 $\sigma$), the resulting set is enriched for thermodynamically
 favourable interstitials at a rate well above the $\sim18$\%
@@ -147,16 +164,22 @@ a downstream DFT-validation queue with the model's $\mu$-ranking
 saves $\approx 4\times$ the compute relative to random sampling.
 
 \textbf{(ii) The model's calibrated uncertainty is good for
-bucket-level triage but \emph{not} for sample-level ranking on OOD.}
-Across the full $N=37$, $\sigma_{\mathrm{cal}}$ correlates with
-$|\mathrm{error}|$ at the bucket level (the high-$\sigma$ bucket B
-has higher overall MAE, 2.81 vs 2.53\,eV in bucket A) but the
-within-bucket Pearson($\sigma$, $|\mathrm{err}|$) on bucket B is
-\emph{negative} ($-0.288$). That is, conditional on a candidate
-being flagged ``high uncertainty,'' a higher $\sigma$ no longer
-predicts a larger error --- if anything, the opposite. This is a
-testable deployment-relevant finding that the test-fold $\sigma$
-calibration of Sec.~\ref{sec:exp} alone could not have surfaced.
+bucket-level triage but plausibly \emph{not} for sample-level
+ranking on OOD.} Across the full $N=37$, $\sigma_{\mathrm{cal}}$
+separates the buckets at the mean level (the high-$\sigma$ bucket B
+has higher overall MAE, 2.81 vs 2.53\,eV in bucket A; both intervals
+overlap), but the within-bucket Pearson($\sigma$, $|\mathrm{err}|$)
+on bucket B is $-0.288$ (95\% CI $[-0.60, +0.09]$). The point
+estimate is negative; the 95\% CI weakly straddles zero at this
+sample size ($n_B=17$). We therefore report this as a \emph{candidate
+deployment caveat} that requires confirmation with larger N rather
+than a statistically established correlation: conditional on a
+candidate being flagged ``high uncertainty'' by $\sigma_{\mathrm{cal}}$,
+there is no positive evidence within our data that higher $\sigma$
+predicts larger error, and the central tendency is mildly the
+opposite. This is a testable deployment-relevant prediction that
+the test-fold $\sigma$ calibration of Sec.~\ref{sec:exp} alone could
+not have surfaced.
 
 \textbf{(iii) The IMP2D test MAE materially overstates OOD
 performance.} Per-dopant-corrected MAE on this 37-candidate
