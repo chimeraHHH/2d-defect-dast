@@ -147,6 +147,45 @@ primary deployment claim.}
 
 \input{tables/per_host_breakdown}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_per_host_signed.png}
+\caption{Per-host signed prediction error
+$E_f^{\rm DFT,corr}-E_f^{\rm pred}$ on the 37-candidate prospective
+DFT subset, sorted left-to-right by mean $|\!\mathrm{err}\!|$.
+Each marker is a single candidate (circle: bucket A; triangle:
+bucket B); the short horizontal tick is the per-host mean. The
+shaded band marks $|\!\mathrm{err}\!| < 1$\,eV. Most hosts (BiITe,
+Bi$_2$I$_6$, PtS$_2$, Ti$_2$CO$_2$, SnS$_2$, SnSe$_2$,
+Pd$_2$Se$_4$) fall within the band; a small number of
+host--dopant pairs --- notably Bi@NbS$_2$ (B-bucket, $+17.4$\,eV)
+and In@TiO$_2$ (A-bucket, $+12.9$\,eV) --- drive the heavy tail
+of the overall MAE distribution. Bucket A circles and bucket B
+triangles overlap in vertical extent, consistent with the
+within-bucket Pearson($\sigma_{\rm cal}$, $|\!\mathrm{err}\!|$)
+result.}
+\label{fig:per_host_signed}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_bootstrap_dist.png}
+\caption{Bootstrap distributions (5\,000 stratified-by-bucket
+resamples, seed 42) for the four headline statistics of the
+prospective DFT subsection. Solid vertical line: full-data point
+estimate. Shaded band: 95\% percentile CI. Dotted grey line:
+zero reference. The overall predicted-vs-DFT Pearson correlation
+(top right) and the bucket-A discovery rate (bottom left) have
+CIs that exclude their respective null hypotheses
+(Pearson $> 0$ at $p \approx 0.025$; discovery $> 0.18$ pool
+base-rate well below the lower CI bound). The bucket-B
+within-bucket Pearson($\sigma_{\rm cal}$, $|\mathrm{err}|$)
+(bottom right) has a 95\% CI that weakly straddles zero,
+motivating the conservative ``deployment caveat'' framing in the
+text.}
+\label{fig:bootstrap_dist}
+\end{figure}
+
 \paragraph{Interpretation.}
 Three findings emerge.
 

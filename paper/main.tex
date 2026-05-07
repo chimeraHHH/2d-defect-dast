@@ -383,6 +383,33 @@ self-attention block.
 % =====================================================================
 \section{Architectures}\label{sec:arch}
 
+Figure~\ref{fig:peridelft_arch} gives a one-glance overview of
+\modelname: a hybrid encoder (local SchNet branch + global
+self-attention with the additive Periodic Fourier Bias of
+Sec.~\ref{sec:arch:pfa}) feeds four per-source readout heads, and
+the prediction is a 6-seed temperature-scaled ensemble that
+produces both a point estimate $\mu$ and a calibrated uncertainty
+$\sigma_{\mathrm{cal}}$. The three architectural design choices
+that distinguish \modelname\ from the existing periodic-graph
+Transformer family (Matformer, Crystalformer, PotNet) are
+discussed in Sec.~\ref{sec:related}; the rest of this section
+gives the implementation-level definitions.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_peridelft_arch.png}
+\caption{\modelname\ architecture overview. \textbf{Top:} the data
+flow from a 28-atom defect supercell through the hybrid encoder
+to the four per-source readout heads, into the 6-seed
+temperature-scaled ensemble. \textbf{Bottom:} the Periodic Fourier
+Bias (PFA) on minimum-image fractional displacement
+$\mathbf{f}_{ij} \in [-0.5, 0.5)^3$. PFA's exact translation
+invariance follows from the $2\pi$-periodicity of cos/sin on
+$\mathbf{f}_{ij}$ (right inset); the ablation cost is a single
+boolean flag and the parameter overhead is $\sim 2$\,k.}
+\label{fig:peridelft_arch}
+\end{figure}
+
 \subsection{v1 baseline: CrystalTransformer}\label{sec:arch:v1}
 The v1 baseline of~\cite{ourPaperV12} stacks three SchNet-style
 local-interaction layers (continuous-filter convolution + RBF-encoded
