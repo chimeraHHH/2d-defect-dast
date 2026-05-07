@@ -1,0 +1,171 @@
+--------------------------------------------------------------------------
+WARNING: Open MPI tried to bind a process but failed.  This is a
+warning only; your job will continue, though performance may
+be degraded.
+
+  Local host:        3253031b5b37
+  Application name:  /root/qe-7.3.1/bin/pw.x
+  Error message:     failed to bind memory
+  Location:          ../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:447
+
+--------------------------------------------------------------------------
+
+     Program PWSCF v.7.3.1 starts on  7May2026 at  2: 5:31 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
+         "P. Giannozzi et al., J. Chem. Phys. 152 154105 (2020);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI & OpenMP), running on       8 processor cores
+     Number of MPI processes:                 1
+     Threads/MPI process:                     8
+
+     MPI processes distributed on     1 nodes
+     91787 MiB available memory on the printing compute node when the environment starts
+ 
+     Reading input from cand199_B_Ge2_La.in
+
+     Current dimensions of program PWSCF are:
+     Max number of different atomic species (ntypx) = 10
+     Max number of k-points (npk) =  40000
+     Max angular momentum in pseudopotentials (lmaxx) =  4
+     file Ge.UPF: wavefunction(s)  4S renormalized
+     file La.UPF: wavefunction(s)  5S 5D 4F renormalized
+ 
+     Subspace diagonalization in iterative solution of the eigenvalue problem:
+     a serial algorithm will be used
+
+ 
+     G-vector sticks info
+     --------------------
+     sticks:   dense  smooth     PW     G-vecs:    dense   smooth      PW
+     Sum        6505    4339   1069               533931   290531   36195
+ 
+     Using Slab Decomposition
+ 
+
+
+     bravais-lattice index     =            0
+     lattice parameter (alat)  =      22.9427  a.u.
+     unit-cell volume          =   13093.6731 (a.u.)^3
+     number of atoms/cell      =           19
+     number of atomic types    =            2
+     number of electrons       =        83.00
+     number of Kohn-Sham states=           50
+     kinetic-energy cutoff     =      30.0000  Ry
+     charge density cutoff     =     180.0000  Ry
+     scf convergence threshold =      1.0E-07
+     mixing beta               =       0.4000
+     number of iterations used =            8  plain     mixing
+     Exchange-correlation= SLA  PW   PBX  PBC
+                           (   1   4   3   4   0   0   0)
+
+     GPU acceleration is ACTIVE.  1 visible GPUs per MPI rank
+
+
+     celldm(1)=  22.942683  celldm(2)=   0.000000  celldm(3)=   0.000000
+     celldm(4)=   0.000000  celldm(5)=   0.000000  celldm(6)=   0.000000
+
+     crystal axes: (cart. coord. in units of alat)
+               a(1) = (   1.000000   0.000000   0.000000 )  
+               a(2) = (  -0.500000   0.866025   0.000000 )  
+               a(3) = (   0.000000   0.000000   1.251982 )  
+
+     reciprocal axes: (cart. coord. in units 2 pi/alat)
+               b(1) = (  1.000000  0.577350 -0.000000 )  
+               b(2) = (  0.000000  1.154701  0.000000 )  
+               b(3) = (  0.000000 -0.000000  0.798733 )  
+
+
+     PseudoPot. # 1 for Ge read from file:
+     /root/qe_pseudos/Ge.UPF
+     MD5 check sum: fa6acec385508fbd41db1ad5f2fba766
+     Pseudo is Projector augmented-wave + core cor, Zval =  4.0
+     Generated using "atomic" code by A. Dal Corso (espresso distribution)
+     Shape of augmentation charge: BESSEL
+     Using radial grid of 1207 points,  4 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 2 for La read from file:
+     /root/qe_pseudos/La.UPF
+     MD5 check sum: 6e6ac421535d279511fd22156ed99225
+     Pseudo is Projector augmented-wave + core cor, Zval = 11.0
+     Generated using &quot;atomic&quot; code by A. Dal Corso  v.6.2.2
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1253 points,  8 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+                l(5) =   2
+                l(6) =   2
+                l(7) =   3
+                l(8) =   3
+     Q(r) pseudized with 0 coefficients 
+
+
+     atomic species   valence    mass     pseudopotential
+     Ge                4.00    72.63000     Ge( 1.00)
+     La               11.00   138.90550     La( 1.00)
+
+     No symmetry found
+
+
+
+   Cartesian axes
+
+     site n.     atom                  positions (alat units)
+         1        Ge     tau(   1) = (   0.0000304   0.0017394   0.6556585  )
+         2        Ge     tau(   2) = (   0.3329291   0.5781419   0.6607532  )
+         3        Ge     tau(   3) = (   0.6649940   0.3855920   0.5952408  )
+         4        Ge     tau(   4) = (   0.5001511   0.2879571   0.6546131  )
+         5        Ge     tau(   5) = (   0.8330083   0.0947765   0.5924873  )
+         6        Ge     tau(   6) = (   0.6665407  -0.0006117   0.6556024  )
+         7        Ge     tau(   7) = (   0.1674315   0.6740128   0.5945473  )
+         8        Ge     tau(   8) = (   0.0000270   0.5782321   0.6613797  )
+         9        Ge     tau(   9) = (   0.4999988   0.6705499   0.5994279  )
+        10        Ge     tau(  10) = (   0.3350425   0.3855021   0.5951033  )
+        11        Ge     tau(  11) = (   0.5000234   0.0930520   0.5955458  )
+        12        Ge     tau(  12) = (   0.3334390  -0.0007088   0.6554683  )
+        13        Ge     tau(  13) = (  -0.1674450   0.6739752   0.5943809  )
+        14        Ge     tau(  14) = (  -0.3330262   0.5783668   0.6607519  )
+        15        Ge     tau(  15) = (  -0.0001447   0.3852085   0.5953028  )
+        16        Ge     tau(  16) = (  -0.1780950   0.2819353   0.6759253  )
+        17        Ge     tau(  17) = (   0.1669964   0.0947479   0.5927914  )
+        18        Ge     tau(  18) = (   0.1781480   0.2818664   0.6760881  )
+        19        La     tau(  19) = (  -0.0000491   0.3065173   0.7923158  )
+
+     number of k points=     1  Methfessel-Paxton smearing, width (Ry)=  0.0100
+                       cart. coord. in units 2pi/alat
+        k(    1) = (   0.0000000   0.0000000   0.0000000), wk =   2.0000000
+
+     Dense  grid:   533931 G-vectors     FFT dimensions: ( 100, 100, 125)
+
+     Smooth grid:   290531 G-vectors     FFT dimensions: (  80,  80, 108)
+
+     Estimated max dynamical RAM per process >       5.28 GB
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     Error in routine  ylmr2 (15):
+     l too large, or wrong number of Ylm required
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+     stopping ...
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 15.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------

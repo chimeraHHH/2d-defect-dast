@@ -30,7 +30,10 @@ RY = 13.6056980659  # 1 Ry in eV (QE convention)
 
 
 def parse_total_energy_ry(path: Path) -> float | None:
-    """Return final '!    total energy' value in Ry, or None if not converged."""
+    """Return final converged total energy in Ry; fall back to last
+    'total energy' line ONLY if the SCF was oscillating within
+    chemical accuracy (last 10 iterations within 0.01 Ry of each other).
+    Otherwise return None (SCF diverged, result unreliable)."""
     if not path.exists():
         return None
     try:
@@ -39,9 +42,16 @@ def parse_total_energy_ry(path: Path) -> float | None:
         return None
     if "JOB DONE" not in text:
         return None
-    # "!    total energy              =    -2867.38086481 Ry"
+    # Prefer the converged value (lines starting with '!').
     matches = re.findall(r"^\s*!\s*total energy\s*=\s*(-?\d+\.\d+)\s*Ry", text, re.MULTILINE)
+    if matches:
+        return float(matches[-1])
+    # Fallback: SCF hit electron_maxstep but check stability.
+    matches = re.findall(r"^\s*total energy\s*=\s*(-?\d+\.\d+)\s*Ry", text, re.MULTILINE)
     if not matches:
+        return None
+    last = [float(m) for m in matches[-10:]]
+    if max(last) - min(last) > 0.01:  # > 0.14 eV swing → diverged
         return None
     return float(matches[-1])
 

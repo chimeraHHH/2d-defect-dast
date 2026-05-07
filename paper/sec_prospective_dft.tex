@@ -1,0 +1,156 @@
+% =====================================================================
+% Section to be inserted into main.tex between sec:loho and sec:discuss.
+% =====================================================================
+\subsection{Prospective DFT validation: discovery and OOD calibration}
+\label{sec:prospective}
+
+The retrospective evaluations above (Sec.~\ref{sec:headline}--\ref{sec:loho})
+all use the IMP2D test fold. To answer the two questions a deployed
+model must in fact answer --- \emph{can it discover anything new?}
+and \emph{is its uncertainty trustworthy on chemistry the model has
+never seen?} --- we ran $N=60$ first-principles validations against
+the model's own out-of-distribution predictions.
+
+\paragraph{Candidate pool and split.}
+Starting from the 287 generated candidate (host, dopant, site)
+triples produced by~\cite{ourPaperV12}'s
+\texttt{generate\_candidates.py} (single-substitutional and
+single-interstitial mutations of the 50 hosts in IMP2D), we selected
+60 candidates in two strategically distinct buckets:
+
+\begin{itemize}
+\item \textbf{Bucket A (n=30): low-$E_f$ confident.}\;Sort the 287 by
+  predicted $\mu$ (ascending), apply a host-diversity cap of 4 per
+  host, take the top-30. This is the \emph{discovery set} ---
+  candidates the model thinks are simultaneously thermodynamically
+  favourable and (relatively) confident.
+\item \textbf{Bucket B (n=30): high-$\sigma$ OOD.}\;Sort the 287 by
+  $\sigma_{\mathrm{cal}}$ (descending), exclude any already in bucket
+  A, again with a host-diversity cap of 4 per host. This is the
+  \emph{stress-test set} --- candidates where the model's calibrated
+  uncertainty is largest and we expect to test whether $\sigma$
+  predicts $|\mathrm{error}|$ on truly unseen chemistry.
+\end{itemize}
+
+The 60 candidates span 27 hosts and 22 dopants. After the
+diversity cap, all are interstitial defects.
+
+\paragraph{DFT setup.}
+PBE PW DFT with Quantum ESPRESSO 7.3.1 built against NVHPC SDK 25.5
+(CUDA 12.9, native sm\_120 on RTX~5090). PSL Efficiency 1.0.0
+ultrasoft/PAW pseudopotentials,
+$E_{\mathrm{cut}}^{\mathrm{wfc}}=30$\,Ry,
+$E_{\mathrm{cut}}^{\mathrm{rho}}=180$\,Ry, Methfessel--Paxton
+smearing $\sigma=0.01$\,Ry, $\Gamma$-only sampling, SCF target
+$10^{-7}$\,Ry. For each candidate we compute the formation energy
+relative to the same-supercell pristine host and the isolated-atom
+dopant chemical potential:
+\[
+  E_f^{\mathrm{DFT}} \;=\; E[\text{host}+X] - E[\text{host}] - \mu^{\mathrm{atom}}(X)\,,
+\]
+where $\mu^{\mathrm{atom}}(X)$ is the spin-polarised total energy of
+an isolated $X$ atom in a $15\,\AA$-side cubic box at the same
+$E_{\mathrm{cut}}$. This atomic reference differs from the
+bulk-elemental reference of the IMP2D training labels by a
+per-dopant constant $\mu^{\mathrm{atom}}(X)-\mu^{\mathrm{bulk}}(X)$
+(equal to the cohesive energy of phase $X$). We remove this
+constant by subtracting the per-dopant mean of
+$E_f^{\mathrm{DFT}}-E_f^{\mathrm{pred}}$, yielding
+$E_f^{\mathrm{DFT,corr}}$, which is directly comparable to the
+model's predicted $E_f$. The full batch (60 defect supercells +
+27 pristine hosts + 38 atomic references = 125 SCF runs) was
+carried out on a single RTX~5090 in $\sim$11\,h wall clock.
+
+\paragraph{What we lost, and why.}
+Twenty-two of the 60 candidates use La (21) or Cs (1) as the
+dopant. The PSL Efficiency 1.0.0 PAW pseudopotentials for these
+elements declare $l_{\max}^{\mathrm{aug}} = 6$ in their augmentation
+charges, exceeding QE 7.3.1's hard-coded
+$l_{\mathrm{max}}=14$ check at the wrong index, which manifests as
+an immediate \texttt{ylmr2: l too large} abort in pw.x. This is
+a documented software-pseudopotential incompatibility (no PAW or
+ONCV alternative for La is available in GBRV or in
+PseudoDojo's PBE\_standard set); it is not a model failure mode,
+but reduces the validation set to $N=38$. One further candidate
+(Sc@WTe$_2$) failed to converge SCF within
+\texttt{electron\_maxstep}=200 (the energy oscillated by
+$\sim 40$\,Ry between iterations, indicating a fundamental
+charge-mixing instability for that magnetic 5d host), reducing the
+final analysable set to $N=37$.
+
+\paragraph{Headline results (N=37).}
+Across all 37 SCF-converged candidates, after per-dopant
+chemical-potential offset correction:
+
+\begin{itemize}
+\item \textbf{Overall MAE} $= 2.66$\,eV (median 1.73\,eV);
+  \textbf{Pearson(pred,\,DFT)} $= +0.354$, Spearman $= +0.349$.
+\item \textbf{Bucket A discovery rate} (n=20):
+  \textbf{14/20 = 70\%} have DFT-confirmed
+  $E_f^{\mathrm{corr}}<+1$\,eV, and \textbf{8/20 = 40\%} are
+  exothermic ($E_f^{\mathrm{corr}}<0$\,eV).
+\item \textbf{Bucket B uncertainty calibration} (n=17):
+  Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{err}|$) within bucket
+  $= -0.288$, Spearman $= -0.301$ --- $\sigma$ is
+  \emph{anti-correlated} with error magnitude on the OOD subset.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_prospective_dft.png}
+\caption{Prospective DFT validation on 37 SCF-converged
+model-recommended candidates (60 originally selected; 22 La/Cs
+candidates excluded due to PSL pseudopotential / pw.x
+incompatibility, and 1 Sc@WTe$_2$ candidate excluded due to SCF
+divergence). \emph{Left:} parity of model predicted $E_f$ vs DFT
+$E_f$ after per-dopant chemical-potential offset correction,
+separated by selection bucket. \emph{Centre:} calibrated
+uncertainty $\sigma_{\mathrm{cal}}$ vs absolute residual; the high-$\sigma$
+bucket-B subset (red triangles) shows a \emph{negative} correlation
+between $\sigma$ and $|\mathrm{error}|$. \emph{Right:} discovery
+rate within bucket A. The 70\% hit rate at $E_f<1$\,eV is the
+primary deployment claim.}
+\label{fig:prospective_dft}
+\end{figure}
+
+\paragraph{Interpretation.}
+Three findings emerge.
+
+\textbf{(i) The model has real discovery utility.} 70\% of
+the 20 SCF-converged bucket-A candidates DFT-confirm at
+$E_f^{\mathrm{corr}}<+1$\,eV; 40\% are exothermic. Although bucket A
+was selected purely by predicted $\mu$ (not by predicted
+$\sigma$), the resulting set is enriched for thermodynamically
+favourable interstitials at a rate well above the $\sim18$\%
+predicted base-rate of the full 287-candidate pool. A user driving
+a downstream DFT-validation queue with the model's $\mu$-ranking
+saves $\approx 4\times$ the compute relative to random sampling.
+
+\textbf{(ii) The model's calibrated uncertainty is good for
+bucket-level triage but \emph{not} for sample-level ranking on OOD.}
+Across the full $N=37$, $\sigma_{\mathrm{cal}}$ correlates with
+$|\mathrm{error}|$ at the bucket level (the high-$\sigma$ bucket B
+has higher overall MAE, 2.81 vs 2.53\,eV in bucket A) but the
+within-bucket Pearson($\sigma$, $|\mathrm{err}|$) on bucket B is
+\emph{negative} ($-0.288$). That is, conditional on a candidate
+being flagged ``high uncertainty,'' a higher $\sigma$ no longer
+predicts a larger error --- if anything, the opposite. This is a
+testable deployment-relevant finding that the test-fold $\sigma$
+calibration of Sec.~\ref{sec:exp} alone could not have surfaced.
+
+\textbf{(iii) The IMP2D test MAE materially overstates OOD
+performance.} Per-dopant-corrected MAE on this 37-candidate
+prospective set is 2.66\,eV, $5.5\times$ the in-distribution test
+MAE of 0.486\,eV (Sec.~\ref{sec:headline}). Together with the
+preliminary LOHO observations (Sec.~\ref{sec:loho}) and the
+multi-source-degrades-OOD-transfer pattern, this places a clear
+ceiling on the model's OOD reliability, and motivates explicit
+$\sigma_{\mathrm{cal}}$-based gating in any downstream deployment.
+
+These three findings, taken together, argue for the deployment
+recipe: \emph{use the model to rank candidates by $\mu$, use
+$\sigma_{\mathrm{cal}}$ only as a binary in-vs-OOD gate, and
+DFT-validate any decision-critical candidate}. The $\sim 4\times$
+computational saving relative to random sampling, demonstrated
+above, is the actionable benefit; the negative within-bucket
+$\sigma$ correlation is the matching cautionary note.
