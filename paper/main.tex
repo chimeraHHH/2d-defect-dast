@@ -613,65 +613,22 @@ control needed to establish that distinction.
 
 \subsection{Dual-stream verification: 4 seeds}\label{sec:dualstream}
 
-We trained the dual-stream architecture
-(Section~\ref{sec:arch:ds}) on the leak-free joint-augmented
-(defect, pristine) dataset for 50 epochs at four random seeds.
-Table~\ref{tab:dualstream} gives the result.
-
-\begin{table}[h]
-\centering
-\caption{Dual-stream + leak-free joint augmentation. The mean lies
-within one combined standard deviation of the v1 baseline 4-seed
-mean (0.537~$\pm$~0.014\,eV); the architecture is statistically
-indistinguishable from the v1 baseline at this data scale.}
-\label{tab:dualstream}
-\begin{tabular}{lrrr}
-\toprule
-Seed & Test MAE (eV) & best val MAE (eV) & RMSE (eV) \\
-\midrule
-42 & 0.5088 & 0.4979 & 1.170 \\
-0  & 0.5344 & 0.5423 & 1.223 \\
-1  & 0.5571 & 0.5621 & 1.128 \\
-2  & 0.5118 & 0.5369 & 1.131 \\
-\midrule
-\textbf{mean $\pm$ std} & \textbf{0.5280 $\pm$ 0.0225} & --- & --- \\
-v1 baseline (4-seed) & 0.5370 $\pm$ 0.0140 & --- & --- \\
-$|\Delta| / \sigma_{\mathrm{pooled}}$ & \multicolumn{3}{l}{$0.34$ \quad (statistically tied)} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.92\linewidth]{fig_v3_dualstream.png}
-\caption{Dual-stream verification. \textbf{Left:} test MAE bars
-comparing ALIGNN, v1 baseline (4-seed), v2 PFA full (single seed),
-v3 dual-stream + aug (4-seed mean $\pm$ std), and \modelname
-(4-seed mean $\pm$ std, on the multi-source split). \textbf{Right:}
-per-seed dual-stream scatter, with the orange marker indicating
-mean $\pm$ standard deviation.}
-\label{fig:v3}
-\end{figure}
-
-\paragraph{The invariance loss is small at convergence.} Across all
-four seeds, the auxiliary loss of Eq.~\ref{eq:Linv} converges to
-$\mathcal{L}_{\mathrm{inv}}/\lambda \approx 10^{-3}$ over the 50
-training epochs, indicating that the network has learned the
+For brevity we report only the headline number here and defer the
+full table, figure, and same-data control to
+Appendix~\ref{app:dualstream}. The dual-stream architecture
+(Sec.~\ref{sec:arch:ds}), trained at four seeds on the leak-free
+joint-augmented (defect, pristine) corpus, achieves a 4-seed test MAE
+of $0.528 \pm 0.023$\,eV --- statistically tied with the v1 baseline
+($0.537 \pm 0.014$\,eV; pooled $|\Delta|/\sigma = 0.34$). The
+auxiliary invariance loss
+$\mathcal{L}_{\mathrm{inv}}/\lambda$ converges to $\sim 10^{-3}$,
+confirming that the network's internal representation respects the
 $f(\mathbf{x}_{\mathrm{pri}}, \mathbf{x}_{\mathrm{pri}}) = 0$
-identity to within millielectronvolts. This is a clean
-\emph{interpretability} result: even though the dual-stream
-architecture does not meaningfully reduce test MAE, the network's
-internal representation does respect the physical invariance.
-
-\paragraph{Same-data control: dual-stream wins by 6.3\,\% without
-augmentation.} As a control, the dual-stream model trained on the
-8\,512-sample no-aug dataset (with its host pristine pair) reaches
-test MAE 0.5830\,eV against the same-data v1 baseline
-(\texttt{baseline\_h128\_long}, 60 epochs, no aug) at
-0.622\,eV~\cite{ourPaperV12}. Without augmentation diluting the
-inductive bias, dual-stream wins by 6.3\,\%; with leak-free
-$3\times$ augmentation pushing the corpus to 25\,536 samples, the
-gain dissolves into the seed noise.
+identity at the millielectronvolt level. The same architecture,
+trained without augmentation on 8\,512 samples, beats the same-data
+v1 baseline by 6.3\,\% --- a small-data gain that is dissolved by
+the $3\times$ leak-free augmentation lever in our headline setting,
+and that motivates not deploying dual-stream at the IMP2D scale.
 
 \subsection{Multi-source joint training}\label{sec:multi}
 
@@ -921,43 +878,19 @@ correlation tables and per-host Cohen's $d$ values are in
 
 \subsection{Methodology audit: a self-caught augmentation leak}\label{sec:leak}
 
-In the course of extending the leak-free augmentation pipeline to
-the (defect, pristine) pair format for the dual-stream architecture
-(Sec.~\ref{sec:arch:ds}) we re-introduced the
-``concatenate-then-split'' leak by an over-restrictive
-metadata-version check. The pkl format we used
-(\texttt{aug\_pristine\_dataset\_safe.pkl}) carried the version
-string ``\texttt{leak\_free\_aug\_pristine\_v1}''; our split function,
-\texttt{src.dataset.make\_splits}, only triggered the ordered
-leak-free split when \texttt{meta["version"] == "leak\_free\_v1"} and
-silently fell through to the random-shuffle path for any other
-version string. The first dual-stream + aug training run thus
-returned test MAE 0.275\,eV --- a number too good to be true given
-the v1 baseline of 0.516 and the 4-seed v2 PFA mean of 0.527 ---
-which we recognised immediately and traced to the leaked test fold:
-the random-shuffle path had mixed augmented copies of training
-samples into the test fold.
-
-The fix we applied --- and which we recommend as the standard ---
-triggers the ordered-split path on the \emph{presence} of explicit
-\texttt{n\_train} / \texttt{n\_val} / \texttt{n\_test} keys in
-metadata, regardless of any version string. Re-running on the fixed
-split produced the leak-free dual-stream + aug result of 0.5088\,eV
-reported in Sec.~\ref{sec:dualstream}, recovering the expected
-seed-noise behaviour. Both the leaked and the leak-free runs are
-preserved in the repository (\texttt{results/dualstream\_h128\_aug\_LEAKED/}
-vs.\ \texttt{results/dualstream\_h128\_aug/}) for the record.
-
-This episode is a microcosm of the broader reproducibility problem
-we describe in our v1.2 work~\cite{ourPaperV12}. A
-\emph{single hard-coded version-string check} silently re-introduced
-a $2.5\times$ apparent-accuracy inflation in a paper otherwise
-careful about leakage. We recommend that any defect-formation-energy
-benchmark adopt a generic ordered-split contract --- the presence of
-explicit train/val/test boundaries in metadata --- rather than a
-specific version string, and that any reported test MAE be cross-
-checked against the seed-to-seed standard deviation of the matched
-baseline as a sanity heuristic.
+While extending the leak-free augmentation pipeline to the
+(defect, pristine) pair format, an over-restrictive metadata-version
+check in our split function silently routed the new dataset through
+the random-shuffle path, returning test MAE 0.275\,eV --- a
+$2.5\times$ apparent-accuracy inflation relative to the leak-free
+0.5088\,eV that the same training run gave once the bug was fixed.
+We caught the bug from the ``too-good-to-be-true'' delta against
+the matched baseline and propose a generic ordered-split metadata
+contract (presence of explicit \texttt{n\_train}, \texttt{n\_val},
+\texttt{n\_test} keys, not a hard-coded version string) as the
+remedy. The full episode --- including the leaked and leak-free
+training runs both preserved in the repository --- is reported in
+Appendix~\ref{app:leak} as a methodology case study.
 
 \subsection{Out-of-distribution: leave-one-host-out (preliminary)}\label{sec:loho}
 
@@ -1184,5 +1117,116 @@ flow, and parameter count.
 % =====================================================================
 \bibliographystyle{plain}
 \bibliography{refs}
+
+% =====================================================================
+\appendix
+\section{Appendix}\label{app:appendix}
+
+\subsection{Dual-stream verification: full table, figure, and same-data control}\label{app:dualstream}
+
+We trained the dual-stream architecture
+(Section~\ref{sec:arch:ds}) on the leak-free joint-augmented
+(defect, pristine) dataset for 50 epochs at four random seeds.
+Table~\ref{tab:dualstream} reports per-seed and 4-seed-mean
+test MAE.
+
+\begin{table}[h]
+\centering
+\caption{Dual-stream + leak-free joint augmentation. The 4-seed
+mean lies within one combined standard deviation of the v1 baseline
+4-seed mean (0.537~$\pm$~0.014\,eV); the architecture is
+statistically tied with the v1 baseline at this data scale.}
+\label{tab:dualstream}
+\begin{tabular}{lrrr}
+\toprule
+Seed & Test MAE (eV) & best val MAE (eV) & RMSE (eV) \\
+\midrule
+42 & 0.5088 & 0.4979 & 1.170 \\
+0  & 0.5344 & 0.5423 & 1.223 \\
+1  & 0.5571 & 0.5621 & 1.128 \\
+2  & 0.5118 & 0.5369 & 1.131 \\
+\midrule
+\textbf{mean $\pm$ std} & \textbf{0.5280 $\pm$ 0.0225} & --- & --- \\
+v1 baseline (4-seed) & 0.5370 $\pm$ 0.0140 & --- & --- \\
+$|\Delta| / \sigma_{\mathrm{pooled}}$ & \multicolumn{3}{l}{$0.34$ \quad (statistically tied)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.92\linewidth]{fig_v3_dualstream.png}
+\caption{Dual-stream verification. \textbf{Left:} test MAE bars
+comparing ALIGNN, v1 baseline (4-seed), v2 PFA full (single seed),
+v3 dual-stream + aug (4-seed mean $\pm$ std), and \modelname
+(4-seed mean $\pm$ std, on the multi-source split). \textbf{Right:}
+per-seed dual-stream scatter, with the orange marker indicating
+mean $\pm$ standard deviation.}
+\label{fig:v3}
+\end{figure}
+
+\paragraph{The invariance loss is small at convergence.} Across all
+four seeds, the auxiliary loss of Eq.~\ref{eq:Linv} converges to
+$\mathcal{L}_{\mathrm{inv}}/\lambda \approx 10^{-3}$ over the 50
+training epochs, indicating that the network has learned the
+$f(\mathbf{x}_{\mathrm{pri}}, \mathbf{x}_{\mathrm{pri}}) = 0$
+identity to within millielectronvolts. This is a clean
+\emph{interpretability} result: even though the dual-stream
+architecture does not meaningfully reduce test MAE, the network's
+internal representation does respect the physical invariance.
+
+\paragraph{Same-data control: dual-stream wins by 6.3\,\% without
+augmentation.} As a control, the dual-stream model trained on the
+8\,512-sample no-aug dataset (with its host pristine pair) reaches
+test MAE 0.5830\,eV against the same-data v1 baseline
+(\texttt{baseline\_h128\_long}, 60 epochs, no aug) at
+0.622\,eV~\cite{ourPaperV12}. Without augmentation diluting the
+inductive bias, dual-stream wins by 6.3\,\%; with leak-free
+$3\times$ augmentation pushing the corpus to 25\,536 samples, the
+gain dissolves into the seed noise. This same-data control is
+the empirical basis for the deployment guidance in
+Sec.~\ref{sec:deploy} that dual-stream is appropriate for small-data
+regimes ($N_{\mathrm{train}} \lesssim 10^4$) but is masked by
+augmentation at the IMP2D scale.
+
+\subsection{Augmentation leak audit: full case study}\label{app:leak}
+
+In the course of extending the leak-free augmentation pipeline to
+the (defect, pristine) pair format for the dual-stream architecture
+(Sec.~\ref{sec:arch:ds}) we re-introduced the
+``concatenate-then-split'' leak by an over-restrictive
+metadata-version check. The pkl format we used
+(\texttt{aug\_pristine\_dataset\_safe.pkl}) carried the version
+string ``\texttt{leak\_free\_aug\_pristine\_v1}''; our split function,
+\texttt{src.dataset.make\_splits}, only triggered the ordered
+leak-free split when \texttt{meta["version"] == "leak\_free\_v1"} and
+silently fell through to the random-shuffle path for any other
+version string. The first dual-stream + aug training run thus
+returned test MAE 0.275\,eV --- a number too good to be true given
+the v1 baseline of 0.516 and the 4-seed v2 PFA mean of 0.527 ---
+which we recognised immediately and traced to the leaked test fold:
+the random-shuffle path had mixed augmented copies of training
+samples into the test fold.
+
+The fix we applied --- and which we recommend as the standard ---
+triggers the ordered-split path on the \emph{presence} of explicit
+\texttt{n\_train} / \texttt{n\_val} / \texttt{n\_test} keys in
+metadata, regardless of any version string. Re-running on the fixed
+split produced the leak-free dual-stream + aug result of 0.5088\,eV
+reported in Sec.~\ref{sec:dualstream}, recovering the expected
+seed-noise behaviour. Both the leaked and the leak-free runs are
+preserved in the repository (\texttt{results/dualstream\_h128\_aug\_LEAKED/}
+vs.\ \texttt{results/dualstream\_h128\_aug/}) for the record.
+
+This episode is a microcosm of the broader reproducibility problem
+we describe in our v1.2 work~\cite{ourPaperV12}. A
+\emph{single hard-coded version-string check} silently re-introduced
+a $2.5\times$ apparent-accuracy inflation in a paper otherwise
+careful about leakage. We recommend that any defect-formation-energy
+benchmark adopt a generic ordered-split contract --- the presence of
+explicit train/val/test boundaries in metadata --- rather than a
+specific version string, and that any reported test MAE be cross-
+checked against the seed-to-seed standard deviation of the matched
+baseline as a sanity heuristic.
 
 \end{document}
