@@ -73,3 +73,4 @@ results/logs/*.txt
 # Editor / OS
 .vscode/
 .idea/
+self-check/
