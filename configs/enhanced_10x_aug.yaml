@@ -1,0 +1,43 @@
+model: baseline
+data_path: data/processed/extended_aug_dataset_safe.pkl
+output_dir: results/enhanced_10x_aug
+seed: 42
+batch_size: 64
+epochs: 50
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+# P0-2: Host-balanced sampling
+host_balanced: true
+samples_per_host: 50
+# P0-2: Feature-space Mixup
+mixup_alpha: 0.2
+# P1-1: Auxiliary defect classification
+aux_defect_weight: 0.1
+# P1-3: Stochastic Depth
+drop_path_rate: 0.1
+# P1-3: Label noise (Gaussian smoothing)
+label_noise_std: 0.05
+# P1-3: SWA (last 10 epochs)
+use_swa: true
+swa_start_epoch: 40
+swa_lr: 1.0e-4
+# P1-2: Pretrained embeddings (set after pretraining completes)
+# pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+optimizer:
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  factor: 0.5
+  patience: 6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
