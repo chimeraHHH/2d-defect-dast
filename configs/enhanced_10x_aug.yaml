@@ -23,8 +23,7 @@ label_noise_std: 0.05
 use_swa: true
 swa_start_epoch: 40
 swa_lr: 1.0e-4
-# P1-2: Pretrained embeddings (set after pretraining completes)
-# pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+# P1-2: Pretrained embeddings (without pretrain — see enhanced_10x_pretrained.yaml for with-pretrain variant)
 optimizer:
   lr: 3.0e-4
   weight_decay: 1.0e-4
