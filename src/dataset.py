@@ -101,6 +101,7 @@ class CrystalGraphDataset(Dataset):
             "defect_mask": defect_mask,
             "edge_index": torch.from_numpy(sample["edge_index"]),
             "edge_dist": torch.from_numpy(sample["edge_dist"]),
+            "edge_offset": torch.from_numpy(sample["edge_offset"]).float(),
             "triplet_index": torch.from_numpy(sample["triplet_index"]),
             "angles": torch.from_numpy(sample["angles"]),
             "dist_matrix": torch.from_numpy(sample["dist_matrix"]),

@@ -1,11 +1,13 @@
 """Enhanced training loop with P0+P1 improvements.
 
-P0-2: Host-balanced sampling + feature-space Mixup
+P0-2: Host-balanced sampling
 P1-1: Auxiliary defect-classification head
 P1-3: SWA, Stochastic Depth (DropPath), Label Smoothing (noise)
+Online augmentation: random rotation + perturbation + strain per epoch
+Adversarial training: FGSM on input features for robust representations
 
 Usage:
-  python -m src.train_enhanced --config configs/enhanced_baseline.yaml
+  python -m src.train_enhanced --config configs/enhanced_online_adv.yaml
 """
 from __future__ import annotations
 
@@ -31,6 +33,7 @@ if str(ROOT) not in sys.path:
 
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
 from src.sampler import HostBalancedSampler
+from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
 from src.models import (
     CrystalTransformer,
     DefectAwareTransformer,
@@ -217,16 +220,31 @@ def main() -> None:
         seed=cfg.get("seed", 42),
     )
 
+    # Online augmentation: wrap train set with on-the-fly transforms
+    use_online_aug = cfg.get("online_aug", False)
+    if use_online_aug:
+        aug_cfg = cfg.get("online_aug_cfg", {})
+        transform = OnlineAugTransform(
+            sigma_range=tuple(aug_cfg.get("sigma_range", [0.01, 0.05])),
+            strain_range=aug_cfg.get("strain_range", 2.0),
+            rotate_prob=aug_cfg.get("rotate_prob", 1.0),
+            perturb_prob=aug_cfg.get("perturb_prob", 0.8),
+            strain_prob=aug_cfg.get("strain_prob", 0.3),
+        )
+        train_set = OnlineAugDataset(train_set, transform=transform)
+
     # P0-2: Host-balanced sampling
     use_balanced = cfg.get("host_balanced", False)
     if use_balanced:
         sampler = HostBalancedSampler(
-            dataset, subset_indices=train_set.indices,
+            train_set if use_online_aug else dataset,
+            subset_indices=train_set.indices if hasattr(train_set, 'indices') else None,
             samples_per_host=cfg.get("samples_per_host", 50),
             seed=cfg.get("seed", 42),
         )
         train_loader = DataLoader(
-            dataset, batch_size=cfg.get("batch_size", 64),
+            train_set if use_online_aug else dataset,
+            batch_size=cfg.get("batch_size", 64),
             sampler=sampler, collate_fn=collate_fn,
         )
     else:
@@ -307,8 +325,13 @@ def main() -> None:
     epochs = cfg.get("epochs", 50)
     grad_clip = cfg.get("grad_clip", 5.0)
 
-    # P0-2: Mixup
+    # P0-2: Mixup (disabled for graph data — see feedback)
     mixup_alpha = cfg.get("mixup_alpha", 0.0)
+
+    # Adversarial training
+    adv_eps = cfg.get("adv_eps", 0.0)
+    adv_weight = cfg.get("adv_weight", 0.0)
+    use_adv = adv_eps > 0 and adv_weight > 0
 
     # P1-3: Label smoothing (Gaussian noise on targets)
     label_noise_std = cfg.get("label_noise_std", 0.0)
@@ -335,7 +358,8 @@ def main() -> None:
             f"Device: {device}\n"
             f"Model: {model_cls.__name__} | params={n_params / 1e6:.3f}M\n"
             f"Train/Val/Test: {len(train_set)}/{len(val_set)}/{len(test_set)}\n"
-            f"Enhancements: balanced={use_balanced} mixup={mixup_alpha} "
+            f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
+            f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
             f"droppath={drop_path_rate} label_noise={label_noise_std} "
             f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w}\n"
             f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
@@ -372,20 +396,25 @@ def main() -> None:
                     target_noisy = target
 
                 target_norm = normalizer.norm(target_noisy)
-                preds_norm = model(batch)
-                task_loss = criterion(preds_norm, target_norm)
+
+                # Adversarial training path
+                adv_loss_val = 0.0
+                if use_adv:
+                    preds_norm, task_loss, adv_loss = adversarial_perturbation(
+                        model, batch, criterion, target_norm, eps=adv_eps,
+                    )
+                    total_loss = task_loss + adv_weight * adv_loss
+                    adv_loss_val = adv_loss.item()
+                else:
+                    preds_norm = model(batch)
+                    task_loss = criterion(preds_norm, target_norm)
+                    total_loss = task_loss
 
                 # P1-1: Aux defect classification
                 aux_loss = torch.tensor(0.0, device=device)
                 if aux_defect_head is not None and aux_defect_w > 0:
-                    # extract intermediate features — use the last global layer output
-                    # We access the model's internal state by running a hook-free approach:
-                    # re-forward just the readout input (pooled features before readout MLP)
-                    # For simplicity, use defect_mask as target for per-atom classification
                     defect_target = batch["defect_mask"].float()
                     mask = batch["atom_mask"]
-                    # Get per-atom features from model internals
-                    # We use a simple approach: run the embedding + local layers
                     with torch.no_grad():
                         h_embed = model.embed(batch["x"])
                     logits = aux_defect_head(h_embed, mask)
@@ -393,8 +422,7 @@ def main() -> None:
                         logits, defect_target, weight=mask.float(),
                         reduction="sum"
                     ) / mask.float().sum().clamp(min=1.0)
-
-                total_loss = task_loss + aux_defect_w * aux_loss
+                    total_loss = total_loss + aux_defect_w * aux_loss
 
                 optimizer.zero_grad(set_to_none=True)
                 total_loss.backward()
