@@ -201,6 +201,8 @@ def main() -> None:
         cfg["seed"] = args.seed
         cfg["output_dir"] = cfg["output_dir"] + f"_s{args.seed}"
 
+    split_seed = cfg.get("split_seed", 42)
+
     out_dir = ROOT / cfg["output_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "train.log"
@@ -214,16 +216,17 @@ def main() -> None:
     else:
         device = torch.device("cpu")
 
-    set_seed(cfg.get("seed", 42))
-
-    # ---- Data ----
+    # Data split uses fixed split_seed (default 42) for reproducibility across ensemble members.
+    # Model init uses cfg["seed"] which may differ per run.
     dataset = CrystalGraphDataset(ROOT / cfg["data_path"])
     train_set, val_set, test_set = make_splits(
         dataset,
         train_ratio=cfg.get("train_ratio", 0.8),
         val_ratio=cfg.get("val_ratio", 0.1),
-        seed=cfg.get("seed", 42),
+        seed=split_seed,
     )
+
+    set_seed(cfg.get("seed", 42))
 
     # Online augmentation
     use_online_aug = cfg.get("online_aug", False)
