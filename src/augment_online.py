@@ -1,20 +1,19 @@
-"""Online (on-the-fly) augmentation for crystal graph data.
+"""Online (on-the-fly) augmentation and coordinate-space adversarial training.
 
-Unlike static augmentation (pre-compute N× copies to disk), online augmentation
-applies *fresh random transforms every epoch*, so the model never sees the same
-perturbed structure twice. This eliminates the fixed-noise memorization problem
-of static augmentation while giving effectively infinite data diversity.
+Online augmentation applies *fresh random transforms every epoch*, so the model
+never sees the same perturbed structure twice.
 
 Transforms applied per sample:
   1. Random SO(2) rotation — FREE: preserves all distances and angles exactly.
   2. Random Gaussian perturbation — O(E + N²): recomputes edge_dist and
-     dist_matrix from perturbed positions + stored edge_offset. Angles are
-     approximately preserved for σ ≤ 0.05 Å (δθ < 0.5°).
+     dist_matrix from perturbed positions + stored edge_offset.
   3. Random in-plane biaxial strain — same cost as perturbation.
 
-Also provides an adversarial training helper that perturbs input features
-in the direction that maximises loss (FGSM on x-space), forcing the model
-to learn robust representations.
+Adversarial training uses FGSM on atomic coordinates (not features):
+  δpos = ε · sign(∂L/∂pos)
+This finds the worst-case geometric perturbation — physically meaningful as it
+corresponds to thermal vibrations / DFT relaxation uncertainty. Distance
+computation is fully differentiable through PyTorch autograd.
 """
 from __future__ import annotations
 
@@ -148,30 +147,125 @@ class OnlineAugDataset(Dataset):
         return sample
 
 
+def compute_dist_matrix_differentiable(
+    positions: torch.Tensor,
+    cell: torch.Tensor,
+    atom_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Differentiable N×N minimum-image distance matrix.
+
+    Args:
+        positions: (B, N_max, 3) atomic coordinates
+        cell: (B, 3, 3) unit cell matrices
+        atom_mask: (B, N_max) bool mask for valid atoms
+
+    Returns:
+        (B, N_max, N_max) distance matrix with grad through positions
+    """
+    diff = positions.unsqueeze(2) - positions.unsqueeze(1)  # (B, N, N, 3)
+    cell_inv = torch.linalg.inv(cell)  # (B, 3, 3)
+    diff_frac = torch.einsum("bnmd,bdk->bnmk", diff, cell_inv)
+    # round() has zero grad but acts as constant offset for small perturbations
+    diff_frac = diff_frac - diff_frac.round()
+    diff_mic = torch.einsum("bnmd,bdk->bnmk", diff_frac, cell)
+    dist = diff_mic.norm(dim=-1)  # (B, N, N)
+    mask_2d = atom_mask.unsqueeze(1) & atom_mask.unsqueeze(2)
+    return dist * mask_2d.float()
+
+
+def compute_edge_dist_differentiable(
+    positions: torch.Tensor,
+    edge_index_list,
+    edge_offset_list,
+    cell: torch.Tensor,
+    num_atoms_list,
+) -> list:
+    """Differentiable per-sample edge distances.
+
+    Args:
+        positions: (B, N_max, 3) atomic coordinates (requires_grad OK)
+        edge_index_list: list of (2, E_b) tensors
+        edge_offset_list: list of (E_b, 3) integer offset tensors
+        cell: (B, 3, 3) unit cell matrices
+        num_atoms_list: list of ints
+
+    Returns:
+        list of (E_b,) distance tensors with grad through positions
+    """
+    device = positions.device
+    result = []
+    for b in range(len(num_atoms_list)):
+        n = num_atoms_list[b]
+        pos_b = positions[b, :n]  # (n, 3)
+        ei = edge_index_list[b].to(device)
+        cell_b = cell[b]
+        i, j = ei[0].long(), ei[1].long()
+        if edge_offset_list:
+            eo = edge_offset_list[b].to(device).float()
+            offset_cart = eo @ cell_b  # (E, 3)
+        else:
+            offset_cart = 0.0
+        d_ij = pos_b[j] - pos_b[i] + offset_cart
+        result.append(d_ij.norm(dim=-1))
+    return result
+
+
 def adversarial_perturbation(
     model,
     batch: Dict[str, torch.Tensor],
     criterion,
     target_norm: torch.Tensor,
     eps: float = 0.01,
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    """FGSM-style adversarial perturbation on input features.
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Coordinate-space FGSM adversarial perturbation.
 
-    Returns (preds_clean, adv_loss) where adv_loss is the consistency loss
-    between clean and adversarial predictions.
+    Finds the atomic displacement δpos = ε·sign(∂L/∂pos) that maximally
+    increases the loss, then enforces prediction consistency between clean
+    and perturbed structures. Physically corresponds to worst-case thermal
+    vibrations or DFT relaxation noise.
+
+    Returns (preds_clean, task_loss, adv_consistency_loss).
     """
-    x = batch["x"].detach().clone().requires_grad_(True)
-    batch_for_grad = {k: v for k, v in batch.items()}
-    batch_for_grad["x"] = x
+    positions = batch["positions"].detach().clone().requires_grad_(True)
+    cell = batch["cell"]
+    atom_mask = batch["atom_mask"]
 
-    preds_clean = model(batch_for_grad)
+    dist_matrix = compute_dist_matrix_differentiable(positions, cell, atom_mask)
+    edge_dist_list = compute_edge_dist_differentiable(
+        positions,
+        batch["edge_index_list"],
+        batch.get("edge_offset_list", []),
+        cell,
+        batch["num_atoms_list"],
+    )
+
+    batch_grad = {k: v for k, v in batch.items()}
+    batch_grad["positions"] = positions
+    batch_grad["dist_matrix"] = dist_matrix
+    batch_grad["edge_dist_list"] = edge_dist_list
+
+    preds_clean = model(batch_grad)
     loss = criterion(preds_clean, target_norm)
-    grad_x = torch.autograd.grad(loss, x, retain_graph=True)[0]
+    grad_pos = torch.autograd.grad(loss, positions, retain_graph=True)[0]
 
-    x_adv = (x + eps * grad_x.sign()).detach()
+    mask_3d = atom_mask.float().unsqueeze(-1)
+    pos_adv = (positions + eps * grad_pos.sign() * mask_3d).detach()
+
+    with torch.no_grad():
+        dist_matrix_adv = compute_dist_matrix_differentiable(pos_adv, cell, atom_mask)
+        edge_dist_list_adv = compute_edge_dist_differentiable(
+            pos_adv,
+            batch["edge_index_list"],
+            batch.get("edge_offset_list", []),
+            cell,
+            batch["num_atoms_list"],
+        )
+
     batch_adv = {k: v for k, v in batch.items()}
-    batch_adv["x"] = x_adv
-    preds_adv = model(batch_adv)
+    batch_adv["positions"] = pos_adv
+    batch_adv["dist_matrix"] = dist_matrix_adv
+    batch_adv["edge_dist_list"] = edge_dist_list_adv
 
+    preds_adv = model(batch_adv)
     adv_loss = F.mse_loss(preds_clean, preds_adv)
     return preds_clean, loss, adv_loss

@@ -143,7 +143,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     target = torch.zeros(batch_size, dtype=torch.float32)
     num_atoms = torch.zeros(batch_size, dtype=torch.long)
 
-    edge_index_list, edge_dist_list = [], []
+    edge_index_list, edge_dist_list, edge_offset_list = [], [], []
     triplet_index_list, angles_list = [], []
     cell = torch.zeros(batch_size, 3, 3, dtype=torch.float32)
 
@@ -160,6 +160,8 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         cell[i] = item["cell"]
         edge_index_list.append(item["edge_index"])
         edge_dist_list.append(item["edge_dist"])
+        if "edge_offset" in item:
+            edge_offset_list.append(item["edge_offset"])
         triplet_index_list.append(item["triplet_index"])
         angles_list.append(item["angles"])
 
@@ -175,6 +177,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "num_atoms_list": natoms_list,
         "edge_index_list": edge_index_list,
         "edge_dist_list": edge_dist_list,
+        "edge_offset_list": edge_offset_list,
         "triplet_index_list": triplet_index_list,
         "angles_list": angles_list,
     }
