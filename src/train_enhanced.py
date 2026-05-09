@@ -220,36 +220,39 @@ def main() -> None:
         seed=cfg.get("seed", 42),
     )
 
-    # Online augmentation: wrap train set with on-the-fly transforms
+    # Online augmentation
     use_online_aug = cfg.get("online_aug", False)
+    aug_transform = None
     if use_online_aug:
         aug_cfg = cfg.get("online_aug_cfg", {})
-        transform = OnlineAugTransform(
+        aug_transform = OnlineAugTransform(
             sigma_range=tuple(aug_cfg.get("sigma_range", [0.01, 0.05])),
             strain_range=aug_cfg.get("strain_range", 2.0),
             rotate_prob=aug_cfg.get("rotate_prob", 1.0),
             perturb_prob=aug_cfg.get("perturb_prob", 0.8),
             strain_prob=aug_cfg.get("strain_prob", 0.3),
         )
-        train_set = OnlineAugDataset(train_set, transform=transform)
 
     # P0-2: Host-balanced sampling
     use_balanced = cfg.get("host_balanced", False)
     if use_balanced:
+        # Sampler always indexes into the full dataset by original indices
         sampler = HostBalancedSampler(
-            train_set if use_online_aug else dataset,
-            subset_indices=train_set.indices if hasattr(train_set, 'indices') else None,
+            dataset,
+            subset_indices=train_set.indices,
             samples_per_host=cfg.get("samples_per_host", 50),
             seed=cfg.get("seed", 42),
         )
+        # Wrap full dataset with online aug (sampler restricts to train indices)
+        loader_ds = OnlineAugDataset(dataset, transform=aug_transform) if use_online_aug else dataset
         train_loader = DataLoader(
-            train_set if use_online_aug else dataset,
-            batch_size=cfg.get("batch_size", 64),
+            loader_ds, batch_size=cfg.get("batch_size", 64),
             sampler=sampler, collate_fn=collate_fn,
         )
     else:
+        loader_ds = OnlineAugDataset(train_set, transform=aug_transform) if use_online_aug else train_set
         train_loader = DataLoader(
-            train_set, batch_size=cfg.get("batch_size", 64),
+            loader_ds, batch_size=cfg.get("batch_size", 64),
             shuffle=True, collate_fn=collate_fn,
         )
     val_loader = DataLoader(val_set, batch_size=cfg.get("batch_size", 64),
