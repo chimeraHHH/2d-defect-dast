@@ -8,11 +8,11 @@ train_ratio: 0.8
 val_ratio: 0.1
 loss: mse
 grad_clip: 5.0
-# P0-2: Host-balanced sampling
+# P0-2: Host-balanced sampling (scale to dataset: 93K / 44 hosts ≈ 2100)
 host_balanced: true
-samples_per_host: 50
-# P0-2: Feature-space Mixup
-mixup_alpha: 0.2
+samples_per_host: 2000
+# P0-2: Mixup disabled — mixing positions/dist_matrix across crystals is nonsensical
+mixup_alpha: 0.0
 # P1-1: Auxiliary defect classification
 aux_defect_weight: 0.1
 # P1-3: Stochastic Depth
