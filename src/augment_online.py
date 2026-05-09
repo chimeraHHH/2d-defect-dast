@@ -217,14 +217,15 @@ def adversarial_perturbation(
     target_norm: torch.Tensor,
     eps: float = 0.01,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Coordinate-space FGSM adversarial perturbation.
+    """Coordinate-space FGSM adversarial training (Madry-style robustness).
 
     Finds the atomic displacement δpos = ε·sign(∂L/∂pos) that maximally
-    increases the loss, then enforces prediction consistency between clean
-    and perturbed structures. Physically corresponds to worst-case thermal
-    vibrations or DFT relaxation noise.
+    increases the loss, then trains the model to predict accurately even at
+    that worst-case perturbation. Unlike consistency loss (which forces
+    invariance and conflicts with the regression objective), this preserves
+    the model's sensitivity to geometry while improving worst-case accuracy.
 
-    Returns (preds_clean, task_loss, adv_consistency_loss).
+    Returns (preds_clean, task_loss, adv_robustness_loss).
     """
     positions = batch["positions"].detach().clone().requires_grad_(True)
     cell = batch["cell"]
@@ -267,5 +268,5 @@ def adversarial_perturbation(
     batch_adv["edge_dist_list"] = edge_dist_list_adv
 
     preds_adv = model(batch_adv)
-    adv_loss = F.mse_loss(preds_clean, preds_adv)
+    adv_loss = criterion(preds_adv, target_norm)
     return preds_clean, loss, adv_loss
