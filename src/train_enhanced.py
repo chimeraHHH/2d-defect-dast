@@ -191,10 +191,15 @@ def main() -> None:
     parser.add_argument("--config", required=True)
     parser.add_argument("--max-steps", type=int, default=0)
     parser.add_argument("--device", default=None)
+    parser.add_argument("--seed", type=int, default=None)
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
+
+    if args.seed is not None:
+        cfg["seed"] = args.seed
+        cfg["output_dir"] = cfg["output_dir"] + f"_s{args.seed}"
 
     out_dir = ROOT / cfg["output_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
