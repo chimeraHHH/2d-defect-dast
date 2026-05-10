@@ -78,6 +78,8 @@ def main():
         "uae_mae_s44": ("enhanced_online_100ep_uae_mae_s44", uae_kwargs),
         "uae_mae_warmup_s42": ("enhanced_online_100ep_uae_mae_warmup_s42", uae_kwargs),
         "uae_mae_warmup_s43": ("enhanced_online_100ep_uae_mae_warmup_s43", uae_kwargs),
+        "uae_mae_warmup_s44": ("enhanced_online_100ep_uae_mae_warmup_s44", uae_kwargs),
+        "uae_mae_warmup_s45": ("enhanced_online_100ep_uae_mae_warmup_s45", uae_kwargs),
     }
 
     all_preds = {}
