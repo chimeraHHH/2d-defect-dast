@@ -327,15 +327,24 @@ def main() -> None:
     )
     sched_type = cfg.get("scheduler_type", "plateau")
     sched_kwargs = cfg.get("scheduler", {"factor": 0.5, "patience": 5})
+    warmup_epochs = cfg.get("warmup_epochs", 0)
     if sched_type == "cosine":
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, T_max=cfg.get("epochs", 50),
+        main_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=cfg.get("epochs", 50) - warmup_epochs,
             eta_min=sched_kwargs.get("eta_min", 1e-6),
         )
     else:
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        main_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode="min", **sched_kwargs
         )
+    if warmup_epochs > 0:
+        warmup_scheduler = torch.optim.lr_scheduler.LinearLR(
+            optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs)
+        scheduler = torch.optim.lr_scheduler.SequentialLR(
+            optimizer, schedulers=[warmup_scheduler, main_scheduler],
+            milestones=[warmup_epochs])
+    else:
+        scheduler = main_scheduler
 
     loss_name = cfg.get("loss", "mse")
     if loss_name == "huber":
@@ -484,7 +493,7 @@ def main() -> None:
                 val_metrics = evaluate(model, val_loader, normalizer, device, swa_model)
             else:
                 val_metrics = evaluate(model, val_loader, normalizer, device)
-                if sched_type == "cosine":
+                if sched_type == "cosine" or warmup_epochs > 0:
                     scheduler.step()
                 else:
                     scheduler.step(val_metrics["mae"])
