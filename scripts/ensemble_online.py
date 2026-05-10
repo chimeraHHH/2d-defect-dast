@@ -57,20 +57,24 @@ def main():
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=64, shuffle=False, collate_fn=collate_fn)
 
-    model_kwargs = dict(
+    base_kwargs = dict(
         atom_fea_len=9, hidden_dim=128, n_local_layers=3, n_global_layers=2,
         num_heads=4, rcut_local=5.0, dmax_global=12.0, defect_embedding=True, dropout=0.0)
 
+    uae_kwargs = dict(**base_kwargs, ct_uae_path=str(ROOT / "data/ct_uae_mt3_embeddings.pt"))
+
     runs = {
-        "100ep_s42": "enhanced_online_100ep_s42",
-        "100ep_s43": "enhanced_online_100ep_s43",
-        "100ep_s44": "enhanced_online_100ep_s44",
+        "100ep_s42": ("enhanced_online_100ep_s42", base_kwargs),
+        "100ep_s43": ("enhanced_online_100ep_s43", base_kwargs),
+        "100ep_s44": ("enhanced_online_100ep_s44", base_kwargs),
+        "uae_s42": ("enhanced_online_100ep_uae_s42", uae_kwargs),
+        "uae_s43": ("enhanced_online_100ep_uae_s43", uae_kwargs),
     }
 
     all_preds = {}
     targets = None
 
-    for name, run_dir in runs.items():
+    for name, (run_dir, model_kwargs) in runs.items():
         ckpt = ROOT / "results" / run_dir / "best.pt"
         if not ckpt.exists():
             print(f"  SKIP {name}: no checkpoint")

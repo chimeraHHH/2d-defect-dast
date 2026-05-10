@@ -173,6 +173,7 @@ class CrystalTransformer(nn.Module):
         defect_embedding: bool = True,
         dropout: float = 0.0,
         ct_uae_path: str = None,
+        n_readout_heads: int = 1,
     ) -> None:
         super().__init__()
         if ct_uae_path is not None:
@@ -202,13 +203,26 @@ class CrystalTransformer(nn.Module):
                 for _ in range(n_global_layers)
             ]
         )
-        self.readout = nn.Sequential(
-            nn.LayerNorm(hidden_dim),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.SiLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, 1),
-        )
+        self.n_readout_heads = n_readout_heads
+        if n_readout_heads <= 1:
+            self.readout = nn.Sequential(
+                nn.LayerNorm(hidden_dim),
+                nn.Linear(hidden_dim, hidden_dim),
+                nn.SiLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim, 1),
+            )
+        else:
+            self.readout = nn.ModuleList([
+                nn.Sequential(
+                    nn.LayerNorm(hidden_dim),
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.SiLU(),
+                    nn.Dropout(dropout),
+                    nn.Linear(hidden_dim, 1),
+                )
+                for _ in range(n_readout_heads)
+            ])
 
     def _flatten_edges(
         self,
@@ -300,4 +314,7 @@ class CrystalTransformer(nn.Module):
 
         mask_f = mask.float().unsqueeze(-1)
         pooled = (h_global * mask_f).sum(dim=1) / mask_f.sum(dim=1).clamp(min=1.0)
-        return self.readout(pooled).squeeze(-1)
+        if self.n_readout_heads <= 1:
+            return self.readout(pooled).squeeze(-1)
+        preds = torch.stack([head(pooled).squeeze(-1) for head in self.readout], dim=0)
+        return preds.mean(dim=0)
