@@ -63,6 +63,11 @@ def main():
 
     uae_kwargs = dict(**base_kwargs, ct_uae_path=str(ROOT / "data/ct_uae_mt3_embeddings.pt"))
 
+    deep_kwargs = dict(
+        atom_fea_len=9, hidden_dim=128, n_local_layers=4, n_global_layers=3,
+        num_heads=4, rcut_local=5.0, dmax_global=12.0, defect_embedding=True, dropout=0.0,
+        ct_uae_path=str(ROOT / "data/ct_uae_mt3_embeddings.pt"))
+
     runs = {
         "100ep_s42": ("enhanced_online_100ep_s42", base_kwargs),
         "100ep_s43": ("enhanced_online_100ep_s43", base_kwargs),
@@ -80,6 +85,10 @@ def main():
         "uae_mae_warmup_s43": ("enhanced_online_100ep_uae_mae_warmup_s43", uae_kwargs),
         "uae_mae_warmup_s44": ("enhanced_online_100ep_uae_mae_warmup_s44", uae_kwargs),
         "uae_mae_warmup_s45": ("enhanced_online_100ep_uae_mae_warmup_s45", uae_kwargs),
+        "uae_mae_warmup_s46": ("enhanced_online_100ep_uae_mae_warmup_s46", uae_kwargs),
+        "deep_s42": ("enhanced_online_100ep_uae_mae_warmup_deep_s42", deep_kwargs),
+        "deep_s43": ("enhanced_online_100ep_uae_mae_warmup_deep_s43", deep_kwargs),
+        "deep_s45": ("enhanced_online_100ep_uae_mae_warmup_deep_s45", deep_kwargs),
     }
 
     all_preds = {}
