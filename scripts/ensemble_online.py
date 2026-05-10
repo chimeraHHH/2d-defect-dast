@@ -91,6 +91,8 @@ def main():
         "deep_s45": ("enhanced_online_100ep_uae_mae_warmup_deep_s45", deep_kwargs),
         "no_uae_s42": ("enhanced_online_100ep_mae_warmup_no_uae_s42", base_kwargs),
         "deep_huber_s42": ("enhanced_online_100ep_deep_huber_warmup_s42", deep_kwargs),
+        "150ep_s42": ("enhanced_online_150ep_uae_mae_warmup_s42", uae_kwargs),
+        "150ep_s45": ("enhanced_online_150ep_uae_mae_warmup_s45", uae_kwargs),
     }
 
     all_preds = {}
