@@ -324,6 +324,78 @@ python scripts/prospective_dft_analyze.py
 * **JARVIS-DFT** (NIST)：2D vacancy 70 + 3D vacancy 381 + DFT-3D 18 k 样本
 * **PSL Efficiency 1.0.0** PAW/USPP 赝势（v3 DFT 验证）
 
+## Roadmap / TODO
+
+基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
+当前最优：单模型 0.513 eV / 3-ensemble 0.460 eV（100ep online-aug, split_seed=42）。
+
+### Tier 1 — 低成本高收益（不改架构）
+
+- [ ] **Readout ensembling**：只 ensemble 最后的 readout MLP（6 个 head
+  共享 trunk），推理成本 ≈ 单模型 1.05×，替代当前 6× 的 full ensemble。
+  参考：[UQ for foundation model potentials](https://www.nature.com/articles/s41524-025-01572-y)
+  （npj Comput. Mater. 2025）
+- [ ] **ct-UAE 预训练原子嵌入**：用 CrystalTransformer Universal Atomic
+  Embeddings 替换当前 9-dim 手工特征，零额外推理成本，文献报告 14–18% 提升。
+  参考：[ct-UAE](https://www.nature.com/articles/s41467-025-56481-x)
+  （Nature Comms 2025）
+- [ ] **拓扑描述符（persistent homology）**：为缺陷位点周围的空洞几何
+  计算 PH 特征，拼接到节点特征。文献报告在钙钛矿缺陷 Ef 上降低 55% MAE。
+  参考：[PH + GNN for Defect Ef](https://pubs.acs.org/doi/10.1021/acs.chemmater.4c03028)
+  （Chem. Mater. 2024）
+- [ ] **扩大 ensemble 成员数**：当前 3-member → 5–6 member（同架构不同
+  init seed），预期逼近旧 6-ensemble 0.443 的水平
+
+### Tier 2 — 中等成本（局部架构改动）
+
+- [ ] **iComFormer 风格几何完备注意力**：用不变量（距离 + 键角）替代纯距离
+  编码的全局 Transformer 层，不引入等变张量积开销。ICLR 2024 在 MatBench
+  上超越 ALIGNN。
+  参考：[ComFormer](https://arxiv.org/abs/2403.11857)（ICLR 2024）
+- [ ] **CrystalFormer 周期求和注意力**：通过距离衰减势对周期映像求无穷和，
+  仅用 Matformer 29% 参数达到 SOTA。适合我们的 2D 周期超胞。
+  参考：[CrystalFormer](https://omron-sinicx.github.io/crystalformer/)
+  （ICLR 2024）
+- [ ] **DefiNet 缺陷标记节点**：为缺陷位点引入专用标记节点 + 缺陷感知消息
+  传递，几乎不增加参数量。
+  参考：[DefiNet](https://www.nature.com/articles/s41524-025-01728-w)
+  （npj Comput. Mater. 2025）
+- [ ] **多保真度 delta-learning**：对混合不同 DFT 泛函的多源数据引入保真度
+  嵌入，10% 高精度数据 + 廉价数据即可匹配 8× 高精度数据的效果。
+  参考：[Multi-fidelity MLIP](https://pubs.acs.org/doi/10.1021/jacs.4c14455)
+  （JACS 2024）
+- [ ] **ARK 知识蒸馏**：用等变教师模型（MACE/NequIP）的角度关系知识蒸馏
+  到我们的紧凑学生模型，保持 0.75M 参数下获得等变级精度。
+  参考：[ARK Distillation](https://www.nature.com/articles/s41524-026-02062-5)
+  （npj Comput. Mater. 2026）
+
+### Tier 3 — 高成本探索性方向
+
+- [ ] **MACE-MP-0 微调**：在 150K 结构上预训练的通用 E(3) 等变势，
+  fine-tune 到 2D 缺陷 Ef。但需注意 universal MLIP 对缺陷态存在系统性
+  能量低估（[softening 问题](https://www.nature.com/articles/s41524-024-01500-6)）。
+  参考：[MACE-MP-0](https://www.nature.com/articles/s41524-025-01742-y)
+  （2024）
+- [ ] **CLOUD 式对称性掩码预训练**：用空间群 + Wyckoff 位置的序列化表示
+  做 masked-language-model 预训练，可能为缺陷预测提供对称性先验。
+  参考：[CLOUD](https://www.nature.com/articles/s41467-026-70467-3)
+  （Nature Comms 2026）
+- [ ] **4-body（二面角）交互**：捕捉 2D 材料缺陷弛豫中的面外畸变，
+  需要在消息传递中引入四体几何特征。
+  参考：[Hybrid Transformer-Graph](https://www.nature.com/articles/s41524-024-01472-7)
+  （npj Comput. Mater. 2024）
+
+### 已验证无效（不再重试）
+
+- [x] ~~DAST 稀疏/稠密架构~~（1.83 / 1.49 eV，+112/72%）
+- [x] ~~Hidden-dim 192~~（过拟合）
+- [x] ~~坐标空间对抗训练（Madry / consistency）~~（0.518 / 0.535，均劣于
+  online-only 0.513）
+- [x] ~~特征空间 FGSM~~（物理无意义）
+- [x] ~~v2 单源 PFA + 多尺度 + 缺陷偏置~~（边际收益被数据规模吞没）
+
+---
+
 ## 致谢
 
 * 数据：DTU CMR / NIST JARVIS
