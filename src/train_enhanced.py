@@ -325,10 +325,17 @@ def main() -> None:
         lr=optim_kwargs.get("lr", 3e-4),
         weight_decay=optim_kwargs.get("weight_decay", 1e-4),
     )
+    sched_type = cfg.get("scheduler_type", "plateau")
     sched_kwargs = cfg.get("scheduler", {"factor": 0.5, "patience": 5})
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", **sched_kwargs
-    )
+    if sched_type == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=cfg.get("epochs", 50),
+            eta_min=sched_kwargs.get("eta_min", 1e-6),
+        )
+    else:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="min", **sched_kwargs
+        )
 
     loss_name = cfg.get("loss", "mse")
     if loss_name == "huber":
@@ -477,7 +484,10 @@ def main() -> None:
                 val_metrics = evaluate(model, val_loader, normalizer, device, swa_model)
             else:
                 val_metrics = evaluate(model, val_loader, normalizer, device)
-                scheduler.step(val_metrics["mae"])
+                if sched_type == "cosine":
+                    scheduler.step()
+                else:
+                    scheduler.step(val_metrics["mae"])
 
             improved = val_metrics["mae"] < best_val_mae
             if improved:
