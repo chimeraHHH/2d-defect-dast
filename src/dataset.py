@@ -98,6 +98,7 @@ class CrystalGraphDataset(Dataset):
         defect_mask = torch.from_numpy(sample["defect_mask"]).long()
         item = {
             "x": x,
+            "atomic_numbers": numbers,
             "defect_mask": defect_mask,
             "edge_index": torch.from_numpy(sample["edge_index"]),
             "edge_dist": torch.from_numpy(sample["edge_dist"]),
@@ -136,6 +137,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     feat_dim = batch[0]["x"].shape[-1]
 
     x = torch.zeros(batch_size, n_max, feat_dim, dtype=torch.float32)
+    atomic_numbers = torch.zeros(batch_size, n_max, dtype=torch.long)
     defect_mask = torch.zeros(batch_size, n_max, dtype=torch.long)
     atom_mask = torch.zeros(batch_size, n_max, dtype=torch.bool)
     dist_matrix = torch.zeros(batch_size, n_max, n_max, dtype=torch.float32)
@@ -150,6 +152,8 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     for i, item in enumerate(batch):
         n = item["num_atoms"]
         x[i, :n] = item["x"]
+        if "atomic_numbers" in item:
+            atomic_numbers[i, :n] = item["atomic_numbers"]
         defect_mask[i, :n] = item["defect_mask"]
         atom_mask[i, :n] = True
         dist_matrix[i, :n, :n] = item["dist_matrix"]
@@ -167,6 +171,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
 
     out = {
         "x": x,
+        "atomic_numbers": atomic_numbers,
         "defect_mask": defect_mask,
         "atom_mask": atom_mask,
         "dist_matrix": dist_matrix,

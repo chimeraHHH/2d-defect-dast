@@ -172,9 +172,17 @@ class CrystalTransformer(nn.Module):
         dmax_global: float = 12.0,
         defect_embedding: bool = True,
         dropout: float = 0.0,
+        ct_uae_path: str = None,
     ) -> None:
         super().__init__()
-        self.embed = nn.Linear(atom_fea_len, hidden_dim)
+        if ct_uae_path is not None:
+            uae_table = torch.load(ct_uae_path, map_location="cpu", weights_only=False)
+            self.register_buffer("ct_uae_table", uae_table)  # (100, 128)
+            uae_dim = uae_table.shape[1]
+            self.embed = nn.Linear(atom_fea_len + uae_dim, hidden_dim)
+        else:
+            self.ct_uae_table = None
+            self.embed = nn.Linear(atom_fea_len, hidden_dim)
         self.defect_embedding = (
             nn.Embedding(2, hidden_dim) if defect_embedding else None
         )
@@ -248,6 +256,12 @@ class CrystalTransformer(nn.Module):
         defect_mask = batch.get("defect_mask")
         device = x.device
 
+        if self.ct_uae_table is not None:
+            z = batch.get("atomic_numbers")
+            if z is not None:
+                z_clamped = z.clamp(0, self.ct_uae_table.shape[0] - 1)
+                uae_fea = self.ct_uae_table[z_clamped]
+                x = torch.cat([x, uae_fea], dim=-1)
         h = self.embed(x)
         if self.defect_embedding is not None and defect_mask is not None:
             h = h + self.defect_embedding(defect_mask)

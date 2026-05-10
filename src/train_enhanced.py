@@ -299,7 +299,14 @@ def main() -> None:
         loaded = []
         if "embed_weight" in embed_ckpt and hasattr(model, "embed"):
             with torch.no_grad():
-                model.embed.weight.copy_(embed_ckpt["embed_weight"])
+                pre_w = embed_ckpt["embed_weight"]
+                cur_w = model.embed.weight
+                if pre_w.shape == cur_w.shape:
+                    cur_w.copy_(pre_w)
+                else:
+                    # UAE widens input dim: copy pretrained cols into first slice
+                    n_pre = pre_w.shape[1]
+                    cur_w[:, :n_pre].copy_(pre_w)
                 if "embed_bias" in embed_ckpt:
                     model.embed.bias.copy_(embed_ckpt["embed_bias"])
             loaded.append("embed")
@@ -427,7 +434,13 @@ def main() -> None:
                     defect_target = batch["defect_mask"].float()
                     mask = batch["atom_mask"]
                     with torch.no_grad():
-                        h_embed = model.embed(batch["x"])
+                        _x_aux = batch["x"]
+                        if getattr(model, "ct_uae_table", None) is not None:
+                            z = batch.get("atomic_numbers")
+                            if z is not None:
+                                z_c = z.clamp(0, model.ct_uae_table.shape[0] - 1)
+                                _x_aux = torch.cat([_x_aux, model.ct_uae_table[z_c]], dim=-1)
+                        h_embed = model.embed(_x_aux)
                     logits = aux_defect_head(h_embed, mask)
                     aux_loss = nn.functional.binary_cross_entropy_with_logits(
                         logits, defect_target, weight=mask.float(),

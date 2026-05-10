@@ -1,0 +1,43 @@
+model: baseline
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: results/enhanced_online_100ep_uae
+seed: 42
+batch_size: 64
+epochs: 100
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mse
+grad_clip: 5.0
+online_aug: true
+online_aug_cfg:
+  sigma_range: [0.01, 0.05]
+  strain_range: 2.0
+  rotate_prob: 1.0
+  perturb_prob: 0.8
+  strain_prob: 0.3
+host_balanced: true
+samples_per_host: 200
+aux_defect_weight: 0.1
+drop_path_rate: 0.1
+label_noise_std: 0.05
+use_swa: true
+swa_start_epoch: 82
+swa_lr: 1.0e-4
+pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+optimizer:
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  factor: 0.5
+  patience: 6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
