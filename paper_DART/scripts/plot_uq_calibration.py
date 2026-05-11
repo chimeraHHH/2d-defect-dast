@@ -98,7 +98,7 @@ rho, pval = stats.spearmanr(ens_std, abs_errors)
 print(f"Spearman(sigma, |error|): rho={rho:.3f}, p={pval:.2e}")
 
 # ── Plot ───────────────────────────────────────────────────────────────
-fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
+fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
 
 # Panel (a): Calibration curve
 ax = axes[0]

@@ -64,14 +64,15 @@ that challenges the model.
 \label{fig:error_analysis}
 \end{figure*}
 
-\begin{figure*}[t]
+\begin{figure*}[tb]
 \centering
-\includegraphics[width=\textwidth]{figures/periodic_table_mae.pdf}
+\includegraphics[width=0.92\textwidth]{figures/periodic_table_mae.pdf}
 \caption{Per-dopant MAE mapped onto the periodic table.
-  Each cell shows the element symbol, MAE (eV), and test-sample count.
+  Each cell shows the element symbol and MAE (eV); numbers in the top-right
+  corner indicate test-sample count.
   Main-group metals (Bi, Pb, Sr) are easiest; early transition metals with
   partially filled $d$-shells (Ta, Mn, Sc) are hardest.
-  Grey cells indicate elements not present in the IMP2D test set.}
+  Grey cells indicate elements absent from the IMP2D test set.}
 \label{fig:periodic_table}
 \end{figure*}
 
@@ -236,9 +237,9 @@ absolute error is 0.577 ($p < 10^{-5}$), confirming that ensemble
 variance is a meaningful, if imperfect, proxy for prediction confidence
 (Fig.~\ref{fig:uq}).
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/uq_calibration.pdf}
+\includegraphics[width=0.85\textwidth]{figures/uq_calibration.pdf}
 \caption{Uncertainty quantification performance.
   (a)~Calibration curve: observed vs.\ nominal coverage after temperature
   scaling; the red square marks the 90\% target.
@@ -246,7 +247,7 @@ variance is a meaningful, if imperfect, proxy for prediction confidence
   confirming that higher $\sigma$ correlates with larger errors
   (Spearman $\rho = 0.58$).}
 \label{fig:uq}
-\end{figure}
+\end{figure*}
 
 %----------------------------------------------------------------------
 \subsection{Physical interpretability}\label{sec:interpret}

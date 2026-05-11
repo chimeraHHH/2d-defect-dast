@@ -1,13 +1,16 @@
-\documentclass[twocolumn,superscriptaddress,prb]{revtex4-2}
-% Alternative: \documentclass[preprint,aps,prb]{revtex4-2}
+\documentclass[twocolumn,superscriptaddress,prb,floatfix]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{multirow}
 \usepackage{siunitx}
+\usepackage[expansion=false]{microtype}  % protrusion only (avoids font-expansion error with revtex)
+\usepackage[colorlinks=true,
+            linkcolor=blue!60!black,
+            citecolor=green!50!black,
+            urlcolor=blue!70!black]{hyperref}
 \graphicspath{{figures/}}
 
 \newcommand{\dart}{\textsc{Dart}}
