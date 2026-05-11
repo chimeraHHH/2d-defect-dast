@@ -139,5 +139,56 @@
     "Deep model (4+3) appears in every top-k combination despite similar solo MAE",
     "Temperature \u03c4=1.40 << v1's \u03c4=1.83 means v4 ensemble is inherently better calibrated",
     "\u03c3-|error| correlation of 0.546 enables meaningful uncertainty-based triage"
-  ]
+  ],
+  "multi_source_v4": {
+    "description": "v4 recipe applied to 4-DB joint training (IMP2D + JARVIS-2D + JARVIS-3D + DFT-3D)",
+    "models": {
+      "ms4_deep_s42": {
+        "architecture": "deep (4+3 layers)",
+        "params": "1.14M",
+        "test_mae": 0.4131,
+        "val_mae_swa": 0.3975,
+        "wall_min": 65.2,
+        "ensemble_contribution": "enters greedy at k=3 (3rd most valuable)"
+      },
+      "ms4_s43": {
+        "architecture": "shallow (3+2 layers)",
+        "params": "0.83M",
+        "test_mae": 0.4409,
+        "val_mae_swa": 0.4061,
+        "wall_min": 50.5,
+        "ensemble_contribution": "marginal (enters at k=8)"
+      },
+      "ms4_s42": {
+        "architecture": "shallow (3+2 layers)",
+        "params": "0.83M",
+        "status": "training (ep74/150)",
+        "expected_test_mae": "~0.44"
+      }
+    },
+    "key_finding": "Deep multi-source model provides genuine ensemble diversity due to different architecture + different training data distribution. Enters greedy selection at k=3.",
+    "error_correlation": {
+      "ms4_deep_vs_best6_mean": 0.828,
+      "ms4_s43_vs_best6_mean": 0.833,
+      "intra_best6_mean": 0.834
+    }
+  },
+  "headline": {
+    "best_ensemble_ss_ms": {
+      "mae": 0.362,
+      "k": 5,
+      "vs_alignn": "-33%"
+    },
+    "best_ensemble_ss_only": {
+      "mae": 0.368,
+      "k": 5,
+      "vs_alignn": "-32%"
+    },
+    "best_single": {
+      "mae": 0.407,
+      "model": "150ep_s45",
+      "vs_alignn": "-25%"
+    },
+    "alignn_reference": 0.54
+  }
 }
