@@ -29,30 +29,27 @@
 \date{\today}
 
 \begin{abstract}
-Point defects critically influence the electronic, optical, and catalytic
-properties of two-dimensional (2D) materials, yet first-principles
-prediction of defect formation energies ($\ef$) across vast host--dopant
-spaces remains prohibitively expensive.
-%
+Point defects control many electronic, optical, and catalytic properties
+of two-dimensional (2D) materials, but first-principles formation-energy
+calculations remain too expensive for exhaustive host--dopant screening.
 Here we introduce \dart{} (Defect-Aware Radial Transformer), a compact
-0.75\,M-parameter graph transformer that couples local bond-angle message
-passing with global periodic self-attention, augmented by an explicit
-defect-site embedding.
-%
-On the IMP2D benchmark (10\,641 impurity configurations across 44 host
-monolayers), \dart{} achieves a test MAE of 0.407~eV---25\% below ALIGNN
-with $5.4\times$ fewer parameters---with systematic ablation confirming
-that training engineering accounts for the majority of the gain.
-%
-A graduated out-of-distribution assessment quantifies generalization
-boundaries: leave-one-host-out extrapolation within the transition-metal
-dichalcogenide family yields a mean MAE of 0.54~eV, accompanied by
-calibrated ensemble uncertainty (93\% coverage at the 90\% nominal level).
-%
-These results demonstrate that physically informed inductive biases
-combined with rigorous training methodology, rather than parameter
-scaling, are the primary levers for accurate and trustworthy
-defect-property surrogates in the data-limited materials regime.
+graph transformer for 2D defect formation energy prediction. \dart{}
+combines local bond-angle message passing, global periodic self-attention,
+and an explicit defect-site embedding, and is trained with a data-limited
+recipe that emphasizes robust loss design, augmentation, and multi-source
+representation learning.
+
+On the IMP2D benchmark, \dart{} outperforms established graph-neural-network
+baselines while using substantially fewer parameters, and ensemble averaging
+further improves accuracy and uncertainty calibration. Ablation experiments
+show that the gain comes not from model scaling alone, but from the coupling
+of defect-aware inductive bias with careful training methodology. We further
+evaluate transfer beyond random splits using leave-one-host-out and
+compositional block-out protocols, showing that \dart{} degrades gracefully
+within related 2D-material families while exposing clear limits for broader
+extrapolation. These results position \dart{} as an efficient surrogate for
+rapid defect screening and uncertainty-guided triage before targeted
+first-principles validation.
 \end{abstract}
 
 \maketitle
