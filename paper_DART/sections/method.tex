@@ -125,9 +125,20 @@ $\phi_\mathrm{bias}(d_{ij}^{\mathrm{PBC}})$ can be interpreted as a
 even atoms without topological edges (beyond $r_\mathrm{cut}$) can exchange
 information if the learned potential assigns non-negligible coupling at their
 separation.
-This is particularly relevant for defects, whose strain fields and
-charge-density perturbations propagate as approximately $1/r^2$ in 2D,
-well beyond typical GNN cutoff radii.
+%
+Concretely, the Gaussian RBF expansion
+$e_{ij,k} = \exp(-(d-\mu_k)^2/\sigma^2)$ that feeds $\phi_\mathrm{bias}$
+forms a localized basis in real space, analogous to how plane-wave
+expansions $e^{i\mathbf{G}\cdot\mathbf{r}}$ form a basis in reciprocal
+space.
+By learning linear combinations of these Gaussians, the model implicitly
+constructs a smooth, distance-dependent coupling function---effectively
+performing a ``soft'' Fourier-like decomposition of the interatomic
+interaction landscape.
+%
+This mechanism is particularly relevant for point defects in 2D, whose
+strain fields and charge-density perturbations decay as
+${\sim}1/r^2$~\cite{fang2025}, well beyond typical GNN cutoff radii.
 
 The defect embedding $\mathbf{e}_\mathrm{def}$ ensures that the dopant atom
 occupies a distinct region in the query space, naturally emerging as an
@@ -190,12 +201,33 @@ We employ a systematic training recipe optimized for the data-limited regime
 \end{itemize}
 
 \paragraph{Multi-source data fusion.}
-To enrich the learned atomic representations, we jointly train on four
-databases: IMP2D (primary), JARVIS-2D, JARVIS-3D, and a curated DFT-3D
-formation energy set.
-Each source has an independent readout head while sharing the local and
-global encoder layers, preventing label-space contamination while
-transferring structural knowledge.
+A key challenge in training on small materials databases is that the model
+never encounters enough structural diversity to learn robust atomic
+representations.
+We address this by jointly training on four databases with complementary
+coverage:
+(i)~IMP2D~\cite{imp2d2023} (10\,641 2D defect configurations, primary
+target),
+(ii)~JARVIS-2D (1\,105 pristine 2D formation energies),
+(iii)~JARVIS-3D (4\,457 bulk formation energies), and
+(iv)~a curated DFT-3D set (10\,987 bulk crystals from the Materials
+Project), totaling ${\sim}27$\,k samples.
+%
+Because the four databases differ in dimensionality (2D vs.\ 3D),
+defect content (impurity vs.\ pristine), and label semantics (defect
+$\ef$ vs.\ bulk formation energy), a naive merge would degrade
+performance.
+We instead adopt a \emph{multi-head} architecture: the local and global
+encoder layers are shared across all sources, but each source feeds into
+its own independent two-layer readout MLP.
+During training, batches are drawn from all sources with tunable
+per-source sampling weights (IMP2D\,$=$\,1.0, JARVIS-2D\,$=$\,0.5,
+JARVIS-3D\,$=$\,0.5, DFT-3D\,$=$\,0.1), and each sample's loss is
+routed through its corresponding head.
+This prevents label-space contamination while allowing the shared encoder
+to learn transferable structural representations---particularly for
+rare dopant elements that appear in auxiliary databases but have few
+IMP2D entries.
 
 %----------------------------------------------------------------------
 \subsection{Ensemble and uncertainty quantification}\label{sec:uq_method}

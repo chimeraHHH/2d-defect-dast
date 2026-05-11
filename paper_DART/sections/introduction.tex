@@ -9,10 +9,14 @@ vacancies---fundamentally govern the electronic, optical, and catalytic
 properties of two-dimensional (2D) materials~\cite{imp2d2023}.
 In transition-metal dichalcogenides (TMDs) such as MoS$_2$ and WSe$_2$,
 a single dopant atom can shift the Fermi level, create mid-gap trap states,
-or activate catalytic edge sites.
+or activate catalytic edge sites---properties directly relevant to
+photocatalytic water splitting, single-photon emission, and
+next-generation field-effect transistors.
 The defect formation energy $\ef$ quantifies the thermodynamic cost of
 introducing such a defect and serves as the primary descriptor for
-high-throughput defect screening.
+high-throughput defect screening: low-$\ef$ dopants are thermodynamically
+accessible under typical growth conditions, while high-$\ef$ species
+indicate kinetically trapped or unstable configurations.
 
 However, the combinatorial space of possible host--dopant configurations
 is enormous.
@@ -73,7 +77,16 @@ We address these gaps by introducing \dart{} (Defect-Aware Radial
 Transformer), a compact model with explicit physical inductive biases for 2D
 defect systems, accompanied by a rigorous multi-tier generalization
 assessment.
-Our contributions are:
+%
+Our central thesis is that, in the data-limited regime characteristic of
+materials science ($N \sim 10^4$), \emph{physically informed architecture
+design combined with systematic data and training engineering} yields
+larger gains than scaling model capacity alone.
+\dart{} demonstrates this by outperforming models with $5\times$ more
+parameters through targeted inductive biases---defect-site awareness and
+long-range periodic attention---rather than brute-force parameterization.
+%
+Specifically, our contributions are:
 
 \begin{enumerate}
   \item \textbf{\dart{} architecture} (\S\ref{sec:arch}):

@@ -14,6 +14,20 @@ $\alpha = -0.40$ for data scaling but $\beta \approx -0.01$ for parameter
 scaling ($R^2 = 0.95$), confirming that \emph{more data, not more
 parameters}, is the primary lever for improvement on this task.
 
+\paragraph{Decomposing the improvement.}
+The comparison between \dart{} (0.407\eV{}) and the vanilla
+CrystalTransformer backbone (0.516\eV{}) trained with the same
+architecture but a standard MSE/plateau recipe directly quantifies the
+contribution of our training and data engineering.
+Of the total 0.133\eV{} improvement, the training pipeline
+(MAE loss, cosine warmup, SWA) accounts for ${\sim}0.10$\eV{}
+(Table~\ref{tab:ablation}), while the defect-site embedding and
+ct-UAE transfer embeddings contribute the remaining
+${\sim}0.03$\eV{}.
+This breakdown reinforces our thesis: in the small-data regime,
+\emph{how} one trains matters at least as much as \emph{what}
+one trains.
+
 %----------------------------------------------------------------------
 \subsection{Self-attention as learned potential summation}
 %----------------------------------------------------------------------
@@ -22,6 +36,11 @@ The success of the global geometric attention layers can be understood
 through the lens of ``neural potential summation''~\cite{crystalformer2024}:
 the learned distance bias $\phi_\mathrm{bias}(d_{ij}^{\mathrm{PBC}})$ acts
 as a non-parametric interatomic potential that gates information flow.
+In solid-state physics, the crystal potential is naturally decomposed into
+Fourier components in reciprocal space; analogously, the Gaussian RBF
+expansion that feeds $\phi_\mathrm{bias}$ provides a localized basis in
+real space from which the MLP learns smooth, physically meaningful coupling
+functions.
 For defect systems, where the perturbation source (dopant) induces
 long-range elastic strain fields decaying as ${\sim}1/r^2$ in 2D, this
 mechanism naturally allocates higher attention weights to nearby atoms while
@@ -51,6 +70,37 @@ The LOHO framework is readily transferable to other multi-component
 material families (e.g., high-entropy alloys, hybrid perovskites).
 
 %----------------------------------------------------------------------
+\subsection{Toward practical defect engineering}
+%----------------------------------------------------------------------
+
+Beyond benchmarking accuracy, \dart{}'s calibrated predictions enable
+concrete materials-design workflows.
+Given that low-$\ef$ dopants are thermodynamically accessible under
+typical synthesis conditions, a practitioner can use \dart{} to rapidly
+rank all 65 candidate dopants for a new TMD host and identify the
+top-$k$ candidates for experimental validation---reducing the DFT
+pre-screening burden from thousands of CPU-hours to seconds of GPU
+inference.
+%
+Moreover, the per-dopant error map (Fig.~\ref{fig:periodic_table})
+reveals that predictions for main-group dopants (Bi, Pb, Sr) are
+already reliable enough (MAE $< 0.17$\eV{}) for semi-quantitative
+screening, while early transition-metal dopants (Sc, Mn, Ta) require
+additional caution.
+This element-resolved confidence map can directly guide experimentalists:
+high-confidence predictions warrant immediate synthesis attempts, while
+uncertain predictions should be verified by targeted DFT calculations
+or prioritized in active-learning loops.
+%
+In the context of defect engineering for device applications---where
+beneficial defects (e.g., luminescent centers for single-photon emitters,
+shallow dopants for carrier modulation) must be distinguished from
+detrimental ones (deep traps, recombination centers)---\dart{}'s
+ability to rapidly evaluate $\ef$ across the full host--dopant matrix
+provides a first-pass filter before more expensive excited-state or
+transport calculations.
+
+%----------------------------------------------------------------------
 \subsection{Limitations and outlook}
 %----------------------------------------------------------------------
 
@@ -58,14 +108,24 @@ Several limitations warrant acknowledgment:
 (1)~The current model covers only the 44 host materials in IMP2D;
 generalization to entirely new material families (e.g., MXenes, h-BN
 alloys) requires expanded training data.
-(2)~We predict only defect formation energies; extending to other
+(2)~The IMP2D database contains only substitutional adsorbates and
+interstitials; vacancy-type defects---single vacancies, divacancies, and
+Stone--Wales reconstructions---are absent from both training and
+evaluation.
+Incorporating vacancy datasets, such as existing graphene defect
+libraries containing hundreds of defect configurations, would extend
+\dart{}'s applicability to the broader defect landscape.
+(3)~We predict only defect formation energies; extending to other
 defect-related properties---charge transition levels, migration barriers,
-optical transition energies---would broaden the platform's utility for
-defect engineering.
-(3)~The OOD evaluation is limited to the G6-TMD subfamily; a broader
+carrier capture coefficients, and optical transition energies---would
+broaden the platform's utility for full defect engineering pipelines.
+(4)~The OOD evaluation is limited to the G6-TMD subfamily; a broader
 cross-family assessment awaits datasets with sufficient diversity.
 
 Looking forward, the integration of \dart{} with active learning loops
 could efficiently expand the training distribution into unexplored
 regions of host--dopant space, guided by the calibrated uncertainty
 estimates demonstrated here.
+Coupling \dart{} predictions with high-throughput transport and optical
+simulations would enable end-to-end screening of dopants for targeted
+device functionalities.

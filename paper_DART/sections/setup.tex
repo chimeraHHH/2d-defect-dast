@@ -20,17 +20,25 @@ set, totaling ${\sim}27$\,k samples across all sources.
 \begin{itemize}
   \item \textbf{Naive baseline}: global mean of training-set $\ef$ values,
     providing a lower bound on model utility.
+  \item \textbf{LightGBM}: tree-based baseline with 9-dimensional atomic
+    features (same as \dart{} node features), providing a non-neural reference.
+  \item \textbf{El~Alouani~\textit{et al.}}~\cite{elalouani2024}:
+    LightGBM with Jacobi--Legendre structural descriptors on the same
+    IMP2D dataset (reported result).
   \item \textbf{SchNet}~\cite{schutt2018}: continuous-filter GNN
     (0.46\,M parameters), representing the CGCNN-class of models without
     angular information.
   \item \textbf{ALIGNN}~\cite{alignn2021}: line-graph GNN with explicit
     bond-angle encoding (4.03\,M parameters), the current standard for
     crystal property prediction.
-  \item \textbf{LightGBM}: tree-based baseline with 9-dimensional atomic
-    features (same as \dart{} node features), providing a non-neural reference.
-  \item \textbf{El~Alouani~\textit{et al.}}~\cite{elalouani2024}:
-    LightGBM with Jacobi--Legendre structural descriptors on the same
-    IMP2D dataset (reported result).
+  \item \textbf{CrystalTransformer}~\cite{crystalformer2024}: the vanilla
+    local+global transformer with distance-biased attention
+    (0.75\,M parameters), trained with MSE loss and plateau learning rate
+    scheduling.
+    \dart{} shares this backbone architecture but adds the defect-site
+    embedding, switches to an optimized training recipe
+    (\S\ref{sec:training}), and incorporates multi-source fusion---making
+    the comparison between the two a direct measure of these contributions.
 \end{itemize}
 
 All GNN baselines are trained with identical data splits and evaluation

@@ -10,7 +10,9 @@ the IMP2D test set (1\,065 samples).
 \begin{table}[t]
 \centering
 \caption{Test-set performance on IMP2D (Tier~0, random split).
-  $\Delta_\mathrm{ALIGNN}$ is relative MAE reduction vs.\ ALIGNN.}
+  $\Delta_\mathrm{ALIGNN}$ is relative MAE reduction vs.\ ALIGNN.
+  CrystalTransformer$^*$ uses the same backbone as \dart{} but without
+  the defect-site embedding or optimized training recipe.}
 \label{tab:main}
 \begin{tabular}{@{}lrcc@{}}
 \toprule
@@ -21,6 +23,7 @@ LightGBM (ours)      & ---     & 1.158 & --- \\
 El~Alouani~\textit{et al.} & --- & 0.518 & $+4\%$ \\
 SchNet               & 0.46\,M & 0.585 & $+8\%$ \\
 ALIGNN               & 4.03\,M & 0.540 & --- \\
+CrystalTransformer$^*$  & 0.75\,M & 0.516 & $-4\%$ \\
 \midrule
 \dart{} (single)     & 0.75\,M & \textbf{0.407} & $-25\%$ \\
 \dart{} (29-ens.)    & ---     & \textbf{0.359} & $-34\%$ \\
@@ -31,9 +34,25 @@ ALIGNN               & 4.03\,M & 0.540 & --- \\
 \dart{} achieves a single-model MAE of 0.407\eV{}, reducing the error by
 25\% relative to ALIGNN (0.540\eV{}) with 5.4$\times$ fewer parameters
 (0.75\,M vs.\ 4.03\,M).
+Notably, the vanilla CrystalTransformer backbone---sharing \dart{}'s
+architecture but trained with MSE loss and plateau scheduling---reaches
+only 0.516\eV{}, confirming that the defect-site embedding and optimized
+training pipeline contribute a further 21\% improvement beyond
+architectural choice alone.
 The 29-model ensemble further reduces the MAE to 0.359\eV{} ($-34\%$),
 with multi-source models contributing orthogonal error patterns
 (selected at $k=3$ during greedy forward selection).
+
+\paragraph{Computational efficiency.}
+\dart{}'s compact design translates to practical training and inference
+advantages.
+A full 150-epoch training run completes in ${\sim}22$ minutes on a
+single NVIDIA L40S GPU, compared to ${\sim}12$ minutes for the
+50-epoch CrystalTransformer baseline (at lower final accuracy) and
+several hours for ALIGNN with comparable hyperparameter search.
+At inference, \dart{} processes the 1\,065-sample test set in
+$<5$~seconds, enabling rapid screening of the full
+$44\times65$ host--dopant matrix in under 30~seconds.
 
 \paragraph{Error structure.}
 Figure~\ref{fig:error_analysis} decomposes prediction errors along three
@@ -43,9 +62,13 @@ physically meaningful axes.
 bias toward either defect class.
 (b)~By $\ef$ magnitude: the model is most accurate for $|\ef| < 5$\eV{}
 (MAE $\leq 0.34$\eV{}) but degrades for extreme values
-($\ef > 10$\eV{}: MAE $= 2.69$\eV{}, $n=35$), reflecting both data
-sparsity in the tails and the intrinsic difficulty of high-energy
-configurations.
+($\ef > 10$\eV{}: MAE $= 2.69$\eV{}, $n=35$).
+This degradation reflects three compounding factors: data sparsity in the
+tails ($<3.3\%$ of training data), the intrinsic difficulty of high-energy
+configurations where DFT convergence itself is often marginal, and the
+physical diversity of extreme-$\ef$ structures---which span chemically
+disparate host--dopant pairs with qualitatively different bonding
+character (ionic vs.\ covalent vs.\ metallic).
 (c)~By dopant element: Figure~\ref{fig:periodic_table} maps per-dopant
 MAE onto the periodic table, revealing that main-group metals (Bi, Pb,
 Sr: MAE $< 0.17$\eV{}) are consistently easier to predict than early
