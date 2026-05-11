@@ -1,0 +1,35 @@
+{
+  "graduated_evaluation": [
+    {
+      "tier": 0,
+      "scenario": "ID (random split)",
+      "mae_eV": 0.362,
+      "description": "Same distribution (28-model ensemble)"
+    },
+    {
+      "tier": 1,
+      "scenario": "Intra-family OOD (P0, 2-fold)",
+      "mae_eV": 0.4494568854570389,
+      "description": "Leave-one-G6-host-out [\u00b10.073]"
+    },
+    {
+      "tier": 2,
+      "scenario": "Full OOD (prospective DFT)",
+      "mae_eV": 2.66,
+      "description": "Novel materials (v3)"
+    }
+  ],
+  "p0_results": {
+    "MoS2": {
+      "test_mae": 0.5221874117851257,
+      "val_mae": 0.43065425753593445,
+      "naive_mae": 3.5073226145997283
+    },
+    "MoSe2": {
+      "test_mae": 0.376726359128952,
+      "val_mae": 0.43316006660461426,
+      "naive_mae": 2.874223629544268
+    }
+  },
+  "p1_result": null
+}
