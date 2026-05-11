@@ -56,6 +56,9 @@ MODEL_KWARGS = dict(
     dropout=0.1, ct_uae_path=str(ROOT / "data" / "ct_uae_mt3_embeddings.pt"),
 )
 
+# Flag to disable ct-UAE (set via --no-uae argument)
+USE_UAE = True
+
 # ── Experiment definitions ───────────────────────────────────────────────
 G6_HOSTS = ['MoS2', 'MoSe2', 'MoTe2', 'WS2', 'WSe2', 'WTe2', 'MoSSe']
 
@@ -163,12 +166,13 @@ def make_loho_split(data, holdout_hosts=None, holdout_dopants=None,
 
 
 # ── Training ─────────────────────────────────────────────────────────────
-def train_model(train_loader, val_loader, device, seed, tag):
+def train_model(train_loader, val_loader, device, seed, tag, model_kwargs=None):
     """Train CrystalTransformer with v4 recipe."""
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    model = CrystalTransformer(**MODEL_KWARGS).to(device)
+    kwargs = model_kwargs if model_kwargs is not None else MODEL_KWARGS
+    model = CrystalTransformer(**kwargs).to(device)
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"  Model params: {n_params/1e6:.4f}M")
 
@@ -302,21 +306,30 @@ def evaluate(model, test_loader, device):
 
 
 # ── Main ─────────────────────────────────────────────────────────────────
-def run_single_fold(exp, fold, seed, gpu):
+def run_single_fold(exp, fold, seed, gpu, no_uae=False):
     """Run a single fold of the OOD experiment."""
     device = torch.device(f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
+    uae_label = " [NO-UAE ablation]" if no_uae else ""
     print(f"\n{'='*60}")
-    print(f"OOD Experiment: {exp}, Fold: {fold}, Seed: {seed}, Device: {device}")
+    print(f"OOD Experiment: {exp}, Fold: {fold}, Seed: {seed}, Device: {device}{uae_label}")
     print(f"{'='*60}")
+
+    # Apply UAE ablation
+    model_kwargs = dict(MODEL_KWARGS)
+    if no_uae:
+        model_kwargs["ct_uae_path"] = None
 
     # Load data
     data = load_data()
 
     # Create splits based on experiment type
+    # Tag suffix for ablation
+    uae_suffix = "_nouae" if no_uae else ""
+
     if exp == "p0":
         # Leave-one-G6-host-out
         assert fold in G6_HOSTS, f"fold must be one of {G6_HOSTS}"
-        tag = f"loho_{fold}_s{seed}"
+        tag = f"loho_{fold}_s{seed}{uae_suffix}"
         train_data, val_data, test_data = make_loho_split(
             data, holdout_hosts=[fold], seed=seed
         )
@@ -324,7 +337,7 @@ def run_single_fold(exp, fold, seed, gpu):
 
     elif exp == "p1":
         # Block-out: G6 × 3d-TM
-        tag = f"block_g6x3d_s{seed}"
+        tag = f"block_g6x3d_s{seed}{uae_suffix}"
         train_data, val_data, test_data = make_loho_split(
             data, block_hosts=set(G6_HOSTS), block_dopants=set(TM_3D), seed=seed
         )
@@ -355,7 +368,8 @@ def run_single_fold(exp, fold, seed, gpu):
                              collate_fn=collate_fn, num_workers=2, pin_memory=True)
 
     # Train
-    model, best_val, wall, history = train_model(train_loader, val_loader, device, seed, tag)
+    model, best_val, wall, history = train_model(train_loader, val_loader, device, seed, tag,
+                                                  model_kwargs=model_kwargs)
 
     # Evaluate on test set
     print(f"\n  Evaluating on OOD test set ({len(test_data)} samples)...")
@@ -403,7 +417,7 @@ def run_single_fold(exp, fold, seed, gpu):
         "per_host_mae": {h: float(np.abs(np.array(per_host[h]["preds"]) -
                                           np.array(per_host[h]["targets"])).mean())
                         for h in per_host},
-        "model_kwargs": MODEL_KWARGS,
+        "model_kwargs": model_kwargs,
         "config": {
             "epochs": EPOCHS, "lr": LR, "batch_size": BATCH_SIZE,
             "warmup": WARMUP_EPOCHS, "swa_start": SWA_START,
@@ -455,6 +469,8 @@ def main():
     parser.add_argument("--gpu", type=int, default=0,
                         help="GPU ID for single fold")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--no-uae", action="store_true",
+                        help="Ablation: disable ct-UAE pretrained embeddings")
     args = parser.parse_args()
 
     if args.all and args.exp == "p0":
@@ -465,7 +481,7 @@ def main():
         parser.error("P0 requires --fold (host name) or --all")
 
     fold = args.fold if args.fold else "g6x3d"
-    run_single_fold(args.exp, fold, args.seed, args.gpu)
+    run_single_fold(args.exp, fold, args.seed, args.gpu, no_uae=args.no_uae)
 
 
 if __name__ == "__main__":
