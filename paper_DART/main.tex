@@ -29,40 +29,30 @@
 \date{\today}
 
 \begin{abstract}
-Defect engineering in two-dimensional (2D) materials demands rapid screening
-of defect formation energies ($\ef$) across vast combinatorial spaces, yet
-density functional theory (DFT) calculations remain prohibitively expensive.
-Existing graph neural network (GNN) surrogates achieve reasonable accuracy on
-random test splits but lack systematic evaluation of generalization to unseen
-host materials---a prerequisite for trustworthy deployment.
+Point defects critically influence the electronic, optical, and catalytic
+properties of two-dimensional (2D) materials, yet first-principles
+prediction of defect formation energies ($\ef$) across vast host--dopant
+spaces remains prohibitively expensive.
 %
 Here we introduce \dart{} (Defect-Aware Radial Transformer), a compact
-0.75\,M-parameter architecture coupling local bond--angle message passing
-with global periodic self-attention biased by minimum-image distances, and
-augmented by an explicit defect-site embedding.
+0.75\,M-parameter graph transformer that couples local bond-angle message
+passing with global periodic self-attention, augmented by an explicit
+defect-site embedding.
 %
-On the IMP2D benchmark (10\,641 DFT-converged impurity configurations in 44
-host monolayers), \dart{} achieves a single-model mean absolute error (MAE)
-of 0.407~eV and an ensemble MAE of 0.359~eV, reducing the error by 25\%
-and 34\% relative to ALIGNN (4.03\,M parameters), respectively.
+On the IMP2D benchmark (10\,641 impurity configurations across 44 host
+monolayers), \dart{} achieves a test MAE of 0.407~eV---25\% below ALIGNN
+with $5.4\times$ fewer parameters---with systematic ablation confirming
+that training engineering accounts for the majority of the gain.
 %
-We further propose a three-tier \emph{Graduated Generalization Assessment}:
-(i)~in-distribution random split, (ii)~intra-family out-of-distribution via
-leave-one-host-out cross-validation over G6 transition-metal dichalcogenides,
-and (iii)~compositional out-of-distribution via block-out matrix completion.
+A graduated out-of-distribution assessment quantifies generalization
+boundaries: leave-one-host-out extrapolation within the transition-metal
+dichalcogenide family yields a mean MAE of 0.54~eV, accompanied by
+calibrated ensemble uncertainty (93\% coverage at the 90\% nominal level).
 %
-\dart{} degrades gracefully from 0.36 to 0.54~eV ($1.5\times$) under
-intra-family extrapolation---far milder than the $4.9\times$ naive-baseline
-gap---demonstrating robust transferability within the TMD family.
-%
-Temperature-scaled ensemble uncertainty achieves 93.4\% empirical coverage at
-the 90\% nominal level, enabling reliable high-throughput screening with
-calibrated confidence bounds.
-%
-These results establish \dart{} as an efficient and trustworthy surrogate
-for accelerating defect engineering workflows in 2D materials---from
-identifying beneficial dopants for catalysis and optoelectronics to
-flagging detrimental trap states in electronic devices.
+These results demonstrate that physically informed inductive biases
+combined with rigorous training methodology, rather than parameter
+scaling, are the primary levers for accurate and trustworthy
+defect-property surrogates in the data-limited materials regime.
 \end{abstract}
 
 \maketitle
