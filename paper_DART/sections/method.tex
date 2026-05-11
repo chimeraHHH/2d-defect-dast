@@ -64,6 +64,19 @@ geometries.
 bonding from long-range defect-induced perturbations
 (Fig.~\ref{fig:architecture}).
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/architecture.pdf}
+\caption{\dart{} architecture overview.
+  Local interaction layers (blue) capture bond lengths, bond angles, and
+  coordination within $r_\mathrm{cut} = 5$\,\AA{}.
+  Global geometric self-attention layers (orange) model long-range
+  defect-induced perturbations via distance-biased attention up to
+  $d_\mathrm{max} = 12$\,\AA{}.
+  An explicit defect-site embedding (red) injects the dopant location.}
+\label{fig:architecture}
+\end{figure*}
+
 \subsubsection{Local interaction layers}
 
 The first $L_\mathrm{loc} = 3$ layers operate on the sparse neighbor graph.
