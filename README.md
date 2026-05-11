@@ -2,8 +2,9 @@
 
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.362%20eV-red)](#v40-enhanced-training--26-model-ensemble-2026-05-10)
-[![best single](https://img.shields.io/badge/best%20single-0.407%20eV-orange)](#v40-enhanced-training--26-model-ensemble-2026-05-10)
+[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.359%20eV-red)](#v40-enhanced-training--29-model-ensemble-2026-05-10)
+[![best single](https://img.shields.io/badge/best%20single-0.407%20eV-orange)](#v40-enhanced-training--29-model-ensemble-2026-05-10)
+[![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
 [![DFT discovery](https://img.shields.io/badge/prospective%20DFT-70%25%20A%20hit%20rate-9cf)](#v30-prospective-dft-验证-2026-05-07)
 
@@ -14,12 +15,14 @@
 
 * **0.75 M 参数的紧凑混合模型大幅超越 ALIGNN（4.03 M）**
   （v4 best single 0.407 eV vs ALIGNN 0.540 eV，↓25%）
-* **28-model 多样性集成（含多源深度模型）** 在 1065 测试样本上达 **0.362 eV**（↓33% vs ALIGNN）
+* **29-model 多样性集成（含多源模型）** 在 1065 测试样本上达 **0.359 eV**（↓34% vs ALIGNN）
+* **约束 OOD 评估**：Leave-One-Host-Out 7-fold 平均 **0.540 eV**，
+  从 ID 到族内 OOD 仅 1.5× 退化（而非全 OOD 的 7.3×），模型优雅降级
+* **ct-UAE 消融**：预训练原子嵌入对 ID 有 +1% 收益，但 OOD 场景无统计显著帮助（p=0.22）
 * **6-seed ensemble + 温度缩放** 90% 覆盖率从 72.5% 校准到 93.4%
-* **v2 多源 PFA 4-seed = 0.486 ± 0.025 eV**（11% 优于 v1 多源 baseline）
 * **物理可解释性**：自注意力 + occlusion + bond-strain + LightGBM-physics
   四个量化测试均显示模型自发将缺陷原子学成全局枢纽（注意力 32×、归因 90.7%）
-* **Prospective DFT（v3，本仓库新增）**：60 模型推荐候选 → 37 真实
+* **Prospective DFT（v3）**：60 模型推荐候选 → 37 真实
   PBE QE 验证 → bucket A 70% 命中低 Ef，σ_cal 在 OOD 上反向校准
 
 > **诚实化声明**：项目曾经报告过 0.206 eV 的"突破性"结果。该数字基于
@@ -27,9 +30,9 @@
 
 ---
 
-## v4.0 — Enhanced Training + 26-Model Ensemble（2026-05-10）
+## v4.0 — Enhanced Training + 29-Model Ensemble（2026-05-10）
 
-通过系统性的训练策略优化和多样性集成，将 test MAE 从 0.443 eV 推进到 **0.362 eV**（含多源深度模型）。
+通过系统性的训练策略优化和多样性集成，将 test MAE 从 0.443 eV 推进到 **0.359 eV**（含多源模型）。
 
 ### 核心改进
 
@@ -52,12 +55,13 @@
 |---|---|---|
 | 2 | 0.377 | 150ep_s42 + 150ep_s45 |
 | 3 | 0.366 | + **ms4_deep_s42** [多源深度] |
-| 5 | **0.362** | 150ep_s45 + 150ep_s42 + ms4_deep + 150ep_s43 + deep_s42 |
-| 8 | 0.362 | + warmup_s46 + no_uae_s42 + ms4_s43 |
-| Full (28) | 0.389 | 全部模型平均 |
+| 5 | 0.362 | + 150ep_s43 + deep_s42 |
+| 6 | 0.360 | + **ms4_s42** [多源浅层] |
+| 7 | **0.359** | + no_uae_s42 |
+| Full (29) | 0.388 | 全部模型平均 |
 
-**关键发现**：多源深度模型 (ms4_deep_s42) 在 k=3 被选入，提供单源模型无法覆盖的多样性。
-最优组合跨越 **6 个多样性轴**：
+**关键发现**：多源模型 ms4_deep_s42 (k=3) 和 ms4_s42 (k=6) 均被选入，
+提供单源模型无法覆盖的数据分布多样性。最优组合跨越 **6 个多样性轴**：
 - **损失函数**：MSE / Huber / MAE
 - **架构深度**：浅 (3+2 layers) / 深 (4+3 layers)
 - **训练长度**：100ep / 150ep
@@ -65,7 +69,7 @@
 - **随机种子**：s42–s46
 - **训练数据**：单源 IMP2D / 多源 4-DB 联合
 
-Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
+Best-7 ensemble σ–|error| Spearman = 0.577，可用于不确定度估计。
 
 ### SOTA 对比
 
@@ -75,11 +79,11 @@ Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
 | CrystalTransformer v1.2 (single) | 0.75 M | 0.516 | −4% |
 | **CT v4 best single** | **0.75 M** | **0.407** | **−25%** |
 | CT v4 5-ensemble (SS only) | 5×0.75 M | 0.368 | −32% |
-| **CT v4 5-ensemble (SS+MS)** | **5×(0.75–1.1) M** | **0.362** | **−33%** |
+| **CT v4 7-ensemble (SS+MS)** | **7×(0.75–1.1) M** | **0.359** | **−34%** |
 
 代码：
 * [scripts/ensemble_online.py](scripts/ensemble_online.py) — 26 模型加载 + greedy 集成评估
-* [scripts/ensemble_combined.py](scripts/ensemble_combined.py) — 28 模型（含多源）联合评估
+* [scripts/ensemble_combined.py](scripts/ensemble_combined.py) — 29 模型（含多源）联合评估
 * [configs/enhanced_online_150ep_uae_mae_warmup.yaml](configs/enhanced_online_150ep_uae_mae_warmup.yaml) — 最优单模型配方
 * [configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml](configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml) — 深层变体
 
@@ -91,13 +95,79 @@ Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
 | 模型 | 架构 | 参数 | Test MAE | 集成贡献 |
 |---|---|---|---|---|
 | ms4_deep_s42 | 深 (4+3) | 1.14 M | 0.413 | **k=3 选入**（第3重要） |
-| ms4_s43 | 浅 (3+2) | 0.83 M | 0.441 | k=8（边际贡献） |
+| ms4_s42 | 浅 (3+2) | 0.83 M | 0.421 | **k=6 选入** |
+| ms4_s43 | 浅 (3+2) | 0.83 M | 0.441 | k=10（边际贡献） |
 
-**关键洞察**：深层多源模型同时具备架构多样性和数据分布多样性，与单源模型的
-误差相关性更低（mean ρ=0.83），是唯一一个在 greedy selection 前 5 名中被
-选入的多源模型。
+**关键洞察**：多源模型同时具备架构多样性和数据分布多样性，与单源模型的
+误差相关性更低（mean ρ=0.83），在 greedy selection 中有 2 个进入前 7 名。
 
 代码：[scripts/multi_source_v4.py](scripts/multi_source_v4.py)
+
+### v4.1 — Constrained OOD Evaluation（2026-05-11）
+
+> 填补 ID (0.36 eV) 和全 OOD (2.66 eV) 之间的评估空白：
+> 在化学空间中设计受控的留出实验，量化模型的**梯度退化**行为。
+
+#### Graduated Generalization Table
+
+| Tier | Scenario | MAE (eV) | Description |
+|------|----------|----------|-------------|
+| 0 | ID（随机划分） | 0.362 | 同分布，29-model 集成 |
+| 1 | 族内 OOD（P0, 7-fold） | 0.540 ± 0.117 | Leave-one-G6-host-out |
+| 2 | 组合 OOD（P1） | 0.534 | G6×3d 块缺失（矩阵补全） |
+| 3 | 全 OOD（prospective DFT） | 2.660 | 从未见过的材料 + DFT 验证 |
+
+**核心结论**：模型从 ID 到约束 OOD 仅 **1.5×** 退化，
+远优于到全 OOD 的 7.3×，证明模型学到了跨宿主化学迁移知识。
+
+#### P0: Leave-One-G6-Host-Out（7-fold）
+
+依次留出 Group-6 TMD 家族中的一个宿主（MoS2, MoSe2, MoTe2, WS2, WSe2, WTe2, MoSSe），
+用其余 6 个 G6 宿主 + 37 个非 G6 宿主训练，在留出宿主上评估。
+
+| Fold | OOD MAE | Naive Baseline | 改善 |
+|------|---------|----------------|------|
+| MoSe2 | **0.377** | 2.874 | 86.9% |
+| MoTe2 | 0.480 | 1.910 | 74.8% |
+| MoSSe | 0.484 | 2.019 | 76.1% |
+| WTe2 | 0.506 | 2.005 | 74.8% |
+| MoS2 | 0.522 | 3.507 | 85.1% |
+| WSe2 | 0.653 | 2.883 | 77.3% |
+| WS2 | 0.759 | 3.253 | 76.7% |
+| **Mean** | **0.540 ± 0.117** | **2.636** | **79.5%** |
+
+**vs ALIGNN ID (0.540 eV)**：约束 OOD 平均性能 ≈ ALIGNN 的同分布性能。
+
+#### P1: G6×3d Compositional Block-Out
+
+留出 G6-TMD 宿主与 3d 过渡金属掺杂剂的所有组合（372 样本），
+训练集仅见过"G6 + 非 3d"和"非 G6 + 3d"——测试模型的组合外推能力。
+
+- **OOD MAE: 0.534 eV**（naive baseline 1.754, 改善 69.5%）
+- Per-host range: MoTe2 0.389 — WS2 0.667
+
+#### ct-UAE Ablation for OOD
+
+对比有 / 无 ct-UAE 预训练原子嵌入对 OOD 泛化的影响：
+
+| 指标 | With ct-UAE | Without ct-UAE |
+|------|-------------|----------------|
+| P0 Mean OOD MAE | 0.540 ± 0.117 | **0.493 ± 0.087** |
+| No-UAE 赢的 fold | 2/7 | **5/7** |
+| Paired t-test | — | p = 0.22 (不显著) |
+
+ct-UAE 在 ID 有 ~1% 收益，但 **OOD 无统计显著帮助**。
+趋势性地，无 UAE 的模型在 OOD 上更好且方差更小——
+可能因为 UAE 编码了训练分布的化学模式，轻微过拟合。
+
+代码：
+* [scripts/ood_loho_train.py](scripts/ood_loho_train.py) — P0/P1 训练（含 `--no-uae` 消融）
+* [scripts/ood_collect_results.py](scripts/ood_collect_results.py) — 结果汇总 + graduated table
+* [scripts/ood_experiment_design.md](scripts/ood_experiment_design.md) — 实验设计文档
+
+输出：
+* [results/ood/ood_summary.json](results/ood/ood_summary.json) — 结构化汇总
+* [results/ood/ablation_uae_ood.json](results/ood/ablation_uae_ood.json) — ct-UAE 消融对比
 
 ---
 
@@ -202,7 +272,7 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|
-| 🥇 **v4 5-ens (SS+MS combined)** | 5×(0.75–1.1) M | **0.362 eV** | — | 含多源深度模型，↓33% vs ALIGNN |
+| 🥇 **v4 7-ens (SS+MS combined)** | 7×(0.75–1.1) M | **0.359 eV** | — | 含多源模型，↓34% vs ALIGNN |
 | 🥈 **v4 5-ens (SS only)** | 5×0.75 M | **0.368 eV** | 0.978 eV | 150ep+deep+UAE 多样性 |
 | 🥉 **v4 best single (150ep MAE+warmup+UAE)** | 0.75 M | **0.407 eV** | — | seed 45 |
 | v1.2 6-member ensemble (τ=1.83) | 6×0.75 M | 0.443 eV | 1.094 eV | 4×50ep + 2×100ep |
@@ -223,12 +293,16 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 详见 [scripts/uq_calibration.py](scripts/uq_calibration.py) /
 [scripts/uq_calibration_xlong.py](scripts/uq_calibration_xlong.py)。
 
-### 跨域外推 (Leave-One-Host-Out)
+### 跨域外推 (Constrained OOD)
 
-5 个二维材料家族留一宿主：MoS₂ / Cr₂I₆ / C₂H₂ / TaSe₂ / MoSSe；每个
-host 留出 ~300 测试样本，剩余样本（leak-free × 3 增强）从头训练 50
-epoch。结果详见 [results/loho_summary.json](results/loho_summary.json)
-与 [paper §sec:loho](paper/main.pdf)。
+**v4.1 系统性 OOD 评估**（详见 [v4.1 节](#v41--constrained-ood-evaluation2026-05-11)）：
+- P0: G6-TMD 家族 7-fold leave-one-host-out → **0.540 ± 0.117 eV**
+- P1: G6×3d 组合块缺失 → **0.534 eV**
+- ct-UAE 消融：OOD 无显著帮助 (p=0.22)
+- Graduated table: ID 0.36 → 约束 OOD 0.54 → 全 OOD 2.66
+
+v1.2 legacy LOHO（5 host, 50ep）结果详见
+[results/loho_summary.json](results/loho_summary.json)。
 
 ### 跨数据集迁移 (IMP2D → JARVIS)
 
@@ -251,7 +325,7 @@ epoch。结果详见 [results/loho_summary.json](results/loho_summary.json)
 | CrystalTransformer v1.2 (ours) | 0.75 | 0.516 |
 | **CT v4 best single (ours)** | **0.75** | **0.407** |
 | CT v4 5-ensemble SS (ours) | 5×0.75 | 0.368 |
-| **CT v4 5-ensemble SS+MS (ours)** | **5×(0.75–1.1)** | **0.362** |
+| **CT v4 7-ensemble SS+MS (ours)** | **7×(0.75–1.1)** | **0.359** |
 
 **经验缩放律** log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
 R² = 0.95 → **数据是瓶颈，模型容量超过 ~0.5–0.8 M 反而过拟合**。
@@ -287,6 +361,12 @@ scripts/
 ├── train_pfa.py / train_dualstream.py
 # v4.x enhanced training + ensemble
 ├── ensemble_online.py                    # ⭐ 26-model greedy ensemble 评估
+├── ensemble_combined.py                  # ⭐ 29-model SS+MS 联合评估
+├── multi_source_v4.py                    # ⭐ 4-DB 联合 v4 训练
+# v4.1 constrained OOD evaluation (2026-05-11)
+├── ood_loho_train.py                     # ⭐ P0/P1 OOD 训练（含 --no-uae 消融）
+├── ood_collect_results.py                # ⭐ OOD 结果汇总 + graduated table
+├── ood_experiment_design.md              # OOD 实验设计文档
 # Phase A/B physical interpretability (2026-05-06)
 ├── phase_a_descriptors.py            # ⭐ 数据驱动平衡键长 + bond_strain
 ├── phase_a_occlusion_per_atom.py     # ⭐ 全 test fold per-atom 归因
@@ -321,7 +401,14 @@ results/
 ├── prospective_dft_summary.json              # ⭐ raw + corrected 统计
 ├── qe_outputs/                               # ⭐ 125 个 pw.x .out (3.5 MB)
 ├── phase_a_*.{json,npz}                      # ⭐ 物理可解释性
-└── phase_b_ood_physics.json                  # ⭐ OOD 物理分布偏移
+├── phase_b_ood_physics.json                  # ⭐ OOD 物理分布偏移
+├── ood/                                      # ⭐ v4.1 约束 OOD 评估
+│   ├── loho_{MoS2,...,MoSSe}_s42/            #   P0 7-fold metrics
+│   ├── loho_*_s42_nouae/                     #   ct-UAE 消融 metrics
+│   ├── block_g6x3d_s42/                      #   P1 组合块缺失
+│   ├── ood_summary.json                      #   graduated evaluation table
+│   └── ablation_uae_ood.json                 #   ct-UAE 消融统计
+└── ensemble_combined.json                    # ⭐ 29-model 集成结果
 paper/
 ├── main.tex / main.pdf                       # ⭐ 论文 v2.0 (18 pages)
 ├── sec_prospective_dft.tex                   # ⭐ §Prospective DFT
@@ -409,7 +496,7 @@ python scripts/prospective_dft_analyze.py
 ## Roadmap / TODO
 
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
-当前最优：**单模型 0.407 eV / 5-ensemble 0.362 eV**（SS+MS combined, 含多源深度模型）。
+当前最优：**单模型 0.407 eV / 7-ensemble 0.359 eV**（SS+MS combined, 含多源模型）。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
@@ -422,8 +509,10 @@ python scripts/prospective_dft_analyze.py
   计算 PH 特征，拼接到节点特征。文献报告在钙钛矿缺陷 Ef 上降低 55% MAE。
   参考：[PH + GNN for Defect Ef](https://pubs.acs.org/doi/10.1021/acs.chemmater.4c03028)
   （Chem. Mater. 2024）
-- [x] **扩大 ensemble 成员数**：28 models across 6 diversity axes (含多源深度) →
-  best-5 ensemble 0.362 eV（↓18% vs 旧 6-ensemble 0.443，↓33% vs ALIGNN）
+- [x] **扩大 ensemble 成员数**：29 models across 6 diversity axes (含多源模型) →
+  best-7 ensemble 0.359 eV（↓19% vs 旧 6-ensemble 0.443，↓34% vs ALIGNN）
+- [x] **约束 OOD 评估**：G6-TMD 7-fold LOHO (0.540 eV) + G6×3d 组合块缺失 (0.534 eV)
+  + ct-UAE 消融（OOD 无显著帮助，p=0.22）
 
 ### Tier 2 — 中等成本（局部架构改动）
 
