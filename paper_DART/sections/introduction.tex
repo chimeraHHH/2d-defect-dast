@@ -1,0 +1,98 @@
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------
+\subsection{Defect engineering in two-dimensional materials}
+%----------------------------------------------------------------------
+
+Point defects---substitutional impurities, interstitials, and
+vacancies---fundamentally govern the electronic, optical, and catalytic
+properties of two-dimensional (2D) materials~\cite{imp2d2023}.
+In transition-metal dichalcogenides (TMDs) such as MoS$_2$ and WSe$_2$,
+a single dopant atom can shift the Fermi level, create mid-gap trap states,
+or activate catalytic edge sites.
+The defect formation energy $\ef$ quantifies the thermodynamic cost of
+introducing such a defect and serves as the primary descriptor for
+high-throughput defect screening.
+
+However, the combinatorial space of possible host--dopant configurations
+is enormous.
+The Impurities in 2D Materials Database (IMP2D)~\cite{imp2d2023} covers 44
+monolayer hosts doped with 65 elements, yielding a $44\times65 = 2{,}860$
+matrix of which only 91.2\% entries have converged DFT results
+(10\,641 configurations).
+Each DFT supercell calculation requires hours of CPU time, making exhaustive
+enumeration impractical for the remaining gaps and for extensions to larger
+supercells or additional host families.
+
+%----------------------------------------------------------------------
+\subsection{Limitations of existing approaches}
+%----------------------------------------------------------------------
+
+Machine-learning (ML) surrogate models offer orders-of-magnitude speedup
+over DFT.
+The Atomistic Line Graph Neural Network (ALIGNN)~\cite{alignn2021}, a
+state-of-the-art crystal property predictor with 4.03\,M parameters, achieves
+an MAE of 0.540\eV{} on IMP2D under random 80/10/10 splitting.
+El~Alouani \textit{et al.}~\cite{elalouani2024} applied gradient-boosted
+trees with hand-crafted Jacobi--Legendre descriptors to the same database,
+reaching 0.518\eV{}.
+Kazeev \textit{et al.}~\cite{kazeev2023} introduced sparse defect
+representations for six host materials, achieving 42\,meV/site (a per-site
+metric not directly comparable to per-structure MAE).
+
+Despite these advances, three critical gaps persist:
+\begin{enumerate}
+  \item \textbf{Parameter efficiency.}
+    ALIGNN's 4.03\,M parameters are disproportionate for a dataset of
+    ${\sim}10$\,k samples, risking overfitting and slow inference.
+  \item \textbf{Physical inductive bias for defects.}
+    Standard message-passing GNNs are bounded by a fixed cutoff radius
+    $r_\mathrm{cut}$, yet point defects in 2D materials induce strain fields
+    and charge-density perturbations extending well beyond typical
+    $r_\mathrm{cut} = 5$--$8$\,\AA{}~\cite{fang2025}.
+    Capturing such long-range effects requires either very deep networks
+    (information dilution) or explicit global interactions.
+  \item \textbf{Generalization assessment.}
+    All prior work on IMP2D reports only random-split accuracy---a measure
+    of interpolation, not extrapolation~\cite{li2025ood}.
+    No study has evaluated whether these models transfer to \emph{unseen
+    host materials} within the same chemical family, let alone across
+    families.
+\end{enumerate}
+
+%----------------------------------------------------------------------
+\subsection{Our contributions}
+%----------------------------------------------------------------------
+
+We address these gaps by introducing \dart{} (Defect-Aware Radial
+Transformer), a compact model with explicit physical inductive biases for 2D
+defect systems, accompanied by a rigorous multi-tier generalization
+assessment.
+Our contributions are:
+
+\begin{enumerate}
+  \item \textbf{\dart{} architecture} (\S\ref{sec:arch}):
+    A 0.75\,M-parameter model combining local bond--angle message passing
+    (three-body interactions within $r_\mathrm{cut}=5$\,\AA{}) with global
+    multi-head self-attention biased by periodic minimum-image distances
+    ($d_\mathrm{max}=12$\,\AA{}), augmented by an explicit defect-site
+    embedding.
+
+  \item \textbf{Systematic training pipeline} (\S\ref{sec:training}):
+    MAE loss, cosine warmup, stochastic weight averaging (SWA), ct-UAE
+    pretrained atomic embeddings~\cite{ctuae2025}, and multi-source data
+    fusion (IMP2D + three auxiliary databases) yield a single-model MAE of
+    0.407\eV{} and a 29-model ensemble of 0.359\eV{} ($-34\%$ vs.\ ALIGNN).
+
+  \item \textbf{Graduated Generalization Assessment} (\S\ref{sec:ood}):
+    A three-tier protocol---in-distribution, intra-family
+    leave-one-host-out (LOHO), and compositional block-out---quantifying
+    \dart{}'s deployment boundaries.
+    Intra-family OOD degrades by only 1.5$\times$ (0.54\eV{}), far below
+    the 4.9$\times$ naive-baseline collapse.
+
+  \item \textbf{Calibrated uncertainty quantification}
+    (\S\ref{sec:uq}):
+    Temperature-scaled ensemble variance achieves 93.4\% coverage at the
+    90\% nominal level.
+\end{enumerate}

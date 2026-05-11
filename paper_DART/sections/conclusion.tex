@@ -1,0 +1,31 @@
+% !TEX root = ../main.tex
+
+We have presented \dart{}, a compact 0.75\,M-parameter defect-aware graph
+transformer that achieves state-of-the-art accuracy for predicting defect
+formation energies in two-dimensional materials.
+Three principal findings emerge:
+
+\begin{enumerate}
+  \item \textbf{Accuracy with efficiency.}
+    \dart{} reduces the test MAE on IMP2D from 0.540\eV{} (ALIGNN, 4.03\,M
+    parameters) to 0.407\eV{} (single model) and 0.359\eV{} (ensemble),
+    representing a 25--34\% improvement with 5.4$\times$ fewer parameters.
+
+  \item \textbf{Quantified generalization boundaries.}
+    The graduated three-tier OOD assessment reveals that \dart{} degrades
+    gracefully within the TMD family (1.5$\times$ MAE increase under
+    leave-one-host-out), with Mo-based hosts being systematically easier to
+    predict than W-based hosts---a trend rooted in orbital delocalization
+    differences between 4$d$ and 5$d$ electrons.
+
+  \item \textbf{Calibrated uncertainty.}
+    Temperature-scaled ensemble uncertainty achieves 93.4\% coverage at the
+    90\% nominal level, enabling practitioners to identify unreliable
+    predictions before deployment.
+\end{enumerate}
+
+Together, these results establish \dart{} as a reliable and efficient
+surrogate for high-throughput screening of 2D material defect properties,
+with clearly delineated applicability domains.
+The code, trained models, and evaluation protocols are publicly available
+to support reproducibility and community benchmarking.

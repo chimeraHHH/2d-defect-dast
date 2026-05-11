@@ -1,0 +1,60 @@
+% !TEX root = ../main.tex
+
+\subsection{Dataset}
+
+We use the Impurities in 2D Materials Database
+(IMP2D)~\cite{imp2d2023}, filtering for DFT-converged configurations with
+$|\ef| < 20$\eV{}, yielding 10\,641 samples spanning 44 host monolayers and
+65 dopant elements.
+The dataset covers two defect types: adsorbates (68\%) and interstitials
+(32\%).
+We adopt a deterministic ordered split of 8\,512 / 1\,064 / 1\,065 for
+training / validation / testing.
+
+For multi-source training, we additionally incorporate JARVIS-2D (2D
+formation energies), JARVIS-3D (3D formation energies), and a curated DFT-3D
+set, totaling ${\sim}27$\,k samples across all sources.
+
+\subsection{Baselines}
+
+\begin{itemize}
+  \item \textbf{Naive baseline}: global mean of training-set $\ef$ values,
+    providing a lower bound on model utility.
+  \item \textbf{SchNet}~\cite{schutt2018}: continuous-filter GNN
+    (0.46\,M parameters), representing the CGCNN-class of models without
+    angular information.
+  \item \textbf{ALIGNN}~\cite{alignn2021}: line-graph GNN with explicit
+    bond-angle encoding (4.03\,M parameters), the current standard for
+    crystal property prediction.
+  \item \textbf{LightGBM}: tree-based baseline with 9-dimensional atomic
+    features (same as \dart{} node features), providing a non-neural reference.
+  \item \textbf{El~Alouani~\textit{et al.}}~\cite{elalouani2024}:
+    LightGBM with Jacobi--Legendre structural descriptors on the same
+    IMP2D dataset (reported result).
+\end{itemize}
+
+All GNN baselines are trained with identical data splits and evaluation
+protocol for fair comparison.
+
+\subsection{Training details}
+
+\dart{} is trained with AdamW ($\beta_1 = 0.9$, $\beta_2 = 0.999$,
+weight decay $10^{-4}$), batch size 64, and gradient clipping at 5.0.
+Host-balanced sampling ensures each of the 44 hosts contributes equally per
+epoch (200 samples per host with replacement).
+All experiments use a single NVIDIA L40S GPU; typical training time is
+${\sim}22$ minutes for 150 epochs.
+
+For the OOD evaluation (Tier~1), we retrain \dart{} from scratch for each of
+the 7 LOHO folds, using the standard recipe without multi-source data
+(single-source IMP2D only, seed 42).
+
+\subsection{Evaluation metrics}
+
+We report mean absolute error
+$\mae = \frac{1}{N}\sum_i |{\hat{E}}_{\mathrm{f},i} - E_{\mathrm{f},i}|$
+and root-mean-square error (RMSE) in eV.
+For OOD experiments, we additionally compare against the naive baseline to
+quantify the improvement ratio.
+Statistical significance of ablation comparisons is assessed via paired
+$t$-tests across multiple seeds (3--5 seeds per configuration).
