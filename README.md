@@ -83,6 +83,22 @@ Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
 * [configs/enhanced_online_150ep_uae_mae_warmup.yaml](configs/enhanced_online_150ep_uae_mae_warmup.yaml) — 最优单模型配方
 * [configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml](configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml) — 深层变体
 
+### Multi-Source v4（2026-05-11）
+
+将 v4 训练配方迁移到 4-DB 联合训练（IMP2D + JARVIS-2D + JARVIS-3D + DFT-3D），
+使用 per-source readout heads + source weighting：
+
+| 模型 | 架构 | 参数 | Test MAE | 集成贡献 |
+|---|---|---|---|---|
+| ms4_deep_s42 | 深 (4+3) | 1.14 M | 0.413 | **k=3 选入**（第3重要） |
+| ms4_s43 | 浅 (3+2) | 0.83 M | 0.441 | k=8（边际贡献） |
+
+**关键洞察**：深层多源模型同时具备架构多样性和数据分布多样性，与单源模型的
+误差相关性更低（mean ρ=0.83），是唯一一个在 greedy selection 前 5 名中被
+选入的多源模型。
+
+代码：[scripts/multi_source_v4.py](scripts/multi_source_v4.py)
+
 ---
 
 ## v3.0 — Prospective DFT 验证（2026-05-07）
@@ -406,8 +422,8 @@ python scripts/prospective_dft_analyze.py
   计算 PH 特征，拼接到节点特征。文献报告在钙钛矿缺陷 Ef 上降低 55% MAE。
   参考：[PH + GNN for Defect Ef](https://pubs.acs.org/doi/10.1021/acs.chemmater.4c03028)
   （Chem. Mater. 2024）
-- [x] **扩大 ensemble 成员数**：26 models across 5 diversity axes →
-  best-5 ensemble 0.368 eV（↓17% vs 旧 6-ensemble 0.443）
+- [x] **扩大 ensemble 成员数**：28 models across 6 diversity axes (含多源深度) →
+  best-5 ensemble 0.362 eV（↓18% vs 旧 6-ensemble 0.443，↓33% vs ALIGNN）
 
 ### Tier 2 — 中等成本（局部架构改动）
 
