@@ -1,0 +1,32 @@
+# LaTeX temporary files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+main.pdf
+
+# Figure PNGs (keep PDFs only)
+figures/*.png
+
+# Standalone TikZ temp files
+figures/*.aux
+figures/*.log
+figures/*.pdf
+!figures/architecture.pdf
+!figures/error_analysis.pdf
+!figures/loho_bar.pdf
+!figures/ablation_waterfall.pdf
+!figures/periodic_table_mae.pdf
+!figures/uq_calibration.pdf
+
+# Python
+__pycache__/
+*.pyc
