@@ -11,9 +11,9 @@
 \graphicspath{{figures/}}
 
 \newcommand{\dart}{\textsc{Dart}}
-\newcommand{\ef}{E_\mathrm{f}}
+\newcommand{\ef}{\ensuremath{E_\mathrm{f}}}
 \newcommand{\mae}{\mathrm{MAE}}
-\newcommand{\eV}{\,\mathrm{eV}}
+\newcommand{\eV}{\ensuremath{\,\mathrm{eV}}}
 
 \begin{document}
 
@@ -27,7 +27,7 @@
 
 \begin{abstract}
 Defect engineering in two-dimensional (2D) materials demands rapid screening
-of defect formation energies (\ef) across vast combinatorial spaces, yet
+of defect formation energies ($\ef$) across vast combinatorial spaces, yet
 density functional theory (DFT) calculations remain prohibitively expensive.
 Existing graph neural network (GNN) surrogates achieve reasonable accuracy on
 random test splits but lack systematic evaluation of generalization to unseen
@@ -40,7 +40,7 @@ augmented by an explicit defect-site embedding.
 %
 On the IMP2D benchmark (10\,641 DFT-converged impurity configurations in 44
 host monolayers), \dart{} achieves a single-model mean absolute error (MAE)
-of 0.407\eV{} and an ensemble MAE of 0.359\eV{}, reducing the error by 25\%
+of 0.407~eV and an ensemble MAE of 0.359~eV, reducing the error by 25\%
 and 34\% relative to ALIGNN (4.03\,M parameters), respectively.
 %
 We further propose a three-tier \emph{Graduated Generalization Assessment}:
@@ -48,8 +48,8 @@ We further propose a three-tier \emph{Graduated Generalization Assessment}:
 leave-one-host-out cross-validation over G6 transition-metal dichalcogenides,
 and (iii)~compositional out-of-distribution via block-out matrix completion.
 %
-\dart{} degrades gracefully from 0.36 to 0.54\eV{} (1.5$\times$) under
-intra-family extrapolation---far milder than the 4.9$\times$ naive-baseline
+\dart{} degrades gracefully from 0.36 to 0.54~eV ($1.5\times$) under
+intra-family extrapolation---far milder than the $4.9\times$ naive-baseline
 gap---demonstrating robust transferability within the TMD family.
 %
 Temperature-scaled ensemble uncertainty achieves 93.4\% empirical coverage at
