@@ -1,0 +1,36 @@
+{
+  "experiment": "p0",
+  "fold": "WTe2",
+  "seed": 42,
+  "tag": "loho_WTe2_s42",
+  "n_train": 9331,
+  "n_val": 1036,
+  "n_test": 274,
+  "best_val_mae": 0.43733295798301697,
+  "test_mae": 0.5059505701065063,
+  "test_rmse": 1.1670849323272705,
+  "naive_baseline_mae": 2.004945045328094,
+  "wall_min": 22.977647761503857,
+  "per_host_mae": {
+    "WTe2": 0.5059505701065063
+  },
+  "model_kwargs": {
+    "atom_fea_len": 9,
+    "hidden_dim": 128,
+    "n_local_layers": 3,
+    "n_global_layers": 2,
+    "num_heads": 4,
+    "rcut_local": 5.0,
+    "dmax_global": 12.0,
+    "defect_embedding": true,
+    "dropout": 0.1,
+    "ct_uae_path": "/home/huayiming/Workspace/yiminghua/project/data/ct_uae_mt3_embeddings.pt"
+  },
+  "config": {
+    "epochs": 150,
+    "lr": 0.0005,
+    "batch_size": 64,
+    "warmup": 10,
+    "swa_start": 120
+  }
+}

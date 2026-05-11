@@ -1,0 +1,36 @@
+{
+  "experiment": "p0",
+  "fold": "MoSSe",
+  "seed": 42,
+  "tag": "loho_MoSSe_s42",
+  "n_train": 9160,
+  "n_val": 1017,
+  "n_test": 464,
+  "best_val_mae": 0.46548542380332947,
+  "test_mae": 0.4835100471973419,
+  "test_rmse": 1.1471655368804932,
+  "naive_baseline_mae": 2.019417787515785,
+  "wall_min": 22.32508249282837,
+  "per_host_mae": {
+    "MoSSe": 0.4835100471973419
+  },
+  "model_kwargs": {
+    "atom_fea_len": 9,
+    "hidden_dim": 128,
+    "n_local_layers": 3,
+    "n_global_layers": 2,
+    "num_heads": 4,
+    "rcut_local": 5.0,
+    "dmax_global": 12.0,
+    "defect_embedding": true,
+    "dropout": 0.1,
+    "ct_uae_path": "/home/huayiming/Workspace/yiminghua/project/data/ct_uae_mt3_embeddings.pt"
+  },
+  "config": {
+    "epochs": 150,
+    "lr": 0.0005,
+    "batch_size": 64,
+    "warmup": 10,
+    "swa_start": 120
+  }
+}

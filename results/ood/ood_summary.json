@@ -8,12 +8,18 @@
     },
     {
       "tier": 1,
-      "scenario": "Intra-family OOD (P0, 2-fold)",
-      "mae_eV": 0.4494568854570389,
-      "description": "Leave-one-G6-host-out [\u00b10.073]"
+      "scenario": "Intra-family OOD (P0, 7-fold)",
+      "mae_eV": 0.5401244972433362,
+      "description": "Leave-one-G6-host-out [\u00b10.117]"
     },
     {
       "tier": 2,
+      "scenario": "Compositional OOD (P1)",
+      "mae_eV": 0.5343446731567383,
+      "description": "G6\u00d73d block-out (matrix completion)"
+    },
+    {
+      "tier": 3,
       "scenario": "Full OOD (prospective DFT)",
       "mae_eV": 2.66,
       "description": "Novel materials (v3)"
@@ -29,7 +35,43 @@
       "test_mae": 0.376726359128952,
       "val_mae": 0.43316006660461426,
       "naive_mae": 2.874223629544268
+    },
+    "MoTe2": {
+      "test_mae": 0.480378657579422,
+      "val_mae": 0.42636463046073914,
+      "naive_mae": 1.9101871536739867
+    },
+    "WS2": {
+      "test_mae": 0.758820652961731,
+      "val_mae": 0.42927223443984985,
+      "naive_mae": 3.252959771804925
+    },
+    "WSe2": {
+      "test_mae": 0.6532977819442749,
+      "val_mae": 0.46274688839912415,
+      "naive_mae": 2.8833947519387686
+    },
+    "WTe2": {
+      "test_mae": 0.5059505701065063,
+      "val_mae": 0.43733295798301697,
+      "naive_mae": 2.004945045328094
+    },
+    "MoSSe": {
+      "test_mae": 0.4835100471973419,
+      "val_mae": 0.46548542380332947,
+      "naive_mae": 2.019417787515785
     }
   },
-  "p1_result": null
+  "p1_result": {
+    "test_mae": 0.5343446731567383,
+    "per_host_mae": {
+      "MoS2": 0.6202759146690369,
+      "MoTe2": 0.3884553015232086,
+      "WSe2": 0.5407027006149292,
+      "MoSe2": 0.5473803281784058,
+      "WS2": 0.6666502356529236,
+      "WTe2": 0.40703925490379333,
+      "MoSSe": 0.5460357069969177
+    }
+  }
 }
