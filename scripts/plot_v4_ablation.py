@@ -72,31 +72,43 @@ def plot_progressive_improvement():
 
 
 def plot_ensemble_curve():
-    """Ensemble size vs MAE showing saturation."""
+    """Ensemble size vs MAE showing saturation — SS only vs SS+MS combined."""
     data = np.load(RESULTS / "ensemble_online.npz", allow_pickle=True)
     individual = data["individual_preds"]
     targets = data["targets"]
     names = list(data["model_names"])
 
-    # Load UQ results for best-k values
+    # Load UQ results for SS-only best-k values
     with open(RESULTS / "uq_v4_ensemble.json") as f:
         uq = json.load(f)
 
-    ks = [int(k) for k in uq["best_per_k"].keys()]
-    maes = [uq["best_per_k"][str(k)]["mae"] for k in ks]
+    ks_ss = [int(k) for k in uq["best_per_k"].keys()]
+    maes_ss = [uq["best_per_k"][str(k)]["mae"] for k in ks_ss]
 
-    fig, ax = plt.subplots(1, 1, figsize=(5, 3.5))
-    ax.plot(ks, maes, "o-", color="darkblue", markersize=6, linewidth=2)
+    # Load combined results (SS+MS)
+    with open(RESULTS / "ensemble_combined.json") as f:
+        combined = json.load(f)
 
-    # Mark sweet spot
-    best_idx = np.argmin(maes)
-    ax.scatter([ks[best_idx]], [maes[best_idx]], s=120, color="red", zorder=5,
-               label=f"Best: k={ks[best_idx]}, MAE={maes[best_idx]:.4f}")
+    ks_comb = [int(k) for k in combined["greedy_selection"].keys()]
+    maes_comb = [combined["greedy_selection"][str(k)]["mae"] for k in ks_comb]
 
-    # Full ensemble
-    full_mae = float(np.abs(individual.mean(axis=0) - targets).mean())
-    ax.axhline(full_mae, color="gray", linestyle="--", linewidth=1,
-               label=f"Full ({len(names)}): {full_mae:.4f}")
+    fig, ax = plt.subplots(1, 1, figsize=(5.5, 3.8))
+    ax.plot(ks_ss, maes_ss, "o-", color="steelblue", markersize=5, linewidth=1.5,
+            label="Single-source only (26 models)")
+    ax.plot(ks_comb, maes_comb, "s-", color="darkred", markersize=5, linewidth=2,
+            label="SS + Multi-source (28 models)")
+
+    # Mark best combined
+    best_comb_idx = np.argmin(maes_comb)
+    ax.scatter([ks_comb[best_comb_idx]], [maes_comb[best_comb_idx]], s=120,
+               color="red", zorder=5, marker="*",
+               label=f"Best combined: k={ks_comb[best_comb_idx]}, MAE={maes_comb[best_comb_idx]:.4f}")
+
+    # Mark best SS
+    best_ss_idx = np.argmin(maes_ss)
+    ax.scatter([ks_ss[best_ss_idx]], [maes_ss[best_ss_idx]], s=80,
+               color="blue", zorder=5,
+               label=f"Best SS: k={ks_ss[best_ss_idx]}, MAE={maes_ss[best_ss_idx]:.4f}")
 
     # Reference lines
     ax.axhline(0.540, color="orange", linestyle=":", linewidth=1, label="ALIGNN (0.540)")
@@ -104,10 +116,10 @@ def plot_ensemble_curve():
 
     ax.set_xlabel("Ensemble size (k)")
     ax.set_ylabel("Test MAE (eV)")
-    ax.set_title("Ensemble Saturation Analysis")
-    ax.legend(loc="upper right", fontsize=8)
+    ax.set_title("Ensemble Saturation: Single-Source vs Combined")
+    ax.legend(loc="upper right", fontsize=7.5)
     ax.grid(alpha=0.3)
-    ax.set_xlim(1.5, 8.5)
+    ax.set_xlim(1.5, 10.5)
     ax.set_ylim(0.35, 0.42)
 
     fig.savefig(FIG_DIR / "fig_v4_ensemble_curve.png")
