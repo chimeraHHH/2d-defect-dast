@@ -1,0 +1,143 @@
+{
+  "single_model_progression": [
+    {
+      "version": "v1.0",
+      "config": "h128, 50ep, MSE, plateau",
+      "mae": 0.537,
+      "std": 0.014,
+      "n_seeds": 4,
+      "params": "0.75M"
+    },
+    {
+      "version": "v1.2",
+      "config": "h128, 100ep, MSE, plateau",
+      "mae": 0.516,
+      "std": null,
+      "n_seeds": 1,
+      "params": "0.75M"
+    },
+    {
+      "version": "v4.0",
+      "config": "h128, 100ep, MSE+UAE, plateau",
+      "mae": 0.504,
+      "std": null,
+      "n_seeds": 3,
+      "params": "0.83M"
+    },
+    {
+      "version": "v4.1",
+      "config": "h128, 100ep, MAE+UAE, cosine",
+      "mae": 0.452,
+      "std": null,
+      "n_seeds": 3,
+      "params": "0.83M"
+    },
+    {
+      "version": "v4.2",
+      "config": "h128, 100ep, MAE+UAE+warmup, cosine",
+      "mae": 0.411,
+      "std": 0.01,
+      "n_seeds": 5,
+      "params": "0.83M"
+    },
+    {
+      "version": "v4.3",
+      "config": "h128, 150ep, MAE+UAE+warmup+SWA",
+      "mae": 0.407,
+      "std": null,
+      "n_seeds": 3,
+      "params": "0.83M"
+    }
+  ],
+  "ensemble_progression": [
+    {
+      "version": "v1.0",
+      "config": "4-seed, 50ep",
+      "mae": 0.464,
+      "k": 4
+    },
+    {
+      "version": "v1.2",
+      "config": "6-member, \u03c4=1.83",
+      "mae": 0.443,
+      "k": 6
+    },
+    {
+      "version": "v2.0",
+      "config": "4-seed PFA+multi-source",
+      "mae": 0.486,
+      "k": 4
+    },
+    {
+      "version": "v4.0",
+      "config": "26-model, greedy best-5",
+      "mae": 0.368,
+      "k": 5
+    },
+    {
+      "version": "v4.0",
+      "config": "26-model, greedy best-6",
+      "mae": 0.368,
+      "k": 6
+    },
+    {
+      "version": "v4.0",
+      "config": "26-model, full average",
+      "mae": 0.389,
+      "k": 26
+    }
+  ],
+  "baselines": [
+    {
+      "model": "LightGBM (handcraft)",
+      "mae": 1.158,
+      "params": "~500 features"
+    },
+    {
+      "model": "SchNet",
+      "mae": 0.585,
+      "params": "0.46M"
+    },
+    {
+      "model": "ALIGNN",
+      "mae": 0.54,
+      "params": "4.03M"
+    },
+    {
+      "model": "CT v4 (ours, single)",
+      "mae": 0.407,
+      "params": "0.83M"
+    },
+    {
+      "model": "CT v4 (ours, 5-ens)",
+      "mae": 0.368,
+      "params": "5\u00d70.83M"
+    }
+  ],
+  "uq_summary": {
+    "best_6_ensemble": {
+      "mae": 0.368,
+      "tau": 2.567,
+      "nll": 0.604,
+      "ece": 0.068,
+      "cov90": 0.934,
+      "sigma_corr": 0.544
+    },
+    "full_26_ensemble": {
+      "mae": 0.389,
+      "tau": 1.395,
+      "nll": 1.034,
+      "ece": 0.027,
+      "cov90": 0.904,
+      "sigma_corr": 0.546
+    }
+  },
+  "key_findings": [
+    "MAE loss is the single biggest improvement (+0.04 eV) by directly optimizing the evaluation metric",
+    "Ensemble saturates at k=5-6 across 5 diversity axes (loss, architecture, epochs, features, seed)",
+    "ct-UAE provides marginal single-model gain but critical ensemble diversity",
+    "Deep model (4+3) appears in every top-k combination despite similar solo MAE",
+    "Temperature \u03c4=1.40 << v1's \u03c4=1.83 means v4 ensemble is inherently better calibrated",
+    "\u03c3-|error| correlation of 0.546 enables meaningful uncertainty-based triage"
+  ]
+}
