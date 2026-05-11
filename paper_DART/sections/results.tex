@@ -53,6 +53,28 @@ transition metals (Sc, Mn, Ta: MAE $> 0.77$\eV{}), suggesting that
 partially filled $d$-shells introduce complex multi-orbital hybridization
 that challenges the model.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/error_analysis.pdf}
+\caption{Error decomposition on the IMP2D test set (1\,065 samples).
+  (a)~By defect type: adsorbates and interstitials achieve comparable MAE.
+  (b)~By $\ef$ magnitude: performance degrades for $|\ef| > 10$\eV{} due to
+  data sparsity.
+  (c)~Predicted vs.\ DFT formation energies; color encodes $|\mathrm{error}|$.}
+\label{fig:error_analysis}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/periodic_table_mae.pdf}
+\caption{Per-dopant MAE mapped onto the periodic table.
+  Each cell shows the element symbol, MAE (eV), and test-sample count.
+  Main-group metals (Bi, Pb, Sr) are easiest; early transition metals with
+  partially filled $d$-shells (Ta, Mn, Sc) are hardest.
+  Grey cells indicate elements not present in the IMP2D test set.}
+\label{fig:periodic_table}
+\end{figure*}
+
 %----------------------------------------------------------------------
 \subsection{Training pipeline ablation}\label{sec:ablation}
 %----------------------------------------------------------------------
@@ -86,6 +108,17 @@ $\ell_1$ gradient during early training.
 Extending training to 150 epochs with SWA adds another $-0.011$\eV{}.
 Each improvement is significant across seeds (paired $t$-test, $p < 0.05$
 for the first two steps).
+Figure~\ref{fig:ablation} visualizes the cumulative improvement.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/ablation_waterfall.pdf}
+\caption{Cumulative training pipeline ablation (3--5 seed averages).
+  Error bars show $\pm 1\sigma$ across seeds.
+  Dashed red line: ALIGNN baseline (0.540\eV{}).
+  Dotted blue line: ensemble result (0.359\eV{}).}
+\label{fig:ablation}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Intra-family OOD evaluation (Tier~1)}\label{sec:ood}
@@ -131,6 +164,18 @@ This asymmetry reflects the greater spatial extent of W $5d$ orbitals
 compared to Mo $4d$, leading to more delocalized defect states and
 stronger defect--host $d$--$p$ hybridization that is harder to capture from
 the remaining training data.
+Figure~\ref{fig:loho} compares \dart{} and naive-baseline MAE for each fold.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/loho_bar.pdf}
+\caption{Leave-one-host-out (LOHO) evaluation on G6-TMDs.
+  Blue bars: Mo-based hosts; red bars: W-based hosts.
+  Faded bars: naive (training-set mean) baseline.
+  Dashed green line: Tier~0 (in-distribution) MAE;
+  dotted purple line: Tier~1 mean.}
+\label{fig:loho}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Compositional OOD evaluation (Tier~2)}\label{sec:blockout}
@@ -188,7 +233,20 @@ At the 90\% nominal coverage level, the empirical coverage reaches
 93.4\%, with an expected calibration error (ECE) of 0.068.
 The Spearman correlation between predicted uncertainty ($\sigma$) and
 absolute error is 0.577 ($p < 10^{-5}$), confirming that ensemble
-variance is a meaningful, if imperfect, proxy for prediction confidence.
+variance is a meaningful, if imperfect, proxy for prediction confidence
+(Fig.~\ref{fig:uq}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/uq_calibration.pdf}
+\caption{Uncertainty quantification performance.
+  (a)~Calibration curve: observed vs.\ nominal coverage after temperature
+  scaling; the red square marks the 90\% target.
+  (b)~Absolute error vs.\ predicted $\sigma$; red points show binned means,
+  confirming that higher $\sigma$ correlates with larger errors
+  (Spearman $\rho = 0.58$).}
+\label{fig:uq}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Physical interpretability}\label{sec:interpret}
