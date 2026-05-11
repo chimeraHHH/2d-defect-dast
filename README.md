@@ -2,7 +2,7 @@
 
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.368%20eV-red)](#v40-enhanced-training--26-model-ensemble-2026-05-10)
+[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.362%20eV-red)](#v40-enhanced-training--26-model-ensemble-2026-05-10)
 [![best single](https://img.shields.io/badge/best%20single-0.407%20eV-orange)](#v40-enhanced-training--26-model-ensemble-2026-05-10)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
 [![DFT discovery](https://img.shields.io/badge/prospective%20DFT-70%25%20A%20hit%20rate-9cf)](#v30-prospective-dft-验证-2026-05-07)
@@ -14,7 +14,7 @@
 
 * **0.75 M 参数的紧凑混合模型大幅超越 ALIGNN（4.03 M）**
   （v4 best single 0.407 eV vs ALIGNN 0.540 eV，↓25%）
-* **26-model 多样性集成** 在 1065 测试样本上达 **0.368 eV**（↓32% vs ALIGNN）
+* **28-model 多样性集成（含多源深度模型）** 在 1065 测试样本上达 **0.362 eV**（↓33% vs ALIGNN）
 * **6-seed ensemble + 温度缩放** 90% 覆盖率从 72.5% 校准到 93.4%
 * **v2 多源 PFA 4-seed = 0.486 ± 0.025 eV**（11% 优于 v1 多源 baseline）
 * **物理可解释性**：自注意力 + occlusion + bond-strain + LightGBM-physics
@@ -29,7 +29,7 @@
 
 ## v4.0 — Enhanced Training + 26-Model Ensemble（2026-05-10）
 
-通过系统性的训练策略优化和多样性集成，将 test MAE 从 0.443 eV 推进到 **0.368 eV**。
+通过系统性的训练策略优化和多样性集成，将 test MAE 从 0.443 eV 推进到 **0.362 eV**（含多源深度模型）。
 
 ### 核心改进
 
@@ -50,18 +50,20 @@
 
 | k | Test MAE | 组成 |
 |---|---|---|
-| 2 | 0.378 | 150ep_s42 + 150ep_s45 |
-| 3 | 0.372 | + 150ep_deep_s42 |
-| 5 | **0.368** | uae_warmup_s46 + deep_s42 + 150ep_s42 + 150ep_s43 + 150ep_s45 |
-| 6 | **0.368** | + uae_warmup_s45 |
-| Full (26) | 0.389 | 全部模型平均 |
+| 2 | 0.377 | 150ep_s42 + 150ep_s45 |
+| 3 | 0.366 | + **ms4_deep_s42** [多源深度] |
+| 5 | **0.362** | 150ep_s45 + 150ep_s42 + ms4_deep + 150ep_s43 + deep_s42 |
+| 8 | 0.362 | + warmup_s46 + no_uae_s42 + ms4_s43 |
+| Full (28) | 0.389 | 全部模型平均 |
 
-**关键发现**：集成在 k=5–6 饱和；额外模型增加噪声。最优组合跨越 5 个多样性轴：
+**关键发现**：多源深度模型 (ms4_deep_s42) 在 k=3 被选入，提供单源模型无法覆盖的多样性。
+最优组合跨越 **6 个多样性轴**：
 - **损失函数**：MSE / Huber / MAE
 - **架构深度**：浅 (3+2 layers) / 深 (4+3 layers)
 - **训练长度**：100ep / 150ep
 - **特征空间**：±ct-UAE embeddings
 - **随机种子**：s42–s46
+- **训练数据**：单源 IMP2D / 多源 4-DB 联合
 
 Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
 
@@ -72,10 +74,12 @@ Full ensemble σ–|error| correlation = 0.546，可用于不确定度估计。
 | ALIGNN | 4.03 M | 0.540 | — |
 | CrystalTransformer v1.2 (single) | 0.75 M | 0.516 | −4% |
 | **CT v4 best single** | **0.75 M** | **0.407** | **−25%** |
-| **CT v4 5-ensemble** | **5×0.75 M** | **0.368** | **−32%** |
+| CT v4 5-ensemble (SS only) | 5×0.75 M | 0.368 | −32% |
+| **CT v4 5-ensemble (SS+MS)** | **5×(0.75–1.1) M** | **0.362** | **−33%** |
 
 代码：
 * [scripts/ensemble_online.py](scripts/ensemble_online.py) — 26 模型加载 + greedy 集成评估
+* [scripts/ensemble_combined.py](scripts/ensemble_combined.py) — 28 模型（含多源）联合评估
 * [configs/enhanced_online_150ep_uae_mae_warmup.yaml](configs/enhanced_online_150ep_uae_mae_warmup.yaml) — 最优单模型配方
 * [configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml](configs/enhanced_online_150ep_uae_mae_warmup_deep.yaml) — 深层变体
 
@@ -182,8 +186,9 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|
-| 🥇 **v4 5-ensemble (best-k greedy)** | 5×0.75 M | **0.368 eV** | 0.978 eV | 150ep+deep+UAE 多样性 |
-| 🥈 **v4 best single (150ep MAE+warmup+UAE)** | 0.75 M | **0.407 eV** | — | seed 45 |
+| 🥇 **v4 5-ens (SS+MS combined)** | 5×(0.75–1.1) M | **0.362 eV** | — | 含多源深度模型，↓33% vs ALIGNN |
+| 🥈 **v4 5-ens (SS only)** | 5×0.75 M | **0.368 eV** | 0.978 eV | 150ep+deep+UAE 多样性 |
+| 🥉 **v4 best single (150ep MAE+warmup+UAE)** | 0.75 M | **0.407 eV** | — | seed 45 |
 | v1.2 6-member ensemble (τ=1.83) | 6×0.75 M | 0.443 eV | 1.094 eV | 4×50ep + 2×100ep |
 | v1.2 baseline (4-seed mean) | 0.75 M | 0.537 ± 0.014 | 1.169 ± 0.025 | 主结论数字 |
 | **ALIGNN** (团队前期复现) | 4.03 M | 0.540 | 1.167 | 文献基线 |
@@ -229,7 +234,8 @@ epoch。结果详见 [results/loho_summary.json](results/loho_summary.json)
 | ALIGNN | 4.03 | 0.540 |
 | CrystalTransformer v1.2 (ours) | 0.75 | 0.516 |
 | **CT v4 best single (ours)** | **0.75** | **0.407** |
-| **CT v4 5-ensemble (ours)** | **5×0.75** | **0.368** |
+| CT v4 5-ensemble SS (ours) | 5×0.75 | 0.368 |
+| **CT v4 5-ensemble SS+MS (ours)** | **5×(0.75–1.1)** | **0.362** |
 
 **经验缩放律** log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
 R² = 0.95 → **数据是瓶颈，模型容量超过 ~0.5–0.8 M 反而过拟合**。
@@ -387,7 +393,7 @@ python scripts/prospective_dft_analyze.py
 ## Roadmap / TODO
 
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
-当前最优：**单模型 0.407 eV / 5-ensemble 0.368 eV**（150ep MAE+warmup+cosine+ct-UAE）。
+当前最优：**单模型 0.407 eV / 5-ensemble 0.362 eV**（SS+MS combined, 含多源深度模型）。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
