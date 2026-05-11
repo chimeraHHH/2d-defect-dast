@@ -1,0 +1,463 @@
+{
+  "description": "Dopant chemical potentials back-computed from IMP2D: mu = en2 - hostenergy - eform",
+  "source": "imp2d.db (VASP PBE)",
+  "n_elements": 65,
+  "n_reliable": 61,
+  "elements": {
+    "Ag": {
+      "mu_eV": -2.7175,
+      "mean_eV": -2.7175,
+      "std_eV": 0.0,
+      "n_entries": 211,
+      "reliable": true
+    },
+    "Al": {
+      "mu_eV": -3.7374,
+      "mean_eV": -3.7374,
+      "std_eV": 0.0,
+      "n_entries": 224,
+      "reliable": true
+    },
+    "As": {
+      "mu_eV": -4.6811,
+      "mean_eV": -4.6811,
+      "std_eV": 0.0,
+      "n_entries": 219,
+      "reliable": true
+    },
+    "Au": {
+      "mu_eV": -3.2074,
+      "mean_eV": -3.2074,
+      "std_eV": 0.0,
+      "n_entries": 209,
+      "reliable": true
+    },
+    "B": {
+      "mu_eV": -6.706,
+      "mean_eV": -6.706,
+      "std_eV": 0.0,
+      "n_entries": 276,
+      "reliable": true
+    },
+    "Ba": {
+      "mu_eV": -1.9065,
+      "mean_eV": -1.9065,
+      "std_eV": 0.0,
+      "n_entries": 203,
+      "reliable": true
+    },
+    "Be": {
+      "mu_eV": -3.7585,
+      "mean_eV": -3.7585,
+      "std_eV": 0.0,
+      "n_entries": 264,
+      "reliable": true
+    },
+    "Bi": {
+      "mu_eV": -3.8829,
+      "mean_eV": -3.8829,
+      "std_eV": 0.0,
+      "n_entries": 205,
+      "reliable": true
+    },
+    "Br": {
+      "mu_eV": -1.6424,
+      "mean_eV": -1.6424,
+      "std_eV": 0.0,
+      "n_entries": 226,
+      "reliable": true
+    },
+    "C": {
+      "mu_eV": -9.2282,
+      "mean_eV": -9.2282,
+      "std_eV": 0.0,
+      "n_entries": 272,
+      "reliable": true
+    },
+    "Ca": {
+      "mu_eV": -1.9296,
+      "mean_eV": -1.9296,
+      "std_eV": 0.0,
+      "n_entries": 229,
+      "reliable": true
+    },
+    "Cd": {
+      "mu_eV": -0.7651,
+      "mean_eV": -0.7651,
+      "std_eV": 0.0,
+      "n_entries": 214,
+      "reliable": true
+    },
+    "Cl": {
+      "mu_eV": -1.8498,
+      "mean_eV": -1.8498,
+      "std_eV": 0.0,
+      "n_entries": 242,
+      "reliable": true
+    },
+    "Co": {
+      "mu_eV": -7.0353,
+      "mean_eV": -7.0353,
+      "std_eV": 0.0,
+      "n_entries": 239,
+      "reliable": true
+    },
+    "Cr": {
+      "mu_eV": -9.5128,
+      "mean_eV": -9.5128,
+      "std_eV": 0.0,
+      "n_entries": 234,
+      "reliable": true
+    },
+    "Cs": {
+      "mu_eV": -0.8479,
+      "mean_eV": -0.8479,
+      "std_eV": 0.0,
+      "n_entries": 212,
+      "reliable": true
+    },
+    "Cu": {
+      "mu_eV": -3.7298,
+      "mean_eV": -3.7298,
+      "std_eV": 0.0,
+      "n_entries": 236,
+      "reliable": true
+    },
+    "F": {
+      "mu_eV": -1.83,
+      "mean_eV": -1.83,
+      "std_eV": 0.0,
+      "n_entries": 273,
+      "reliable": true
+    },
+    "Fe": {
+      "mu_eV": -8.2411,
+      "mean_eV": -8.2411,
+      "std_eV": 0.0,
+      "n_entries": 234,
+      "reliable": true
+    },
+    "Ga": {
+      "mu_eV": -2.9214,
+      "mean_eV": -2.9214,
+      "std_eV": 0.0,
+      "n_entries": 186,
+      "reliable": true
+    },
+    "Ge": {
+      "mu_eV": -4.5079,
+      "mean_eV": -4.5079,
+      "std_eV": 0.0,
+      "n_entries": 213,
+      "reliable": true
+    },
+    "H": {
+      "mu_eV": -3.3954,
+      "mean_eV": -3.3954,
+      "std_eV": 0.0,
+      "n_entries": 282,
+      "reliable": true
+    },
+    "Hf": {
+      "mu_eV": -9.9236,
+      "mean_eV": -9.9236,
+      "std_eV": 0.0,
+      "n_entries": 215,
+      "reliable": true
+    },
+    "Hg": {
+      "mu_eV": -0.1836,
+      "mean_eV": -0.1836,
+      "std_eV": 0.0,
+      "n_entries": 207,
+      "reliable": true
+    },
+    "I": {
+      "mu_eV": -1.5229,
+      "mean_eV": -1.5229,
+      "std_eV": 0.0,
+      "n_entries": 206,
+      "reliable": true
+    },
+    "In": {
+      "mu_eV": -2.5362,
+      "mean_eV": -2.5362,
+      "std_eV": 0.0,
+      "n_entries": 217,
+      "reliable": true
+    },
+    "Ir": {
+      "mu_eV": -8.857,
+      "mean_eV": -8.857,
+      "std_eV": 0.0,
+      "n_entries": 218,
+      "reliable": true
+    },
+    "K": {
+      "mu_eV": -1.044,
+      "mean_eV": -1.044,
+      "std_eV": 0.0,
+      "n_entries": 211,
+      "reliable": true
+    },
+    "Li": {
+      "mu_eV": -1.9065,
+      "mean_eV": -1.9065,
+      "std_eV": 0.0,
+      "n_entries": 255,
+      "reliable": true
+    },
+    "Lu": {
+      "mu_eV": -4.4525,
+      "mean_eV": -4.4525,
+      "std_eV": 0.0,
+      "n_entries": 238,
+      "reliable": true
+    },
+    "Mg": {
+      "mu_eV": -1.5027,
+      "mean_eV": -1.5027,
+      "std_eV": 0.0,
+      "n_entries": 230,
+      "reliable": true
+    },
+    "Mn": {
+      "mu_eV": -8.9134,
+      "mean_eV": -8.9134,
+      "std_eV": 0.0,
+      "n_entries": 234,
+      "reliable": true
+    },
+    "Mo": {
+      "mu_eV": -10.9073,
+      "mean_eV": -10.9073,
+      "std_eV": 0.0,
+      "n_entries": 217,
+      "reliable": true
+    },
+    "N": {
+      "mu_eV": -8.3414,
+      "mean_eV": -8.3414,
+      "std_eV": 0.0,
+      "n_entries": 269,
+      "reliable": true
+    },
+    "Na": {
+      "mu_eV": -1.312,
+      "mean_eV": -1.312,
+      "std_eV": 0.0,
+      "n_entries": 238,
+      "reliable": true
+    },
+    "Nb": {
+      "mu_eV": -10.2273,
+      "mean_eV": -10.2273,
+      "std_eV": 0.0,
+      "n_entries": 234,
+      "reliable": true
+    },
+    "Ni": {
+      "mu_eV": -5.4696,
+      "mean_eV": -5.4696,
+      "std_eV": 0.0,
+      "n_entries": 232,
+      "reliable": true
+    },
+    "O": {
+      "mu_eV": -4.9534,
+      "mean_eV": -4.9534,
+      "std_eV": 0.0,
+      "n_entries": 276,
+      "reliable": true
+    },
+    "Os": {
+      "mu_eV": -11.2558,
+      "mean_eV": -11.2558,
+      "std_eV": 0.0,
+      "n_entries": 220,
+      "reliable": true
+    },
+    "P": {
+      "mu_eV": -5.3756,
+      "mean_eV": -5.3756,
+      "std_eV": 0.0,
+      "n_entries": 228,
+      "reliable": true
+    },
+    "Pb": {
+      "mu_eV": -3.5548,
+      "mean_eV": -3.5548,
+      "std_eV": 0.0,
+      "n_entries": 206,
+      "reliable": true
+    },
+    "Pd": {
+      "mu_eV": -5.2232,
+      "mean_eV": -5.2232,
+      "std_eV": 0.0,
+      "n_entries": 218,
+      "reliable": true
+    },
+    "Pt": {
+      "mu_eV": -6.1156,
+      "mean_eV": -6.1156,
+      "std_eV": 0.0,
+      "n_entries": 218,
+      "reliable": true
+    },
+    "Rb": {
+      "mu_eV": -0.9336,
+      "mean_eV": -0.9336,
+      "std_eV": 0.0,
+      "n_entries": 209,
+      "reliable": true
+    },
+    "Re": {
+      "mu_eV": -12.4276,
+      "mean_eV": -9.1097,
+      "std_eV": 50.5368,
+      "n_entries": 233,
+      "reliable": false
+    },
+    "Rh": {
+      "mu_eV": -7.2493,
+      "mean_eV": -7.2493,
+      "std_eV": 0.0,
+      "n_entries": 208,
+      "reliable": true
+    },
+    "Ru": {
+      "mu_eV": -9.242,
+      "mean_eV": -9.242,
+      "std_eV": 0.0,
+      "n_entries": 220,
+      "reliable": true
+    },
+    "S": {
+      "mu_eV": -3.5055,
+      "mean_eV": -2.0982,
+      "std_eV": 21.4342,
+      "n_entries": 233,
+      "reliable": false
+    },
+    "Sb": {
+      "mu_eV": -4.1476,
+      "mean_eV": -4.1476,
+      "std_eV": 0.0,
+      "n_entries": 210,
+      "reliable": true
+    },
+    "Sc": {
+      "mu_eV": -6.2491,
+      "mean_eV": -6.2491,
+      "std_eV": 0.0,
+      "n_entries": 241,
+      "reliable": true
+    },
+    "Se": {
+      "mu_eV": -3.5038,
+      "mean_eV": -3.5038,
+      "std_eV": 0.0,
+      "n_entries": 228,
+      "reliable": true
+    },
+    "Si": {
+      "mu_eV": -5.4204,
+      "mean_eV": -5.4204,
+      "std_eV": 0.0,
+      "n_entries": 226,
+      "reliable": true
+    },
+    "Sn": {
+      "mu_eV": -3.8461,
+      "mean_eV": -3.8461,
+      "std_eV": 0.0,
+      "n_entries": 207,
+      "reliable": true
+    },
+    "Sr": {
+      "mu_eV": -1.6408,
+      "mean_eV": -1.6408,
+      "std_eV": 0.0,
+      "n_entries": 209,
+      "reliable": true
+    },
+    "Ta": {
+      "mu_eV": -11.8197,
+      "mean_eV": -11.8197,
+      "std_eV": 0.0,
+      "n_entries": 208,
+      "reliable": true
+    },
+    "Tc": {
+      "mu_eV": -10.3417,
+      "mean_eV": -10.3417,
+      "std_eV": 0.0,
+      "n_entries": 215,
+      "reliable": true
+    },
+    "Te": {
+      "mu_eV": -3.1437,
+      "mean_eV": -3.1437,
+      "std_eV": 0.0,
+      "n_entries": 207,
+      "reliable": true
+    },
+    "Ti": {
+      "mu_eV": -7.8347,
+      "mean_eV": 2.2108,
+      "std_eV": 105.8362,
+      "n_entries": 224,
+      "reliable": false
+    },
+    "Tl": {
+      "mu_eV": -2.2293,
+      "mean_eV": -2.2293,
+      "std_eV": 0.0,
+      "n_entries": 198,
+      "reliable": true
+    },
+    "V": {
+      "mu_eV": -8.9944,
+      "mean_eV": -8.9944,
+      "std_eV": 0.0,
+      "n_entries": 227,
+      "reliable": true
+    },
+    "W": {
+      "mu_eV": -12.9327,
+      "mean_eV": -12.9327,
+      "std_eV": 0.0,
+      "n_entries": 214,
+      "reliable": true
+    },
+    "Xe": {
+      "mu_eV": -0.0402,
+      "mean_eV": -0.0402,
+      "std_eV": 0.0,
+      "n_entries": 232,
+      "reliable": true
+    },
+    "Y": {
+      "mu_eV": -6.4287,
+      "mean_eV": -4.552,
+      "std_eV": 27.7723,
+      "n_entries": 220,
+      "reliable": false
+    },
+    "Zn": {
+      "mu_eV": -1.0968,
+      "mean_eV": -1.0968,
+      "std_eV": 0.0,
+      "n_entries": 194,
+      "reliable": true
+    },
+    "Zr": {
+      "mu_eV": -8.5217,
+      "mean_eV": -8.5217,
+      "std_eV": 0.0,
+      "n_entries": 214,
+      "reliable": true
+    }
+  }
+}
