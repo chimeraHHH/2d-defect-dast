@@ -1,0 +1,36 @@
+{
+  "experiment": "p0",
+  "fold": "MoTe2",
+  "seed": 42,
+  "tag": "loho_MoTe2_s42_nouae",
+  "n_train": 9339,
+  "n_val": 1037,
+  "n_test": 265,
+  "best_val_mae": 0.4297514259815216,
+  "test_mae": 0.42980536818504333,
+  "test_rmse": 1.0316160917282104,
+  "naive_baseline_mae": 1.9101871536739867,
+  "wall_min": 22.75589290459951,
+  "per_host_mae": {
+    "MoTe2": 0.42980536818504333
+  },
+  "model_kwargs": {
+    "atom_fea_len": 9,
+    "hidden_dim": 128,
+    "n_local_layers": 3,
+    "n_global_layers": 2,
+    "num_heads": 4,
+    "rcut_local": 5.0,
+    "dmax_global": 12.0,
+    "defect_embedding": true,
+    "dropout": 0.1,
+    "ct_uae_path": null
+  },
+  "config": {
+    "epochs": 150,
+    "lr": 0.0005,
+    "batch_size": 64,
+    "warmup": 10,
+    "swa_start": 120
+  }
+}

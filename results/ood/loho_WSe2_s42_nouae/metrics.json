@@ -1,0 +1,36 @@
+{
+  "experiment": "p0",
+  "fold": "WSe2",
+  "seed": 42,
+  "tag": "loho_WSe2_s42_nouae",
+  "n_train": 9298,
+  "n_val": 1033,
+  "n_test": 310,
+  "best_val_mae": 0.43512648344039917,
+  "test_mae": 0.44009536504745483,
+  "test_rmse": 0.8754298686981201,
+  "naive_baseline_mae": 2.8833947519387686,
+  "wall_min": 21.62415450414022,
+  "per_host_mae": {
+    "WSe2": 0.44009536504745483
+  },
+  "model_kwargs": {
+    "atom_fea_len": 9,
+    "hidden_dim": 128,
+    "n_local_layers": 3,
+    "n_global_layers": 2,
+    "num_heads": 4,
+    "rcut_local": 5.0,
+    "dmax_global": 12.0,
+    "defect_embedding": true,
+    "dropout": 0.1,
+    "ct_uae_path": null
+  },
+  "config": {
+    "epochs": 150,
+    "lr": 0.0005,
+    "batch_size": 64,
+    "warmup": 10,
+    "swa_start": 120
+  }
+}
