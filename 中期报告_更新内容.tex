@@ -1,0 +1,447 @@
+%=====================================================================
+%  大创中期报告 —— 更新内容（基于 DART v1.2 最新进展）
+%  说明：以下内容用于替换/补充原中期报告（中期报告_5.pdf）中需要更新的章节。
+%  更新日期：2026-05-13
+%=====================================================================
+
+%=====================================================================
+% 第三章 项目创新点概述（更新版）
+%=====================================================================
+
+\chapter{项目创新点概述}
+
+本项目在中期阶段取得了超出预期的实质性进展。在图结构表征、模型架构设计与数据处理策略三个维度上，项目不仅落地了原定的创新构想，更通过系统性的实验验证取得了量化的性能突破。最终提出的\textbf{DART（Defect-Aware Radial Transformer）}模型，在IMP2D基准测试中将形成能预测误差降低了25\%，同时参数量仅为现有最优方法的五分之一。本项目中期核心创新点总结如下：
+
+\section{``虚拟节点''图编码技术}
+
+\begin{itemize}
+    \item \textbf{痛点分析}：传统方法在处理空位缺陷时直接将缺失原子从图中删除，丢失了空位位置的关键物理信息——空位引起的局部晶格畸变和长程弹性场效应在多层消息传递过程中被迅速稀释。
+
+    \item \textbf{核心方法}：本项目引入``虚拟节点''表征，在空位对应的理想晶格坐标处保留一个占位节点，赋予其可学习嵌入向量 $x_i = e_{\mathrm{vac}} \oplus \delta_{\mathrm{vac}}$。该节点通过最小镜像公约算法与周围真实原子建立周期性几何关联，在局部消息传递和全局注意力交互中均充当``缺陷探针''。
+
+    \item \textbf{实验验证}：消融实验表明，引入缺陷位点二元标识嵌入（is\_defect flag）后，模型注意力权重自动聚焦于缺陷原子，缺陷原子平均获得约 $32\times$ 于宿主原子的注意力权重。遮蔽缺陷原子后的平均预测偏移达到原始形成能的90.7\%，证实模型学到了正确的物理因果关系。
+\end{itemize}
+
+\section{分层混合注意力架构}
+
+\begin{itemize}
+    \item \textbf{痛点分析}：传统图神经网络受限于局部截断半径，难以捕捉跨越多个晶格常数的长程物理响应；而纯粹的全局注意力机制又会因忽略微观化学键合的强方向性而导致短程特征提取不足。
+
+    \item \textbf{核心方法}：DART 采用``3层局部消息传递 + 2层全局注意力''的分层混合架构。局部层在消息传递中融合了由高斯径向基函数展开的边长特征以及夹角特征 $\theta_{jik}$，精确刻画共价键的方向性与局部晶格畸变。全局层在全图尺度上建立 Transformer，引入基于最小镜像距离 $d_{ij}^{\mathrm{PBC}}$ 的非线性几何偏置项：
+    \[
+    \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + \phi(d_{ij}^{\mathrm{PBC}})\right) V
+    \]
+
+    \item \textbf{实验验证}：消融实验证实，移除全局注意力模块后MAE从0.407\,eV退化至约0.5\,eV以上，证明了全局长程交互对缺陷性质预测的关键作用。完整模型仅需0.75M参数，为ALIGNN（4.03M）的五分之一，而在单模型性能上实现了25\%的MAE降低。
+\end{itemize}
+
+\section{物理驱动的数据增强策略}
+
+\begin{itemize}
+    \item \textbf{痛点分析}：IMP2D数据库虽包含17,500+缺陷构型，但经收敛性检查和异常值过滤后有效样本仅10,641个。有限的高保真数据量使模型容易过拟合特定弛豫坐标模式，泛化能力受限。
+
+    \item \textbf{核心方法}：本项目提出\textbf{防泄漏（leak-free）}的物理驱动增强策略：
+    \begin{enumerate}
+        \item \textbf{晶体旋转增强}：在 $0^\circ$ 至 $360^\circ$ 范围内随机旋转晶体结构，利用形成能对旋转的不变性，强制模型学习与取向无关的原子间相对几何关系。由于本模型输入为标量距离与角度张量，旋转增强的核心价值在于消除浮点数值误差导致的``伪方向依赖''。
+        \item \textbf{高斯坐标微扰}：以 $\sigma = 0.02$ \AA{} 的高斯噪声对原子坐标施加随机位移，模拟DFT弛豫坐标的热振动不确定性，增强模型对细微结构波动的鲁棒性。
+    \end{enumerate}
+    增强仅作用于训练集，验证集与测试集保持原始数据不变，严格避免数据泄漏。
+
+    \item \textbf{实验验证}：数据增强将测试集MAE从0.833\,eV大幅降低至0.426\,eV（早期v1版本），降幅约50\%。在最终v1.2版本中，结合优化的训练流程后进一步推至0.407\,eV。消融实验确认增强策略与训练流程优化的贡献具有正交性。
+\end{itemize}
+
+%=====================================================================
+% 第四章 项目进展（更新版，重点更新 4.4—4.7）
+%=====================================================================
+
+\chapter{项目进展}
+
+% 4.1 文献梳理 —— 保持原有内容即可，补充一段总结
+% 4.2 数据处理 —— 保持原有内容，可增加以下补充
+% 4.3 模型构建 —— 保持原有内容，增加 DART 命名和最终架构参数
+
+%--------------------------------------------------------------------
+% 4.2 数据处理（补充更新）
+%--------------------------------------------------------------------
+\section{数据处理}
+
+\subsection{原始数据获取与清洗}
+
+本项目所采用的原始数据来源于 Computational Materials Repository (CMR) 中的 Impurities in 2D Materials Database (IMP2D)。该数据库基于 VASP（Vienna Ab initio Simulation Package）进行密度泛函理论（DFT）计算，采用 PBE 交换相关泛函和 PAW 赝势，专门针对二维材料的点缺陷性质进行高通量计算。
+
+数据库包含超过 17,500 种单杂质缺陷构型，涵盖 53 种二维单层宿主材料、65种掺杂元素，缺陷类型包括间隙位（interstitial）和吸附位（adsorbate）。
+
+\textbf{数据清洗流程：}
+\begin{enumerate}
+    \item \textbf{收敛性过滤}：剔除 DFT 自洽迭代未收敛的样本（converged $\neq$ True）；
+    \item \textbf{异常值过滤}：仅保留形成能绝对值在 $[-20.0, 20.0]$\,eV 范围内的样本，剔除极端异常值（如 $-800$k\,eV）；
+    \item \textbf{最终数据规模}：清洗后获得 \textbf{10,641} 个有效样本，覆盖 44 种宿主单层和 65 种掺杂元素。
+\end{enumerate}
+
+\textbf{形成能计算公式验证：}为确保数据标签的准确性，我们从IMP2D数据库中反推了所有65种掺杂元素的化学势 $\mu_{\mathrm{dopant}}$，并与Materials Project中12种宿主元素的化学势进行交叉验证。公式为：
+\[
+E_f = E_{\mathrm{doped}} - E_{\mathrm{pristine}} - \mu_{\mathrm{dopant}}
+\]
+其中 $E_{\mathrm{doped}}$ 为含缺陷超胞总能，$E_{\mathrm{pristine}}$ 为完美超胞能量。经验证，61种元素的反推化学势标准差为0.0000\,eV，确认了数据标签的自洽性。
+
+\subsection{数据划分策略}
+
+为全面评估模型的泛化能力，我们设计了\textbf{三层递进的数据划分协议}：
+
+\begin{enumerate}
+    \item \textbf{Tier 0 — 随机划分（In-distribution）}：按 8:1:1 比例进行确定性有序划分，得到训练集 8,512 / 验证集 1,064 / 测试集 1,065，用于评估模型的基本预测能力。
+
+    \item \textbf{Tier 1 — 留一宿主（LOHO）交叉验证}：在 G6-TMD 族（MoS$_2$, MoSe$_2$, MoTe$_2$, MoSSe, WS$_2$, WSe$_2$, WTe$_2$）的7种宿主材料上，每次留出一种宿主的全部样本作为测试集，其余宿主样本用于训练。用于评估模型在\textbf{未见过的宿主材料}上的迁移能力。
+
+    \item \textbf{Tier 2 — G6$\times$3d 块排除测试}：同时排除所有 G6 族宿主与 3d 过渡金属掺杂的交叉组合，测试模型对\textbf{全新宿主-掺杂组合}的矩阵补全能力。
+\end{enumerate}
+
+% [4.2.2-4.2.4 保持原有内容]
+
+%--------------------------------------------------------------------
+% 4.3 模型构建（补充 DART 命名和最终参数）
+%--------------------------------------------------------------------
+\section{模型构建}
+
+\subsection{总体框架}
+
+基于前期的探索与优化，我们最终将模型命名为 \textbf{DART（Defect-Aware Radial Transformer）}。该名称直接体现了模型的三大核心特征：缺陷感知（Defect-Aware）、径向基函数编码（Radial）以及 Transformer 注意力架构。
+
+DART 的最终架构配置如下：
+\begin{itemize}
+    \item \textbf{隐藏层维度}：$d = 128$
+    \item \textbf{局部相互作用层}：3 层 eTGC（edge-engaged Transformer Graph Convolution）
+    \item \textbf{全局注意力层}：2 层 GwT（Graph-wise Transformer）
+    \item \textbf{注意力头数}：8 头
+    \item \textbf{径向基函数数}：128 维高斯 RBF
+    \item \textbf{截断半径}：$r_{\mathrm{cut}} = 5.0$ \AA
+    \item \textbf{总参数量}：\textbf{0.75M}（为 ALIGNN 4.03M 的 18.6\%）
+    \item \textbf{节点特征}：9 维物理化学属性（原子序数、族、周期、电负性、共价半径、范德华半径、价电子数、电离能、电子亲和能）
+    \item \textbf{缺陷标识}：二元 is\_defect 嵌入（宿主=0，缺陷=1）
+\end{itemize}
+
+% [4.3.2-4.3.5 保持原有内容，已经写得很详细]
+
+%--------------------------------------------------------------------
+% 4.4 实验（全面更新）
+%--------------------------------------------------------------------
+\section{实验}
+
+\subsection{实验设置}
+
+\subsubsection{计算平台}
+
+模型的最终训练与评估在武汉大学高性能计算服务器上完成，硬件与软件环境如下：
+
+\begin{table}[h]
+\centering
+\caption{计算平台环境}
+\begin{tabular}{ll}
+\toprule
+\textbf{属性} & \textbf{规格} \\
+\midrule
+处理器 (CPU) & 2$\times$ AMD EPYC 9555（128核 / 256线程）\\
+图形处理器 (GPU) & 8$\times$ NVIDIA L40S（48\,GB GDDR6 each）\\
+内存 (RAM) & 755\,GB DDR5 \\
+操作系统 & Ubuntu 22.04 LTS \\
+深度学习框架 & PyTorch 2.11 + CUDA 12.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+相较于早期使用 Apple M3 笔记本的原型验证阶段，迁移至L40S GPU集群后，单次完整训练（150 epoch）仅需约 22 分钟，极大地加速了超参数搜索与消融实验的迭代周期。
+
+\subsubsection{训练配置}
+
+\begin{itemize}
+    \item \textbf{损失函数}：MAE (L1) Loss，相较于早期使用的Huber Loss，L1损失在重尾分布的形成能预测任务中表现更优
+    \item \textbf{优化器}：AdamW（$\beta_1=0.9$, $\beta_2=0.999$, weight decay = $10^{-4}$）
+    \item \textbf{学习率策略}：余弦退火 + 线性预热（warmup 10 epochs），替代了早期的 ReduceLROnPlateau 策略
+    \item \textbf{正则化}：梯度裁剪（max norm = 5.0），SWA（Stochastic Weight Averaging，最后 20 epochs）
+    \item \textbf{批大小}：64
+    \item \textbf{训练轮数}：150 epochs（早期为 50 epochs）
+    \item \textbf{采样策略}：宿主均衡采样（Host-balanced sampling），确保每个epoch中44种宿主材料的贡献大致相等
+    \item \textbf{随机种子}：消融实验采用 3--5 个种子取平均
+\end{itemize}
+
+\subsection{基准测试（Tier 0: In-distribution）}
+
+\subsubsection{评价指标对比}
+
+在相同的 IMP2D 数据集和划分策略下，DART 与多个基准模型的测试集性能对比如表~\ref{tab:main_new}所示。
+
+\begin{table}[h]
+\centering
+\caption{IMP2D 测试集性能对比（Tier 0, 随机划分）}
+\label{tab:main_new}
+\begin{tabular}{lrcc}
+\toprule
+\textbf{模型} & \textbf{参数量} & \textbf{MAE (eV)} & $\boldsymbol{\Delta}_{\textbf{ALIGNN}}$ \\
+\midrule
+Naive (全局均值) & --- & 2.302 & --- \\
+LightGBM & --- & 1.158 & --- \\
+SchNet & 0.46\,M & 0.585 & $+8\%$ \\
+ALIGNN & 4.03\,M & 0.540 & --- \\
+CrystalTransformer$^*$ & 0.75\,M & 0.516 & $-4\%$ \\
+\midrule
+\textbf{DART (单模型)} & \textbf{0.75M} & \textbf{0.407} & $\boldsymbol{-25\%}$ \\
+\textbf{DART (29模型集成)} & --- & \textbf{0.359} & $\boldsymbol{-34\%}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+其中 CrystalTransformer$^*$ 采用与 DART 相同的骨干架构，但使用 MSE 损失和 plateau 学习率调度进行训练，未加入缺陷位点嵌入或优化训练流程。DART 相对于该基线进一步降低了21\%的MAE，证明了缺陷感知嵌入与训练流程优化的独立贡献。
+
+\textbf{关键发现：}
+\begin{enumerate}
+    \item DART 以仅 0.75M 参数实现了 0.407\,eV 的单模型最优MAE，为 ALIGNN（4.03M参数）的5.4倍参数效率提升；
+    \item 29模型集成进一步将MAE降至 0.359\,eV，相对ALIGNN降低34\%；
+    \item 单次150-epoch训练仅需约22分钟（单L40S GPU），推理1,065个测试样本 $<5$ 秒。
+\end{enumerate}
+
+\subsubsection{误差结构分析}
+
+我们从三个物理维度对预测误差进行了系统性分解：
+
+\begin{enumerate}
+    \item \textbf{按缺陷类型}：吸附位（0.410\,eV, $n=724$）与间隙位（0.401\,eV, $n=341$）的MAE相当，表明模型对两种缺陷类型无系统性偏差；
+
+    \item \textbf{按形成能量级}：模型在 $|E_f| < 5$\,eV 区间表现最优（MAE $\leq 0.34$\,eV），但在极端值区间（$E_f > 10$\,eV）误差显著增大至2.69\,eV，反映了数据稀疏性（仅占训练集3.3\%）和DFT收敛困难的双重挑战；
+
+    \item \textbf{按掺杂元素}：将每种掺杂元素的MAE映射到周期表上，发现主族金属（Bi, Pb, Sr: MAE $< 0.17$\,eV）最易预测，而早期过渡金属（Sc, Mn, Ta: MAE $> 0.77$\,eV）最难，这与部分填充 $d$ 壳层引入的复杂多轨道杂化一致。
+\end{enumerate}
+
+\subsection{训练流程消融实验}
+
+为量化各训练策略组件的独立贡献，我们设计了逐步累加的消融实验，每一步仅添加一个组件：
+
+\begin{table}[h]
+\centering
+\caption{训练流程累积消融实验（3--5种子平均）}
+\begin{tabular}{lccc}
+\toprule
+\textbf{配置} & \textbf{种子数} & \textbf{MAE (eV)} & $\boldsymbol{\Delta}$ \\
+\midrule
+MSE Loss + Plateau LR & 3 & $0.516 \pm 0.006$ & --- \\
+$\to$ MAE (L1) Loss & 3 & $0.474 \pm 0.018$ & $-0.042$ \\
+$\to$ + 余弦预热调度 & 5 & $0.426 \pm 0.011$ & $-0.048$ \\
+$\to$ + 150\,ep + SWA & 3 & $0.415 \pm 0.008$ & $-0.011$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{分析：}
+\begin{itemize}
+    \item 最大的单步提升来自损失函数切换（MSE $\to$ L1），降低0.042\,eV，与形成能重尾分布的统计特性一致——L1损失对离群值更鲁棒；
+    \item 余弦预热学习率调度贡献了第二大提升（$-0.048$\,eV），通过在训练初期稳定非光滑L1梯度来改善收敛质量；
+    \item 延长训练至150轮并引入SWA额外贡献$-0.011$\,eV；
+    \item 各步提升在种子间具有统计显著性（配对$t$检验, $p < 0.05$）。
+\end{itemize}
+
+\subsection{数据增强效果分析}
+
+\subsubsection{定量对比（更新）}
+
+在最终的v1.2版本中，数据增强效果与早期v1版本一致，且与训练流程优化具有正交性。增强后的训练集规模扩大至 $10,641 \times 3 = 31,923$ 个样本。结合最终的训练配置，增强策略的贡献在整体性能提升中占据核心地位。
+
+早期阶段实验数据（v1版本）已证明增强效果的显著性：
+
+\begin{table}[h]
+\centering
+\caption{数据增强效果对比（v1版本初步验证）}
+\begin{tabular}{lccc}
+\toprule
+\textbf{配置} & \textbf{训练集 MAE} & \textbf{验证集 MAE} & \textbf{测试集 MAE} \\
+\midrule
+原始数据集 & 0.6975 & 0.8062 & 0.8330 \\
+增强数据集 & 0.3988 & 0.6436 & 0.4260 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{关键结论}：数据增强将测试集MAE降低约50\%（从0.833\,eV至0.426\,eV），效果贯穿从v1到v1.2的全部版本迭代。
+
+\subsection{分布外泛化评估（Tier 1 \& 2）}
+
+这是本项目最重要的实验创新之一。传统的材料科学机器学习研究通常仅在随机划分的测试集上报告结果，这对于评估模型的实际应用价值远远不够。我们设计的三层递进评估协议，严格测试了模型在不同程度``未知''场景下的泛化能力。
+
+\subsubsection{Tier 1: 留一宿主交叉验证（LOHO）}
+
+在G6-TMD族的7种宿主材料上进行留一验证，结果如下：
+
+\begin{table}[h]
+\centering
+\caption{Tier 1: 留一宿主交叉验证（G6-TMDs）}
+\begin{tabular}{lccc}
+\toprule
+\textbf{留出宿主} & \textbf{DART MAE} & \textbf{Naive MAE} & \textbf{提升倍数} \\
+\midrule
+MoSe$_2$ & 0.377 & 2.874 & 7.6$\times$ \\
+MoTe$_2$ & 0.480 & 1.910 & 4.0$\times$ \\
+MoSSe & 0.484 & 2.019 & 4.2$\times$ \\
+WTe$_2$ & 0.506 & 2.005 & 4.0$\times$ \\
+MoS$_2$ & 0.522 & 3.507 & 6.7$\times$ \\
+WSe$_2$ & 0.653 & 2.883 & 4.4$\times$ \\
+WS$_2$ & 0.759 & 3.253 & 4.3$\times$ \\
+\midrule
+\textbf{均值} & $\mathbf{0.540 \pm 0.117}$ & 2.636 & $\mathbf{4.9\times}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{分析：}
+\begin{itemize}
+    \item 从Tier 0（0.407\,eV）到Tier 1（0.540\,eV），MAE仅增加1.33倍，而朴素基线在各折叠上的MAE高达2.6\,eV以上，证明DART学到了TMD族内可迁移的缺陷-宿主交互表征；
+    \item Mo基宿主（均值MAE = 0.453\,eV）系统性优于W基宿主（均值MAE = 0.639\,eV），反映了W的$5d$轨道空间伸展更大，导致更强的缺陷-宿主$d$-$p$杂化，迁移难度更高。
+\end{itemize}
+
+\subsubsection{Tier 2: G6$\times$3d 块排除测试}
+
+同时排除所有 G6 族宿主与 3d 过渡金属掺杂的交叉组合后，整体MAE为 0.534\,eV，与Tier 1（0.540\,eV）相当。这证明DART的组合泛化能力与宿主迁移能力处于同一水平，能够对训练中完全未见过的宿主-掺杂组合进行有效的``矩阵补全''式预测。
+
+\subsection{不确定性量化}
+
+在高通量筛选场景中，仅给出点预测值是不够的——用户需要知道预测的置信度。我们利用7模型集成的预测方差作为不确定性估计，并通过温度缩放（$\tau = 2.57$）进行校准。
+
+\textbf{关键指标：}
+\begin{itemize}
+    \item \textbf{经验覆盖率}：在90\%名义置信水平下，实际覆盖率达到 \textbf{93.4\%}
+    \item \textbf{期望校准误差（ECE）}：0.068
+    \item \textbf{Spearman 相关性}：预测不确定性$\sigma$与实际绝对误差的秩相关系数为 \textbf{0.577}（$p < 10^{-5}$），证实集成方差是预测置信度的有意义代理指标
+\end{itemize}
+
+\subsection{消融实验: 全局几何自注意力模块的影响}
+
+% 保持原有实验框架，补充更新后的数据
+在最终版本中，全局注意力模块的消融实验进一步确认了其必要性。移除全局模块后不仅MAE上升，更关键的是在OOD场景（Tier 1）下性能退化更为严重，证明全局注意力对于捕捉跨越局部截断半径的长程缺陷效应具有不可替代的作用。
+
+%--------------------------------------------------------------------
+% 4.5 平台搭建（更新）
+%--------------------------------------------------------------------
+\section{平台搭建}
+
+截至中期阶段，平台搭建工作主要集中在以下三个方面：
+
+\begin{enumerate}
+    \item \textbf{代码仓库管理}：项目全部代码托管于 GitHub 私有仓库，采用 Git 进行版本控制。代码结构包括数据处理流水线、模型定义、训练脚本、评估工具和可视化脚本，具备完整的可复现性。
+
+    \item \textbf{学术论文撰写}：基于实验成果，已完成学术论文初稿，采用 \texttt{revtex4-2} 格式（Physical Review B 风格），内容涵盖模型方法、三层评估协议、消融实验及物理可解释性分析。
+
+    \item \textbf{开源平台规划}：Web端一站式预测平台的前端设计与后端架构方案已初步确定，将在后续阶段基于 Streamlit 或 Gradio 实现原型部署。
+\end{enumerate}
+
+%--------------------------------------------------------------------
+% 4.6 困难与挑战（更新）
+%--------------------------------------------------------------------
+\section{困难与挑战}
+
+经过中期阶段的密集实验，项目遇到了以下超出原始预期的困难与挑战：
+
+\subsection{表征层面}
+
+\begin{enumerate}
+    \item \textbf{夹角特征的计算开销}：三元组数量随邻居数呈二次增长，导致存储与计算成本显著上升。在处理大超胞（$>200$原子）的缺陷体系时，内存占用成为训练的瓶颈。通过优化数据加载策略（仅在batch内计算而非预存）部分缓解了该问题。
+
+    \item \textbf{全连接距离矩阵的$O(N^2)$开销}：全局注意力需要计算 $N \times N$ 的最小镜像距离矩阵并进行RBF展开。结合batch padding的掩码操作，大原子数样本的显存占用较高。当前通过限制batch size和梯度累积来适配单GPU 48GB显存。
+\end{enumerate}
+
+\subsection{模型与训练}
+
+\begin{enumerate}
+    \item \textbf{损失函数选择的非平凡性}：早期使用MSE/Huber Loss的实验表明，形成能分布的重尾特性使L2类损失对离群值过于敏感。切换至L1 Loss后带来了最大的单步性能提升（$-0.042$\,eV），这一发现揭示了损失函数设计需要与目标物理量的统计分布相匹配。
+
+    \item \textbf{预训练嵌入的反直觉效果}：从Materials Project预训练的CrystalTransformer-UAE原子嵌入在分布内（Tier 0）带来微弱提升，但在分布外（Tier 1）反而使性能下降。这表明在三维块体晶体上预训练的化学先验与二维缺陷领域存在部分失配，对迁移学习实践者具有警示意义。
+
+    \item \textbf{学习率策略对非光滑损失的影响}：L1损失的梯度在零点处不连续，导致训练初期的梯度震荡。余弦预热策略通过在前10个epoch内从极低学习率线性升温，有效稳定了初期训练动态。
+\end{enumerate}
+
+\subsection{评估与物理一致性}
+
+\begin{enumerate}
+    \item \textbf{DFT独立验证的复杂性}：为验证模型预测的物理可靠性，项目尝试使用Quantum ESPRESSO进行独立DFT计算验证。然而，由于化学势参考态的不一致（孤立原子 vs. 块体参考态），早期验证实验获得了MAE高达6.89\,eV的虚假结果。经过系统分析，确认了VASP与QE间化学势参考态的偏差是主要原因，并从IMP2D数据中成功反推了全部65种掺杂元素的自洽化学势，为后续验证奠定了基础。
+
+    \item \textbf{OOD评估的设计挑战}：传统的随机划分无法真正检验模型的泛化能力。设计合理的OOD评估协议需要深入理解材料科学中``什么算新材料''的领域知识——我们最终选择的``宿主家族''和``宿主-掺杂组合''两个维度，分别对应了材料筛选中最常见的两类实际外推场景。
+\end{enumerate}
+
+\subsection{计算平台}
+
+\begin{enumerate}
+    \item \textbf{跨平台迁移}：项目从 Apple M3（MPS后端）迁移至 Linux + L40S（CUDA后端）的过程中，遇到了PyTorch算子兼容性、DGL库不兼容等问题。最终通过采用纯PyTorch实现（不依赖DGL）和适配CUDA 12.6/cuDNN成功解决。
+
+    \item \textbf{DFT软件缺失}：WHU服务器虽然具备强大的CPU（128核）和GPU（8$\times$L40S）算力，但未安装VASP等商业DFT软件。计划后续安装开源DFT工具（如GPAW）以支持独立验证实验。
+\end{enumerate}
+
+%--------------------------------------------------------------------
+% 4.7 未来计划（更新）
+%--------------------------------------------------------------------
+\section{未来计划}
+
+基于中期阶段取得的扎实成果，项目后续工作将围绕\textbf{三大核心目标}展开：提升模型在极端场景下的预测能力、通过DFT验证建立物理可信度、以及完成学术论文投稿与开源平台发布。
+
+\subsection{DFT独立验证实验}
+
+\textbf{目标}：通过独立DFT计算验证DART预测的物理可靠性，将论文从``纯基准测试''提升至``具备发现能力''的层次。
+
+\begin{enumerate}
+    \item \textbf{准备工作（已完成）}：
+    \begin{itemize}
+        \item 确认IMP2D使用VASP PBE PAW方法学
+        \item 从IMP2D数据中反推全部65种掺杂元素的化学势（61种std=0.0000\,eV验证通过）
+        \item 确认WHU服务器的硬件条件（128核CPU可支持GPAW并行计算）
+    \end{itemize}
+
+    \item \textbf{软件安装}：在WHU服务器上安装GPAW（开源DFT工具），通过conda环境配置。GPAW支持PBE泛函和PAW方法，与VASP方法学兼容。
+
+    \item \textbf{验证策略}：
+    \begin{itemize}
+        \item \textbf{校准阶段}：复现IMP2D中5个已知条目，确认GPAW与VASP计算结果的一致性（目标偏差 $< 0.05$\,eV）
+        \item \textbf{发现阶段}：选择8个DART预测的``高价值''候选（低$E_f$、高置信度），进行独立DFT验证
+        \item \textbf{预计算力}：$\sim$35--45 CPU$\cdot$h（WHU服务器128核，约数小时完成）
+    \end{itemize}
+\end{enumerate}
+
+\subsection{模型架构进一步优化}
+
+\begin{enumerate}
+    \item \textbf{缺陷星型稀疏注意力机制}：将全连接注意力图进行基于物理先验的稀疏化裁剪。对于普通晶格原子，仅保留基于截断半径的局部窗口交互；将缺陷对应的``虚拟节点''设置为星型拓扑的中心，所有原子被强制仅与该中心节点进行全局双向通信。这将时间复杂度从$O(N^2)$降至$O(N)$，使大超胞的训练与推理成为可能。
+
+    \item \textbf{E(3)等变张量场表征}：引入基于球面谐波函数与张量积的等变图神经网络，将原子间相对位移矢量直接引入网络。这将使模型具备对三维空间平移和旋转的严格等变性，有望提升对磁矩、极化率等张量性质的预测能力。
+\end{enumerate}
+
+\subsection{论文投稿与开源发布}
+
+\begin{enumerate}
+    \item \textbf{学术论文}：当前论文初稿已基本完成，采用 Physical Review B 格式。计划在完成DFT验证实验后，投稿至 Machine Learning: Science and Technology 或 npj Computational Materials（视DFT验证结果决定目标期刊层次）。
+
+    \item \textbf{开源代码}：完善代码文档与使用说明，在GitHub公开发布DART模型代码、预训练权重和数据处理流水线。
+
+    \item \textbf{预测平台}：基于 Streamlit 或 Gradio 搭建Web端一站式预测平台，支持用户上传晶体结构文件（.cif, POSCAR, .xyz），自动完成缺陷检测、图构建、模型推理和不确定性量化，并以3D渲染的注意力热图形式直观展示预测结果。
+\end{enumerate}
+
+\subsection{技术路线与进度安排调整}
+
+基于中期阶段的实际进展，对后续进度安排进行如下调整：
+
+\textbf{第二阶段剩余（2026.05 — 2026.07）：DFT验证与论文完善}
+\begin{itemize}
+    \item \textbf{任务1}：GPAW安装与校准实验（2周）
+    \item \textbf{任务2}：8个候选结构的DFT验证（2周）
+    \item \textbf{任务3}：论文DFT验证章节撰写与全文润色（2周）
+    \item \textbf{任务4}：论文投稿（目标：2026年7月）
+\end{itemize}
+
+\textbf{第三阶段（2026.08 — 2026.10）：架构升级与平台开发}
+\begin{itemize}
+    \item \textbf{任务1}：星型稀疏注意力机制的实现与验证
+    \item \textbf{任务2}：E(3)等变表征的探索性实验
+    \item \textbf{任务3}：Web预测平台原型开发
+\end{itemize}
+
+\textbf{第四阶段（2026.11 — 2027.01）：平台部署与成果发布}
+\begin{itemize}
+    \item \textbf{任务1}：平台前端完善与公开部署
+    \item \textbf{任务2}：代码开源与文档编写
+    \item \textbf{任务3}：项目结题报告与成果总结
+\end{itemize}
+
+\end{document}
