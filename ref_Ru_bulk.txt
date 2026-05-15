@@ -1,0 +1,320 @@
+  ___ ___ ___ _ _ _
+ |   |   |_  | | | |
+ | | | | | . | | | |
+ |__ |  _|___|_____| - 25.7.0
+ |___|_|
+
+User:   root@autodl-container-cb134f97cf-3ebc7372
+Date:   Fri May 15 08:56:12 2026
+Arch:   x86_64
+Pid:    751134
+CWD:    /root/autodl-tmp/2d-defect-dast
+Python: 3.10.20
+gpaw:   /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/gpaw
+_gpaw:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/
+        _gpaw.cpython-310-x86_64-linux-gnu.so
+ase:    /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/ase (version 3.28.0)
+numpy:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy (version 2.2.6)
+scipy:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/scipy (version 1.15.2)
+libxc:  7.0.0
+units:  Angstrom and eV
+cores: 1
+OpenMP: False
+OMP_NUM_THREADS: 1
+
+input parameters:
+  mode=PW(ecut=500.0),
+  kpts=MonkhorstPack(size=array([8, 8, 4])),
+  occupations=Occupations(name='fermi-dirac', width=0.05, fixmagmom=False),
+  parallel={'gpu': True},
+  spinpol=True,
+  xc=XC(name='PBE')
+
+environment variables:
+  GPAW_CPUPY=False,
+  GPAW_MPI4PY=False,
+  GPAW_NEW=True,
+  GPAW_NO_C_EXTENSION=False,
+  GPAW_TRACE=False,
+  GPAW_USE_GPUS=True
+
+Diagonalizing LCAO Hamiltonian
+Converting LCAO to grid
+                 
+                 
+                 
+                 
+        Ru       
+                 
+                 
+       Ru        
+                 
+                 
+                 
+                 
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 Ru     0.000000    0.000000    0.000000    ( 0.0000,  0.0000,  0.0000)
+   1 Ru     0.000000    1.558846    2.140000    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    yes    2.700000    0.000000    0.000000    14     0.1670
+  2. axis:    yes   -1.350000    2.338269    0.000000    14     0.1670
+  3. axis:    yes    0.000000    0.000000    4.280000    24     0.1783
+
+  Lengths:   2.700000   2.700000   4.280000
+  Angles:   90.000000  90.000000 120.000000
+
+Effective grid spacing dv^(1/3) = 0.1791
+
+symmetry:
+  number of symmetries: 12
+  rotations: [
+    [[ 1,  1,  0], [ 0, -1,  0], [ 0,  0,  1]],
+    [[ 1,  1,  0], [ 0, -1,  0], [ 0,  0, -1]],
+    [[ 1,  0,  0], [ 0,  1,  0], [ 0,  0,  1]],
+    [[ 1,  0,  0], [ 0,  1,  0], [ 0,  0, -1]],
+    [[ 0,  1,  0], [-1, -1,  0], [ 0,  0,  1]],
+    [[ 0,  1,  0], [-1, -1,  0], [ 0,  0, -1]],
+    [[ 0, -1,  0], [-1,  0,  0], [ 0,  0,  1]],
+    [[ 0, -1,  0], [-1,  0,  0], [ 0,  0, -1]],
+    [[-1,  0,  0], [ 1,  1,  0], [ 0,  0,  1]],
+    [[-1,  0,  0], [ 1,  1,  0], [ 0,  0, -1]],
+    [[-1, -1,  0], [ 1,  0,  0], [ 0,  0,  1]],
+    [[-1, -1,  0], [ 1,  0,  0], [ 0,  0, -1]]]
+
+bz sampling:
+  number of bz points: 256
+  number of ibz points: 40
+  your k-points are not as symmetric as your crystal!
+  monkhorst-pack size: [8, 8, 4]
+  monkhorst-pack shift: [0, 0, 0]
+  points and weights: [
+    [[  0.06250000,  -0.06250000,   0.12500000], 0.01562500],  # 0
+    [[  0.06250000,  -0.06250000,   0.37500000], 0.01562500],  # 1
+    [[  0.06250000,   0.06250000,   0.12500000], 0.01562500],  # 2
+    [[  0.06250000,   0.06250000,   0.37500000], 0.01562500],  # 3
+    [[  0.18750000,  -0.18750000,   0.12500000], 0.01562500],  # 4
+    [[  0.18750000,  -0.18750000,   0.37500000], 0.01562500],  # 5
+    [[  0.18750000,  -0.06250000,   0.12500000], 0.03125000],  # 6
+    [[  0.18750000,  -0.06250000,   0.37500000], 0.03125000],  # 7
+    [[  0.18750000,   0.06250000,   0.12500000], 0.03125000],  # 8
+    [[  0.18750000,   0.06250000,   0.37500000], 0.03125000],  # 9
+    # ...
+    [[  0.43750000,   0.43750000,   0.37500000], 0.01562500]]  # 39
+
+plane wave coefficients: 698
+cutoff: 500.0 eV
+
+spin-components: 2  # (collinear spins)
+bands: 24
+spin-degeneracy: 1
+dtype: complex128
+
+memory:
+    storage: GPU
+    wave functions: 20_797_440  # bytes  (20_797_440 per core)
+
+parallelization:
+    kpt:    1
+    domain: 1
+    band:   1
+
+density:
+  valence electrons: 32.0
+  components: 2
+  grid points: [14 14 24]
+  charge: 0.0  # |e|
+
+potential:
+  grid points: [14 14 24]
+
+species:
+  Ru:
+    name: Ruthenium
+    id: 670232e5f51aeb2542f664849653fb2d
+    Z: 44.0
+    valence: 16
+    core: 28
+    charge: 0.0
+    file: /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/gpaw_data/setups/Ru.PBE.gz
+    compensation charges: {type: gauss,
+                           rc: 0.39,
+                           lmax: 2}
+    cutoffs: {filter: 2.16,
+              core: 1.30}
+    projectors:
+      #              energy  rcut
+      - 4s(2.00)   -76.316   1.281
+      - 5s(1.00)    -4.236   1.281
+      - 4p(6.00)   -46.423   1.286
+      - 5p(0.00)    -0.913   1.286
+      - 4d(7.00)    -5.203   1.254
+      -  d          22.008   1.254
+  
+    # Using partial waves for Ru as LCAO basis
+
+Reference energy: -246490.249966  # eV
+
+eigensolver:
+  {'converge_bands': 'occupied', 'name': 'Davidson', 'niter': 2}
+Density mixing:
+  Method: difference
+  Backend: pulay
+  Linear mixing parameter: 0.05
+  old densities: 5
+  Damping of long wavelength oscillations: 50
+occupation numbers:
+  Fermi-Dirac:
+    width: 0.0500  # eV
+  
+
+<gpaw.new.pw.paw_poisson.SlowPAWPoissonSolver object at 0x7f9818fe2950>
+xc functional:
+  name: PBE with 2 nearest neighbor stencil
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:  magmom
+                         energy   eigst   dens
+iter:   1 08:56:15   -20.475143   +0.23           +0.0000
+iter:   2 08:56:16   -20.195075   -1.69  -1.30    +0.0000
+iter:   3 08:56:18   -19.627479   -0.79  -1.33    +0.0000
+iter:   4 08:56:19   -19.087121   -2.30  -1.57    +0.0000
+iter:   5 08:56:20   -18.912686   -2.10  -1.84    +0.0000
+iter:   6 08:56:21   -18.913060   -3.53  -2.70    -0.0000
+iter:   7 08:56:23   -18.912593c  -4.92  -3.10    -0.0000
+iter:   8 08:56:24   -18.912586c  -5.65  -3.52    -0.0000
+iter:   9 08:56:25   -18.912590c  -6.57  -3.81    -0.0000
+iter:  10 08:56:27   -18.912587c  -7.14  -3.99    -0.0000
+iter:  11 08:56:28   -18.912585c  -7.03  -4.28c   -0.0000
+iter:  12 08:56:29   -18.912585c  -8.46c -4.91c   -0.0000
+Converged in 12 steps
+Energy contributions relative to reference atoms: (reference = -246490.249966)
+
+kinetic:          -3.647127
+coulomb:          -3.432884
+zero:             -0.366463
+external:          0.000000
+xc:              -11.459971
+entropy:          -0.012280
+spinorbit:         0.000000
+----------------------------
+Free energy:     -18.918725
+Extrapolated:    -18.912585
+
+dipole moment: [-7.942393, -6.327581, -14.981652]  # |e|*Ang
+
+total magnetic moment: [0.000000, 0.000000, -0.000000]
+
+local magnetic moments: [
+  [ 0.000000,  0.000000, -0.000000],  # Ru 0
+  [ 0.000000,  0.000000, -0.000000]]  # Ru 1
+
+
+Fermi level: 13.514
+
+kpt = [0.062, -0.062, 0.125], weight = 0.016:
+  Band      eig [eV]   occ [0-1]      eig [eV]   occ [0-1]
+     0       -59.591       1.000       -59.591       1.000
+     1       -59.402       1.000       -59.402       1.000
+     2       -30.053       1.000       -30.053       1.000
+     3       -29.206       1.000       -29.206       1.000
+     4       -29.188       1.000       -29.188       1.000
+     5       -29.063       1.000       -29.063       1.000
+     6       -29.025       1.000       -29.025       1.000
+     7       -28.996       1.000       -28.996       1.000
+     8         5.879       1.000         5.879       1.000
+     9         7.511       1.000         7.511       1.000
+    10        10.605       1.000        10.605       1.000
+    11        10.923       1.000        10.923       1.000
+    12        11.128       1.000        11.128       1.000
+    13        11.391       1.000        11.391       1.000
+    14        11.595       1.000        11.595       1.000
+    15        12.306       1.000        12.306       1.000
+    16        12.316       1.000        12.316       1.000
+    17        13.348       0.965        13.348       0.965
+    18        14.768       0.000        14.768       0.000
+    19        15.830       0.000        15.830       0.000
+    20        24.636       0.000        24.636       0.000
+    21        28.675       0.000        28.675       0.000
+    22        31.741       0.000        31.741       0.000
+    23        35.391       0.000        35.391       0.000
+
+kpt = [0.062, -0.062, 0.375], weight = 0.016:
+  Band      eig [eV]   occ [0-1]      eig [eV]   occ [0-1]
+     0       -59.536       1.000       -59.536       1.000
+     1       -59.458       1.000       -59.458       1.000
+     2       -29.762       1.000       -29.762       1.000
+     3       -29.340       1.000       -29.340       1.000
+     4       -29.155       1.000       -29.155       1.000
+     5       -29.140       1.000       -29.140       1.000
+     6       -29.081       1.000       -29.081       1.000
+     7       -29.073       1.000       -29.073       1.000
+     8         7.037       1.000         7.037       1.000
+     9         7.783       1.000         7.783       1.000
+    10        10.438       1.000        10.438       1.000
+    11        10.677       1.000        10.677       1.000
+    12        10.704       1.000        10.704       1.000
+    13        10.747       1.000        10.747       1.000
+    14        11.070       1.000        11.070       1.000
+    15        11.693       1.000        11.693       1.000
+    16        13.478       0.674        13.478       0.674
+    17        13.549       0.331        13.549       0.331
+    18        14.477       0.000        14.477       0.000
+    19        14.704       0.000        14.704       0.000
+    20        28.213       0.000        28.213       0.000
+    21        28.287       0.000        28.287       0.000
+    22        30.247       0.000        30.247       0.000
+    23        34.678       0.000        34.678       0.000
+
+kpt = [0.062, 0.062, 0.125], weight = 0.016:
+  Band      eig [eV]   occ [0-1]      eig [eV]   occ [0-1]
+     0       -59.579       1.000       -59.579       1.000
+     1       -59.398       1.000       -59.398       1.000
+     2       -30.029       1.000       -30.029       1.000
+     3       -29.256       1.000       -29.256       1.000
+     4       -29.212       1.000       -29.212       1.000
+     5       -29.121       1.000       -29.121       1.000
+     6       -29.036       1.000       -29.036       1.000
+     7       -29.000       1.000       -29.000       1.000
+     8         6.154       1.000         6.154       1.000
+     9         7.723       1.000         7.723       1.000
+    10        10.344       1.000        10.344       1.000
+    11        11.081       1.000        11.081       1.000
+    12        11.198       1.000        11.198       1.000
+    13        11.219       1.000        11.219       1.000
+    14        11.785       1.000        11.785       1.000
+    15        12.046       1.000        12.046       1.000
+    16        12.281       1.000        12.281       1.000
+    17        12.844       1.000        12.844       1.000
+    18        14.842       0.000        14.842       0.000
+    19        16.841       0.000        16.841       0.000
+    20        24.626       0.000        24.626       0.000
+    21        29.115       0.000        29.115       0.000
+    22        32.008       0.000        32.008       0.000
+    23        33.192       0.000        33.192       0.000
+(only showing first 3 out of 40 k-points)
+
+No gap
+No difference between direct/indirect transitions
+
+Forces: [  # eV/Ang
+  [    0.0000,     0.0000,     0.0000],  # Ru 0
+  [    0.0000,     0.0000,     0.0000]]  # Ru 1
+---
+
+timing:  # [seconds]
+  Total:  20332.228  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Init:       1.750  # 
+  SCF:       15.437  # 
+  Forces:     0.152  # 
+
+Max RSS: 3232.543  # MiB

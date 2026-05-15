@@ -1,0 +1,665 @@
+  ___ ___ ___ _ _ _
+ |   |   |_  | | | |
+ | | | | | . | | | |
+ |__ |  _|___|_____| - 25.7.0
+ |___|_|
+
+User:   root@autodl-container-cb134f97cf-3ebc7372
+Date:   Fri May 15 22:08:00 2026
+Arch:   x86_64
+Pid:    926295
+CWD:    /root/autodl-tmp/2d-defect-dast
+Python: 3.10.20
+gpaw:   /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/gpaw
+_gpaw:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/
+        _gpaw.cpython-310-x86_64-linux-gnu.so
+ase:    /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/ase (version 3.28.0)
+numpy:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy (version 2.2.6)
+scipy:  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/scipy (version 1.15.2)
+libxc:  7.0.0
+units:  Angstrom and eV
+cores: 1
+OpenMP: False
+OMP_NUM_THREADS: 1
+
+input parameters:
+  mode=PW(ecut=500.0),
+  kpts=MonkhorstPack(size=array([1, 1, 1])),
+  occupations=Occupations(name='fermi-dirac', width=0.05, fixmagmom=False),
+  parallel={'gpu': True},
+  spinpol=False,
+  xc=XC(name='PBE')
+
+environment variables:
+  GPAW_CPUPY=False,
+  GPAW_MPI4PY=False,
+  GPAW_NEW=True,
+  GPAW_NO_C_EXTENSION=False,
+  GPAW_TRACE=False,
+  GPAW_USE_GPUS=True
+
+Diagonalizing LCAO Hamiltonian
+Converting LCAO to grid
+          .------------------------------------.  
+         /|                                    |  
+        / |                                    |  
+       /  |                                    |  
+      /   |                                    |  
+     /    |                                    |  
+    /     |                                    |  
+   /      |                                    |  
+  /       |                                    |  
+ *        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |             N                      |  
+ |        |             N                      |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        .------------------------------------.  
+ |       /                                    /   
+ |      /                                    /    
+ |     /                                    /     
+ |    /                                    /      
+ |   /                                    /       
+ |  /                                    /        
+ | /                                    /         
+ |/                                    /          
+ *------------------------------------*           
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 N      7.500000    7.500000    8.064990    ( 0.0000,  0.0000,  0.0000)
+   1 N      7.500000    7.500000    6.935010    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    no    15.000000    0.000000    0.000000    80     0.1875
+  2. axis:    no     0.000000   15.000000    0.000000    80     0.1875
+  3. axis:    no     0.000000    0.000000   15.000000    80     0.1875
+
+  Lengths:  15.000000  15.000000  15.000000
+  Angles:   90.000000  90.000000  90.000000
+
+Effective grid spacing dv^(1/3) = 0.1875
+
+symmetry:
+  number of symmetries: 16
+  rotations: [
+    [[ 1,  0,  0], [ 0,  1,  0], [ 0,  0,  1]],
+    [[ 1,  0,  0], [ 0,  1,  0], [ 0,  0, -1]],
+    [[ 1,  0,  0], [ 0, -1,  0], [ 0,  0,  1]],
+    [[ 1,  0,  0], [ 0, -1,  0], [ 0,  0, -1]],
+    [[ 0,  1,  0], [ 1,  0,  0], [ 0,  0,  1]],
+    [[ 0,  1,  0], [ 1,  0,  0], [ 0,  0, -1]],
+    [[ 0,  1,  0], [-1,  0,  0], [ 0,  0,  1]],
+    [[ 0,  1,  0], [-1,  0,  0], [ 0,  0, -1]],
+    [[ 0, -1,  0], [ 1,  0,  0], [ 0,  0,  1]],
+    [[ 0, -1,  0], [ 1,  0,  0], [ 0,  0, -1]],
+    [[ 0, -1,  0], [-1,  0,  0], [ 0,  0,  1]],
+    [[ 0, -1,  0], [-1,  0,  0], [ 0,  0, -1]],
+    [[-1,  0,  0], [ 0,  1,  0], [ 0,  0,  1]],
+    [[-1,  0,  0], [ 0,  1,  0], [ 0,  0, -1]],
+    [[-1,  0,  0], [ 0, -1,  0], [ 0,  0,  1]],
+    [[-1,  0,  0], [ 0, -1,  0], [ 0,  0, -1]]]
+
+bz sampling:
+  number of bz points: 1
+  number of ibz points: 1
+  monkhorst-pack size: [1, 1, 1]
+  monkhorst-pack shift: [0, 0, 0]
+  points and weights: [
+    [[  0.00000000,   0.00000000,   0.00000000], 1.00000000]]  # 0
+
+plane wave coefficients: 42844
+cutoff: 500.0 eV
+
+spin-components: 1  # (collinear spins)
+bands: 8
+spin-degeneracy: 2
+dtype: float64
+
+memory:
+    storage: GPU
+    wave functions: 5_484_032  # bytes  (5_484_032 per core)
+
+parallelization:
+    kpt:    1
+    domain: 1
+    band:   1
+
+density:
+  valence electrons: 10.0
+  components: 1
+  grid points: [80 80 80]
+  charge: 0.0  # |e|
+
+potential:
+  grid points: [80 80 80]
+
+species:
+  N:
+    name: Nitrogen
+    id: f7500608b86eaa90eef8b1d9a670dc53
+    Z: 7.0
+    valence: 5
+    core: 2
+    charge: 0.0
+    file: /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/gpaw_data/setups/N.PBE.gz
+    compensation charges: {type: gauss,
+                           rc: 0.18,
+                           lmax: 2}
+    cutoffs: {filter: 1.11,
+              core: 0.96}
+    projectors:
+      #              energy  rcut
+      - 2s(2.00)   -18.583   0.603
+      - 2p(3.00)    -7.089   0.529
+      -  s           8.629   0.603
+      -  p          20.123   0.529
+      -  d           0.000   0.577
+  
+    # Using partial waves for N as LCAO basis
+
+Reference energy: -2963.443008  # eV
+
+eigensolver:
+  {'converge_bands': 'occupied', 'name': 'Davidson', 'niter': 2}
+Density mixing:
+  Method: separate
+  Backend: pulay
+  Linear mixing parameter: 0.25
+  old densities: 3
+  Damping of long wavelength oscillations: 1  # (no daming)
+occupation numbers:
+  Fermi-Dirac:
+    width: 0.0500  # eV
+  
+
+<gpaw.new.pw.paw_poisson.SlowPAWPoissonSolver object at 0x7fc9f0237010>
+xc functional:
+  name: PBE with 2 nearest neighbor stencil
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:
+                         energy   eigst   dens
+iter:   1 22:08:01   -16.313704   +0.52
+iter:   2 22:08:02   -16.034836   -1.17  -0.94
+iter:   3 22:08:02   -15.821668   -0.82  -1.08
+iter:   4 22:08:02   -15.815231   -2.16  -1.56
+iter:   5 22:08:02   -15.777317   -1.75  -1.56
+iter:   6 22:08:03   -15.772101   -3.23  -1.89
+iter:   7 22:08:03   -15.771800   -3.06  -2.13
+iter:   8 22:08:03   -15.771360c  -3.59  -2.50
+iter:   9 22:08:03   -15.771191c  -4.44  -2.82
+iter:  10 22:08:04   -15.771202c  -5.03  -3.49
+iter:  11 22:08:04   -15.771192c  -5.58  -3.41
+iter:  12 22:08:04   -15.771192c  -7.38  -4.42c
+iter:  13 22:08:04   -15.771192c  -7.51c -4.70c
+Converged in 13 steps
+Energy contributions relative to reference atoms: (reference = -2963.443008)
+
+kinetic:           7.500342
+coulomb:         -12.151171
+zero:             -0.112369
+external:          0.000000
+xc:              -11.007994
+entropy:          -0.000000
+spinorbit:         0.000000
+----------------------------
+Free energy:     -15.771192
+Extrapolated:    -15.771192
+
+dipole moment: [0.000002, 0.000002, 0.000002]  # |e|*Ang
+
+
+Fermi level: -7.527
+
+kpt = [0.000, 0.000, 0.000], weight = 1.000:
+  Band      eig [eV]   occ [0-2]
+     0       -27.845       2.000
+     1       -13.751       2.000
+     2       -11.287       2.000
+     3       -11.287       2.000
+     4       -10.165       2.000
+     5        -2.197       0.000
+     6        -2.197       0.000
+     7         0.479       0.000
+
+Gap: 7.968 eV
+Transition (v -> c):
+  (s=0, k=0, n=4, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=5, [0.00, 0.00, 0.00])
+No difference between direct/indirect transitions
+vacuum-level: 0.056  # V
+
+Forces: [  # eV/Ang
+  [    0.0000,     0.0000,    -2.9656],  # N  0
+  [    0.0000,     0.0000,     2.9656]]  # N  1
+          .------------------------------------.  
+         /|                                    |  
+        / |                                    |  
+       /  |                                    |  
+      /   |                                    |  
+     /    |                                    |  
+    /     |                                    |  
+   /      |                                    |  
+  /       |                                    |  
+ *        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |             N                      |  
+ |        |             N                      |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        .------------------------------------.  
+ |       /                                    /   
+ |      /                                    /    
+ |     /                                    /     
+ |    /                                    /      
+ |   /                                    /       
+ |  /                                    /        
+ | /                                    /         
+ |/                                    /          
+ *------------------------------------*           
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 N      7.500000    7.500000    8.022624    ( 0.0000,  0.0000,  0.0000)
+   1 N      7.500000    7.500000    6.977376    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    no    15.000000    0.000000    0.000000    80     0.1875
+  2. axis:    no     0.000000   15.000000    0.000000    80     0.1875
+  3. axis:    no     0.000000    0.000000   15.000000    80     0.1875
+
+  Lengths:  15.000000  15.000000  15.000000
+  Angles:   90.000000  90.000000  90.000000
+
+Effective grid spacing dv^(1/3) = 0.1875
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:
+                         energy   eigst   dens
+iter:   1 22:08:05   -15.957383   -0.76
+iter:   2 22:08:05   -15.659049   -1.69  -1.32
+iter:   3 22:08:06   -15.485937   -1.43  -1.54
+iter:   4 22:08:06   -15.485805   -2.49  -1.81
+iter:   5 22:08:06   -15.467466   -2.47  -2.04
+iter:   6 22:08:06   -15.467585   -3.30  -2.90
+iter:   7 22:08:07   -15.467577c  -4.49  -2.78
+iter:   8 22:08:07   -15.467553c  -4.98  -2.89
+iter:   9 22:08:07   -15.467532c  -5.19  -3.29
+iter:  10 22:08:07   -15.467516c  -5.93  -3.16
+iter:  11 22:08:07   -15.467516c  -7.02  -4.29c
+iter:  12 22:08:08   -15.467516c  -7.93c -4.78c
+Converged in 12 steps
+Energy contributions relative to reference atoms: (reference = -2963.443008)
+
+kinetic:          22.262185
+coulomb:         -23.637995
+zero:             -0.130578
+external:          0.000000
+xc:              -13.961128
+entropy:          -0.000000
+spinorbit:         0.000000
+----------------------------
+Free energy:     -15.467516
+Extrapolated:    -15.467516
+
+dipole moment: [0.000556, 0.000556, 0.000556]  # |e|*Ang
+
+
+Fermi level: -6.392
+
+kpt = [0.000, 0.000, 0.000], weight = 1.000:
+  Band      eig [eV]   occ [0-2]
+     0       -29.103       2.000
+     1       -13.147       2.000
+     2       -11.993       2.000
+     3       -11.993       2.000
+     4       -10.215       2.000
+     5        -1.185       0.000
+     6        -1.185       0.000
+     7        -0.187       0.000
+
+Gap: 9.030 eV
+Transition (v -> c):
+  (s=0, k=0, n=4, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=5, [0.00, 0.00, 0.00])
+No difference between direct/indirect transitions
+vacuum-level: 0.055  # V
+
+Forces: [  # eV/Ang
+  [    0.0000,    -0.0000,    11.4389],  # N  0
+  [   -0.0000,     0.0000,   -11.4389]]  # N  1
+          .------------------------------------.  
+         /|                                    |  
+        / |                                    |  
+       /  |                                    |  
+      /   |                                    |  
+     /    |                                    |  
+    /     |                                    |  
+   /      |                                    |  
+  /       |                                    |  
+ *        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |             N                      |  
+ |        |             N                      |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        .------------------------------------.  
+ |       /                                    /   
+ |      /                                    /    
+ |     /                                    /     
+ |    /                                    /      
+ |   /                                    /       
+ |  /                                    /        
+ | /                                    /         
+ |/                                    /          
+ *------------------------------------*           
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 N      7.500000    7.500000    8.056268    ( 0.0000,  0.0000,  0.0000)
+   1 N      7.500000    7.500000    6.943732    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    no    15.000000    0.000000    0.000000    80     0.1875
+  2. axis:    no     0.000000   15.000000    0.000000    80     0.1875
+  3. axis:    no     0.000000    0.000000   15.000000    80     0.1875
+
+  Lengths:  15.000000  15.000000  15.000000
+  Angles:   90.000000  90.000000  90.000000
+
+Effective grid spacing dv^(1/3) = 0.1875
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:
+                         energy   eigst   dens
+iter:   1 22:08:08   -16.153871   -0.83
+iter:   2 22:08:08   -15.945013   -1.89  -1.41
+iter:   3 22:08:09   -15.815155   -1.63  -1.62
+iter:   4 22:08:09   -15.812277   -2.96  -1.91
+iter:   5 22:08:09   -15.802924   -2.85  -2.24
+iter:   6 22:08:09   -15.802922   -3.74  -2.98
+iter:   7 22:08:09   -15.802907c  -5.00  -2.88
+iter:   8 22:08:10   -15.802868c  -5.32  -2.99
+iter:   9 22:08:10   -15.802849c  -5.18  -3.40
+iter:  10 22:08:10   -15.802833c  -6.07  -3.20
+iter:  11 22:08:10   -15.802833c  -7.31  -3.95
+iter:  12 22:08:11   -15.802832c  -7.28  -4.23c
+iter:  13 22:08:11   -15.802832c  -8.46c -4.81c
+Converged in 13 steps
+Energy contributions relative to reference atoms: (reference = -2963.443008)
+
+kinetic:          10.115905
+coulomb:         -14.236128
+zero:             -0.114035
+external:          0.000000
+xc:              -11.568575
+entropy:          -0.000000
+spinorbit:         0.000000
+----------------------------
+Free energy:     -15.802832
+Extrapolated:    -15.802832
+
+dipole moment: [-0.000327, -0.000327, -0.000327]  # |e|*Ang
+
+
+Fermi level: -6.392
+
+kpt = [0.000, 0.000, 0.000], weight = 1.000:
+  Band      eig [eV]   occ [0-2]
+     0       -28.105       2.000
+     1       -13.629       2.000
+     2       -11.423       2.000
+     3       -11.423       2.000
+     4       -10.177       2.000
+     5        -1.999       0.000
+     6        -1.999       0.000
+     7        -0.194       0.000
+
+Gap: 8.177 eV
+Transition (v -> c):
+  (s=0, k=0, n=4, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=5, [0.00, 0.00, 0.00])
+No difference between direct/indirect transitions
+vacuum-level: 0.056  # V
+
+Forces: [  # eV/Ang
+  [    0.0000,     0.0000,    -0.6147],  # N  0
+  [    0.0000,     0.0000,     0.6147]]  # N  1
+          .------------------------------------.  
+         /|                                    |  
+        / |                                    |  
+       /  |                                    |  
+      /   |                                    |  
+     /    |                                    |  
+    /     |                                    |  
+   /      |                                    |  
+  /       |                                    |  
+ *        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |             N                      |  
+ |        |             N                      |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        .------------------------------------.  
+ |       /                                    /   
+ |      /                                    /    
+ |     /                                    /     
+ |    /                                    /      
+ |   /                                    /       
+ |  /                                    /        
+ | /                                    /         
+ |/                                    /          
+ *------------------------------------*           
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 N      7.500000    7.500000    8.054552    ( 0.0000,  0.0000,  0.0000)
+   1 N      7.500000    7.500000    6.945448    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    no    15.000000    0.000000    0.000000    80     0.1875
+  2. axis:    no     0.000000   15.000000    0.000000    80     0.1875
+  3. axis:    no     0.000000    0.000000   15.000000    80     0.1875
+
+  Lengths:  15.000000  15.000000  15.000000
+  Angles:   90.000000  90.000000  90.000000
+
+Effective grid spacing dv^(1/3) = 0.1875
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:
+                         energy   eigst   dens
+iter:   1 22:08:11   -15.804934c  -3.49
+iter:   2 22:08:11   -15.804424c  -4.48  -2.71
+iter:   3 22:08:12   -15.804122c  -4.23  -2.93
+iter:   4 22:08:12   -15.804114c  -5.53  -3.21
+iter:   5 22:08:12   -15.804092c  -5.46  -3.54
+iter:   6 22:08:12   -15.804092c  -6.31  -4.28c
+iter:   7 22:08:13   -15.804092c  -7.60c -4.19c
+Converged in 7 steps
+Energy contributions relative to reference atoms: (reference = -2963.443008)
+
+kinetic:          10.652859
+coulomb:         -14.660502
+zero:             -0.114512
+external:          0.000000
+xc:              -11.681936
+entropy:          -0.000000
+spinorbit:         0.000000
+----------------------------
+Free energy:     -15.804092
+Extrapolated:    -15.804092
+
+dipole moment: [-0.002639, -0.002639, -0.002639]  # |e|*Ang
+
+
+Fermi level: -6.392
+
+kpt = [0.000, 0.000, 0.000], weight = 1.000:
+  Band      eig [eV]   occ [0-2]
+     0       -28.155       2.000
+     1       -13.603       2.000
+     2       -11.450       2.000
+     3       -11.450       2.000
+     4       -10.178       2.000
+     5        -1.959       0.000
+     6        -1.959       0.000
+     7        -0.193       0.000
+
+Gap: 8.219 eV
+Transition (v -> c):
+  (s=0, k=0, n=4, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=5, [0.00, 0.00, 0.00])
+No difference between direct/indirect transitions
+vacuum-level: 0.056  # V
+
+Forces: [  # eV/Ang
+  [   -0.0000,    -0.0000,    -0.1160],  # N  0
+  [    0.0000,     0.0000,     0.1160]]  # N  1
+          .------------------------------------.  
+         /|                                    |  
+        / |                                    |  
+       /  |                                    |  
+      /   |                                    |  
+     /    |                                    |  
+    /     |                                    |  
+   /      |                                    |  
+  /       |                                    |  
+ *        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |             N                      |  
+ |        |             N                      |  
+ |        |                                    |  
+ |        |                                    |  
+ |        |                                    |  
+ |        .------------------------------------.  
+ |       /                                    /   
+ |      /                                    /    
+ |     /                                    /     
+ |    /                                    /      
+ |   /                                    /       
+ |  /                                    /        
+ | /                                    /         
+ |/                                    /          
+ *------------------------------------*           
+
+Atomic positions and initial magnetic moments
+
+Positions:
+   0 N      7.500000    7.500000    8.054153    ( 0.0000,  0.0000,  0.0000)
+   1 N      7.500000    7.500000    6.945847    ( 0.0000,  0.0000,  0.0000)
+
+Unit cell:
+           periodic     x           y           z      points  spacing
+  1. axis:    no    15.000000    0.000000    0.000000    80     0.1875
+  2. axis:    no     0.000000   15.000000    0.000000    80     0.1875
+  3. axis:    no     0.000000    0.000000   15.000000    80     0.1875
+
+  Lengths:  15.000000  15.000000  15.000000
+  Angles:   90.000000  90.000000  90.000000
+
+Effective grid spacing dv^(1/3) = 0.1875
+
+convergence criteria:
+- Maximum [total energy] change in last 3 cyles: 0.0005 eV / valence electron
+- Maximum integral of absolute [dens]ity change: 0.0001 electrons / valence electron
+- Maximum integral of absolute [eigenst]ate change: 4e-08 eV^2 / valence electron
+maximum number of iterations: 333
+
+     iter     time        total  log10-change:
+                         energy   eigst   dens
+iter:   1 22:08:13   -15.804184c  -4.76
+iter:   2 22:08:13   -15.804157c  -5.75  -3.34
+iter:   3 22:08:13   -15.804140c  -5.49  -3.56
+iter:   4 22:08:14   -15.804140c  -6.79  -3.84
+iter:   5 22:08:14   -15.804139c  -6.73  -4.18c
+iter:   6 22:08:14   -15.804139c  -7.58c -4.91c
+Converged in 6 steps
+Energy contributions relative to reference atoms: (reference = -2963.443008)
+
+kinetic:          10.780119
+coulomb:         -14.761854
+zero:             -0.114617
+external:          0.000000
+xc:              -11.707787
+entropy:          -0.000000
+spinorbit:         0.000000
+----------------------------
+Free energy:     -15.804139
+Extrapolated:    -15.804139
+
+dipole moment: [-0.000703, -0.000703, -0.000703]  # |e|*Ang
+
+
+Fermi level: -6.392
+
+kpt = [0.000, 0.000, 0.000], weight = 1.000:
+  Band      eig [eV]   occ [0-2]
+     0       -28.168       2.000
+     1       -13.599       2.000
+     2       -11.457       2.000
+     3       -11.457       2.000
+     4       -10.179       2.000
+     5        -1.951       0.000
+     6        -1.951       0.000
+     7        -0.193       0.000
+
+Gap: 8.229 eV
+Transition (v -> c):
+  (s=0, k=0, n=4, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=5, [0.00, 0.00, 0.00])
+No difference between direct/indirect transitions
+vacuum-level: 0.056  # V
+
+Forces: [  # eV/Ang
+  [    0.0000,     0.0000,     0.0004],  # N  0
+  [    0.0000,     0.0000,    -0.0004]]  # N  1
+---
+
+timing:  # [seconds]
+  Total:  14.445  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Init:    0.614  # ━━╸
+  SCF:    11.821  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╸
+  Forces:  0.681  # ━━╸
+  Move:    0.991  # ━━━━
+
+Max RSS: 2157.457  # MiB

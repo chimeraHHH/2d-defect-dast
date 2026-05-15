@@ -1,0 +1,14 @@
+include MANIFEST.in
+include COPYING LICENSE CONTRIBUTING.rst CHANGELOG.rst
+include config.py siteconfig_example.py
+include c/*.c
+include c/*.h
+include c/xc/*.h
+include c/xc/*.c
+include c/gpu/*.h
+include c/gpu/*.c
+include c/gpu/kernels/*.cpp
+include c/bmgs/*.h
+include c/bmgs/*.c
+
+include pytest.ini

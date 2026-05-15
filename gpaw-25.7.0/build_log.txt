@@ -1,0 +1,122 @@
+Using pip 26.1.1 from /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/pip (python 3.10)
+Looking in indexes: http://mirrors.aliyun.com/pypi/simple
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Running command Preparing metadata (pyproject.toml)
+  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/setuptools/dist.py:765: SetuptoolsDeprecationWarning: License classifiers are deprecated.
+  !!
+
+          ********************************************************************************
+          Please consider removing the following classifiers in favor of a SPDX license expression:
+
+          License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+
+          See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+          ********************************************************************************
+
+  !!
+    self._finalize_license_expression()
+  .git directory not found. GPAW git hash not written.
+  Reading configuration from siteconfig.py
+  running dist_info
+  creating /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info
+  writing /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/PKG-INFO
+  writing dependency_links to /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/dependency_links.txt
+  writing entry points to /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/entry_points.txt
+  writing requirements to /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/requires.txt
+  writing top-level names to /tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/top_level.txt
+  writing manifest file '/tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/SOURCES.txt'
+  reading manifest file '/tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/SOURCES.txt'
+  reading manifest template 'MANIFEST.in'
+  adding license file 'LICENSE'
+  adding license file 'COPYING'
+  writing manifest file '/tmp/pip-modern-metadata-t64pnbud/gpaw.egg-info/SOURCES.txt'
+  creating '/tmp/pip-modern-metadata-t64pnbud/gpaw-25.7.0.dist-info'
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: ase>=3.25.0 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from gpaw==25.7.0) (3.28.0)
+Requirement already satisfied: numpy in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from gpaw==25.7.0) (2.2.6)
+Requirement already satisfied: scipy>=1.6.0 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from gpaw==25.7.0) (1.15.2)
+Requirement already satisfied: gpaw-data in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from gpaw==25.7.0) (1.0.1)
+Requirement already satisfied: matplotlib>=3.5.2 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from ase>=3.25.0->gpaw==25.7.0) (3.10.8)
+Requirement already satisfied: contourpy>=1.0.1 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (1.3.2)
+Requirement already satisfied: cycler>=0.10 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (4.63.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (1.5.0)
+Requirement already satisfied: packaging>=20.0 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (26.0)
+Requirement already satisfied: pillow>=8 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (12.1.1)
+Requirement already satisfied: pyparsing>=3 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (3.3.2)
+Requirement already satisfied: python-dateutil>=2.7 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (2.9.0.post0)
+Requirement already satisfied: six>=1.5 in /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages (from python-dateutil>=2.7->matplotlib>=3.5.2->ase>=3.25.0->gpaw==25.7.0) (1.17.0)
+Building wheels for collected packages: gpaw
+  Building wheel for gpaw (pyproject.toml): started
+  Running command Building wheel for gpaw (pyproject.toml)
+  /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/setuptools/dist.py:765: SetuptoolsDeprecationWarning: License classifiers are deprecated.
+  !!
+
+          ********************************************************************************
+          Please consider removing the following classifiers in favor of a SPDX license expression:
+
+          License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+
+          See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+          ********************************************************************************
+
+  !!
+    self._finalize_license_expression()
+  .git directory not found. GPAW git hash not written.
+  Reading configuration from siteconfig.py
+  running bdist_wheel
+  running build
+  running build_py
+  running build_ext
+  building gpu kernels
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/cut.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/cut.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/elementwise.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/elementwise.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/ext-potential.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/ext-potential.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/fd.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/fd.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/interpolate.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/interpolate.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/lfc.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/lfc.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/linalg.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/linalg.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/mblas.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/mblas.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/paste.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/paste.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/pwlfc-expand.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/pwlfc-expand.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/relax.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/relax.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/restrict.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/restrict.o
+  nvcc -O3 -g -arch=sm_89 -x cu -Xcompiler -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/kernels/translate.cpp -o build/temp.linux-x86_64-cpython-310/c/gpu/kernels/translate.o
+  building '_gpaw' extension
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/_gpaw_so.c -o build/temp.linux-x86_64-cpython-310/c/_gpaw_so.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/bc.c -o build/temp.linux-x86_64-cpython-310/c/bc.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/blacs.c -o build/temp.linux-x86_64-cpython-310/c/blacs.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/blas.c -o build/temp.linux-x86_64-cpython-310/c/blas.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/bmgs/bmgs.c -o build/temp.linux-x86_64-cpython-310/c/bmgs/bmgs.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/constraints.c -o build/temp.linux-x86_64-cpython-310/c/constraints.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/elpa.c -o build/temp.linux-x86_64-cpython-310/c/elpa.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/fd_preconditioner.c -o build/temp.linux-x86_64-cpython-310/c/fd_preconditioner.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/fftw.c -o build/temp.linux-x86_64-cpython-310/c/fftw.o -Wall -Wno-unknown-pragmas -std=c99
+  gcc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include -I/root/miniconda3/envs/gpaw-env/targets/x86_64-linux/include/cccl -fPIC -DNPY_NO_DEPRECATED_API=7 -DGPAW_NO_UNDERSCORE_CBLACS -DGPAW_NO_UNDERSCORE_CSCALAPACK -DGPAW_MPI_INPLACE -DGPAW_WITH_FFTW -DGPAW_GPU -DGPAW_GPU_AWARE_MPI -DGPAW_CUDA -UNDEBUG -I/root/miniconda3/envs/gpaw-env/include -I/root/miniconda3/envs/gpaw-env/include/python3.10 -I/root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/numpy/_core/include -c c/gpu/bc.c -o build/temp.linux-x86_64-cpython-310/c/gpu/bc.o -Wall -Wno-unknown-pragmas -std=c99
+  c/gpu/bc.c: In function 'bc_unpack_paste_gpu':
+  c/gpu/bc.c:281:17: error: implicit declaration of function 'MPI_Irecv' [-Wimplicit-function-declaration]
+    281 |                 MPI_Irecv(bc_rbuff_gpu[i][d], bc->nrecv[i][d] * nin,
+        |                 ^~~~~~~~~
+  c/gpu/bc.c:282:25: error: 'MPI_DOUBLE' undeclared (first use in this function); did you mean 'NPY_DOUBLE'?
+    282 |                         MPI_DOUBLE, p, d + 1000 * i, bc->comm, &recvreq[i][d]);
+        |                         ^~~~~~~~~~
+        |                         NPY_DOUBLE
+  c/gpu/bc.c:282:25: note: each undeclared identifier is reported only once for each function it appears in
+  error: command '/root/miniconda3/envs/gpaw-env/bin/gcc' failed with exit code 1
+  error: subprocess-exited-with-error
+  
+  × Building wheel for gpaw (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> No available output.
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  full command: /root/miniconda3/envs/gpaw-env/bin/python3.10 /root/miniconda3/envs/gpaw-env/lib/python3.10/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py build_wheel /tmp/tmp3zfzjvw9
+  cwd: /root/autodl-tmp/2d-defect-dast/gpaw-25.7.0
+  Building wheel for gpaw (pyproject.toml): finished with status 'error'
+  ERROR: Failed building wheel for gpaw
+Failed to build gpaw
+error: failed-wheel-build-for-install
+
+× Failed to build installable wheels for some pyproject.toml based projects
+╰─> gpaw
