@@ -377,6 +377,18 @@ def main() -> None:
         criterion = nn.MSELoss()
     elif loss_name == "mae":
         criterion = nn.L1Loss()
+    elif loss_name == "focal_mae":
+        # Focal MAE: dynamically upweight hard samples based on error magnitude.
+        # L = mean( w_i * |e_i| ) where w_i = (|e_i|/mean(|e|))^gamma
+        # gamma=0 → standard MAE; gamma=1 → approximately MSE; 0.5 is moderate.
+        focal_gamma = cfg.get("focal_gamma", 0.5)
+        def _focal_mae(pred, target):
+            errors = torch.abs(pred - target)
+            with torch.no_grad():
+                weights = (errors / errors.mean().clamp(min=1e-6)) ** focal_gamma
+                weights = weights / weights.mean()  # normalise so mean weight = 1
+            return (weights * errors).mean()
+        criterion = _focal_mae
     else:
         raise ValueError(loss_name)
 
