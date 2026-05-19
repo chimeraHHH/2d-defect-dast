@@ -56,6 +56,7 @@ MODELS = {
     "v2_ema": {"label": "+ EMA", "color": "#f39c12", "ls": "-", "zorder": 2},
     "v11_lds": {"label": "+ LDS", "color": "#1abc9c", "ls": "-", "zorder": 2},
     "v13_rnc": {"label": "+ RnC + LDS", "color": "#e67e22", "ls": "-", "zorder": 2},
+    "v14_jk": {"label": "+ JK aggregation", "color": "#8e44ad", "ls": "-", "zorder": 2},
     # Combined
     "v8_ema_physics": {"label": "EMA+Phys+Def", "color": "#c0392b", "ls": "-.", "zorder": 3},
     "v10_best_combo": {"label": "V10 (all best)", "color": "#2c3e50", "ls": "-", "zorder": 4},
