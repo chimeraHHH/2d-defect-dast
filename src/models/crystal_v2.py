@@ -702,6 +702,8 @@ class CrystalTransformerV2(nn.Module):
         moe_balance_weight: float = 0.01,
         # V6: Physics-motivated dopant–host mismatch
         use_physics_features: bool = False,
+        # JK: Jumping Knowledge aggregation over layers
+        use_jk_aggregation: bool = False,
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -772,6 +774,14 @@ class CrystalTransformerV2(nn.Module):
             )
             for _ in range(n_global_layers)
         ])
+
+        # --- JK aggregation (optional, Xu et al. ICML 2018) ---
+        # Learn to weight features from [local_out, global_1, ..., global_L]
+        # so the readout sees both local defect detail and global context.
+        self.use_jk_aggregation = use_jk_aggregation
+        if use_jk_aggregation:
+            n_jk = 1 + n_global_layers  # local output + each global layer
+            self.jk_weights = nn.Parameter(torch.zeros(n_jk))  # init uniform
 
         # --- Readout ---
         self.use_gated_pooling = use_gated_pooling
@@ -932,10 +942,21 @@ class CrystalTransformerV2(nn.Module):
         h_local_flat.index_copy_(0, flat_indices, flat_h)
         h_local = h_local_flat.reshape(b, n_max, c)
 
-        # --- Global transformer ---
-        h_global = h_local
-        for layer in self.global_layers:
-            h_global = layer(h_global, dist_matrix, mask)
+        # --- Global transformer (with optional JK aggregation) ---
+        if self.use_jk_aggregation:
+            jk_layers = [h_local]  # local output as first representation
+            h_global = h_local
+            for layer in self.global_layers:
+                h_global = layer(h_global, dist_matrix, mask)
+                jk_layers.append(h_global)
+            # Weighted combination: softmax over learnable layer weights
+            jk_w = F.softmax(self.jk_weights, dim=0)         # (n_jk,)
+            h_stack = torch.stack(jk_layers, dim=-1)          # (B, N, C, n_jk)
+            h_global = (h_stack * jk_w).sum(dim=-1)           # (B, N, C)
+        else:
+            h_global = h_local
+            for layer in self.global_layers:
+                h_global = layer(h_global, dist_matrix, mask)
 
         # --- Readout ---
         if self.use_gated_pooling:

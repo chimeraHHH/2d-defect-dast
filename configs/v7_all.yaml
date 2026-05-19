@@ -5,6 +5,7 @@
 #   V3: defect-type conditioning (interstitial/adsorbate-specific)
 #   V4: MoE readout (3 experts for energy-range specialisation)
 #   V6: Physics mismatch features (Hume-Rothery dopant-host descriptors)
+#   JK: Jumping Knowledge aggregation (Xu et al., ICML 2018)
 #   ASPH: Persistent homology features (topological defect descriptors)
 #
 # Each innovation is zero-initialized where possible so training starts
@@ -69,3 +70,5 @@ model_kwargs:
   moe_balance_weight: 0.01
   # V6: Physics features
   use_physics_features: true
+  # JK: Jumping Knowledge aggregation
+  use_jk_aggregation: true
