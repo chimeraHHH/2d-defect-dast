@@ -1,0 +1,12 @@
+{
+  "individual_mae": {
+    "v2_gated_pooling": 0.39423391222953796,
+    "v2_gated_pooling_s43": 0.38098248839378357,
+    "v2_gated_pooling_s44": 0.39430978894233704,
+    "v2_gated_pooling_s45": 0.3980581760406494
+  },
+  "ensemble_4_mae": 0.36095985770225525,
+  "ensemble_4_rmse": 0.9945319890975952,
+  "uncertainty_corr": 0.4700129586347037,
+  "n_test": 1065
+}
