@@ -223,8 +223,12 @@ def main() -> None:
     asph_path = cfg.get("asph_features_path")
     if asph_path:
         asph_path = ROOT / asph_path
+    soft_labels_path = cfg.get("soft_labels_path")
+    if soft_labels_path:
+        soft_labels_path = ROOT / soft_labels_path
     dataset = CrystalGraphDataset(ROOT / cfg["data_path"],
-                                   asph_features_path=asph_path)
+                                   asph_features_path=asph_path,
+                                   soft_labels_path=soft_labels_path)
     train_set, val_set, test_set = make_splits(
         dataset,
         train_ratio=cfg.get("train_ratio", 0.8),
@@ -376,6 +380,10 @@ def main() -> None:
     # P1-3: Label smoothing (Gaussian noise on targets)
     label_noise_std = cfg.get("label_noise_std", 0.0)
 
+    # Knowledge distillation
+    distill_alpha = cfg.get("distill_alpha", 1.0)  # 1.0 = no distillation
+    use_distill = distill_alpha < 1.0 and soft_labels_path is not None
+
     # P1-3: SWA
     use_swa = cfg.get("use_swa", False)
     swa_start_epoch = cfg.get("swa_start_epoch", max(1, epochs - 10))
@@ -401,7 +409,8 @@ def main() -> None:
             f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
             f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
             f"droppath={drop_path_rate} label_noise={label_noise_std} "
-            f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w}\n"
+            f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
+            f"distill={use_distill}(alpha={distill_alpha})\n"
             f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
         )
         print(msg)
@@ -449,6 +458,12 @@ def main() -> None:
                     preds_norm = model(batch)
                     task_loss = criterion(preds_norm, target_norm)
                     total_loss = task_loss
+
+                # Knowledge distillation loss
+                if use_distill and "soft_label" in batch:
+                    soft_target_norm = normalizer.norm(batch["soft_label"])
+                    distill_loss = criterion(preds_norm, soft_target_norm)
+                    total_loss = distill_alpha * task_loss + (1.0 - distill_alpha) * distill_loss
 
                 # P1-1: Aux defect classification
                 aux_loss = torch.tensor(0.0, device=device)

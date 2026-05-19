@@ -1,19 +1,16 @@
-# CrystalTransformerV2: Knowledge distillation from ensemble
-# Teacher: greedy-best mixed V1+V2 ensemble (pre-computed soft labels)
-# Student: single V2 with combined DFT + ensemble soft label loss
-# distill_alpha = 0.7: 70% true label + 30% ensemble prediction
+# CrystalTransformerV2: 250-epoch extended training
+# Hypothesis: longer cosine schedule + extended SWA improves single-model MAE
+# Based on v2_gated_pooling (best single model config)
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
-soft_labels_path: data/processed/soft_labels.pkl
-output_dir: results/v2_distill
+output_dir: results/v2_long250
 seed: 42
 batch_size: 64
-epochs: 200
+epochs: 250
 train_ratio: 0.8
 val_ratio: 0.1
 loss: mae
 grad_clip: 5.0
-distill_alpha: 0.7
 online_aug: true
 online_aug_cfg:
   sigma_range: [0.01, 0.05]
@@ -27,7 +24,7 @@ aux_defect_weight: 0.1
 drop_path_rate: 0.1
 label_noise_std: 0.03
 use_swa: true
-swa_start_epoch: 160
+swa_start_epoch: 200
 swa_lr: 1.0e-4
 pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
 scheduler_type: cosine

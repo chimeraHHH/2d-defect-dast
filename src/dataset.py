@@ -27,6 +27,7 @@ class CrystalGraphDataset(Dataset):
         feature_table_path: Optional[str | Path] = None,
         defect_mark_neighbors: int = 0,
         asph_features_path: Optional[str | Path] = None,
+        soft_labels_path: Optional[str | Path] = None,
     ) -> None:
         super().__init__()
         path = Path(data_path)
@@ -64,6 +65,18 @@ class CrystalGraphDataset(Dataset):
                 print(f"Loaded ASPH features: {len(self.asph_features)} structures, "
                       f"{n_comp} components, "
                       f"explained variance={asph_data['explained_variance']:.3f}")
+
+        # Optional soft labels for knowledge distillation
+        self.soft_labels: Optional[np.ndarray] = None
+        if soft_labels_path is not None:
+            sl_path = Path(soft_labels_path)
+            if sl_path.exists():
+                with open(sl_path, "rb") as f:
+                    sl_data = pickle.load(f)
+                self.soft_labels = sl_data["soft_labels"]
+                print(f"Loaded soft labels: {len(self.soft_labels)} samples, "
+                      f"from {sl_data['n_models']}-model ensemble "
+                      f"(MAE={sl_data['mae_ensemble']:.4f})")
 
         # build defect-mark cache once: which atom index is the dopant?
         for sample in self.data:
@@ -129,6 +142,8 @@ class CrystalGraphDataset(Dataset):
             "target": torch.tensor(sample["target"], dtype=torch.float32),
             "num_atoms": numbers.numel(),
         }
+        if self.soft_labels is not None:
+            item["soft_label"] = torch.tensor(self.soft_labels[idx], dtype=torch.float32)
         if "pristine" in sample:
             p = sample["pristine"]
             p_numbers = torch.from_numpy(p["numbers"])
@@ -204,6 +219,9 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "triplet_index_list": triplet_index_list,
         "angles_list": angles_list,
     }
+    # Soft labels for knowledge distillation
+    if "soft_label" in batch[0]:
+        out["soft_label"] = torch.stack([item["soft_label"] for item in batch])
 
     # Optional pristine stream (dual-stream architecture)
     if "pristine_x" in batch[0]:
