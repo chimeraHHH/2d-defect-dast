@@ -616,6 +616,19 @@ def main() -> None:
         "best_val_mae": best_val_mae,
         "test_mae": test_metrics["mae"], "test_rmse": test_metrics["rmse"],
     }
+    # Save model internals for interpretability analysis
+    if hasattr(model, 'jk_weights'):
+        import torch.nn.functional as _F
+        jk_w = _F.softmax(model.jk_weights.detach().cpu(), dim=0).numpy()
+        summary["jk_weights"] = jk_w.tolist()
+        print(f"JK weights: {jk_w}")
+    if hasattr(model, 'defect_type_embed') and model.defect_type_embed is not None:
+        dt_norms = model.defect_type_embed.weight.detach().cpu().norm(dim=1).numpy()
+        summary["defect_type_embed_norms"] = dt_norms.tolist()
+        print(f"Defect-type embed norms: {dt_norms}")
+    if hasattr(model, 'readout') and hasattr(model.readout, 'balance_loss'):
+        summary["moe_balance_loss"] = float(model.readout.balance_loss)
+
     with open(metrics_path, "w") as f:
         json.dump(summary, f, indent=2)
     np.savez(out_dir / "test_predictions.npz",
