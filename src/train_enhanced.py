@@ -145,10 +145,20 @@ def compute_lds_weights(
         raise ValueError(f"Unknown LDS reweight mode: {reweight}")
 
     raw_w = np.clip(raw_w, None, clip_max * raw_w.mean())
-    raw_w = raw_w / raw_w.mean()  # normalise → mean = 1
+    raw_w = raw_w / raw_w.mean()  # normalise bins → mean = 1
 
-    bin_weights = torch.tensor(raw_w, dtype=torch.float32)
+    bin_weights_np = raw_w
     bin_width = (t_max - t_min) / n_bins
+
+    # Sample-level normalisation: ensure E[w_i] ≈ 1 over training set,
+    # so LDS does not change overall gradient scale (only rebalances).
+    sample_idx = ((t_np - t_min) / bin_width).astype(int)
+    sample_idx = np.clip(sample_idx, 0, n_bins - 1)
+    sample_weights = bin_weights_np[sample_idx]
+    sample_mean = float(sample_weights.mean())
+    bin_weights_np = bin_weights_np / max(sample_mean, 1e-8)
+
+    bin_weights = torch.tensor(bin_weights_np, dtype=torch.float32)
 
     def weight_fn(target_values: torch.Tensor) -> torch.Tensor:
         idx = ((target_values.float() - t_min) / bin_width).long()
