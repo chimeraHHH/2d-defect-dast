@@ -29,7 +29,7 @@ done
 echo ""
 
 # Training progress
-for dir in v3_deftype v4_moe v6_physics v2_distill_s43; do
+for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v2_ema v10_best_combo; do
     logfile="results/$dir/nohup.log"
     if [ -f "$logfile" ]; then
         latest=$(tail -1 "$logfile" 2>/dev/null)
@@ -48,7 +48,7 @@ echo ""
 
 # Best checkpoints
 echo "=== BEST CHECKPOINTS ==="
-for dir in v3_deftype v4_moe v6_physics; do
+for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v2_ema v10_best_combo; do
     if [ -f "results/$dir/best.pt" ]; then
         size=$(du -h "results/$dir/best.pt" | cut -f1)
         modified=$(stat -c %Y "results/$dir/best.pt" 2>/dev/null || stat -f %m "results/$dir/best.pt" 2>/dev/null)
@@ -59,7 +59,7 @@ echo ""
 
 # Estimated time remaining (based on avg epoch time from last 3 epochs)
 echo "=== ETA ESTIMATE ==="
-for dir in v3_deftype v4_moe v6_physics; do
+for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics; do
     logfile="results/$dir/nohup.log"
     if [ -f "$logfile" ]; then
         avg_time=$(tail -3 "$logfile" | grep -oP "\d+\.\ds" | sed "s/s//" | awk "{s+=\$1; n++} END {if(n>0) printf \"%.0f\", s/n; else print 0}")

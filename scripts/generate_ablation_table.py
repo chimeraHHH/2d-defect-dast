@@ -46,6 +46,8 @@ INNOVATIONS = {
     "v2_asph": {"label": "+ ASPH topo (V5)", "innovations": ["asph"]},
     "v2_focal": {"label": "+ Focal MAE", "innovations": ["focal"]},
     "v2_uncertainty": {"label": "+ Uncertainty", "innovations": ["uncertainty"]},
+    "v11_lds": {"label": "+ LDS (V11)", "innovations": ["lds"]},
+    "v12_lds_physics": {"label": "LDS+Phys+Cond (V12)", "innovations": ["lds", "physics", "deftype", "contrast"]},
     # Combined
     "v8_ema_physics": {"label": "EMA + Physics + Deftype", "innovations": ["ema", "physics", "deftype"]},
     "v10_best_combo": {"label": "V10 (all best)", "innovations": ["ema", "physics", "deftype", "contrast", "jk"]},
@@ -169,6 +171,7 @@ def main():
         # Individual innovations
         "v3_deftype", "v4_moe", "v6_physics", "v9_contrast",
         "v2_ema", "v2_asph", "v2_focal", "v2_uncertainty",
+        "v11_lds", "v12_lds_physics",
         # Combined
         "v8_ema_physics", "v10_best_combo", "v7_all",
         # Distillation

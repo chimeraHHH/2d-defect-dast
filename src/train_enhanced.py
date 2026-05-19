@@ -98,6 +98,66 @@ def move_batch(batch, device):
     return moved
 
 
+# ---- Label Distribution Smoothing (Yang et al., ICML 2021) ----
+# "Delving into Deep Imbalanced Regression": reweight samples by
+# inverse smoothed label density so that rare energy ranges (esp.
+# the [7,25) eV bottleneck) get proportionally more gradient signal.
+def _gaussian_smooth_1d(values: np.ndarray, sigma: float) -> np.ndarray:
+    """1-D Gaussian smoothing (no scipy dependency)."""
+    width = int(4 * sigma + 0.5)
+    x = np.arange(-width, width + 1, dtype=np.float64)
+    kernel = np.exp(-0.5 * (x / max(sigma, 1e-6)) ** 2)
+    kernel /= kernel.sum()
+    return np.convolve(values, kernel, mode="same")
+
+
+def compute_lds_weights(
+    targets: torch.Tensor,
+    n_bins: int = 100,
+    sigma: float = 2.0,
+    reweight: str = "sqrt_inv",
+    clip_max: float = 10.0,
+):
+    """Build a target-value → weight lookup for LDS reweighting.
+
+    Args:
+        targets: 1-D tensor of training targets (original scale).
+        n_bins: histogram resolution.
+        sigma: Gaussian kernel width for smoothing.
+        reweight: "inv" for 1/density, "sqrt_inv" for 1/sqrt(density).
+        clip_max: cap on per-sample weight to avoid outlier dominance.
+
+    Returns:
+        weight_fn(target_batch) → weight tensor, mean ≈ 1.
+    """
+    t_np = targets.numpy().astype(np.float64)
+    t_min, t_max = float(t_np.min()) - 0.01, float(t_np.max()) + 0.01
+    counts, bin_edges = np.histogram(t_np, bins=n_bins,
+                                      range=(t_min, t_max))
+    smoothed = _gaussian_smooth_1d(counts.astype(np.float64), sigma)
+    smoothed = np.clip(smoothed, 1.0, None)
+
+    if reweight == "inv":
+        raw_w = 1.0 / smoothed
+    elif reweight == "sqrt_inv":
+        raw_w = 1.0 / np.sqrt(smoothed)
+    else:
+        raise ValueError(f"Unknown LDS reweight mode: {reweight}")
+
+    raw_w = np.clip(raw_w, None, clip_max * raw_w.mean())
+    raw_w = raw_w / raw_w.mean()  # normalise → mean = 1
+
+    bin_weights = torch.tensor(raw_w, dtype=torch.float32)
+    bin_width = (t_max - t_min) / n_bins
+
+    def weight_fn(target_values: torch.Tensor) -> torch.Tensor:
+        idx = ((target_values.float() - t_min) / bin_width).long()
+        idx = idx.clamp(0, n_bins - 1)
+        return bin_weights[idx].to(target_values.device)
+
+    return weight_fn
+
+
 # ---- Mixup in feature space (same-host constraint relaxed to batch-level) ----
 def mixup_batch(batch, alpha=0.2):
     """Feature-space Mixup: interpolate embeddings and targets within a batch."""
@@ -340,6 +400,22 @@ def main() -> None:
     target_transform = cfg.get("target_transform", "none")
     normalizer = Normalizer(targets, transform=target_transform)
 
+    # LDS reweighting (Yang et al., ICML 2021)
+    use_lds = cfg.get("use_lds", False)
+    lds_weight_fn = None
+    if use_lds:
+        lds_weight_fn = compute_lds_weights(
+            targets,
+            n_bins=cfg.get("lds_bins", 100),
+            sigma=cfg.get("lds_sigma", 2.0),
+            reweight=cfg.get("lds_reweight", "sqrt_inv"),
+            clip_max=cfg.get("lds_clip", 10.0),
+        )
+        # Print distribution info
+        weights_all = lds_weight_fn(targets)
+        print("LDS weights: min=%.2f max=%.2f mean=%.2f std=%.2f"
+              % (weights_all.min(), weights_all.max(), weights_all.mean(), weights_all.std()))
+
     # ---- Model ----
     model_cls = MODEL_REGISTRY[cfg["model"]]
     model = model_cls(**cfg.get("model_kwargs", {})).to(device)
@@ -490,7 +566,7 @@ def main() -> None:
             f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
             f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
             f"droppath={drop_path_rate} label_noise={label_noise_std} "
-            f"ema={use_ema}(decay={ema_decay}) "
+            f"ema={use_ema}(decay={ema_decay}) lds={use_lds} "
             f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
             f"distill={use_distill}(alpha={distill_alpha})\n"
             f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
@@ -547,7 +623,14 @@ def main() -> None:
                         task_loss = (base_err * torch.exp(-log_var) + log_var).mean()
                     else:
                         preds_norm = model_out if not isinstance(model_out, tuple) else model_out[0]
-                        task_loss = criterion(preds_norm, target_norm)
+                        # LDS reweighting: per-sample weights from label density
+                        if lds_weight_fn is not None:
+                            with torch.no_grad():
+                                lds_w = lds_weight_fn(target)
+                            per_sample = torch.abs(preds_norm - target_norm)
+                            task_loss = (lds_w * per_sample).mean()
+                        else:
+                            task_loss = criterion(preds_norm, target_norm)
                     total_loss = task_loss
 
                 # Knowledge distillation loss
