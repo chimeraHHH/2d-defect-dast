@@ -59,15 +59,34 @@
 | s45 | 0.3981 | |
 | **Mean ± Std** | **0.392 ± 0.007** | 显著优于 V1 的 0.537 ± 0.014 |
 
-### 新型模型创新（V3–V5, 训练中）
+### 物理驱动模型创新（V3–V7）
 
-| 创新 | 描述 | 状态 | 参考 |
+| 创新 | 物理动机 | +参数 | 状态 | 顶刊参考 |
+|---|---|---|---|---|
+| **V3 缺陷类型条件化** | 间隙/吸附缺陷 Ef 分布差异 2× | +512 | 🔄 训练中 | 首创；灵感来自条件生成 (Dhariwal, NeurIPS 2021) |
+| **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | ⏳ 待训练 | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
+| **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | 🔄 训练中 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
+| **JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ✅ 已实现 | Xu et al., ICML 2018 (JK-Net) |
+| **异方差不确定性** | 自适应降权噪声样本 + 置信度估计 | +8.3K | ✅ 已实现 | Kendall & Gal, NeurIPS 2017; Hirschfeld, JCIM 2020 |
+| **ASPH 持久同调** | 拓扑描述缺陷局部环境 (0-dim 连通 + 1-dim 环) | 0 (输入特征) | ✅ 已计算 | Fang & Yan, Chem. Mater. 2025 (Ef MAE↓55%) |
+| **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | 0 | ⏳ 待训练 | Lin et al., ICCV 2017 (Focal Loss, Best Paper) |
+| **V7 全组合** | V2 + V3 + V4 + V6 + JK + ASPH | +31K | ⏳ 待训练 | — |
+
+#### V6 物理失配特征详解
+
+基于 Hume-Rothery 固溶度规则 (1936) 和现代计算材料学，从掺杂原子与宿主晶格的元素性质差异中提取 6 个图级描述符：
+
+| 特征 | 物理含义 | 间隙相关性 | 吸附相关性 |
 |---|---|---|---|
-| **V3 缺陷类型条件化** | 缺陷类型（空位/替代/间隙/吸附）嵌入 → 条件化 readout | 🔄 训练中 | 首创，无先例 |
-| **V4 MoE Readout** | 3/5 专家 MLP + 学习门控，极端能量范围专家化 | ⏳ 待训练 | MoCE, ICLR 2025 |
-| **ASPH 持久同调特征** | ripser 拓扑描述符（0-dim 连通分量 + 1-dim 环结构）→ 8-PCA | ✅ 已计算 | Fang & Yan, Chem. Mater. 2025 |
-| **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | ⏳ 待训练 | 类比 Focal Loss, ICCV 2017 |
-| **V5 全组合** | V2 + V3 + V4 + ASPH + Focal | ⏳ 待训练 | — |
+| 尺寸失配 (Δr/r) | 弹性应变能，Hume-Rothery 15% 规则 | r=0.27 | r=0.02 |
+| 电负性差 (Δχ) | 电荷转移方向，Pauling 规则 | r=−0.19 | r=0.12 |
+| 电离能比 (IE_d/IE_h) | 化学硬度匹配，Pearson HSAB 原理 | r=−0.19 | r=−0.01 |
+| 电子亲和能差 (ΔEA) | 电子接受倾向 | r=−0.03 | r=−0.07 |
+| 价电子失配 (\|ΔVE\|) | 键合兼容性（悬挂键/电荷补偿） | r=0.02 | r=−0.23 |
+| 周期距离 (Δperiod) | 轨道重叠质量 | r=0.28 | r=0.12 |
+
+**关键发现**：相关性具有缺陷类型特异性 — 尺寸失配对间隙缺陷最重要 (r=0.27)，而价电子失配对吸附缺陷最重要 (r=−0.23)。
+这验证了 V3 缺陷类型条件化的必要性：不同缺陷类型由不同物理机制主导。
 
 ### 误差分析（驱动 V3–V5 设计）
 
@@ -111,18 +130,22 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 真正的多样性来自架构差异（multi_source r=0.97）和训练策略差异。
 
 代码：
-* [src/models/crystal_v2.py](src/models/crystal_v2.py) — CrystalTransformerV2（含 V3 条件化 + V4 MoE）
-* [src/train_enhanced.py](src/train_enhanced.py) — 增强训练脚本（SWA、focal MAE、MoE balance loss）
+* [src/models/crystal_v2.py](src/models/crystal_v2.py) — CrystalTransformerV2（含 V3–V7 全部创新：缺陷条件化 + MoE + 物理特征 + JK + 不确定性）
+* [src/train_enhanced.py](src/train_enhanced.py) — 增强训练脚本（SWA、focal MAE、MoE balance loss、异方差损失）
 * [scripts/eval_new_model.py](scripts/eval_new_model.py) — 模型评估：per-range 分析 + 相关性 + 贪心集成
 * [scripts/compute_asph.py](scripts/compute_asph.py) — ASPH 持久同调特征计算
+* [scripts/analyze_innovations.py](scripts/analyze_innovations.py) — V3–V7 创新对比分析
+* [scripts/physics_interpretability.py](scripts/physics_interpretability.py) — 物理可解释性分析（注意力 + JK权重 + 专家分析）
 
 配置：
 * [configs/v3_deftype.yaml](configs/v3_deftype.yaml) — V3 缺陷类型条件化
 * [configs/v4_moe.yaml](configs/v4_moe.yaml) — V4 MoE readout (3 experts)
-* [configs/v4_moe_5exp.yaml](configs/v4_moe_5exp.yaml) — V4 MoE (5 experts)
+* [configs/v6_physics.yaml](configs/v6_physics.yaml) — V6 物理失配特征 (Hume-Rothery)
+* [configs/v2_uncertainty.yaml](configs/v2_uncertainty.yaml) — V2 + 异方差不确定性
 * [configs/v2_asph.yaml](configs/v2_asph.yaml) — V2 + ASPH 持久同调
 * [configs/v2_focal.yaml](configs/v2_focal.yaml) — V2 + Focal MAE 损失
-* [configs/v5_full.yaml](configs/v5_full.yaml) — V5 全组合（ASPH + V3 + V4）
+* [configs/v5_full.yaml](configs/v5_full.yaml) — V5 组合（ASPH + V3 + V4）
+* [configs/v7_all.yaml](configs/v7_all.yaml) — V7 全组合（V3 + V4 + V6 + JK + ASPH）
 
 ---
 
