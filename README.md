@@ -76,14 +76,19 @@
 
 | 创新 | 物理动机 | +参数 | 状态 | 顶刊参考 |
 |---|---|---|---|---|
-| **V3 缺陷类型条件化** | 间隙/吸附缺陷 Ef 分布差异 2× | +512 | 🔄 训练中 | 首创；灵感来自条件生成 (Dhariwal, NeurIPS 2021) |
-| **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | ⏳ 待训练 | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
-| **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | 🔄 训练中 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
-| **JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ✅ 已实现 | Xu et al., ICML 2018 (JK-Net) |
+| **V3 缺陷类型条件化** | 间隙/吸附缺陷 Ef 分布差异 2× | +512 | 🔄 WHU 训练中 | 首创；灵感来自条件生成 (Dhariwal, NeurIPS 2021) |
+| **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | 🔄 WHU 训练中 | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
+| **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | 🔄 WHU 训练中 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
+| **V9 缺陷-宿主对比条件化** | Ef ∝ E(缺陷) − E(原始)，显式建模差值 | +8.5K | ⏳ 待训练 | 物理先验，零初始化 |
+| **V11 LDS 标签分布平滑** | 高 Ef 样本（7.1%）贡献 29% 误差 → 逆密度重权 | 0 | ⏳ 待训练 | Yang et al., ICML 2021 (DIR) |
+| **V13 RnC 对比学习** | 排序保持的特征空间结构化，缓解预测压缩 | +128-dim proj | ⏳ 待训练 | Zha et al., NeurIPS 2023 (Rank-N-Contrast) |
+| **V14 JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ⏳ 待训练 | Xu et al., ICML 2018 (JK-Net) |
+| **V12 LDS+物理+全条件化** | V6+V3+V9+LDS+EMA 协同 | +17K | ⏳ 待训练 | 综合方案 |
+| **V10 最优组合** | 所有正面创新整合 | +31K | ⏳ 待训练 | — |
 | **异方差不确定性** | 自适应降权噪声样本 + 置信度估计 | +8.3K | ✅ 已实现 | Kendall & Gal, NeurIPS 2017; Hirschfeld, JCIM 2020 |
 | **ASPH 持久同调** | 拓扑描述缺陷局部环境 (0-dim 连通 + 1-dim 环) | 0 (输入特征) | ✅ 已计算 | Fang & Yan, Chem. Mater. 2025 (Ef MAE↓55%) |
 | **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | 0 | ⏳ 待训练 | Lin et al., ICCV 2017 (Focal Loss, Best Paper) |
-| **V7 全组合** | V2 + V3 + V4 + V6 + JK + ASPH | +31K | ⏳ 待训练 | — |
+| **EMA 权重平均** | 训练过程中指数滑动平均，更平坦极小值 | 0 | ⏳ 待训练 | Polyak 1992; Izmailov et al., UAI 2018 |
 
 #### V6 物理失配特征详解
 
@@ -100,6 +105,72 @@
 
 **关键发现**：相关性具有缺陷类型特异性 — 尺寸失配对间隙缺陷最重要 (r=0.27)，而价电子失配对吸附缺陷最重要 (r=−0.23)。
 这验证了 V3 缺陷类型条件化的必要性：不同缺陷类型由不同物理机制主导。
+
+### 注意力集中度分析（新发现, 2026-05-19）
+
+通过钩子提取 V2 门控池化层的注意力权重分布：
+
+| 模型 | 缺陷原子注意力占比 | 集中度因子 | 备注 |
+|---|---|---|---|
+| **V2 baseline (s43)** | **99.68%** | **41.3×** | 几乎完全忽略宿主原子 |
+| V3 deftype (ep19) | 11.4% | 5.1× | 条件化使注意力更均匀 |
+| V6 physics (ep17) | 6.0% | 2.2× | 物理特征进一步分散注意力 |
+
+**关键洞察**：V2 基线将 99.68% 的池化注意力集中在缺陷原子上（预期均匀分布 ~2.4%），
+这解释了两个现象：
+1. **[7,25) eV 范围 MAE 4× 于低能范围** — 高 Ef 样本需要宿主晶格上下文（应变能、电子重构），
+   但模型完全丢弃了这些信息
+2. **预测压缩** — pred_std/target_std = 0.921，系统性欠预测高 Ef 样本（偏差 −1.16 eV）
+
+V3 条件化和 V6 物理特征显著分散注意力（从 41.3× 降至 2–5×），为宿主信息提供了替代通路。
+
+### 详细误差分析（2026-05-19）
+
+#### 按缺陷类型
+
+| 类型 | MAE (eV) | 占比 | 平均 Ef | 偏差 |
+|---|---|---|---|---|
+| **间隙 (interstitial)** | **0.620** | 34.4% | 5.03 | −0.29 |
+| 吸附 (adsorbate) | 0.256 | 65.6% | 1.61 | +0.05 |
+
+间隙缺陷 MAE 2.4× 高于吸附缺陷。间隙缺陷 Ef 分布更宽、更重尾，
+是 V3 条件化和 V11 LDS 重权的主要目标。
+
+#### 最难宿主材料 (top 5)
+
+| 宿主 | MAE (eV) | 样本数 | 平均 Ef | 偏差 |
+|---|---|---|---|---|
+| Bi₂I₆ | 2.030 | 15 | 6.84 | −1.60 |
+| Nb₄C₃ | 1.899 | 14 | 7.06 | −1.58 |
+| BiITe | 1.274 | 15 | 4.84 | −0.80 |
+| As₂Te₃ | 1.076 | 16 | 5.70 | −0.82 |
+| TiS₂ | 0.759 | 17 | 3.07 | +0.51 |
+
+重原子化合物（Bi、Nb）和 MXene 类材料是系统性误差来源，
+均呈负偏差（严重欠预测），可能与强自旋-轨道耦合或 DFT 收敛困难相关。
+
+#### 最难掺杂元素 (top 5)
+
+| 掺杂 | MAE (eV) | 样本数 | 偏差 |
+|---|---|---|---|
+| Ru | 1.668 | 3 | −1.668 |
+| F | 1.339 | 25 | −0.643 |
+| P | 0.804 | 21 | −0.457 |
+| Os | 0.756 | 16 | −0.460 |
+| Ca | 0.688 | 21 | −0.428 |
+
+**异常样本**：Nb₄C₃+Ru 吸附，DFT Ef=19.89 eV，模型预测 2.96 eV（误差 16.92 eV），
+疑为 DFT 伪影或未收敛结构。
+
+### TTA 推断（测试时增强）
+
+| 方法 | MAE | Δ | 备注 |
+|---|---|---|---|
+| 原始 | 0.3810 | — | V2 s43 单模型 |
+| TTA(4) 平均 | 0.3808 | −0.0002 | 4 次随机几何增强平均 |
+
+TTA 增益可忽略（−0.0002 eV），因为模型已使用在线增强训练。
+但预测方差与误差的相关性 r=0.348，可作为辅助不确定性信号。
 
 ### 误差分析（驱动 V3–V5 设计）
 
@@ -143,9 +214,14 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 真正的多样性来自架构差异（multi_source r=0.97）和训练策略差异。
 
 代码：
-* [src/models/crystal_v2.py](src/models/crystal_v2.py) — CrystalTransformerV2（含 V3–V7 全部创新：缺陷条件化 + MoE + 物理特征 + JK + 不确定性）
-* [src/train_enhanced.py](src/train_enhanced.py) — 增强训练脚本（SWA、focal MAE、MoE balance loss、异方差损失）
+* [src/models/crystal_v2.py](src/models/crystal_v2.py) — CrystalTransformerV2（含全部创新：缺陷条件化 + MoE + 物理特征 + 对比 + JK + 不确定性）
+* [src/train_enhanced.py](src/train_enhanced.py) — 增强训练脚本（SWA、focal MAE、MoE balance loss、LDS、RnC、异方差损失）
 * [scripts/eval_new_model.py](scripts/eval_new_model.py) — 模型评估：per-range 分析 + 相关性 + 贪心集成
+* [scripts/eval_checkpoint.py](scripts/eval_checkpoint.py) — ⭐ 通用 checkpoint 评估（自动检测格式 + 嵌入式 config/normalizer）
+* [scripts/attention_analysis.py](scripts/attention_analysis.py) — ⭐ 注意力集中度 + JK 权重 + 物理特征重要度分析
+* [scripts/error_analysis_detailed.py](scripts/error_analysis_detailed.py) — ⭐ 按宿主/掺杂/缺陷类型的详细误差分解
+* [scripts/tta_inference.py](scripts/tta_inference.py) — ⭐ 测试时增强推断 + 预测方差不确定性
+* [scripts/generate_paper_table.py](scripts/generate_paper_table.py) — ⭐ 自动生成 LaTeX 论文表格（消融 + per-range + 集成）
 * [scripts/compute_asph.py](scripts/compute_asph.py) — ASPH 持久同调特征计算
 * [scripts/analyze_innovations.py](scripts/analyze_innovations.py) — V3–V7 创新对比分析
 * [scripts/physics_interpretability.py](scripts/physics_interpretability.py) — 物理可解释性分析（注意力 + JK权重 + 专家分析）
@@ -154,6 +230,13 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 * [configs/v3_deftype.yaml](configs/v3_deftype.yaml) — V3 缺陷类型条件化
 * [configs/v4_moe.yaml](configs/v4_moe.yaml) — V4 MoE readout (3 experts)
 * [configs/v6_physics.yaml](configs/v6_physics.yaml) — V6 物理失配特征 (Hume-Rothery)
+* [configs/v9_contrast.yaml](configs/v9_contrast.yaml) — ⭐ V9 缺陷-宿主对比条件化
+* [configs/v11_lds.yaml](configs/v11_lds.yaml) — ⭐ V11 LDS 标签分布平滑 (ICML 2021)
+* [configs/v12_lds_physics.yaml](configs/v12_lds_physics.yaml) — ⭐ V12 LDS + 物理 + 全条件化
+* [configs/v13_rnc.yaml](configs/v13_rnc.yaml) — ⭐ V13 Rank-N-Contrast + LDS (NeurIPS 2023)
+* [configs/v14_jk.yaml](configs/v14_jk.yaml) — ⭐ V14 JK 层聚合 + 缺陷条件化
+* [configs/v10_best_combo.yaml](configs/v10_best_combo.yaml) — ⭐ V10 最优组合
+* [configs/v2_ema.yaml](configs/v2_ema.yaml) — V2 + EMA 权重平均
 * [configs/v2_uncertainty.yaml](configs/v2_uncertainty.yaml) — V2 + 异方差不确定性
 * [configs/v2_asph.yaml](configs/v2_asph.yaml) — V2 + ASPH 持久同调
 * [configs/v2_focal.yaml](configs/v2_focal.yaml) — V2 + Focal MAE 损失
@@ -476,7 +559,7 @@ src/
 ├── augment.py           # 旋转 + 高斯坐标微扰
 ├── dataset.py           # CrystalGraphDataset + collate_fn + 缺陷类型编码
 ├── sampler.py           # ⭐ Host-balanced sampler
-├── train_enhanced.py    # ⭐ 增强训练（SWA/focal MAE/MoE balance/distill）
+├── train_enhanced.py    # ⭐ 增强训练（SWA/focal MAE/MoE balance/LDS/RnC/distill）
 ├── models/
 │   ├── baseline.py      # CrystalTransformer V1 (Local SchNet + Global Transformer)
 │   ├── crystal_v2.py    # ⭐ CrystalTransformerV2 (V3 条件化 + V4 MoE)
@@ -503,6 +586,15 @@ scripts/
 ├── multi_source_v4.py                    # ⭐ 4-DB 联合 v4 训练
 # v5.x architecture optimization (2026-05-19)
 ├── eval_new_model.py                     # ⭐ 新模型评估（per-range + 相关性 + 集成）
+├── eval_checkpoint.py                    # ⭐ 通用 checkpoint 评估（自动检测格式）
+├── attention_analysis.py                 # ⭐ 注意力集中度 + JK 权重 + 物理特征分析
+├── error_analysis_detailed.py            # ⭐ 按宿主/掺杂/缺陷类型误差分解
+├── tta_inference.py                      # ⭐ 测试时增强 + 方差不确定性
+├── generate_paper_table.py              # ⭐ 自动 LaTeX 论文表格生成
+├── generate_ablation_table.py           # 消融表 markdown 生成
+├── make_innovation_figures.py           # 创新训练曲线对比图
+├── launch_queue.sh                       # 多实验排队启动
+├── status_dashboard.sh                   # 训练状态监控面板
 ├── compute_asph.py                       # ⭐ ASPH 持久同调特征（ripser）
 ├── launch_experiment.sh                  # GPU-aware 实验启动脚本
 # v4.1 constrained OOD evaluation (2026-05-11)
@@ -533,10 +625,19 @@ configs/
 # v5.x architecture configs (2026-05-19)
 ├── v3_deftype.yaml                           # ⭐ V3 缺陷类型条件化
 ├── v4_moe.yaml / v4_moe_5exp.yaml           # ⭐ V4 MoE readout (3/5 experts)
-├── v2_asph.yaml                              # ⭐ V2 + ASPH 持久同调
-├── v2_focal.yaml / v2_huber.yaml            # ⭐ 损失函数变体
+├── v6_physics.yaml                           # ⭐ V6 Hume-Rothery 物理特征
+├── v9_contrast.yaml                          # ⭐ V9 缺陷-宿主对比条件化
+├── v11_lds.yaml                              # ⭐ V11 LDS 标签分布平滑
+├── v12_lds_physics.yaml                      # ⭐ V12 LDS+物理+全条件化
+├── v13_rnc.yaml                              # ⭐ V13 RnC 对比 + LDS
+├── v14_jk.yaml                               # ⭐ V14 JK 层聚合
+├── v10_best_combo.yaml                       # ⭐ V10 最优组合
+├── v2_ema.yaml / v2_focal.yaml / v2_huber.yaml  # 训练策略变体
+├── v2_asph.yaml                              # V2 + ASPH 持久同调
+├── v2_uncertainty.yaml                       # V2 + 异方差不确定性
 ├── v2_regstrong.yaml                         # 强正则化消融
-└── v5_full.yaml                              # ⭐ V5 全组合（ASPH+V3+V4）
+├── v5_full.yaml                              # V5 组合（ASPH+V3+V4）
+└── v7_all.yaml                               # V7 全组合
 results/
 ├── <run>/best.pt + metrics.json + test_predictions.npz
 ├── all_metrics.{csv,md}                      # ⭐ 30+ run 自动汇总
@@ -647,6 +748,10 @@ python scripts/prospective_dft_analyze.py
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
 当前最优：**单模型 0.381 eV / 8-ensemble 0.349 eV**（V2 架构 + 多源模型）。
 
+**当前训练状态（2026-05-20）**：V3/V4/V6 在 WHU 8×L40S 服务器训练中（150 epochs），
+训练完成后依次启动 V9 → V11 → V12 → V13 → V14 → V2_ema → V2_focal → V10。
+优先级：物理动机最强的创新先训练，组合方案等单项验证后再启动。
+
 ### Tier 1 — 低成本高收益（不改架构）
 
 - [x] ~~**Readout ensembling**~~：multi-head readout 共享 trunk 实测无收益——
@@ -668,16 +773,35 @@ python scripts/prospective_dft_analyze.py
 
 - [x] **CrystalTransformerV2 架构改进**：✅ 已完成并验证。门控注意力池化 +
   局部环境富集 + Pre-Norm 残差，单模型 0.381 eV（↓26% vs V1）。
-- [x] **缺陷类型条件化 (V3)**：✅ 已实现，训练中。零初始化嵌入，不影响 V2 起点。
+- [x] **缺陷类型条件化 (V3)**：✅ 已实现，WHU 训练中。零初始化嵌入，不影响 V2 起点。
   IMP2D 仅含间隙和吸附两类，但架构支持 4 类。首创，无先例。
-- [x] **MoE Readout (V4)**：✅ 已实现。3/5 专家 MLP + 学习门控 + KL 平衡损失。
+- [x] **MoE Readout (V4)**：✅ 已实现，WHU 训练中。3/5 专家 MLP + 学习门控 + KL 平衡损失。
   参考：[MoCE](https://openreview.net/forum?id=Oit5bHPmjx)（ICLR 2025）
+- [x] **缺陷-宿主对比条件化 (V9)**：✅ 已实现。显式建模 Ef ∝ E(缺陷)−E(原始)，
+  零初始化，为高 Ef 样本提供物理先验通路。
+- [x] **LDS 标签分布平滑 (V11)**：✅ 已实现。高斯核平滑 + sqrt_inv 重权，
+  直击 [7,25) eV 范围梯度饥饿问题。
+  参考：Yang et al., ICML 2021 (Delving into Deep Imbalanced Regression)
+- [x] **RnC 排序对比学习 (V13)**：✅ 已实现。辅助损失在特征空间中保持 Ef 排序，
+  缓解预测压缩并提升集成多样性。
+  参考：Zha et al., NeurIPS 2023 (Rank-N-Contrast)
+- [x] **JK 层聚合 (V14)**：✅ 已实现。学习 softmax 权重混合 [local_out, global_1, global_2]，
+  让模型自适应选择局部 vs 全局特征。
+  参考：Xu et al., ICML 2018 (How Powerful are GNNs)
 - [x] **Focal MAE 损失**：✅ 已实现。动态上权困难样本 w_i = (|e_i|/mean)^γ。
   γ=0.5 使 5× 平均误差的样本获得 2.2× 梯度权重。
+- [x] **EMA 权重平均**：✅ 已实现。训练中指数滑动平均 (decay=0.999)，
+  收敛到更平坦极小值。
 - [ ] **iComFormer 风格几何完备注意力**：用不变量（距离 + 键角）替代纯距离
   编码的全局 Transformer 层，不引入等变张量积开销。ICLR 2024 在 MatBench
   上超越 ALIGNN。
   参考：[ComFormer](https://arxiv.org/abs/2403.11857)（ICLR 2024）
+- [ ] **Balanced MSE / Balanced Smooth L1**：将 BMC 核密度估计引入回归损失，
+  自适应增大稀疏标签区域的梯度，直接对标 LDS 但无需显式密度估计。
+  参考：Ren et al., CVPR 2022 (Balanced MSE for Imbalanced Visual Regression)
+- [ ] **Evidential Deep Learning 不确定性**：单模型输出 Normal-Inv-Gamma 参数，
+  分离认知/偶然不确定性，OOD 检测远优于 MC Dropout。
+  参考：Soleimany et al., Nature Comms 2025
 - [ ] **CrystalFormer 周期求和注意力**：通过距离衰减势对周期映像求无穷和，
   仅用 Matformer 29% 参数达到 SOTA。适合我们的 2D 周期超胞。
   参考：[CrystalFormer](https://omron-sinicx.github.io/crystalformer/)
@@ -723,6 +847,8 @@ python scripts/prospective_dft_analyze.py
 - [x] ~~Deep model + Huber loss~~（训练不稳定，不如 MAE+warmup）
 - [x] ~~Log-target 变换 (sign(y)*log1p(|y|))~~（test MAE 0.399 vs 基线 0.381，
   且与现有模型相关性 r=0.99+，无集成多样性）
+- [x] ~~测试时增强 (TTA)~~（TTA(4) MAE=0.3808 vs 基线 0.3810，δ=−0.0002 eV，
+  因模型已用在线增强训练，几何扰动无新信息。但预测方差可用于不确定性估计 r=0.348）
 
 ---
 
@@ -732,7 +858,9 @@ python scripts/prospective_dft_analyze.py
 * 基线参考：[wuleyan2004/defect_formation_energy_prediction](https://github.com/wuleyan2004/defect_formation_energy_prediction)
 * DFT 软件：[Quantum ESPRESSO 7.3.1](https://www.quantum-espresso.org/) +
   NVIDIA HPC SDK 25.5
-* 训练硬件：WHU 8×L40S (v4 主训练) + RTX 5090 (DFT + 早期实验)
+* 训练硬件：WHU 8×L40S (v4–v5 主训练) + RTX 5090 (DFT + 早期实验)
+* 方法参考：JK-Net (Xu et al., ICML 2018), DIR (Yang et al., ICML 2021),
+  RnC (Zha et al., NeurIPS 2023), ComFormer (ICLR 2024)
 
 ## 许可
 
