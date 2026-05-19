@@ -158,6 +158,57 @@ def compute_lds_weights(
     return weight_fn
 
 
+# ---- Rank-N-Contrast for regression (Zha et al., NeurIPS 2023) ----
+# "Supervised Contrastive Learning for Pre-trained Language Model
+# Fine-tuning" and "Rank-N-Contrast: Learning Continuous Representations
+# for Regression" — adapted for graph-level regression.
+# The loss encourages the feature space to preserve target ordering:
+# samples with similar Ef should cluster, dissimilar ones should separate.
+def rnc_loss(
+    features: torch.Tensor,        # (B, C) — L2-normalised graph reps
+    targets: torch.Tensor,         # (B,)   — regression targets
+    temperature: float = 0.1,
+    label_diff_sigma: float = 1.0, # bandwidth for target similarity kernel
+) -> torch.Tensor:
+    """Rank-N-Contrast loss for continuous regression.
+
+    For each anchor i, positive weight w_ij = exp(-|y_i - y_j|²/σ²).
+    L_i = -log( Σ_j w_ij·exp(z_i·z_j/τ) / Σ_k exp(z_i·z_k/τ) )
+
+    This pushes apart samples with very different targets and pulls
+    together those with similar targets — a continuous generalisation
+    of SupCon (Khosla et al., NeurIPS 2020).
+    """
+    B = features.size(0)
+    if B < 4:
+        return torch.tensor(0.0, device=features.device)
+
+    # Cosine similarity matrix
+    sim = torch.mm(features, features.t()) / temperature  # (B, B)
+
+    # Target similarity kernel (soft positives)
+    target_diff = targets.unsqueeze(0) - targets.unsqueeze(1)  # (B, B)
+    weights = torch.exp(-target_diff.pow(2) / (2 * label_diff_sigma ** 2))
+
+    # Mask out self-similarities
+    mask_self = torch.eye(B, device=features.device).bool()
+    weights = weights.masked_fill(mask_self, 0.0)
+
+    # Numerical stability: subtract max from sim
+    sim_max, _ = sim.max(dim=1, keepdim=True)
+    sim = sim - sim_max.detach()
+
+    exp_sim = torch.exp(sim)
+    exp_sim = exp_sim.masked_fill(mask_self, 0.0)
+
+    # Weighted positive similarities
+    pos = (weights * exp_sim).sum(dim=1)  # (B,)
+    neg = exp_sim.sum(dim=1)              # (B,)
+
+    loss = -torch.log(pos / neg.clamp(min=1e-8) + 1e-8).mean()
+    return loss
+
+
 # ---- Mixup in feature space (same-host constraint relaxed to batch-level) ----
 def mixup_batch(batch, alpha=0.2):
     """Feature-space Mixup: interpolate embeddings and targets within a batch."""
@@ -516,6 +567,12 @@ def main() -> None:
     # This naturally learns per-sample difficulty and downweights outliers.
     use_heteroscedastic = cfg.get("model_kwargs", {}).get("predict_uncertainty", False)
 
+    # Rank-N-Contrast auxiliary loss (Zha et al., NeurIPS 2023)
+    rnc_weight = cfg.get("rnc_weight", 0.0)
+    rnc_temp = cfg.get("rnc_temperature", 0.1)
+    rnc_sigma = cfg.get("rnc_label_sigma", 1.0)
+    use_rnc = rnc_weight > 0
+
     epochs = cfg.get("epochs", 50)
     grad_clip = cfg.get("grad_clip", 5.0)
 
@@ -566,7 +623,7 @@ def main() -> None:
             f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
             f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
             f"droppath={drop_path_rate} label_noise={label_noise_std} "
-            f"ema={use_ema}(decay={ema_decay}) lds={use_lds} "
+            f"ema={use_ema}(decay={ema_decay}) lds={use_lds} rnc={use_rnc} "
             f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
             f"distill={use_distill}(alpha={distill_alpha})\n"
             f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
@@ -613,25 +670,40 @@ def main() -> None:
                     total_loss = task_loss + adv_weight * adv_loss
                     adv_loss_val = adv_loss.item()
                 else:
-                    model_out = model(batch)
-                    if use_heteroscedastic and isinstance(model_out, tuple):
+                    # Forward: request hidden features when RnC is active
+                    model_out = model(batch, return_hidden=use_rnc)
+                    hidden_for_rnc = None
+                    if use_rnc and isinstance(model_out, tuple):
+                        # return_hidden=True → (pred, pooled_features)
+                        preds_norm, hidden_for_rnc = model_out
+                    elif use_heteroscedastic and isinstance(model_out, tuple):
                         preds_norm, log_var = model_out
-                        # Heteroscedastic loss: |y-ŷ|·exp(-s) + s
-                        # s = log(σ²), clamped for numerical stability
+                    else:
+                        preds_norm = model_out if not isinstance(model_out, tuple) else model_out[0]
+
+                    # --- Task loss ---
+                    if use_heteroscedastic and hidden_for_rnc is None:
                         log_var = log_var.clamp(-6, 6)
                         base_err = torch.abs(preds_norm - target_norm)
                         task_loss = (base_err * torch.exp(-log_var) + log_var).mean()
+                    elif lds_weight_fn is not None:
+                        with torch.no_grad():
+                            lds_w = lds_weight_fn(target)
+                        per_sample = torch.abs(preds_norm - target_norm)
+                        task_loss = (lds_w * per_sample).mean()
                     else:
-                        preds_norm = model_out if not isinstance(model_out, tuple) else model_out[0]
-                        # LDS reweighting: per-sample weights from label density
-                        if lds_weight_fn is not None:
-                            with torch.no_grad():
-                                lds_w = lds_weight_fn(target)
-                            per_sample = torch.abs(preds_norm - target_norm)
-                            task_loss = (lds_w * per_sample).mean()
-                        else:
-                            task_loss = criterion(preds_norm, target_norm)
+                        task_loss = criterion(preds_norm, target_norm)
+
                     total_loss = task_loss
+
+                    # --- RnC contrastive regularisation ---
+                    if use_rnc and hidden_for_rnc is not None:
+                        feat_norm = torch.nn.functional.normalize(
+                            hidden_for_rnc, dim=-1)
+                        rnc_l = rnc_loss(feat_norm, target,
+                                         temperature=rnc_temp,
+                                         label_diff_sigma=rnc_sigma)
+                        total_loss = total_loss + rnc_weight * rnc_l
 
                 # Knowledge distillation loss
                 if use_distill and "soft_label" in batch:

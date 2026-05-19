@@ -1,0 +1,69 @@
+# V13: Rank-N-Contrast for regression (Zha et al., NeurIPS 2023)
+#
+# Contrastive auxiliary loss that preserves target ordering in feature space:
+# samples with similar Ef cluster, dissimilar ones separate. This is a
+# continuous generalisation of Supervised Contrastive Learning (Khosla
+# et al., NeurIPS 2020).
+#
+# Combined with LDS for complete imbalanced regression treatment:
+#   - LDS: upweight rare targets in the loss (address gradient starvation)
+#   - RnC: structure feature space by target similarity (address prediction
+#     compression and improve ensemble diversity via different inductive bias)
+model: v2
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: results/v13_rnc
+seed: 42
+batch_size: 64
+epochs: 150
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mae
+grad_clip: 5.0
+online_aug: true
+online_aug_cfg:
+  sigma_range: [0.01, 0.05]
+  strain_range: 2.0
+  rotate_prob: 1.0
+  perturb_prob: 0.8
+  strain_prob: 0.3
+host_balanced: true
+samples_per_host: 200
+aux_defect_weight: 0.1
+drop_path_rate: 0.1
+label_noise_std: 0.03
+# LDS (ICML 2021)
+use_lds: true
+lds_bins: 100
+lds_sigma: 2.0
+lds_reweight: sqrt_inv
+# RnC (NeurIPS 2023)
+rnc_weight: 0.1
+rnc_temperature: 0.1
+rnc_label_sigma: 1.0
+use_ema: true
+ema_decay: 0.999
+use_swa: true
+swa_start_epoch: 120
+swa_lr: 1.0e-4
+pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+scheduler_type: cosine
+warmup_epochs: 10
+optimizer:
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  eta_min: 1.0e-6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  use_gated_pooling: true
+  use_env_enrichment: true
+  use_prenorm_local: true
