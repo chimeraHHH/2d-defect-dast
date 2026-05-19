@@ -58,8 +58,8 @@ INNOVATIONS = {
 }
 
 
-def load_model(results_dir, name):
-    """Load a model's predictions if available."""
+def load_model(results_dir, name, min_epochs=20):
+    """Load a model's predictions if available and sufficiently trained."""
     npz_path = results_dir / name / "test_predictions.npz"
     if not npz_path.exists():
         return None
@@ -67,14 +67,20 @@ def load_model(results_dir, name):
     preds, targets = data["preds"], data["targets"]
     if len(preds) != 1065:
         return None
-    # Also load metrics for n_params
+    # Also load metrics for n_params and epoch count
     metrics_path = results_dir / name / "metrics.json"
     n_params = 0
+    n_epochs = 0
     if metrics_path.exists():
         with open(metrics_path) as f:
             m = json.load(f)
             n_params = m.get("n_params", 0)
-    return {"preds": preds, "targets": targets, "n_params": n_params}
+            n_epochs = len(m.get("history", []))
+    # Skip smoke tests and under-trained models
+    if n_epochs < min_epochs:
+        return None
+    return {"preds": preds, "targets": targets, "n_params": n_params,
+            "n_epochs": n_epochs}
 
 
 def per_range_mae(preds, targets):
