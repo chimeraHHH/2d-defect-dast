@@ -40,6 +40,7 @@ from src.models import (
     PeriodicCrystalTransformer,
     DualStreamPeriodicTransformer,
     compute_invariance_loss,
+    CrystalTransformerV2,
 )
 
 MODEL_REGISTRY = {
@@ -47,6 +48,7 @@ MODEL_REGISTRY = {
     "improved": DefectAwareTransformer,
     "periodic": PeriodicCrystalTransformer,
     "dualstream": DualStreamPeriodicTransformer,
+    "v2": CrystalTransformerV2,
 }
 
 

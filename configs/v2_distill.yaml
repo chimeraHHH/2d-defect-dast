@@ -1,0 +1,71 @@
+# Knowledge distillation: 4-model V1 ensemble → V2 student
+model: v2
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: results/v2_distill
+seed: 42
+batch_size: 64
+epochs: 150
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mae
+grad_clip: 5.0
+
+# Teacher ensemble (4 best V1 checkpoints)
+teacher_checkpoints:
+  - results/enhanced_online_150ep_uae_mae_warmup_s42/best.pt
+  - results/enhanced_online_150ep_uae_mae_warmup_s43/best.pt
+  - results/enhanced_online_150ep_uae_mae_warmup_s45/best.pt
+  - results/enhanced_online_150ep_uae_mae_warmup_deep_s42/best.pt
+teacher_model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.0
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+
+# Distillation weights
+task_weight: 1.0
+distill_weight: 0.5
+
+online_aug: true
+online_aug_cfg:
+  sigma_range: [0.01, 0.05]
+  strain_range: 2.0
+  rotate_prob: 1.0
+  perturb_prob: 0.8
+  strain_prob: 0.3
+host_balanced: true
+samples_per_host: 200
+drop_path_rate: 0.1
+label_noise_std: 0.03
+use_swa: true
+swa_start_epoch: 120
+swa_lr: 1.0e-4
+scheduler_type: cosine
+warmup_epochs: 10
+optimizer:
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  eta_min: 1.0e-6
+
+# Student model kwargs (V2 with all improvements)
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  use_gated_pooling: true
+  use_env_enrichment: true
+  use_prenorm_local: true
