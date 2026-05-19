@@ -185,6 +185,87 @@ class DefectAwarePooling(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Mixture-of-Experts Readout (V4)
+# ---------------------------------------------------------------------------
+class MoEReadout(nn.Module):
+    """Mixture-of-Experts readout for crystal property prediction.
+
+    Inspired by MoCE (ICLR 2025): multiple expert MLPs with learned gating.
+    Each expert can specialise in different regions of the property space —
+    e.g. one expert handles typical formation energies [0, 5] eV while
+    another handles extreme values [10, 20] eV.
+
+    The gating network operates on the pooled graph representation, so
+    the specialisation is input-dependent (not hard-coded by target range).
+
+    A load-balancing auxiliary loss encourages uniform expert utilisation
+    across the batch, preventing expert collapse.
+    """
+
+    def __init__(
+        self,
+        hidden_dim: int,
+        n_experts: int = 3,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        self.n_experts = n_experts
+
+        # Expert heads — each is a lightweight MLP
+        self.experts = nn.ModuleList([
+            nn.Sequential(
+                nn.LayerNorm(hidden_dim),
+                nn.Linear(hidden_dim, hidden_dim // 2),
+                nn.SiLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim // 2, 1),
+            )
+            for _ in range(n_experts)
+        ])
+
+        # Gating network — produces soft expert weights per sample
+        self.gate = nn.Sequential(
+            nn.LayerNorm(hidden_dim),
+            nn.Linear(hidden_dim, hidden_dim // 4),
+            nn.SiLU(),
+            nn.Linear(hidden_dim // 4, n_experts),
+        )
+
+        # Store balance loss for training (set by forward)
+        self._balance_loss: float = 0.0
+
+    @property
+    def balance_loss(self) -> float:
+        return self._balance_loss
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x: (B, hidden_dim) pooled graph representation
+        Returns:
+            pred: (B,) weighted expert predictions
+        """
+        gate_logits = self.gate(x)                              # (B, E)
+        gate_weights = F.softmax(gate_logits, dim=-1)           # (B, E)
+
+        expert_out = torch.stack(
+            [expert(x).squeeze(-1) for expert in self.experts],
+            dim=-1,
+        )                                                       # (B, E)
+
+        pred = (expert_out * gate_weights).sum(dim=-1)          # (B,)
+
+        # Load-balancing loss: KL(avg_gate || uniform)
+        avg_gate = gate_weights.mean(dim=0)                     # (E,)
+        uniform = torch.ones_like(avg_gate) / self.n_experts
+        self._balance_loss = F.kl_div(
+            (avg_gate + 1e-8).log(), uniform, reduction="sum"
+        )
+
+        return pred
+
+
+# ---------------------------------------------------------------------------
 # Local Environment Enrichment
 # ---------------------------------------------------------------------------
 class LocalEnvEnrichment(nn.Module):
@@ -476,6 +557,10 @@ class CrystalTransformerV2(nn.Module):
         # V3: defect-type conditioning
         use_defect_type_cond: bool = False,
         n_defect_types: int = 4,  # vacancy, substitution, interstitial, adsorbate
+        # V4: Mixture of Experts readout
+        use_moe_readout: bool = False,
+        n_moe_experts: int = 3,
+        moe_balance_weight: float = 0.01,
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -547,7 +632,14 @@ class CrystalTransformerV2(nn.Module):
         # else: fall back to mean pooling (same as V1)
 
         self.n_readout_heads = n_readout_heads
-        if n_readout_heads <= 1:
+        self.use_moe_readout = use_moe_readout
+        self.moe_balance_weight = moe_balance_weight
+
+        if use_moe_readout:
+            self.readout = MoEReadout(
+                hidden_dim, n_experts=n_moe_experts, dropout=dropout,
+            )
+        elif n_readout_heads <= 1:
             self.readout = nn.Sequential(
                 nn.LayerNorm(hidden_dim),
                 nn.Linear(hidden_dim, hidden_dim),
@@ -714,7 +806,9 @@ class CrystalTransformerV2(nn.Module):
 
         if return_hidden:
             # For knowledge distillation — return both prediction and hidden
-            if self.n_readout_heads <= 1:
+            if self.use_moe_readout:
+                pred = self.readout(pooled)
+            elif self.n_readout_heads <= 1:
                 pred = self.readout(pooled).squeeze(-1)
             else:
                 preds = torch.stack(
@@ -723,6 +817,8 @@ class CrystalTransformerV2(nn.Module):
                 pred = preds.mean(dim=0)
             return pred, pooled
 
+        if self.use_moe_readout:
+            return self.readout(pooled)
         if self.n_readout_heads <= 1:
             return self.readout(pooled).squeeze(-1)
         preds = torch.stack(

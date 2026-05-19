@@ -499,6 +499,11 @@ def main() -> None:
                     ) / mask.float().sum().clamp(min=1.0)
                     total_loss = total_loss + aux_defect_w * aux_loss
 
+                # MoE balance loss (encourages uniform expert utilisation)
+                moe_balance_w = cfg.get("model_kwargs", {}).get("moe_balance_weight", 0.0)
+                if moe_balance_w > 0 and hasattr(model, "readout") and hasattr(model.readout, "balance_loss"):
+                    total_loss = total_loss + moe_balance_w * model.readout.balance_loss
+
                 optimizer.zero_grad(set_to_none=True)
                 total_loss.backward()
                 if grad_clip:
