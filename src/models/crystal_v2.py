@@ -188,7 +188,7 @@ class DefectAwarePooling(nn.Module):
 # Local Environment Enrichment
 # ---------------------------------------------------------------------------
 class LocalEnvEnrichment(nn.Module):
-    """Compute physics-aware features for the defect site at runtime.
+    """Vectorized physics-aware features for defect sites.
 
     Features per defect atom (broadcast to embedding space):
       - Coordination number (count of edges from defect atom)
@@ -196,8 +196,7 @@ class LocalEnvEnrichment(nn.Module):
       - Max neighbour distance (captures strain)
       - Electronegativity contrast: |EN_defect - mean(EN_host_neighbours)|
 
-    These are projected to hidden_dim and added to the defect atom's embedding.
-    For non-defect atoms, the contribution is zero.
+    Uses scatter operations for GPU-efficient computation — no Python loops.
     """
 
     def __init__(self, hidden_dim: int, n_env_features: int = 4) -> None:
@@ -212,71 +211,87 @@ class LocalEnvEnrichment(nn.Module):
         self,
         h: torch.Tensor,
         defect_mask: torch.Tensor,
-        edge_index_list: list,
-        edge_dist_list: list,
+        edge_index_flat: torch.Tensor,
+        edge_dist_flat: torch.Tensor,
+        flat_defect_mask: torch.Tensor,
+        flat_en: torch.Tensor,
+        flat_indices: torch.Tensor,
         num_atoms_list: list,
-        x_raw: torch.Tensor,
     ) -> torch.Tensor:
-        """Add local environment features to defect atoms.
+        """Add local environment features to defect atoms (vectorized).
 
         Args:
             h: (B, N_max, C) current embeddings
             defect_mask: (B, N_max) int, 1 for defect atoms
-            edge_index_list: per-sample edge indices
-            edge_dist_list: per-sample edge distances
+            edge_index_flat: (2, E_total) flattened edge indices (with offsets)
+            edge_dist_flat: (E_total,) flattened edge distances
+            flat_defect_mask: (N_total,) defect mask in flat atom space
+            flat_en: (N_total,) electronegativity in flat atom space
+            flat_indices: (N_total,) mapping flat atoms back to padded layout
             num_atoms_list: atoms per sample
-            x_raw: (B, N_max, atom_fea_len) raw atom features
-                   (feature index 2 = electronegativity)
         Returns:
             h: (B, N_max, C) with enriched defect embeddings
         """
         device = h.device
         B, N_max, C = h.shape
-        env_features = torch.zeros(B, N_max, 4, device=device, dtype=h.dtype)
+        N_total = flat_defect_mask.shape[0]
 
-        offset = 0
-        for b in range(B):
-            n_atoms = num_atoms_list[b]
-            dm = defect_mask[b, :n_atoms]  # (n_atoms,)
-            defect_indices = dm.nonzero(as_tuple=True)[0]
+        if edge_index_flat.shape[1] == 0:
+            return h
 
-            if len(defect_indices) == 0 or len(edge_index_list) <= b:
-                offset += n_atoms
-                continue
+        row, col = edge_index_flat  # row=center, col=neighbor
 
-            ei = edge_index_list[b].to(device)
-            ed = edge_dist_list[b].to(device)
-            en_raw = x_raw[b, :n_atoms, 2]  # electronegativity (feature idx 2)
+        # Filter to edges whose center is a defect atom
+        is_defect_center = flat_defect_mask[row].bool()
+        if not is_defect_center.any():
+            return h
 
-            for di in defect_indices:
-                di_val = di.item()
-                # Edges where this atom is the center (row)
-                edge_mask = (ei[0] == di_val)
-                if edge_mask.sum() == 0:
-                    continue
+        d_row = row[is_defect_center]          # defect center indices
+        d_dist = edge_dist_flat[is_defect_center]  # corresponding distances
+        d_col = col[is_defect_center]          # neighbor indices
 
-                neigh_dists = ed[edge_mask]
-                neigh_ids = ei[1, edge_mask]
+        # 1. Coordination number per defect atom (scatter_add count)
+        ones = torch.ones_like(d_dist)
+        coord_count = torch.zeros(N_total, device=device, dtype=h.dtype)
+        coord_count.scatter_add_(0, d_row, ones)
 
-                coord_num = float(edge_mask.sum())
-                mean_dist = neigh_dists.mean()
-                max_dist = neigh_dists.max()
+        # 2. Sum of distances per defect atom → mean = sum / count
+        dist_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        dist_sum.scatter_add_(0, d_row, d_dist)
+        safe_count = coord_count.clamp(min=1.0)
+        mean_dist = dist_sum / safe_count
 
-                # Electronegativity contrast
-                en_defect = en_raw[di_val]
-                en_neighs = en_raw[neigh_ids.long()]
-                en_contrast = (en_defect - en_neighs.mean()).abs()
+        # 3. Max distance per defect atom
+        max_dist = torch.zeros(N_total, device=device, dtype=h.dtype)
+        max_dist.scatter_reduce_(0, d_row, d_dist, reduce="amax",
+                                 include_self=False)
 
-                env_features[b, di_val, 0] = coord_num / 20.0  # normalize
-                env_features[b, di_val, 1] = mean_dist / 5.0
-                env_features[b, di_val, 2] = max_dist / 8.0
-                env_features[b, di_val, 3] = en_contrast
+        # 4. EN contrast: |EN_defect - mean(EN_neighbors)|
+        en_neigh = flat_en[d_col]
+        en_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        en_sum.scatter_add_(0, d_row, en_neigh)
+        en_mean_neigh = en_sum / safe_count
+        en_contrast = (flat_en - en_mean_neigh).abs()
 
-            offset += n_atoms
+        # Stack features: (N_total, 4), normalized
+        env_fea = torch.stack([
+            coord_count / 20.0,
+            mean_dist / 5.0,
+            max_dist / 8.0,
+            en_contrast,
+        ], dim=-1)
 
-        # Project and add to defect atoms only
-        env_emb = self.proj(env_features)  # (B, N_max, C)
-        defect_mask_f = defect_mask.float().unsqueeze(-1)  # (B, N_max, 1)
+        # Only keep features for defect atoms (zero out non-defect)
+        env_fea = env_fea * flat_defect_mask.float().unsqueeze(-1)
+
+        # Write back to padded layout (B, N_max, 4)
+        env_padded = torch.zeros(B * N_max, 4, device=device, dtype=h.dtype)
+        env_padded.index_copy_(0, flat_indices, env_fea)
+        env_padded = env_padded.reshape(B, N_max, 4)
+
+        # Project and add
+        env_emb = self.proj(env_padded)
+        defect_mask_f = defect_mask.float().unsqueeze(-1)
         h = h + env_emb * defect_mask_f
 
         return h
@@ -459,34 +474,22 @@ class CrystalTransformerV2(nn.Module):
         if self.defect_embedding is not None and defect_mask is not None:
             h = h + self.defect_embedding(defect_mask)
 
-        # --- Local environment enrichment ---
-        if (self.use_env_enrichment and self.env_enrichment is not None
-                and defect_mask is not None):
-            h = self.env_enrichment(
-                h, defect_mask,
-                batch.get("edge_index_list", []),
-                batch.get("edge_dist_list", []),
-                batch["num_atoms_list"],
-                x_raw,
-            )
-
-        # --- Local message passing ---
+        # --- Build flat atom indices (shared by env enrichment + local layers) ---
         b, n_max, c = h.shape
         num_atoms_list = batch["num_atoms_list"]
-        flat_indices = []
+        flat_idx_parts = []
         for i, n_i in enumerate(num_atoms_list):
             base = i * n_max
-            flat_indices.append(
+            flat_idx_parts.append(
                 torch.arange(n_i, device=device, dtype=torch.long) + base
             )
         flat_indices = (
-            torch.cat(flat_indices)
-            if flat_indices
+            torch.cat(flat_idx_parts)
+            if flat_idx_parts
             else torch.empty(0, dtype=torch.long, device=device)
         )
-        h_flat_full = h.reshape(b * n_max, c)
-        flat_h = h_flat_full.index_select(0, flat_indices)
 
+        # --- Flatten edges (used by both env enrichment and local layers) ---
         edge_index, edge_dist, triplet_index, angles = self._flatten_edges(
             num_atoms_list,
             batch["edge_index_list"],
@@ -495,6 +498,28 @@ class CrystalTransformerV2(nn.Module):
             batch["angles_list"],
             device=device,
         )
+
+        # --- Local environment enrichment (vectorized via scatter) ---
+        if (self.use_env_enrichment and self.env_enrichment is not None
+                and defect_mask is not None):
+            # Build flat defect mask and flat EN for the valid atoms
+            n_total = flat_indices.shape[0]
+            flat_defect = torch.zeros(n_total, device=device, dtype=torch.long)
+            flat_en = torch.zeros(n_total, device=device, dtype=h.dtype)
+            offset = 0
+            for i, n_i in enumerate(num_atoms_list):
+                flat_defect[offset:offset + n_i] = defect_mask[i, :n_i]
+                flat_en[offset:offset + n_i] = x_raw[i, :n_i, 2]
+                offset += n_i
+            h = self.env_enrichment(
+                h, defect_mask, edge_index, edge_dist,
+                flat_defect, flat_en, flat_indices, num_atoms_list,
+            )
+
+        # --- Local message passing ---
+        h_flat_full = h.reshape(b * n_max, c)
+        flat_h = h_flat_full.index_select(0, flat_indices)
+
         edge_attr_rbf = self.edge_rbf(edge_dist)
         for layer in self.local_layers:
             flat_h = layer(
