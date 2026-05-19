@@ -13,6 +13,15 @@ from torch.utils.data import Dataset, Subset
 
 from src.features import get_atom_feature_table
 
+# Defect type → integer encoding (used for defect-type conditioning)
+DEFECT_TYPE_MAP = {
+    "vacancy": 0,
+    "substitution": 1,
+    "interstitial": 2,
+    "adsorbate": 3,
+}
+N_DEFECT_TYPES = len(DEFECT_TYPE_MAP)
+
 
 class CrystalGraphDataset(Dataset):
     """Loads the cleaned defect dataset and exposes per-sample tensors.
@@ -127,10 +136,14 @@ class CrystalGraphDataset(Dataset):
             asph = torch.from_numpy(self.asph_features[idx]).float()
             x = torch.cat([x, asph], dim=-1)
         defect_mask = torch.from_numpy(sample["defect_mask"]).long()
+        # Defect type encoding (from metadata)
+        defect_type_str = sample.get("metadata", {}).get("defecttype", "vacancy")
+        defect_type_idx = DEFECT_TYPE_MAP.get(defect_type_str, 0)
         item = {
             "x": x,
             "atomic_numbers": numbers,
             "defect_mask": defect_mask,
+            "defect_type": torch.tensor(defect_type_idx, dtype=torch.long),
             "edge_index": torch.from_numpy(sample["edge_index"]),
             "edge_dist": torch.from_numpy(sample["edge_dist"]),
             "edge_offset": torch.from_numpy(sample["edge_offset"]).float(),
@@ -202,10 +215,15 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         triplet_index_list.append(item["triplet_index"])
         angles_list.append(item["angles"])
 
+    # Defect type (graph-level)
+    defect_type = torch.stack([item["defect_type"] for item in batch]) \
+        if "defect_type" in batch[0] else torch.zeros(batch_size, dtype=torch.long)
+
     out = {
         "x": x,
         "atomic_numbers": atomic_numbers,
         "defect_mask": defect_mask,
+        "defect_type": defect_type,
         "atom_mask": atom_mask,
         "dist_matrix": dist_matrix,
         "positions": positions,

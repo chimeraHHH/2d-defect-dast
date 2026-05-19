@@ -473,6 +473,9 @@ class CrystalTransformerV2(nn.Module):
         use_env_enrichment: bool = True,
         use_prenorm_local: bool = True,
         env_enrichment_version: int = 1,  # 1=original (4 features), 2=enhanced (11 features)
+        # V3: defect-type conditioning
+        use_defect_type_cond: bool = False,
+        n_defect_types: int = 4,  # vacancy, substitution, interstitial, adsorbate
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -493,6 +496,17 @@ class CrystalTransformerV2(nn.Module):
         self.defect_embedding = (
             nn.Embedding(2, hidden_dim) if defect_embedding else None
         )
+
+        # --- Defect-type conditioning (V3) ---
+        # Embeds the global defect type (vacancy/sub/interstitial/adsorbate)
+        # and conditions the readout head. Physically motivated: interstitials
+        # and adsorbates span much wider Ef ranges than vacancies/substitutions.
+        self.use_defect_type_cond = use_defect_type_cond
+        if use_defect_type_cond:
+            self.defect_type_embed = nn.Embedding(n_defect_types, hidden_dim)
+            nn.init.zeros_(self.defect_type_embed.weight)  # start as no-op
+        else:
+            self.defect_type_embed = None
 
         # --- Local environment enrichment ---
         self.use_env_enrichment = use_env_enrichment
@@ -691,6 +705,12 @@ class CrystalTransformerV2(nn.Module):
             pooled = (h_global * mask_f).sum(dim=1) / mask_f.sum(
                 dim=1
             ).clamp(min=1.0)
+
+        # --- Defect-type conditioning (V3): add type embedding to pooled repr ---
+        if self.use_defect_type_cond and self.defect_type_embed is not None:
+            dt = batch.get("defect_type")
+            if dt is not None:
+                pooled = pooled + self.defect_type_embed(dt)
 
         if return_hidden:
             # For knowledge distillation — return both prediction and hidden
