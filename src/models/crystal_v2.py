@@ -704,6 +704,8 @@ class CrystalTransformerV2(nn.Module):
         use_physics_features: bool = False,
         # JK: Jumping Knowledge aggregation over layers
         use_jk_aggregation: bool = False,
+        # Uncertainty head: predict log-variance alongside Ef
+        predict_uncertainty: bool = False,
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -816,6 +818,22 @@ class CrystalTransformerV2(nn.Module):
                 )
                 for _ in range(n_readout_heads)
             ])
+
+        # --- Uncertainty head (Kendall & Gal, NeurIPS 2017) ---
+        # Predicts log-variance σ² alongside Ef, enabling heteroscedastic
+        # loss: L = |y - ŷ| * exp(-s) + s  where s = log(σ²).
+        # This naturally downweights noisy/hard samples and provides
+        # calibrated uncertainty estimates for ensemble weighting.
+        self.predict_uncertainty = predict_uncertainty
+        if predict_uncertainty:
+            self.uncertainty_head = nn.Sequential(
+                nn.LayerNorm(hidden_dim),
+                nn.Linear(hidden_dim, hidden_dim // 2),
+                nn.SiLU(),
+                nn.Linear(hidden_dim // 2, 1),
+            )
+            # Init bias to log(1) = 0 → initial σ = 1 (unit variance)
+            nn.init.zeros_(self.uncertainty_head[-1].bias)
 
     # Reuse V1's edge flattening
     def _flatten_edges(
@@ -979,27 +997,26 @@ class CrystalTransformerV2(nn.Module):
             if z_batch is not None and defect_mask is not None:
                 pooled = pooled + self.physics_module(z_batch, defect_mask, mask)
 
+        # --- Compute prediction ---
+        if self.use_moe_readout:
+            pred = self.readout(pooled)
+        elif self.n_readout_heads <= 1:
+            pred = self.readout(pooled).squeeze(-1)
+        else:
+            preds = torch.stack(
+                [head(pooled).squeeze(-1) for head in self.readout], dim=0
+            )
+            pred = preds.mean(dim=0)
+
         if return_hidden:
-            # For knowledge distillation — return both prediction and hidden
-            if self.use_moe_readout:
-                pred = self.readout(pooled)
-            elif self.n_readout_heads <= 1:
-                pred = self.readout(pooled).squeeze(-1)
-            else:
-                preds = torch.stack(
-                    [head(pooled).squeeze(-1) for head in self.readout], dim=0
-                )
-                pred = preds.mean(dim=0)
             return pred, pooled
 
-        if self.use_moe_readout:
-            return self.readout(pooled)
-        if self.n_readout_heads <= 1:
-            return self.readout(pooled).squeeze(-1)
-        preds = torch.stack(
-            [head(pooled).squeeze(-1) for head in self.readout], dim=0
-        )
-        return preds.mean(dim=0)
+        # --- Uncertainty estimation (optional) ---
+        if self.predict_uncertainty:
+            log_var = self.uncertainty_head(pooled).squeeze(-1)  # (B,)
+            return pred, log_var
+
+        return pred
 
 
 def _import_v1_local_layer():

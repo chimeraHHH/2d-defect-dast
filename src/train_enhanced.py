@@ -184,7 +184,9 @@ def evaluate(model, loader, normalizer, device, swa_model=None):
         for batch in loader:
             batch = move_batch(batch, device)
             target = batch["target"]
-            preds_norm = eval_model(batch)
+            model_out = eval_model(batch)
+            # Handle uncertainty output: (pred, log_var) tuple
+            preds_norm = model_out[0] if isinstance(model_out, tuple) else model_out
             preds = normalizer.denorm(preds_norm)
             err = preds - target
             abs_err += err.abs().sum().item()
@@ -392,6 +394,12 @@ def main() -> None:
     else:
         raise ValueError(loss_name)
 
+    # Heteroscedastic uncertainty training (Kendall & Gal, NeurIPS 2017)
+    # When model predicts (Ef, log_variance), loss becomes:
+    #   L = |y - ŷ| * exp(-s) + s   where s = log(σ²)
+    # This naturally learns per-sample difficulty and downweights outliers.
+    use_heteroscedastic = cfg.get("model_kwargs", {}).get("predict_uncertainty", False)
+
     epochs = cfg.get("epochs", 50)
     grad_clip = cfg.get("grad_clip", 5.0)
 
@@ -481,8 +489,17 @@ def main() -> None:
                     total_loss = task_loss + adv_weight * adv_loss
                     adv_loss_val = adv_loss.item()
                 else:
-                    preds_norm = model(batch)
-                    task_loss = criterion(preds_norm, target_norm)
+                    model_out = model(batch)
+                    if use_heteroscedastic and isinstance(model_out, tuple):
+                        preds_norm, log_var = model_out
+                        # Heteroscedastic loss: |y-ŷ|·exp(-s) + s
+                        # s = log(σ²), clamped for numerical stability
+                        log_var = log_var.clamp(-6, 6)
+                        base_err = torch.abs(preds_norm - target_norm)
+                        task_loss = (base_err * torch.exp(-log_var) + log_var).mean()
+                    else:
+                        preds_norm = model_out if not isinstance(model_out, tuple) else model_out[0]
+                        task_loss = criterion(preds_norm, target_norm)
                     total_loss = task_loss
 
                 # Knowledge distillation loss
