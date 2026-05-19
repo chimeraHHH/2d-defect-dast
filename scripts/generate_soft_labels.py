@@ -59,7 +59,8 @@ def load_model_and_normalizer(ckpt_path, device):
     model.load_state_dict(state_dict)
     model.to(device).eval()
 
-    normalizer = Normalizer(torch.tensor([mean]))
+    transform = norm_data.get("transform", "none") if isinstance(norm_data, dict) else "none"
+    normalizer = Normalizer(torch.tensor([mean]), transform=transform)
     normalizer.mean = mean
     normalizer.std = std
     return model, normalizer

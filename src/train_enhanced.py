@@ -53,18 +53,31 @@ MODEL_REGISTRY = {
 
 
 class Normalizer:
-    def __init__(self, tensor: torch.Tensor) -> None:
+    def __init__(self, tensor: torch.Tensor, transform: str = "none") -> None:
+        self.transform = transform
+        if transform == "log":
+            tensor = torch.sign(tensor) * torch.log1p(torch.abs(tensor))
         self.mean = float(tensor.mean().item())
         self.std = float(tensor.std().item()) + 1e-6
 
+    def _fwd(self, t: torch.Tensor) -> torch.Tensor:
+        if self.transform == "log":
+            return torch.sign(t) * torch.log1p(torch.abs(t))
+        return t
+
+    def _inv(self, t: torch.Tensor) -> torch.Tensor:
+        if self.transform == "log":
+            return torch.sign(t) * torch.expm1(torch.abs(t))
+        return t
+
     def norm(self, t: torch.Tensor) -> torch.Tensor:
-        return (t - self.mean) / self.std
+        return (self._fwd(t) - self.mean) / self.std
 
     def denorm(self, t: torch.Tensor) -> torch.Tensor:
-        return t * self.std + self.mean
+        return self._inv(t * self.std + self.mean)
 
     def state_dict(self) -> Dict[str, float]:
-        return {"mean": self.mean, "std": self.std}
+        return {"mean": self.mean, "std": self.std, "transform": self.transform}
 
 
 def set_seed(seed: int) -> None:
@@ -282,7 +295,8 @@ def main() -> None:
     targets = torch.tensor(
         [dataset.data[i]["target"] for i in train_set.indices], dtype=torch.float32
     )
-    normalizer = Normalizer(targets)
+    target_transform = cfg.get("target_transform", "none")
+    normalizer = Normalizer(targets, transform=target_transform)
 
     # ---- Model ----
     model_cls = MODEL_REGISTRY[cfg["model"]]
