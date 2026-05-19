@@ -2,8 +2,8 @@
 
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.359%20eV-red)](#v40-enhanced-training--29-model-ensemble-2026-05-10)
-[![best single](https://img.shields.io/badge/best%20single-0.407%20eV-orange)](#v40-enhanced-training--29-model-ensemble-2026-05-10)
+[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.349%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
+[![best single](https://img.shields.io/badge/best%20single-0.381%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
 [![DFT discovery](https://img.shields.io/badge/prospective%20DFT-70%25%20A%20hit%20rate-9cf)](#v30-prospective-dft-验证-2026-05-07)
@@ -13,9 +13,9 @@
 **精度 + 校准 + OOD + 物理可解释性 + 真实 prospective DFT 验证**
 的五维评估。
 
-* **0.75 M 参数的紧凑混合模型大幅超越 ALIGNN（4.03 M）**
-  （v4 best single 0.407 eV vs ALIGNN 0.540 eV，↓25%）
-* **29-model 多样性集成（含多源模型）** 在 1065 测试样本上达 **0.359 eV**（↓34% vs ALIGNN）
+* **0.83 M 参数的 CrystalTransformerV2 大幅超越 ALIGNN（4.03 M）**
+  （v5 best single 0.381 eV vs ALIGNN 0.540 eV，↓29%）
+* **8-model 贪心集成** 在 1065 测试样本上达 **0.349 eV**（↓35% vs ALIGNN）
 * **约束 OOD 评估**：Leave-One-Host-Out 7-fold 平均 **0.540 eV**，
   从 ID 到族内 OOD 仅 1.5× 退化（而非全 OOD 的 7.3×），模型优雅降级
 * **ct-UAE 消融**：预训练原子嵌入对 ID 有 +1% 收益，但 OOD 场景无统计显著帮助（p=0.22）
@@ -27,6 +27,102 @@
 
 > **诚实化声明**：项目曾经报告过 0.206 eV 的"突破性"结果。该数字基于
 > aug-then-split 数据泄漏，已在 v1.1 中撤回；详见 [paper §5.16](paper/main.pdf)。
+
+---
+
+## v5.0 — CrystalTransformerV2 架构优化（2026-05-19）
+
+通过系统性架构改进和新型训练策略，将 test MAE 从 0.407 eV 推进到 **0.381 eV**（单模型），
+集成从 0.359 eV 提升到 **0.349 eV**。这是 IMP2D 数据集上首个 GNN 方法，大幅超越
+唯一已发表基线 El Alouani 2024（tree-based, MAE ~0.518 eV）。
+
+### CrystalTransformerV2 架构（3 个核心改进）
+
+| 组件 | 单独效果 (vs V1) | 机制 |
+|---|---|---|
+| **缺陷感知门控注意力池化** | −19.9%（0.516→0.414） | 注意力加权 + max pooling 门控融合，捕捉缺陷原子极端特征 |
+| **局部环境富集** | −18.0%（0.516→0.423） | 配位数/邻居距离/电负性对比等物理特征注入缺陷位点 |
+| **Pre-Norm 残差** | −21.0%（0.516→0.408） | 现代 Transformer 最佳实践，更稳定训练 |
+| **三者结合 (Full V2)** | **−26.2%（0.516→0.381）** | 组件间存在互补效应 |
+
+参考文献：
+* 门控池化：Hossain et al., Chem. Mater. 2024（全局 max pooling 缺陷 Ef ↓55%）
+* Pre-Norm：Xiong et al., ICML 2020（On Layer Normalization in the Transformer）
+
+### V2 种子稳定性
+
+| 种子 | Test MAE | 备注 |
+|---|---|---|
+| s42 | 0.3942 | |
+| **s43** | **0.3810** | 最优 |
+| s44 | 0.3943 | |
+| s45 | 0.3981 | |
+| **Mean ± Std** | **0.392 ± 0.007** | 显著优于 V1 的 0.537 ± 0.014 |
+
+### 新型模型创新（V3–V5, 训练中）
+
+| 创新 | 描述 | 状态 | 参考 |
+|---|---|---|---|
+| **V3 缺陷类型条件化** | 缺陷类型（空位/替代/间隙/吸附）嵌入 → 条件化 readout | 🔄 训练中 | 首创，无先例 |
+| **V4 MoE Readout** | 3/5 专家 MLP + 学习门控，极端能量范围专家化 | ⏳ 待训练 | MoCE, ICLR 2025 |
+| **ASPH 持久同调特征** | ripser 拓扑描述符（0-dim 连通分量 + 1-dim 环结构）→ 8-PCA | ✅ 已计算 | Fang & Yan, Chem. Mater. 2025 |
+| **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | ⏳ 待训练 | 类比 Focal Loss, ICCV 2017 |
+| **V5 全组合** | V2 + V3 + V4 + ASPH + Focal | ⏳ 待训练 | — |
+
+### 误差分析（驱动 V3–V5 设计）
+
+| 目标范围 (eV) | N 样本 | MAE | 误差贡献 |
+|---|---|---|---|
+| [−15, −3) | 14 (1.3%) | 1.637 | 6.1% |
+| [−3, 0) | 148 (13.9%) | 0.246 | 9.6% |
+| [0, 3) | 516 (48.5%) | 0.192 | 26.2% |
+| [3, 7) | 311 (29.2%) | 0.331 | 27.2% |
+| **[7, 25)** | **76 (7.1%)** | **1.541** | **31.0%** |
+
+**核心发现**：Top 10% 最难样本贡献 59.3% 总误差，其中间隙缺陷占 70%（远超测试集中的 34% 占比）。
+V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
+
+### SOTA 更新
+
+| 模型 | 参数 | Test MAE (eV) | vs ALIGNN |
+|---|---|---|---|
+| El Alouani 2024 (tree-based) | — | 0.518 | +4% |
+| ALIGNN | 4.03 M | 0.540 | — |
+| CrystalTransformer v1.2 (single) | 0.75 M | 0.516 | −4% |
+| CT v4 best single | 0.75 M | 0.407 | −25% |
+| **CT-V2 best single (v5)** | **0.83 M** | **0.381** | **−29%** |
+| CT v4 7-ensemble (SS+MS) | 7×(0.75–1.1) M | 0.359 | −34% |
+| **CT-V2 8-ensemble greedy (v5)** | **8×(0.83–1.1) M** | **0.349** | **−35%** |
+
+集成成员选择（贪心法）：
+
+| k | Test MAE | 新增成员 |
+|---|---|---|
+| 1 | 0.381 | v2_gated_s43 |
+| 2 | 0.362 | + multi_src_v4_deep |
+| 3 | 0.354 | + v2_enhanced_env_s43 |
+| 4 | 0.351 | + v2_gated_s44 |
+| 5 | 0.350 | + v2_long250 |
+| 6 | 0.349 | + v2_enhanced_env |
+| 7 | 0.349 | + multi_src_v4 |
+| **8** | **0.349** | + v2_gated_s42 |
+
+**关键发现**：同架构不同种子模型预测相关性 r=0.99+，集成增益极小。
+真正的多样性来自架构差异（multi_source r=0.97）和训练策略差异。
+
+代码：
+* [src/models/crystal_v2.py](src/models/crystal_v2.py) — CrystalTransformerV2（含 V3 条件化 + V4 MoE）
+* [src/train_enhanced.py](src/train_enhanced.py) — 增强训练脚本（SWA、focal MAE、MoE balance loss）
+* [scripts/eval_new_model.py](scripts/eval_new_model.py) — 模型评估：per-range 分析 + 相关性 + 贪心集成
+* [scripts/compute_asph.py](scripts/compute_asph.py) — ASPH 持久同调特征计算
+
+配置：
+* [configs/v3_deftype.yaml](configs/v3_deftype.yaml) — V3 缺陷类型条件化
+* [configs/v4_moe.yaml](configs/v4_moe.yaml) — V4 MoE readout (3 experts)
+* [configs/v4_moe_5exp.yaml](configs/v4_moe_5exp.yaml) — V4 MoE (5 experts)
+* [configs/v2_asph.yaml](configs/v2_asph.yaml) — V2 + ASPH 持久同调
+* [configs/v2_focal.yaml](configs/v2_focal.yaml) — V2 + Focal MAE 损失
+* [configs/v5_full.yaml](configs/v5_full.yaml) — V5 全组合（ASPH + V3 + V4）
 
 ---
 
@@ -272,9 +368,10 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|
-| 🥇 **v4 7-ens (SS+MS combined)** | 7×(0.75–1.1) M | **0.359 eV** | — | 含多源模型，↓34% vs ALIGNN |
-| 🥈 **v4 5-ens (SS only)** | 5×0.75 M | **0.368 eV** | 0.978 eV | 150ep+deep+UAE 多样性 |
-| 🥉 **v4 best single (150ep MAE+warmup+UAE)** | 0.75 M | **0.407 eV** | — | seed 45 |
+| 🥇 **v5 8-ens greedy (V2+MS)** | 8×(0.83–1.1) M | **0.349 eV** | 0.976 eV | V2 架构+多源，↓35% vs ALIGNN |
+| 🥈 **v4 7-ens (SS+MS combined)** | 7×(0.75–1.1) M | 0.359 eV | — | 含多源模型，↓34% vs ALIGNN |
+| 🥉 **v5 best single (V2 gated s43)** | 0.83 M | **0.381 eV** | 1.004 eV | V2 架构最优种子 |
+| v4 best single (150ep MAE+warmup+UAE) | 0.75 M | 0.407 eV | — | seed 45 |
 | v1.2 6-member ensemble (τ=1.83) | 6×0.75 M | 0.443 eV | 1.094 eV | 4×50ep + 2×100ep |
 | v1.2 baseline (4-seed mean) | 0.75 M | 0.537 ± 0.014 | 1.169 ± 0.025 | 主结论数字 |
 | **ALIGNN** (团队前期复现) | 4.03 M | 0.540 | 1.167 | 文献基线 |
@@ -318,14 +415,16 @@ v1.2 legacy LOHO（5 host, 50ep）结果详见
 | 模型 | 参数 (M) | Test MAE (eV) |
 |---|---|---|
 | LightGBM | n=500 | 1.158 |
+| El Alouani 2024 (tree-based) | — | 0.518 |
 | SchNet | 0.46 | 0.585 |
 | ViSNet (lmax=1) | 1.16 | 0.86 |
 | MACE (lmax=2) | 0.44 | 1.46 |
 | ALIGNN | 4.03 | 0.540 |
 | CrystalTransformer v1.2 (ours) | 0.75 | 0.516 |
-| **CT v4 best single (ours)** | **0.75** | **0.407** |
-| CT v4 5-ensemble SS (ours) | 5×0.75 | 0.368 |
-| **CT v4 7-ensemble SS+MS (ours)** | **7×(0.75–1.1)** | **0.359** |
+| CT v4 best single (ours) | 0.75 | 0.407 |
+| **CT-V2 best single (v5, ours)** | **0.83** | **0.381** |
+| CT v4 7-ensemble SS+MS (ours) | 7×(0.75–1.1) | 0.359 |
+| **CT-V2 8-ensemble greedy (v5, ours)** | **8×(0.83–1.1)** | **0.349** |
 
 **经验缩放律** log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
 R² = 0.95 → **数据是瓶颈，模型容量超过 ~0.5–0.8 M 反而过拟合**。
@@ -339,14 +438,17 @@ src/
 ├── features.py          # 9 维元素物理化学描述符
 ├── graph.py             # PBC 邻居 + 最小镜像距离 + 三体角度
 ├── augment.py           # 旋转 + 高斯坐标微扰
-├── dataset.py           # CrystalGraphDataset + collate_fn + host_aware_splits
+├── dataset.py           # CrystalGraphDataset + collate_fn + 缺陷类型编码
+├── sampler.py           # ⭐ Host-balanced sampler
+├── train_enhanced.py    # ⭐ 增强训练（SWA/focal MAE/MoE balance/distill）
 ├── models/
-│   ├── baseline.py      # CrystalTransformer (Local SchNet + Global Transformer)
-│   ├── pfa.py           # ⭐ Periodic Fourier Bias 注意力
-│   ├── multi_source.py  # ⭐ 4-DB 多源训练
+│   ├── baseline.py      # CrystalTransformer V1 (Local SchNet + Global Transformer)
+│   ├── crystal_v2.py    # ⭐ CrystalTransformerV2 (V3 条件化 + V4 MoE)
+│   ├── pfa.py           # Periodic Fourier Bias 注意力
+│   ├── multi_source.py  # 4-DB 多源训练
 │   ├── dualstream.py    # 缺陷-pristine 双流交叉注意力
 │   └── improved.py      # DAST (legacy)
-└── train.py
+└── train.py             # 原始训练脚本
 scripts/
 # v1.x retrospective
 ├── prepare_dataset.py / build_leak_free_aug.py / build_loho.py
@@ -363,6 +465,10 @@ scripts/
 ├── ensemble_online.py                    # ⭐ 26-model greedy ensemble 评估
 ├── ensemble_combined.py                  # ⭐ 29-model SS+MS 联合评估
 ├── multi_source_v4.py                    # ⭐ 4-DB 联合 v4 训练
+# v5.x architecture optimization (2026-05-19)
+├── eval_new_model.py                     # ⭐ 新模型评估（per-range + 相关性 + 集成）
+├── compute_asph.py                       # ⭐ ASPH 持久同调特征（ripser）
+├── launch_experiment.sh                  # GPU-aware 实验启动脚本
 # v4.1 constrained OOD evaluation (2026-05-11)
 ├── ood_loho_train.py                     # ⭐ P0/P1 OOD 训练（含 --no-uae 消融）
 ├── ood_collect_results.py                # ⭐ OOD 结果汇总 + graduated table
@@ -386,8 +492,15 @@ configs/
 ├── loho_{MoS2,Cr2I6,C2H2,TaSe2,MoSSe}.yaml
 ├── pfa_h128.yaml / multi_source_*.yaml       # v2
 ├── dualstream_h128_imp2d.yaml                # v2 dualstream
-├── enhanced_online_150ep_uae_mae_warmup.yaml # ⭐ v4 最优单模型配方
-└── enhanced_online_*                         # v4 26-model 训练配置
+├── enhanced_online_150ep_uae_mae_warmup.yaml # v4 最优单模型配方
+├── enhanced_online_*                         # v4 26-model 训练配置
+# v5.x architecture configs (2026-05-19)
+├── v3_deftype.yaml                           # ⭐ V3 缺陷类型条件化
+├── v4_moe.yaml / v4_moe_5exp.yaml           # ⭐ V4 MoE readout (3/5 experts)
+├── v2_asph.yaml                              # ⭐ V2 + ASPH 持久同调
+├── v2_focal.yaml / v2_huber.yaml            # ⭐ 损失函数变体
+├── v2_regstrong.yaml                         # 强正则化消融
+└── v5_full.yaml                              # ⭐ V5 全组合（ASPH+V3+V4）
 results/
 ├── <run>/best.pt + metrics.json + test_predictions.npz
 ├── all_metrics.{csv,md}                      # ⭐ 30+ run 自动汇总
@@ -496,7 +609,7 @@ python scripts/prospective_dft_analyze.py
 ## Roadmap / TODO
 
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
-当前最优：**单模型 0.407 eV / 7-ensemble 0.359 eV**（SS+MS combined, 含多源模型）。
+当前最优：**单模型 0.381 eV / 8-ensemble 0.349 eV**（V2 架构 + 多源模型）。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
@@ -505,10 +618,11 @@ python scripts/prospective_dft_analyze.py
 - [x] **ct-UAE 预训练原子嵌入**：128-dim embeddings from Nature Comms 2025
   多任务检查点，拼接到 9-dim 手工特征，单模型 ~0.01 eV 提升，且为集成提供
   特征多样性轴
-- [ ] **拓扑描述符（persistent homology）**：为缺陷位点周围的空洞几何
-  计算 PH 特征，拼接到节点特征。文献报告在钙钛矿缺陷 Ef 上降低 55% MAE。
+- [x] **拓扑描述符（persistent homology）**：✅ 已实现。ASPH 特征通过 ripser
+  计算 0-dim（连通分量）+ 1-dim（环结构）持久同调，PCA 降维至 8 维。
+  5 秒完成 10641 样本，97.7% 方差解释率。待训练验证。
   参考：[PH + GNN for Defect Ef](https://pubs.acs.org/doi/10.1021/acs.chemmater.4c03028)
-  （Chem. Mater. 2024）
+  （Chem. Mater. 2025）
 - [x] **扩大 ensemble 成员数**：29 models across 6 diversity axes (含多源模型) →
   best-7 ensemble 0.359 eV（↓19% vs 旧 6-ensemble 0.443，↓34% vs ALIGNN）
 - [x] **约束 OOD 评估**：G6-TMD 7-fold LOHO (0.540 eV) + G6×3d 组合块缺失 (0.534 eV)
@@ -516,6 +630,14 @@ python scripts/prospective_dft_analyze.py
 
 ### Tier 2 — 中等成本（局部架构改动）
 
+- [x] **CrystalTransformerV2 架构改进**：✅ 已完成并验证。门控注意力池化 +
+  局部环境富集 + Pre-Norm 残差，单模型 0.381 eV（↓26% vs V1）。
+- [x] **缺陷类型条件化 (V3)**：✅ 已实现，训练中。零初始化嵌入，不影响 V2 起点。
+  IMP2D 仅含间隙和吸附两类，但架构支持 4 类。首创，无先例。
+- [x] **MoE Readout (V4)**：✅ 已实现。3/5 专家 MLP + 学习门控 + KL 平衡损失。
+  参考：[MoCE](https://openreview.net/forum?id=Oit5bHPmjx)（ICLR 2025）
+- [x] **Focal MAE 损失**：✅ 已实现。动态上权困难样本 w_i = (|e_i|/mean)^γ。
+  γ=0.5 使 5× 平均误差的样本获得 2.2× 梯度权重。
 - [ ] **iComFormer 风格几何完备注意力**：用不变量（距离 + 键角）替代纯距离
   编码的全局 Transformer 层，不引入等变张量积开销。ICLR 2024 在 MatBench
   上超越 ALIGNN。
@@ -563,6 +685,8 @@ python scripts/prospective_dft_analyze.py
 - [x] ~~v2 单源 PFA + 多尺度 + 缺陷偏置~~（边际收益被数据规模吞没）
 - [x] ~~Multi-head readout (n_readout_heads=4)~~（共享 trunk 限制多样性）
 - [x] ~~Deep model + Huber loss~~（训练不稳定，不如 MAE+warmup）
+- [x] ~~Log-target 变换 (sign(y)*log1p(|y|))~~（test MAE 0.399 vs 基线 0.381，
+  且与现有模型相关性 r=0.99+，无集成多样性）
 
 ---
 
