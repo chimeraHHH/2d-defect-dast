@@ -26,6 +26,7 @@ class CrystalGraphDataset(Dataset):
         data_path: str | Path,
         feature_table_path: Optional[str | Path] = None,
         defect_mark_neighbors: int = 0,
+        asph_features_path: Optional[str | Path] = None,
     ) -> None:
         super().__init__()
         path = Path(data_path)
@@ -50,6 +51,19 @@ class CrystalGraphDataset(Dataset):
                 feature_table_path = ref
         self.atom_features = get_atom_feature_table(feature_table_path)
         self.defect_mark_neighbors = defect_mark_neighbors
+
+        # Optional ASPH (Atom-Specific Persistent Homology) features
+        self.asph_features: Optional[List[np.ndarray]] = None
+        if asph_features_path is not None:
+            asph_path = Path(asph_features_path)
+            if asph_path.exists():
+                with open(asph_path, "rb") as f:
+                    asph_data = pickle.load(f)
+                self.asph_features = asph_data["asph_features"]
+                n_comp = asph_data["n_components"]
+                print(f"Loaded ASPH features: {len(self.asph_features)} structures, "
+                      f"{n_comp} components, "
+                      f"explained variance={asph_data['explained_variance']:.3f}")
 
         # build defect-mark cache once: which atom index is the dopant?
         for sample in self.data:
@@ -95,6 +109,10 @@ class CrystalGraphDataset(Dataset):
         sample = self.data[idx]
         numbers = torch.from_numpy(sample["numbers"])
         x = self.atom_features[numbers]
+        # Concatenate ASPH features if available
+        if self.asph_features is not None:
+            asph = torch.from_numpy(self.asph_features[idx]).float()
+            x = torch.cat([x, asph], dim=-1)
         defect_mask = torch.from_numpy(sample["defect_mask"]).long()
         item = {
             "x": x,

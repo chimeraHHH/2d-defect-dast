@@ -220,7 +220,11 @@ def main() -> None:
 
     # Data split uses fixed split_seed (default 42) for reproducibility across ensemble members.
     # Model init uses cfg["seed"] which may differ per run.
-    dataset = CrystalGraphDataset(ROOT / cfg["data_path"])
+    asph_path = cfg.get("asph_features_path")
+    if asph_path:
+        asph_path = ROOT / asph_path
+    dataset = CrystalGraphDataset(ROOT / cfg["data_path"],
+                                   asph_features_path=asph_path)
     train_set, val_set, test_set = make_splits(
         dataset,
         train_ratio=cfg.get("train_ratio", 0.8),
