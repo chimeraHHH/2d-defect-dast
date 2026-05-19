@@ -521,6 +521,145 @@ class LocalEnvEnrichmentV2(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Physics-Motivated Dopant–Host Mismatch Features (V6)
+# ---------------------------------------------------------------------------
+class PhysicsFeatureModule(nn.Module):
+    """Graph-level dopant–host mismatch descriptors based on Hume-Rothery rules.
+
+    Computes 6 physics features that capture the fundamental drivers of defect
+    formation energy from the periodic table properties of dopant vs host atoms:
+
+      1. Size mismatch:  (r_d - ⟨r_h⟩) / ⟨r_h⟩
+         → elastic strain energy; Hume-Rothery's 15% rule predicts limited
+           solubility when |Δr/r| > 0.15.
+      2. EN difference:  χ_d - ⟨χ_h⟩  (signed)
+         → charge transfer direction & magnitude (Pauling).
+      3. IE ratio:  IE_d / ⟨IE_h⟩
+         → chemical hardness matching; related to Pearson's HSAB principle.
+      4. EA difference:  EA_d - ⟨EA_h⟩
+         → electron-accepting tendency; important for adsorbate binding.
+      5. Valence mismatch:  |VE_d - mode(VE_h)| / 8
+         → bonding compatibility: mismatched valence creates dangling bonds
+           or requires charge compensation.
+      6. Period distance:  period_d - ⟨period_h⟩  (signed)
+         → orbital overlap quality; same-period → better spatial match.
+
+    All features are computed from batch tensors via vectorised masked ops.
+    The final projection is zero-initialised so the module starts as a no-op,
+    preserving compatibility with pretrained V2 weights.
+
+    References:
+        Hume-Rothery W., "The Structure of Metals and Alloys" (1936).
+        Bartel C. J. et al., Sci. Adv. 6, eaaz0510 (2020) — elemental
+            feature importance for formation energy prediction.
+        Ward L. et al., npj Comput. Mater. 2, 16028 (2016) — Magpie
+            compositional descriptors.
+        Goodall R. E. A. & Lee A. A., Nature Commun. 11, 6280 (2020) —
+            Roost: compositional representation for property prediction.
+    """
+
+    N_FEATURES = 6
+
+    def __init__(self, hidden_dim: int) -> None:
+        super().__init__()
+        # Build raw (un-normalised) elemental property lookup tables as buffers.
+        # Index by atomic number Z; Z=0 is a padding placeholder.
+        from ..features import (
+            PAULING_EN, IONIZATION_ENERGY, ELECTRON_AFFINITY, GROUP, PERIOD,
+        )
+        from ase.data import covalent_radii as _cov_r
+
+        max_z = 100
+        cov_r = torch.zeros(max_z + 1)
+        en = torch.zeros(max_z + 1)
+        ie = torch.zeros(max_z + 1)
+        ea = torch.zeros(max_z + 1)
+        ve = torch.zeros(max_z + 1)
+        period = torch.zeros(max_z + 1)
+        for z in range(1, max_z + 1):
+            cov_r[z] = _cov_r[z]
+            en[z] = PAULING_EN[z]
+            ie[z] = IONIZATION_ENERGY[z]
+            ea[z] = ELECTRON_AFFINITY[z]
+            ve[z] = float(GROUP[z] if GROUP[z] <= 2 else (GROUP[z] - 10 if GROUP[z] >= 13 else GROUP[z]))
+            period[z] = float(PERIOD[z])
+
+        self.register_buffer("_cov_radius", cov_r)
+        self.register_buffer("_pauling_en", en)
+        self.register_buffer("_ionization_e", ie)
+        self.register_buffer("_electron_aff", ea)
+        self.register_buffer("_valence_e", ve)
+        self.register_buffer("_period", period)
+
+        # Projection: 6 raw physics features → hidden_dim
+        self.proj = nn.Sequential(
+            nn.Linear(self.N_FEATURES, hidden_dim // 2),
+            nn.SiLU(),
+            nn.Linear(hidden_dim // 2, hidden_dim),
+        )
+        # Zero-init so the module starts as a no-op (safe for pretrained ckpts)
+        nn.init.zeros_(self.proj[-1].weight)
+        nn.init.zeros_(self.proj[-1].bias)
+
+    def forward(
+        self,
+        atomic_numbers: torch.Tensor,
+        defect_mask: torch.Tensor,
+        atom_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Compute graph-level physics mismatch features.
+
+        Args:
+            atomic_numbers: (B, N_max) atomic numbers (long)
+            defect_mask: (B, N_max) int, 1 for defect atoms
+            atom_mask: (B, N_max) bool, True for valid atoms
+        Returns:
+            (B, hidden_dim) physics-conditioned representation
+        """
+        z = atomic_numbers.clamp(0, len(self._cov_radius) - 1)
+
+        # Look up all properties: (B, N_max)
+        r_all = self._cov_radius[z]
+        en_all = self._pauling_en[z]
+        ie_all = self._ionization_e[z]
+        ea_all = self._electron_aff[z]
+        ve_all = self._valence_e[z]
+        per_all = self._period[z]
+
+        # Masks: (B, N_max) float
+        defect_f = defect_mask.float()
+        host_f = ((~defect_mask.bool()) & atom_mask).float()
+        d_count = defect_f.sum(dim=1, keepdim=True).clamp(min=1.0)  # (B, 1)
+        h_count = host_f.sum(dim=1, keepdim=True).clamp(min=1.0)    # (B, 1)
+
+        # Weighted means for dopant and host
+        d_r = (r_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_r = (r_all * host_f).sum(1) / h_count.squeeze(1)
+        d_en = (en_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_en = (en_all * host_f).sum(1) / h_count.squeeze(1)
+        d_ie = (ie_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_ie = (ie_all * host_f).sum(1) / h_count.squeeze(1)
+        d_ea = (ea_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_ea = (ea_all * host_f).sum(1) / h_count.squeeze(1)
+        d_ve = (ve_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_ve = (ve_all * host_f).sum(1) / h_count.squeeze(1)
+        d_per = (per_all * defect_f).sum(1) / d_count.squeeze(1)
+        h_per = (per_all * host_f).sum(1) / h_count.squeeze(1)
+
+        # Compute 6 physics features: (B,) each
+        f1 = (d_r - h_r) / h_r.clamp(min=0.1)               # size mismatch
+        f2 = d_en - h_en                                      # EN difference
+        f3 = d_ie / h_ie.clamp(min=0.1)                      # IE ratio
+        f4 = d_ea - h_ea                                      # EA difference
+        f5 = (d_ve - h_ve).abs() / 8.0                       # valence mismatch
+        f6 = (d_per - h_per) / 3.0                            # period distance
+
+        features = torch.stack([f1, f2, f3, f4, f5, f6], dim=-1)  # (B, 6)
+
+        return self.proj(features)  # (B, hidden_dim)
+
+
+# ---------------------------------------------------------------------------
 # CrystalTransformerV2
 # ---------------------------------------------------------------------------
 class CrystalTransformerV2(nn.Module):
@@ -561,6 +700,8 @@ class CrystalTransformerV2(nn.Module):
         use_moe_readout: bool = False,
         n_moe_experts: int = 3,
         moe_balance_weight: float = 0.01,
+        # V6: Physics-motivated dopant–host mismatch
+        use_physics_features: bool = False,
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -592,6 +733,13 @@ class CrystalTransformerV2(nn.Module):
             nn.init.zeros_(self.defect_type_embed.weight)  # start as no-op
         else:
             self.defect_type_embed = None
+
+        # --- Physics features (V6): dopant–host mismatch ---
+        self.use_physics_features = use_physics_features
+        if use_physics_features:
+            self.physics_module = PhysicsFeatureModule(hidden_dim)
+        else:
+            self.physics_module = None
 
         # --- Local environment enrichment ---
         self.use_env_enrichment = use_env_enrichment
@@ -803,6 +951,12 @@ class CrystalTransformerV2(nn.Module):
             dt = batch.get("defect_type")
             if dt is not None:
                 pooled = pooled + self.defect_type_embed(dt)
+
+        # --- Physics features (V6): dopant–host mismatch conditioning ---
+        if self.use_physics_features and self.physics_module is not None:
+            z_batch = batch.get("atomic_numbers")
+            if z_batch is not None and defect_mask is not None:
+                pooled = pooled + self.physics_module(z_batch, defect_mask, mask)
 
         if return_hidden:
             # For knowledge distillation — return both prediction and hidden
