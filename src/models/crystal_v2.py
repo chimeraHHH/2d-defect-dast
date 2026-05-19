@@ -185,6 +185,66 @@ class DefectAwarePooling(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Defect–Host Contrast Conditioning (V9)
+# ---------------------------------------------------------------------------
+class DefectHostContrast(nn.Module):
+    """Explicit defect–host representation contrast.
+
+    Formation energy is fundamentally a *difference* between the defect
+    crystal and the pristine host.  This module separately pools defect
+    and host atom representations and computes their contrast, giving
+    the readout direct access to this difference signal.
+
+    Motivated by Siamese contrastive architectures and the physics of
+    defect formation: Ef ≈ E(defective) − E(pristine).
+
+    Output is zero-initialised so the module starts as a no-op.
+    """
+
+    def __init__(self, hidden_dim: int) -> None:
+        super().__init__()
+        self.proj = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.SiLU(),
+            nn.Linear(hidden_dim // 2, hidden_dim),
+        )
+        # Zero-init so the module has no effect at initialisation
+        nn.init.zeros_(self.proj[-1].weight)
+        nn.init.zeros_(self.proj[-1].bias)
+
+    def forward(
+        self,
+        h: torch.Tensor,
+        mask: torch.Tensor,
+        defect_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Compute defect–host contrast vector.
+
+        Args:
+            h: (B, N, C) atom representations after global layers
+            mask: (B, N) bool, True for valid atoms
+            defect_mask: (B, N) int/bool, 1 for defect atoms
+        Returns:
+            (B, C) contrast-conditioned representation (to be added to pooled)
+        """
+        defect_m = defect_mask.bool() & mask         # (B, N)
+        host_m = (~defect_mask.bool()) & mask        # (B, N)
+
+        # Mean-pool defect atoms
+        d_count = defect_m.float().sum(dim=1, keepdim=True).clamp(min=1.0)  # (B, 1)
+        h_defect = (h * defect_m.float().unsqueeze(-1)).sum(dim=1) / d_count  # (B, C)
+
+        # Mean-pool host atoms
+        h_count = host_m.float().sum(dim=1, keepdim=True).clamp(min=1.0)
+        h_host = (h * host_m.float().unsqueeze(-1)).sum(dim=1) / h_count     # (B, C)
+
+        # Contrast: difference between defect and host representations
+        contrast = h_defect - h_host  # (B, C)
+
+        return self.proj(contrast)  # (B, C)
+
+
+# ---------------------------------------------------------------------------
 # Mixture-of-Experts Readout (V4)
 # ---------------------------------------------------------------------------
 class MoEReadout(nn.Module):
@@ -704,6 +764,8 @@ class CrystalTransformerV2(nn.Module):
         use_physics_features: bool = False,
         # JK: Jumping Knowledge aggregation over layers
         use_jk_aggregation: bool = False,
+        # V9: Defect–host contrast conditioning
+        use_contrast_conditioning: bool = False,
         # Uncertainty head: predict log-variance alongside Ef
         predict_uncertainty: bool = False,
     ) -> None:
@@ -744,6 +806,13 @@ class CrystalTransformerV2(nn.Module):
             self.physics_module = PhysicsFeatureModule(hidden_dim)
         else:
             self.physics_module = None
+
+        # --- Defect–host contrast conditioning (V9) ---
+        self.use_contrast_conditioning = use_contrast_conditioning
+        if use_contrast_conditioning:
+            self.contrast_module = DefectHostContrast(hidden_dim)
+        else:
+            self.contrast_module = None
 
         # --- Local environment enrichment ---
         self.use_env_enrichment = use_env_enrichment
@@ -996,6 +1065,11 @@ class CrystalTransformerV2(nn.Module):
             z_batch = batch.get("atomic_numbers")
             if z_batch is not None and defect_mask is not None:
                 pooled = pooled + self.physics_module(z_batch, defect_mask, mask)
+
+        # --- Defect–host contrast conditioning (V9) ---
+        if self.use_contrast_conditioning and self.contrast_module is not None:
+            if defect_mask is not None:
+                pooled = pooled + self.contrast_module(h_global, mask, defect_mask)
 
         # --- Compute prediction ---
         if self.use_moe_readout:
