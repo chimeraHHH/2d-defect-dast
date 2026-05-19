@@ -25,7 +25,7 @@ echo ""
 
 # Running experiments
 echo "┌─ ACTIVE TRAINING ──────────────────────────────────┐"
-for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v13_rnc v2_ema v10_best_combo; do
+for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v13_rnc v14_jk v2_ema v10_best_combo; do
     logfile="results/$dir/nohup.log"
     if [ -f "$logfile" ]; then
         latest=$(tail -1 "$logfile" 2>/dev/null)
@@ -60,7 +60,7 @@ echo ""
 
 # Best checkpoints
 echo "┌─ CHECKPOINTS ──────────────────────────────────────┐"
-for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v13_rnc v2_ema; do
+for dir in v3_deftype v4_moe v6_physics v9_contrast v11_lds v12_lds_physics v13_rnc v14_jk v2_ema; do
     if [ -f "results/$dir/best.pt" ]; then
         size=$(du -h "results/$dir/best.pt" | cut -f1)
         echo "│  $dir: best.pt ($size)"
@@ -71,7 +71,7 @@ echo ""
 
 # Queue
 echo "┌─ QUEUE (waiting) ──────────────────────────────────┐"
-for dir in v9_contrast v11_lds v12_lds_physics v13_rnc v2_ema v10_best_combo v2_focal v2_uncertainty; do
+for dir in v9_contrast v11_lds v12_lds_physics v13_rnc v14_jk v2_ema v10_best_combo v2_focal v2_uncertainty; do
     if [ -f "results/$dir/test_predictions.npz" ] && [ -f "results/$dir/metrics.json" ]; then
         n_ep=$(/home/huayiming/.conda/envs/yiminghua/bin/python -c "import json; m=json.load(open('results/$dir/metrics.json')); print(len(m.get('history',[])))" 2>/dev/null || echo "0")
         if [ "$n_ep" -ge 20 ] 2>/dev/null; then

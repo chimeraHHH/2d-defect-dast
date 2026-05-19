@@ -800,6 +800,7 @@ def main() -> None:
                     "normalizer": normalizer.state_dict(),
                     "config": cfg,
                     "epoch": epoch,
+                    "best_val_mae": best_val_mae,
                 }
                 if aux_defect_head is not None:
                     save_dict["aux_defect_head"] = aux_defect_head.state_dict()

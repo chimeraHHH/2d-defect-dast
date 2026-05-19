@@ -1,0 +1,73 @@
+# V14: Jumping Knowledge Aggregation
+#
+# Xu et al., "Representation Learning on Graphs with Jumping Knowledge
+# Networks", ICML 2018.
+#
+# Standard GNNs only use the final layer's representation for readout, but
+# different layers capture different scales of information:
+#   - Local layers: bonding geometry, nearest-neighbor environment
+#   - Global layer 1: medium-range host structure
+#   - Global layer 2: full crystal context
+#
+# JK learns softmax attention weights over all layer outputs, letting the
+# readout adaptively blend local and global features per-atom. For defect
+# formation energy, this is physically motivated: some defects (adsorbates)
+# are highly local while others (substitutions in ionic hosts) depend on
+# long-range electrostatics.
+#
+# Combined with EMA + defect-type conditioning for best baseline comparison.
+model: v2
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: results/v14_jk
+seed: 42
+batch_size: 64
+epochs: 150
+train_ratio: 0.8
+val_ratio: 0.1
+loss: mae
+grad_clip: 5.0
+online_aug: true
+online_aug_cfg:
+  sigma_range: [0.01, 0.05]
+  strain_range: 2.0
+  rotate_prob: 1.0
+  perturb_prob: 0.8
+  strain_prob: 0.3
+host_balanced: true
+samples_per_host: 200
+aux_defect_weight: 0.1
+drop_path_rate: 0.1
+label_noise_std: 0.03
+# EMA (Polyak 1992 / Mean Teacher NeurIPS 2017)
+use_ema: true
+ema_decay: 0.999
+use_swa: true
+swa_start_epoch: 120
+swa_lr: 1.0e-4
+pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+scheduler_type: cosine
+warmup_epochs: 10
+optimizer:
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+scheduler:
+  eta_min: 1.0e-6
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  use_gated_pooling: true
+  use_env_enrichment: true
+  use_prenorm_local: true
+  # JK aggregation (Xu et al. ICML 2018)
+  use_jk_aggregation: true
+  # Defect-type conditioning (synergy test with JK)
+  use_defect_type_cond: true
+  n_defect_types: 4

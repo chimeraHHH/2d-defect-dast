@@ -7,10 +7,12 @@
 #   2. v9_contrast  — Defect-host contrast conditioning (novel, physically motivated)
 #   3. v11_lds      — Label Distribution Smoothing (Yang et al., ICML 2021)
 #   4. v12_lds_phys — LDS + physics + deftype + contrast (full synergy)
-#   5. v2_ema       — EMA baseline (ablation: does EMA help V2?)
-#   6. v10_best     — All best innovations combined
-#   7. v2_focal     — Focal MAE loss for hard samples
-#   8. v2_uncertainty — Heteroscedastic loss (Kendall & Gal, NeurIPS 2017)
+#   5. v13_rnc      — Rank-N-Contrast loss (Zha et al., NeurIPS 2023)
+#   6. v14_jk       — Jumping Knowledge aggregation (Xu et al., ICML 2018)
+#   7. v2_ema       — EMA baseline (ablation: does EMA help V2?)
+#   8. v10_best     — All best innovations combined
+#   9. v2_focal     — Focal MAE loss for hard samples
+#  10. v2_uncertainty — Heteroscedastic loss (Kendall & Gal, NeurIPS 2017)
 #
 # Skip N experiments to launch a lower-priority one.
 
@@ -32,6 +34,7 @@ declare -a CONFIGS=(
     "configs/v11_lds.yaml"
     "configs/v12_lds_physics.yaml"
     "configs/v13_rnc.yaml"
+    "configs/v14_jk.yaml"
     "configs/v2_ema.yaml"
     "configs/v10_best_combo.yaml"
     "configs/v2_focal.yaml"
@@ -44,6 +47,7 @@ declare -a NAMES=(
     "v11_lds"
     "v12_lds_physics"
     "v13_rnc"
+    "v14_jk"
     "v2_ema"
     "v10_best_combo"
     "v2_focal"

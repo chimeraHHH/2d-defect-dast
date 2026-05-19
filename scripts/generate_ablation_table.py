@@ -49,6 +49,7 @@ INNOVATIONS = {
     "v11_lds": {"label": "+ LDS (V11)", "innovations": ["lds"]},
     "v12_lds_physics": {"label": "LDS+Phys+Cond (V12)", "innovations": ["lds", "physics", "deftype", "contrast"]},
     "v13_rnc": {"label": "+ RnC + LDS (V13)", "innovations": ["rnc", "lds"]},
+    "v14_jk": {"label": "+ JK aggregation (V14)", "innovations": ["jk", "deftype"]},
     # Combined
     "v8_ema_physics": {"label": "EMA + Physics + Deftype", "innovations": ["ema", "physics", "deftype"]},
     "v10_best_combo": {"label": "V10 (all best)", "innovations": ["ema", "physics", "deftype", "contrast", "jk"]},
@@ -172,7 +173,7 @@ def main():
         # Individual innovations
         "v3_deftype", "v4_moe", "v6_physics", "v9_contrast",
         "v2_ema", "v2_asph", "v2_focal", "v2_uncertainty",
-        "v11_lds", "v12_lds_physics", "v13_rnc",
+        "v11_lds", "v12_lds_physics", "v13_rnc", "v14_jk",
         # Combined
         "v8_ema_physics", "v10_best_combo", "v7_all",
         # Distillation
