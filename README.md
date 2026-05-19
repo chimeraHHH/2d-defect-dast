@@ -49,6 +49,19 @@
 * 门控池化：Hossain et al., Chem. Mater. 2024（全局 max pooling 缺陷 Ef ↓55%）
 * Pre-Norm：Xiong et al., ICML 2020（On Layer Normalization in the Transformer）
 
+### 与最新文献的对比定位
+
+本工作是 **首个针对二维材料缺陷 Ef 的物理驱动 GNN-Transformer 方法**（截至 2025 年无同类工作）：
+
+| 方法 | 发表 | 数据集 | 关键创新 | 与本工作的关系 |
+|---|---|---|---|---|
+| DefiNet | npj Comput. Mater. 2025 | 14866 bulk defects | 等变 GNN + 显式缺陷标记 | 我们也使用缺陷标记，但结合 Transformer 注意力 |
+| PH+GNN | Chem. Mater. 2025 | bulk defects | 持久同调 → GNN (MAE↓55%) | 我们实现了 ASPH 并整合到 Transformer 架构 |
+| Charged Ef | PRL 2025 | 氧空位 | CGCNN + 费米能级对齐 | 针对带电缺陷，我们针对中性 2D 缺陷 |
+| dGNN | Nature Comput. Sci. 2024 | bulk defects | 缺陷特定图构建 + 池化 | 我们的 V3 条件化 + V2 门控池化类似但更通用 |
+| CLOUD | Nature Commun. 2025 | 百万级预训练 | 物理约束基础模型 | 互补：我们可用 CLOUD 嵌入替代 ct-UAE |
+| MACE/CHGNet | Small 2025 | 86259 空位 | 通用 ML 势 benchmark | MACE RMSE 0.46–0.80 eV，我们的方法在 2D 上更精确 |
+
 ### V2 种子稳定性
 
 | 种子 | Test MAE | 备注 |
