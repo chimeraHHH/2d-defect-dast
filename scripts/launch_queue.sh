@@ -57,10 +57,13 @@ for i in "${!CONFIGS[@]}"; do
     name="${NAMES[$i]}"
     outdir="results/$name"
 
-    # Skip if already completed (has test_predictions.npz)
-    if [ -f "$outdir/test_predictions.npz" ]; then
-        echo "SKIP $name: already completed"
-        continue
+    # Skip if already completed (test_predictions.npz from 20+ epoch run)
+    if [ -f "$outdir/test_predictions.npz" ] && [ -f "$outdir/metrics.json" ]; then
+        n_epochs=$(python3 -c "import json; m=json.load(open('$outdir/metrics.json')); print(len(m.get('history',[])))" 2>/dev/null || echo "0")
+        if [ "$n_epochs" -ge 20 ] 2>/dev/null; then
+            echo "SKIP $name: completed ($n_epochs epochs)"
+            continue
+        fi
     fi
     # Skip if already running
     if pgrep -f "$config" > /dev/null 2>&1; then
