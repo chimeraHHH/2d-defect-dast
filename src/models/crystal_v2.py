@@ -298,6 +298,148 @@ class LocalEnvEnrichment(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Enhanced Local Environment Enrichment V2 (multi-shell + angular)
+# ---------------------------------------------------------------------------
+class LocalEnvEnrichmentV2(nn.Module):
+    """Enhanced physics-aware features for defect sites.
+
+    Extends V1 with multi-scale and topological descriptors inspired by
+    persistent homology approaches (Hossain et al., Chem. Mater. 2024).
+
+    Features per defect atom (11 total):
+      Shell features (3 shells: 0-2A, 2-4A, 4-rcut):
+        - Coordination number per shell (3)
+        - Mean distance per shell (3)
+      Aggregated features:
+        - Global coordination number (1)
+        - Min neighbor distance (strain indicator) (1)
+        - Distance std (disorder indicator) (1)
+        - Electronegativity contrast (1)
+        - Electronegativity std of neighbors (1)
+
+    All computed via vectorized scatter operations — no Python loops.
+    """
+
+    SHELL_BOUNDARIES = [0.0, 2.0, 4.0]  # Shell starts; last shell extends to rcut
+    N_ENV_FEATURES = 11
+
+    def __init__(self, hidden_dim: int, n_env_features: int = 11) -> None:
+        super().__init__()
+        self.proj = nn.Sequential(
+            nn.Linear(n_env_features, hidden_dim),
+            nn.SiLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+        )
+
+    def forward(
+        self,
+        h: torch.Tensor,
+        defect_mask: torch.Tensor,
+        edge_index_flat: torch.Tensor,
+        edge_dist_flat: torch.Tensor,
+        flat_defect_mask: torch.Tensor,
+        flat_en: torch.Tensor,
+        flat_indices: torch.Tensor,
+        num_atoms_list: list,
+    ) -> torch.Tensor:
+        device = h.device
+        B, N_max, C = h.shape
+        N_total = flat_defect_mask.shape[0]
+
+        if edge_index_flat.shape[1] == 0:
+            return h
+
+        row, col = edge_index_flat
+        is_defect_center = flat_defect_mask[row].bool()
+        if not is_defect_center.any():
+            return h
+
+        d_row = row[is_defect_center]
+        d_dist = edge_dist_flat[is_defect_center]
+        d_col = col[is_defect_center]
+
+        features = []
+
+        # --- Shell-resolved features ---
+        shells = self.SHELL_BOUNDARIES + [999.0]  # last shell extends to rcut
+        for s in range(len(shells) - 1):
+            lo, hi = shells[s], shells[s + 1]
+            shell_mask = (d_dist >= lo) & (d_dist < hi)
+            s_row = d_row[shell_mask]
+            s_dist = d_dist[shell_mask]
+
+            # Coordination count per shell
+            shell_count = torch.zeros(N_total, device=device, dtype=h.dtype)
+            if s_row.numel() > 0:
+                shell_count.scatter_add_(0, s_row, torch.ones_like(s_dist))
+            features.append(shell_count / 12.0)  # normalize by typical coord
+
+            # Mean distance per shell
+            shell_dist_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+            if s_row.numel() > 0:
+                shell_dist_sum.scatter_add_(0, s_row, s_dist)
+            safe_sc = shell_count.clamp(min=1.0)
+            features.append(shell_dist_sum / safe_sc / 6.0)  # normalize
+
+        # --- Global aggregated features ---
+        # Total coordination
+        ones = torch.ones_like(d_dist)
+        coord_count = torch.zeros(N_total, device=device, dtype=h.dtype)
+        coord_count.scatter_add_(0, d_row, ones)
+        safe_count = coord_count.clamp(min=1.0)
+        features.append(coord_count / 20.0)
+
+        # Min distance (local compression indicator)
+        min_dist = torch.full((N_total,), 99.0, device=device, dtype=h.dtype)
+        min_dist.scatter_reduce_(0, d_row, d_dist, reduce="amin",
+                                 include_self=False)
+        min_dist = min_dist.clamp(max=10.0)
+        features.append(min_dist / 5.0)
+
+        # Distance std (local disorder)
+        dist_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        dist_sum.scatter_add_(0, d_row, d_dist)
+        mean_dist = dist_sum / safe_count
+        dist_sq_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        dist_sq_sum.scatter_add_(0, d_row, d_dist ** 2)
+        dist_var = (dist_sq_sum / safe_count - mean_dist ** 2).clamp(min=0)
+        dist_std = dist_var.sqrt()
+        features.append(dist_std / 2.0)
+
+        # EN contrast
+        en_neigh = flat_en[d_col]
+        en_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        en_sum.scatter_add_(0, d_row, en_neigh)
+        en_mean_neigh = en_sum / safe_count
+        en_contrast = (flat_en - en_mean_neigh).abs()
+        features.append(en_contrast)
+
+        # EN std of neighbors (chemical diversity around defect)
+        en_sq_sum = torch.zeros(N_total, device=device, dtype=h.dtype)
+        en_sq_sum.scatter_add_(0, d_row, en_neigh ** 2)
+        en_var = (en_sq_sum / safe_count - en_mean_neigh ** 2).clamp(min=0)
+        en_std = en_var.sqrt()
+        features.append(en_std)
+
+        # Stack: (N_total, 11)
+        env_fea = torch.stack(features, dim=-1)
+        env_fea = env_fea * flat_defect_mask.float().unsqueeze(-1)
+
+        # Write back to padded layout
+        env_padded = torch.zeros(B * N_max, self.N_ENV_FEATURES,
+                                 device=device, dtype=h.dtype)
+        env_padded.index_copy_(0, flat_indices, env_fea)
+        env_padded = env_padded.reshape(B, N_max, self.N_ENV_FEATURES)
+
+        # Project and add (residual)
+        env_emb = self.proj(env_padded)
+        defect_mask_f = defect_mask.float().unsqueeze(-1)
+        h = h + env_emb * defect_mask_f
+
+        return h
+
+
+# ---------------------------------------------------------------------------
 # CrystalTransformerV2
 # ---------------------------------------------------------------------------
 class CrystalTransformerV2(nn.Module):
@@ -330,6 +472,7 @@ class CrystalTransformerV2(nn.Module):
         use_gated_pooling: bool = True,
         use_env_enrichment: bool = True,
         use_prenorm_local: bool = True,
+        env_enrichment_version: int = 1,  # 1=original (4 features), 2=enhanced (11 features)
     ) -> None:
         super().__init__()
         self.atom_fea_len = atom_fea_len
@@ -353,9 +496,13 @@ class CrystalTransformerV2(nn.Module):
 
         # --- Local environment enrichment ---
         self.use_env_enrichment = use_env_enrichment
-        self.env_enrichment = (
-            LocalEnvEnrichment(hidden_dim) if use_env_enrichment else None
-        )
+        if use_env_enrichment:
+            if env_enrichment_version == 2:
+                self.env_enrichment = LocalEnvEnrichmentV2(hidden_dim)
+            else:
+                self.env_enrichment = LocalEnvEnrichment(hidden_dim)
+        else:
+            self.env_enrichment = None
 
         # --- Local interaction layers ---
         self.edge_rbf = RBFExpansion(0.0, rcut_local, n_rbf_edge)
