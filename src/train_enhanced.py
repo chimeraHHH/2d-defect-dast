@@ -830,6 +830,14 @@ def main() -> None:
             print(line)
             logf.write(line + "\n")
             logf.flush()
+
+            # Incremental metrics save (every epoch) for monitoring
+            _partial = {
+                "config": cfg, "n_params": n_params, "history": history,
+                "best_val_mae": best_val_mae,
+            }
+            with open(metrics_path, "w") as _mf:
+                json.dump(_partial, _mf, indent=2)
             if args.max_steps and global_step >= args.max_steps:
                 break
 
