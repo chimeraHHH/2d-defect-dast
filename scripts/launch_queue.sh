@@ -2,12 +2,14 @@
 # Launch next experiment from priority queue on a specified GPU.
 # Usage: bash scripts/launch_queue.sh <gpu_id> [--skip N]
 #
-# Priority order (most informative → least):
-#   1. v4_moe       — MoE readout for extreme-Ef specialization
-#   2. v2_asph      — ASPH topological features (55% MAE reduction in literature)
-#   3. v7_all       — All innovations combined
-#   4. v2_uncertainty — Heteroscedastic loss
-#   5. v2_focal     — Focal MAE loss
+# Priority order (most informative for paper → least):
+#   1. v4_moe       — MoE readout for energy-range specialization (ICLR 2025)
+#   2. v9_contrast  — Defect-host contrast conditioning (novel, physically motivated)
+#   3. v2_ema       — EMA baseline (ablation: does EMA help V2?)
+#   4. v10_best     — All best innovations combined
+#   5. v2_asph      — ASPH persistent homology features
+#   6. v2_focal     — Focal MAE loss for hard samples
+#   7. v2_uncertainty — Heteroscedastic loss (Kendall & Gal, NeurIPS 2017)
 #
 # Skip N experiments to launch a lower-priority one.
 
@@ -25,18 +27,22 @@ fi
 # Priority queue
 declare -a CONFIGS=(
     "configs/v4_moe.yaml"
+    "configs/v9_contrast.yaml"
+    "configs/v2_ema.yaml"
+    "configs/v10_best_combo.yaml"
     "configs/v2_asph.yaml"
-    "configs/v7_all.yaml"
-    "configs/v2_uncertainty.yaml"
     "configs/v2_focal.yaml"
+    "configs/v2_uncertainty.yaml"
 )
 
 declare -a NAMES=(
     "v4_moe"
+    "v9_contrast"
+    "v2_ema"
+    "v10_best_combo"
     "v2_asph"
-    "v7_all"
-    "v2_uncertainty"
     "v2_focal"
+    "v2_uncertainty"
 )
 
 # Find next un-launched experiment
@@ -46,11 +52,12 @@ for i in "${!CONFIGS[@]}"; do
     name="${NAMES[$i]}"
     outdir="results/$name"
 
-    # Skip if already running or completed
-    if [ -f "$outdir/metrics.json" ]; then
+    # Skip if already completed (has test_predictions.npz)
+    if [ -f "$outdir/test_predictions.npz" ]; then
         echo "SKIP $name: already completed"
         continue
     fi
+    # Skip if already running
     if pgrep -f "$config" > /dev/null 2>&1; then
         echo "SKIP $name: already running"
         continue
