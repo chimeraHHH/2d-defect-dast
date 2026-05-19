@@ -127,7 +127,7 @@ def analyse_model(model_dir, device="cuda"):
 
     # ── Collect predictions + attention ──────────────────────────────
     all_preds, all_targets = [], []
-    all_defect_attn_ratios = []  # ratio of attn on defect vs non-defect atoms
+    all_defect_attn_fracs = []  # fraction of total attention on defect atoms
     all_hosts = []
     all_dopants = []
 
@@ -150,12 +150,14 @@ def analyse_model(model_dir, device="cuda"):
                     h = (~defect_mask[i].bool()) & m
                     if d.sum() > 0 and h.sum() > 0:
                         defect_attn = attn[i][d].sum().item()
-                        host_attn = attn[i][h].sum().item()
+                        total_attn = attn[i][m].sum().item()
                         n_defect = d.sum().item()
-                        n_host = h.sum().item()
-                        # Normalized ratio: (attn_per_defect / attn_per_host)
-                        ratio = (defect_attn / n_defect) / max(host_attn / n_host, 1e-8)
-                        all_defect_attn_ratios.append(ratio)
+                        n_total = m.sum().item()
+                        # Fraction of total attention on defect atoms
+                        frac = defect_attn / max(total_attn, 1e-8)
+                        # Expected fraction if uniform
+                        expected = n_defect / n_total
+                        all_defect_attn_fracs.append((frac, expected, n_total))
 
         # Collect host/dopant info if available
         if "host_formula" in batch:
@@ -187,19 +189,30 @@ def analyse_model(model_dir, device="cuda"):
             print("  [%d,%d): MAE=%.4f  RMSE=%.4f  bias=%+.4f  n=%d"
                   % (lo, hi, r_mae, r_rmse, bias, mask.sum()))
 
+    # ── Bias analysis ────────────────────────────────────────────────
+    print("\nPrediction bias analysis:")
+    signed_err = preds - targets
+    print("  Overall bias: %+.4f eV" % signed_err.mean())
+    print("  Pred std / Target std: %.3f (compression ratio)"
+          % (preds.std() / targets.std()))
+
     # ── Attention analysis ───────────────────────────────────────────
-    if all_defect_attn_ratios:
-        ratios = np.array(all_defect_attn_ratios)
-        print("\nAttention defect/host ratio:")
-        print("  Mean: %.2fx (defect atoms get %.1fx more attention per atom)"
-              % (ratios.mean(), ratios.mean()))
-        print("  Median: %.2fx" % np.median(ratios))
-        print("  Std: %.2f" % ratios.std())
+    if all_defect_attn_fracs:
+        fracs = np.array([f[0] for f in all_defect_attn_fracs])
+        expected = np.array([f[1] for f in all_defect_attn_fracs])
+        n_atoms = np.array([f[2] for f in all_defect_attn_fracs])
+        concentration = fracs / np.clip(expected, 1e-8, None)
+        print("\nAttention concentration on defect atoms:")
+        print("  Mean defect attn fraction: %.4f (expected if uniform: %.4f)"
+              % (fracs.mean(), expected.mean()))
+        print("  Concentration factor: %.1fx (1.0 = uniform)" % concentration.mean())
+        print("  Median concentration: %.1fx" % np.median(concentration))
+        print("  Min/Max conc: %.1f / %.1f" % (concentration.min(), concentration.max()))
 
         # Correlation with error
-        if len(ratios) == len(errors):
-            corr = np.corrcoef(ratios, errors)[0, 1]
-            print("  Correlation(attn_ratio, |error|): %.3f" % corr)
+        if len(fracs) == len(errors):
+            corr = np.corrcoef(concentration, errors)[0, 1]
+            print("  Correlation(concentration, |error|): %.3f" % corr)
 
     # ── JK weights analysis ──────────────────────────────────────────
     if hasattr(model, "use_jk_aggregation") and model.use_jk_aggregation:
@@ -284,17 +297,19 @@ def analyse_model(model_dir, device="cuda"):
         fig.savefig(fig_dir / "error_distribution.png")
         plt.close()
 
-        # 3. Attention ratio histogram (if available)
-        if all_defect_attn_ratios:
+        # 3. Attention concentration histogram (if available)
+        if all_defect_attn_fracs:
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.hist(ratios, bins=50, color="#9b59b6", alpha=0.7, edgecolor="white")
-            ax.axvline(ratios.mean(), color="red", ls="--",
-                      label="Mean=%.1fx" % ratios.mean())
-            ax.set_xlabel("Defect/Host Attention Ratio")
+            ax.hist(fracs, bins=50, color="#9b59b6", alpha=0.7, edgecolor="white")
+            ax.axvline(fracs.mean(), color="red", ls="--",
+                      label="Mean=%.4f" % fracs.mean())
+            ax.axvline(expected.mean(), color="blue", ls=":",
+                      label="Uniform=%.4f" % expected.mean())
+            ax.set_xlabel("Fraction of Attention on Defect Atoms")
             ax.set_ylabel("Count")
-            ax.set_title("Defect Attention Focus — %s" % model_dir.name)
+            ax.set_title("Defect Attention Concentration — %s" % model_dir.name)
             ax.legend()
-            fig.savefig(fig_dir / "attention_ratio.png")
+            fig.savefig(fig_dir / "attention_concentration.png")
             plt.close()
 
         print("\nFigures saved to %s/" % fig_dir)
@@ -306,7 +321,7 @@ def analyse_model(model_dir, device="cuda"):
         "preds": preds,
         "targets": targets,
         "errors": errors,
-        "defect_attn_ratios": np.array(all_defect_attn_ratios) if all_defect_attn_ratios else None,
+        "defect_attn_fracs": np.array([f[0] for f in all_defect_attn_fracs]) if all_defect_attn_fracs else None,
     }
 
 
