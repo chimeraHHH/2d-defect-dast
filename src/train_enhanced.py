@@ -140,6 +140,46 @@ class DefectClassifierHead(nn.Module):
 
 
 # ---- Stochastic Depth wrapper ----
+class ModelEMA:
+    """Exponential Moving Average of model parameters.
+
+    Maintains a shadow copy: θ_ema = decay · θ_ema + (1 − decay) · θ_model.
+    The EMA model typically generalises better than the raw checkpoint,
+    giving 0.5-2 % relative MAE reduction on held-out data.
+
+    References:
+        Polyak & Juditsky, SIAM J. Control Optim. 1992.
+        Tarvainen & Valpola, NeurIPS 2017 ("Mean Teacher").
+        Used in Uni-Mol, GemNet-OC, DeiT and most SoTA molecular models.
+    """
+    def __init__(self, model: nn.Module, decay: float = 0.999) -> None:
+        self.decay = decay
+        self.shadow = {n: p.data.clone()
+                       for n, p in model.named_parameters() if p.requires_grad}
+        self.backup: dict = {}
+
+    @torch.no_grad()
+    def update(self, model: nn.Module) -> None:
+        for n, p in model.named_parameters():
+            if p.requires_grad and n in self.shadow:
+                self.shadow[n].lerp_(p.data, 1.0 - self.decay)
+
+    def apply_shadow(self, model: nn.Module) -> None:
+        """Swap model params with EMA shadow (call before eval)."""
+        self.backup = {}
+        for n, p in model.named_parameters():
+            if n in self.shadow:
+                self.backup[n] = p.data.clone()
+                p.data.copy_(self.shadow[n])
+
+    def restore(self, model: nn.Module) -> None:
+        """Restore original params (call after eval)."""
+        for n, p in model.named_parameters():
+            if n in self.backup:
+                p.data.copy_(self.backup[n])
+        self.backup = {}
+
+
 class DropPath(nn.Module):
     """Drop paths (stochastic depth) per sample during training."""
     def __init__(self, drop_prob: float = 0.0):
@@ -418,6 +458,13 @@ def main() -> None:
     distill_alpha = cfg.get("distill_alpha", 1.0)  # 1.0 = no distillation
     use_distill = distill_alpha < 1.0 and soft_labels_path is not None
 
+    # EMA (Exponential Moving Average) — Polyak 1992 / Mean Teacher (NeurIPS 2017)
+    use_ema = cfg.get("use_ema", False)
+    ema_decay = cfg.get("ema_decay", 0.999)
+    ema = None
+    if use_ema:
+        ema = ModelEMA(model, decay=ema_decay)
+
     # P1-3: SWA
     use_swa = cfg.get("use_swa", False)
     swa_start_epoch = cfg.get("swa_start_epoch", max(1, epochs - 10))
@@ -443,6 +490,7 @@ def main() -> None:
             f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
             f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
             f"droppath={drop_path_rate} label_noise={label_noise_std} "
+            f"ema={use_ema}(decay={ema_decay}) "
             f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
             f"distill={use_distill}(alpha={distill_alpha})\n"
             f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
@@ -539,6 +587,10 @@ def main() -> None:
                     torch.nn.utils.clip_grad_norm_(all_params, grad_clip)
                 optimizer.step()
 
+                # EMA update after each optimizer step
+                if ema is not None:
+                    ema.update(model)
+
                 with torch.no_grad():
                     preds = normalizer.denorm(preds_norm)
                     abs_err = (preds - batch["target"]).abs().sum().item()
@@ -555,6 +607,12 @@ def main() -> None:
 
             # P1-3: SWA update
             in_swa = use_swa and epoch >= swa_start_epoch
+
+            # Apply EMA shadow for evaluation (when not in SWA phase)
+            eval_with_ema = ema is not None and not in_swa
+            if eval_with_ema:
+                ema.apply_shadow(model)
+
             if in_swa:
                 swa_model.update_parameters(model)
                 swa_scheduler.step()
@@ -570,6 +628,7 @@ def main() -> None:
             improved = val_metrics["mae"] < best_val_mae
             if improved:
                 best_val_mae = val_metrics["mae"]
+                # When EMA is active, model currently holds EMA weights → save those
                 save_model = swa_model.module if in_swa else model
                 save_dict = {
                     "model": save_model.state_dict(),
@@ -581,8 +640,13 @@ def main() -> None:
                     save_dict["aux_defect_head"] = aux_defect_head.state_dict()
                 torch.save(save_dict, ckpt_path)
 
+            # Restore original weights after EMA evaluation
+            if eval_with_ema:
+                ema.restore(model)
+
             dt = time.time() - t0
             aux_str = f"aux_def {aux_defect_loss_sum / max(n_seen, 1):.4f} | " if aux_defect_w > 0 else ""
+            ema_str = " [EMA]" if eval_with_ema else ""
             swa_str = " [SWA]" if in_swa else ""
             row = {
                 "epoch": epoch, "train_mae": train_mae,
@@ -595,7 +659,7 @@ def main() -> None:
                 f"Epoch {epoch:02d}/{epochs} | train MAE {train_mae:.4f} | "
                 f"{aux_str}"
                 f"val MAE {val_metrics['mae']:.4f} RMSE {val_metrics['rmse']:.4f} | "
-                f"lr {row['lr']:.2e} | {dt:.1f}s {'*' if improved else ''}{swa_str}"
+                f"lr {row['lr']:.2e} | {dt:.1f}s {'*' if improved else ''}{ema_str}{swa_str}"
             )
             print(line)
             logf.write(line + "\n")
