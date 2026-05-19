@@ -836,6 +836,7 @@ def main() -> None:
         ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
         model.load_state_dict(ckpt["model"])
         test_metrics = evaluate(model, test_loader, normalizer, device)
+        val_final = evaluate(model, val_loader, normalizer, device)
         final_line = f"\n[Final] Test MAE {test_metrics['mae']:.4f} | RMSE {test_metrics['rmse']:.4f}\n"
         print(final_line)
         logf.write(final_line)
@@ -862,6 +863,9 @@ def main() -> None:
         json.dump(summary, f, indent=2)
     np.savez(out_dir / "test_predictions.npz",
              preds=test_metrics["preds"], targets=test_metrics["targets"])
+    # Save validation predictions for post-hoc calibration
+    np.savez(out_dir / "val_predictions.npz",
+             preds=val_final["preds"], targets=val_final["targets"])
 
 
 if __name__ == "__main__":
