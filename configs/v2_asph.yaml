@@ -3,7 +3,7 @@
 # ASPH adds ~8 PCA components per atom capturing topological local environment
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
-asph_features_path: data/processed/asph_features.pkl
+asph_features_path: data/asph_features.pkl
 output_dir: results/v2_asph
 seed: 42
 batch_size: 64
