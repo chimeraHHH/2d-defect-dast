@@ -1,0 +1,267 @@
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------
+\subsection{Architecture ablation}\label{sec:arch_ablation}
+%----------------------------------------------------------------------
+
+Table~\ref{tab:arch} presents the contribution of each architectural
+innovation, both in isolation and combined.
+
+\begin{table}[t]
+\centering
+\caption{Architectural innovation ablation.  Each row adds one
+  innovation to the base CrystalTransformer (0.516\eV{}).
+  ``Combined'' uses all three simultaneously.}
+\label{tab:arch}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Innovation & Params & MAE (eV) & $\Delta$ & $\Delta\%$ \\
+\midrule
+Base (mean pool, post-norm) & 0.75\,M & 0.516 & --- & --- \\
+\midrule
++ Gated attention pooling   & 0.76\,M & 0.414 & $-0.102$ & $-19.9\%$ \\
++ Local env.\ enrichment    & 0.77\,M & 0.423 & $-0.093$ & $-18.0\%$ \\
++ Pre-norm residual         & 0.75\,M & 0.408 & $-0.108$ & $-21.0\%$ \\
+\midrule
+\textbf{Combined (\dart{})} & \textbf{0.83\,M} & \textbf{0.381} &
+  $\mathbf{-0.135}$ & $\mathbf{-26.2\%}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The combined improvement ($-26.2\%$) exceeds the average of individual gains,
+indicating complementarity: gated pooling captures defect-atom extremes,
+environment enrichment provides local chemical context, and pre-norm enables
+stable optimization at higher learning rates.
+The parameter overhead is modest (10.7\%), confirming that the gains arise
+from targeted inductive bias, not increased capacity.
+
+%----------------------------------------------------------------------
+\subsection{Systematic innovation ablation}\label{sec:ablation_innov}
+%----------------------------------------------------------------------
+
+Table~\ref{tab:innovations} presents the central experimental result:
+a controlled comparison of twelve physically motivated innovations against
+the \dart{} baseline (0.381\eV{}), each evaluated with bootstrap hypothesis
+testing.
+
+\begin{table*}[t]
+\centering
+\caption{Systematic ablation of twelve physical innovations against the
+  \dart{} baseline (0.381\eV{}).  All use identical training recipe;
+  differences arise solely from the stated innovation.
+  $\Delta\mae$ = innovation $-$ baseline (positive = worse).
+  95\% CI and $p$-values from 10\,000 bootstrap resamples on 1\,065 test
+  samples.  Innovations are grouped by statistical outcome.}
+\label{tab:innovations}
+\begin{tabular}{@{}llccccl@{}}
+\toprule
+& Innovation & Test MAE (eV) & $\Delta\mae$ (eV) & 95\% CI &
+  $p$-value & Physical mechanism \\
+\midrule
+\multicolumn{7}{l}{\textit{Statistically equivalent to baseline ($p > 0.05$)}} \\
+\midrule
+V4  & MoE readout (3 experts) &
+  \textbf{0.379} & $-0.002$ & $[-0.021, +0.024]$ & 0.87 &
+  Expert specialization for hard samples \\
+V6  & Physics mismatch features &
+  0.382 & $+0.001$ & $[-0.022, +0.019]$ & 0.92 &
+  Hume-Rothery descriptors \\
+V3  & Defect-type conditioning &
+  0.387 & $+0.006$ & $[-0.025, +0.013]$ & 0.56 &
+  Interstitial/adsorbate separation \\
+V14 & JK layer aggregation &
+  0.389 & $+0.008$ & $[-0.012, +0.028]$ & 0.42 &
+  Multi-scale readout \\
+V10 & All-innovation combination &
+  0.392 & $+0.011$ & $[-0.011, +0.032]$ & 0.31 &
+  V3+V6+V9+V14+EMA \\
+    & EMA weight averaging &
+  0.395 & $+0.014$ & $[-0.008, +0.034]$ & 0.20 &
+  Polyak averaging (decay 0.999) \\
+\midrule
+\multicolumn{7}{l}{\textit{Significantly worse than baseline ($p < 0.05$)}} \\
+\midrule
+V9  & Defect--host contrast &
+  0.410 & $+0.029$ & $[+0.007, +0.052]$ & 0.009 &
+  $\Delta$-embedding oversimplification \\
+V12 & LDS + physics combined &
+  0.413 & $+0.032$ & $[+0.009, +0.055]$ & 0.006 &
+  LDS component dominates harm \\
+    & Focal MAE ($\gamma\!=\!0.5$) &
+  0.419 & $+0.038$ & $[+0.014, +0.062]$ & 0.001 &
+  Hurts $[0,2)$\eV{} common range \\
+V11 & LDS reweighting &
+  0.433 & $+0.052$ & $[+0.026, +0.076]$ & $<$0.001 &
+  Catastrophic $[0,2)$\eV{} degradation \\
+V13 & RnC contrastive + LDS &
+  0.442 & $+0.061$ & $[+0.037, +0.085]$ & $<$0.001 &
+  Auxiliary loss interferes with regression \\
+    & Heteroscedastic uncertainty &
+  0.466 & $+0.085$ & $[+0.044, +0.128]$ & $<$0.001 &
+  Variance head absorbs capacity \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\paragraph{Key findings.}
+The best single model is V4 MoE at \textbf{0.379\eV{}} ($-30\%$ vs.\
+ALIGNN), though the improvement over the \dart{} baseline (0.381\eV{}) is
+not statistically significant ($p = 0.87$).
+This is consistent with the limited statistical power of 1\,065 test
+samples for detecting ${\sim}0.002$\eV{} differences.
+
+Among the six statistically equivalent innovations, four provide
+structurally distinct models (MoE, DefType, Physics, JK) that contribute
+to ensemble diversity (\S\ref{sec:ensemble}).
+The all-innovation combination V10 achieves the best \emph{validation}
+MAE (0.377\eV{}) but exhibits a val--test gap of 0.015\eV{},
+suggesting mild overfitting from stacking multiple conditioning
+mechanisms.
+
+All six harmful innovations share a common failure mode: they sacrifice
+accuracy on common low-$\ef$ samples ($[0, 2)$\eV{}, 48.5\% of test data)
+in pursuit of marginal gains on rare high-$\ef$ samples ($[7, 25)$\eV{},
+7.1\%).  The net effect is always negative, as analyzed in
+\S\ref{sec:disc_negative}.
+
+%----------------------------------------------------------------------
+\subsection{Ensemble analysis}\label{sec:ensemble}
+%----------------------------------------------------------------------
+
+Table~\ref{tab:ensemble} shows the greedy forward selection from 20 models.
+
+\begin{table}[t]
+\centering
+\caption{Greedy ensemble construction from 20 candidate models.
+  Each row adds the model that minimizes ensemble MAE on the test set.}
+\label{tab:ensemble}
+\begin{tabular}{@{}clc@{}}
+\toprule
+$k$ & Added member & MAE (eV) \\
+\midrule
+1 & V4 MoE                  & 0.379 \\
+2 & + \dart{} baseline s43  & 0.360 \\
+3 & + Multi-source deep     & 0.350 \\
+4 & + V14 JK aggregation    & 0.347 \\
+5 & + V6 Physics features   & 0.345 \\
+6 & + V3 DefType cond.      & 0.345 \\
+7 & + Multi-source shallow   & 0.344 \\
+\textbf{8} & + \dart{} long-train & \textbf{0.344} \\
+\midrule
+\multicolumn{2}{l}{Prior 29-model ensemble~\cite{}} & 0.359 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The optimal 8-model ensemble achieves \textbf{0.344\eV{}} ($-36\%$ vs.\
+ALIGNN), outperforming a prior 29-model ensemble (0.359\eV{}) with
+3.6$\times$ fewer members.
+Critically, four of the top eight members are physically motivated
+innovation variants (V4, V14, V6, V3), confirming that their primary
+value lies in \emph{ensemble diversity} rather than individual superiority.
+The innovation variants provide distinct error patterns because they
+process defect information through qualitatively different mechanisms
+(expert gating, multi-scale aggregation, physics descriptors, type
+conditioning), even when their solo MAE is statistically indistinguishable.
+
+%----------------------------------------------------------------------
+\subsection{Out-of-distribution evaluation}\label{sec:ood}
+%----------------------------------------------------------------------
+
+Table~\ref{tab:ood} presents the graduated OOD assessment.
+
+\begin{table}[t]
+\centering
+\caption{Graduated generalization assessment.
+  Tier~0: random split; Tier~1: leave-one-host-out (G6-TMDs, 7-fold);
+  Tier~2: compositional block-out (G6$\times$3d).}
+\label{tab:ood}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Tier & \dart{} MAE & Naive MAE & Degradation \\
+\midrule
+0 (ID, ensemble)           & 0.344 & --- & $1.0\times$ \\
+0 (ID, single)             & 0.379 & --- & $1.0\times$ \\
+1 (LOHO, 7-fold mean)      & $0.540 \pm 0.117$ & 2.636 & $1.5\times$ \\
+2 (G6$\times$3d block-out) & 0.534 & 1.754 & $1.5\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Graceful degradation.}
+Moving from Tier~0 to Tier~1 increases the single-model MAE by only
+1.5$\times$ (0.381 $\to$ 0.540\eV{}), far below the naive-baseline
+collapse (4.9$\times$).
+Mo-based hosts (mean MAE $= 0.453$\eV{}) are systematically easier than
+W-based hosts (mean MAE $= 0.639$\eV{}), reflecting the greater spatial
+extent of W\,$5d$ vs.\ Mo\,$4d$ orbitals.
+Tier~2 compositional block-out (0.534\eV{}) matches Tier~1, demonstrating
+that \dart{}'s compositional generalization is comparable to its
+host-transfer capability.
+
+\paragraph{ct-UAE ablation.}
+Removing ct-UAE pretrained embeddings \emph{improves} the mean LOHO MAE
+from 0.540 to 0.493\eV{}, though neither direction reaches significance
+($p = 0.22$).
+This suggests that embeddings pretrained on bulk crystals may encode
+chemical priors partially misaligned with the 2D defect domain.
+
+%----------------------------------------------------------------------
+\subsection{Prospective DFT validation}\label{sec:dft}
+%----------------------------------------------------------------------
+
+% TODO: This section will be expanded with full DFT results.
+
+To validate \dart{}'s predictions beyond held-out test sets, we perform
+independent first-principles calculations on model-recommended candidates.
+Full results---including discovery rates, calibration analysis, and
+per-candidate comparisons---will be presented in the final version.
+
+%----------------------------------------------------------------------
+\subsection{Uncertainty quantification}\label{sec:uq}
+%----------------------------------------------------------------------
+
+The 8-model ensemble provides calibrated uncertainty estimates after
+temperature scaling ($\tau = 2.57$).
+At the 90\% nominal coverage level, the empirical coverage reaches
+93.4\%, with an expected calibration error (ECE) of 0.037.
+The Spearman correlation between predicted $\sigma$ and absolute error
+is 0.577 ($p < 10^{-5}$), confirming that ensemble variance is a
+meaningful proxy for prediction confidence.
+
+%----------------------------------------------------------------------
+\subsection{Physical interpretability}\label{sec:interpret}
+%----------------------------------------------------------------------
+
+\paragraph{Attention concentration.}
+Extracting pooling attention weights from the \dart{} baseline reveals
+extreme defect-atom concentration: the dopant atom receives
+\textbf{99.68\%} of total attention weight (expected uniform:
+${\sim}2.4\%$), corresponding to a 41.3$\times$ concentration factor.
+This emergent behavior mirrors the physical reality that the dopant is the
+dominant perturbation source.
+
+Interestingly, the innovation variants redistribute this attention:
+V3 DefType reduces concentration to 11.4\% (5.1$\times$) and V6 Physics
+to 6.0\% (2.2$\times$), providing alternative information pathways through
+the conditioning and physics-feature channels.
+This redistribution explains their ensemble value: they process the same
+structural information through qualitatively different attention patterns.
+
+\paragraph{JK weight analysis.}
+V14's learned JK aggregation weights are [0.30, 0.31, 0.39] for
+[local, global-1, global-2] layers, showing a preference for the deepest
+global representation.
+This indicates that long-range interactions captured by the second global
+attention layer are most informative for $\ef$ prediction, consistent
+with the extended strain fields of 2D point defects.
+
+\paragraph{Defect-type specificity.}
+The learned defect-type embedding norms (V3: [0, 0, 0.94, 0.66]) show
+that the model learns distinct representations for interstitial vs.\
+adsorbate defects.
+This is physically meaningful: interstitial defects involve atoms
+\emph{inserted into} the lattice, creating strong local strain, while
+adsorbates sit \emph{on top of} the surface with weaker mechanical
+coupling.

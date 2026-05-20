@@ -1,0 +1,102 @@
+\documentclass[twocolumn,superscriptaddress,prb,floatfix]{revtex4-2}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage[expansion=false]{microtype}
+\usepackage[colorlinks=true,
+            linkcolor=blue!60!black,
+            citecolor=green!50!black,
+            urlcolor=blue!70!black]{hyperref}
+\graphicspath{{figures/}}
+
+\newcommand{\dart}{\textsc{Dart}}
+\newcommand{\ef}{\ensuremath{E_\mathrm{f}}}
+\newcommand{\mae}{\mathrm{MAE}}
+\newcommand{\eV}{\ensuremath{\,\mathrm{eV}}}
+
+\begin{document}
+
+\title{DART: Defect-Aware Radial Transformer with Physically Informed
+       Innovations for Formation Energy Prediction in Two-Dimensional Materials}
+
+\author{Yiming Hua}
+\affiliation{Wuhan University, Wuhan, China}
+% TODO: add other authors
+
+\date{\today}
+
+\begin{abstract}
+Point defects govern the electronic, optical, and catalytic properties of
+two-dimensional (2D) materials, yet first-principles formation-energy
+calculations remain prohibitively expensive for exhaustive host--dopant
+screening.  Here we present \dart{}, a compact graph transformer
+(${\sim}0.83$\,M parameters) that combines local bond-angle message passing,
+global periodic self-attention, and three architectural innovations---defect-aware
+gated attention pooling, local environment enrichment, and pre-norm residual
+connections---achieving a single-model MAE of 0.379\eV{} on the IMP2D benchmark
+(10\,641 configurations, 44 hosts $\times$ 65 dopants), a 30\% reduction over
+ALIGNN (4.03\,M parameters).  An efficient 8-model ensemble further reduces the
+MAE to 0.344\eV{} ($-36\%$ vs.\ ALIGNN), outperforming a prior 29-model ensemble
+with less than one-third the members.
+
+We systematically evaluate twelve physically motivated innovations---including
+mixture-of-experts readout, defect-type conditioning, Hume-Rothery physics
+features, JK layer aggregation, label distribution smoothing, and rank-preserving
+contrastive learning---using bootstrap hypothesis testing on 1\,065 held-out
+samples.  Only four variants match the baseline statistically; the remaining six,
+including all reweighting and auxiliary-loss strategies, are significantly harmful
+($p < 0.05$), providing rigorous negative results that inform future model design.
+
+A graduated three-tier out-of-distribution protocol---random split, intra-family
+leave-one-host-out, and compositional block-out---quantifies \dart{}'s deployment
+boundaries: intra-family OOD degrades by only 1.5$\times$ (0.540\eV{}).
+Temperature-scaled ensemble uncertainty achieves 93.4\% coverage at the 90\%
+nominal level.  Together, these results establish \dart{} as an efficient and
+rigorously validated surrogate for accelerating defect engineering in 2D materials.
+\end{abstract}
+
+\maketitle
+
+%----------------------------------------------------------------------
+\section{Introduction}\label{sec:intro}
+%----------------------------------------------------------------------
+\input{sections/introduction}
+
+%----------------------------------------------------------------------
+\section{Methods}\label{sec:method}
+%----------------------------------------------------------------------
+\input{sections/methods}
+
+%----------------------------------------------------------------------
+\section{Experimental Setup}\label{sec:setup}
+%----------------------------------------------------------------------
+\input{sections/setup}
+
+%----------------------------------------------------------------------
+\section{Results}\label{sec:results}
+%----------------------------------------------------------------------
+\input{sections/results}
+
+%----------------------------------------------------------------------
+\section{Discussion}\label{sec:discussion}
+%----------------------------------------------------------------------
+\input{sections/discussion}
+
+%----------------------------------------------------------------------
+\section{Conclusion}\label{sec:conclusion}
+%----------------------------------------------------------------------
+\input{sections/conclusion}
+
+\begin{acknowledgments}
+This work was supported by the National College Students Innovation and
+Entrepreneurship Training Program (Key Support Area Project).
+Computations were performed on 8$\times$NVIDIA L40S GPUs at Wuhan University.
+\end{acknowledgments}
+
+\bibliography{references}
+
+\end{document}

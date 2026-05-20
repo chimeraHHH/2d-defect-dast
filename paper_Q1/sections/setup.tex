@@ -1,0 +1,73 @@
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------
+\subsection{Dataset}
+%----------------------------------------------------------------------
+
+We use the Impurities in 2D Materials Database
+(IMP2D)~\cite{imp2d2023}, filtering 17\,364 entries by
+\texttt{converged=True} and $|\ef| \leq 20$\eV{} to obtain 10\,641
+valid configurations across 44 monolayer hosts and 65 dopant elements.
+The dataset is split 80/10/10 into train (8\,513), validation (1\,063),
+and test (1\,065) sets with stratified random sampling, using the same
+split as prior work for fair comparison.
+
+The $\ef$ distribution is heavy-tailed: 48.5\% of test samples lie in
+$[0, 3)$\eV{}, while 7.1\% exceed 7\eV{} yet contribute 31\% of total
+error---motivating several of our innovation variants.
+
+\paragraph{Multi-source data.}
+For ensemble diversity, a subset of models are trained on four databases
+jointly: IMP2D (10\,641), JARVIS-2D (1\,105 pristine 2D formation
+energies), JARVIS-3D (4\,457 bulk formation energies), and a curated
+DFT-3D set (10\,987 bulk crystals), totaling ${\sim}27$\,k samples.
+Per-source readout heads prevent label-space contamination while
+allowing the shared encoder to learn transferable representations.
+
+%----------------------------------------------------------------------
+\subsection{Baselines}
+%----------------------------------------------------------------------
+
+We compare against:
+(i)~ALIGNN~\cite{alignn2021} (4.03\,M params, MAE 0.540\eV{}),
+(ii)~El~Alouani~\textit{et al.}~\cite{elalouani2024} (tree-based,
+0.518\eV{}),
+(iii)~SchNet~\cite{schutt2018} (0.46\,M, 0.585\eV{}), and
+(iv)~a LightGBM baseline trained on 22 hand-crafted physics features
+(1.158\eV{}).
+All baselines are evaluated on the same 1\,065-sample test set.
+
+%----------------------------------------------------------------------
+\subsection{Statistical testing protocol}
+%----------------------------------------------------------------------
+
+All pairwise model comparisons use bootstrap resampling
+($n = 10{,}000$) of the 1\,065 test samples.
+For each resample, we compute the difference in MAE between the
+candidate and baseline model.
+The 95\% confidence interval is the 2.5th--97.5th percentile of the
+bootstrap distribution; the $p$-value is twice the fraction of
+resamples where the difference has the opposite sign
+(two-sided test).
+We report Cohen's $d$ as an effect-size measure.
+A result is declared significant at $\alpha = 0.05$.
+
+This protocol accounts for the paired nature of predictions (both
+models evaluated on identical samples) and makes no distributional
+assumptions, appropriate for the non-Gaussian error distribution
+characteristic of $\ef$ prediction.
+
+%----------------------------------------------------------------------
+\subsection{Implementation details}
+%----------------------------------------------------------------------
+
+All models use $d_\mathrm{hidden} = 128$, $L_\mathrm{loc} = 3$,
+$L_\mathrm{glob} = 2$, 4 attention heads, $r_\mathrm{cut} = 5.0$\,\AA{},
+$d_\mathrm{max} = 12.0$\,\AA{}, and batch size 64.
+Optimization uses AdamW ($\beta_1 = 0.9$, $\beta_2 = 0.999$,
+weight decay $10^{-5}$) with gradient clipping at 5.0.
+DataLoader uses 4 workers with pinned memory.
+Each experiment runs 150 epochs on a single NVIDIA L40S GPU
+(AMD EPYC 9555 host, 256 cores), completing in ${\sim}22$ minutes.
+All twelve innovation experiments use identical hyperparameters except
+for the stated innovation, ensuring a controlled comparison.

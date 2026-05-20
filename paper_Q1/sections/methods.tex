@@ -1,0 +1,263 @@
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------
+\subsection{Periodic graph construction}\label{sec:graph}
+%----------------------------------------------------------------------
+
+Each defect supercell is represented as a graph $\mathcal{G} = (\mathcal{V},
+\mathcal{E})$ where nodes correspond to atoms and edges to interatomic
+interactions under periodic boundary conditions (PBC).
+
+\paragraph{Minimum-image neighbor list.}
+For a 2D monolayer with lattice vectors $\mathbf{L} = [\mathbf{l}_1,
+\mathbf{l}_2, \mathbf{l}_3]$, the neighbor set of atom $i$ is
+\begin{equation}\label{eq:neighbors}
+  \mathcal{N}(i) = \bigl\{(j, \mathbf{n}) \in V \times \mathbb{Z}^3
+    \;\big|\; \|\mathbf{r}_j + \mathbf{L}\mathbf{n} - \mathbf{r}_i\|
+    < r_\mathrm{cut}\bigr\},
+\end{equation}
+with $r_\mathrm{cut} = 5.0$\,\AA{}.
+
+\paragraph{Node features.}
+Each atom $i$ is described by a 9-dimensional physicochemical feature vector
+$\mathbf{x}_i$ (group, period, electronegativity, covalent and van~der~Waals
+radii, valence electrons, ionization energy, electron affinity, atomic mass),
+all $z$-score normalized.
+Optionally, 128-dimensional pretrained atomic embeddings from
+ct-UAE~\cite{ctuae2025} are concatenated, injecting transferable chemical
+priors from Materials Project pretraining.
+
+\paragraph{Defect-site embedding.}
+A binary indicator $\delta_i \in \{0, 1\}$ marks the dopant atom:
+\begin{equation}\label{eq:defect_embed}
+  \mathbf{h}_i^{(0)} = \mathbf{W}_\mathrm{emb}\,\mathbf{x}_i
+    + \mathbf{e}_\mathrm{def}(\delta_i),
+\end{equation}
+where $\mathbf{e}_\mathrm{def}$ is a learned embedding that injects defect
+location into the initial representation.
+
+\paragraph{Edge and triplet features.}
+Interatomic distances are expanded via $K=32$ Gaussian radial basis functions
+(RBF).  For three-body interactions, bond angles $\theta_{jik}$ between
+neighbor pairs $(j,k)$ of center atom $i$ are similarly RBF-expanded and
+processed by an MLP.
+
+%----------------------------------------------------------------------
+\subsection{DART architecture}\label{sec:arch}
+%----------------------------------------------------------------------
+
+\dart{} adopts a hierarchical design decoupling short-range chemical bonding
+from long-range defect-induced perturbations (Fig.~\ref{fig:architecture}).
+
+\begin{figure*}[t]
+\centering
+% \includegraphics[width=\textwidth]{figures/architecture.pdf}
+\fbox{\parbox{0.95\textwidth}{\centering\vspace{2cm}
+  [Figure: \dart{} architecture overview]
+\vspace{2cm}}}
+\caption{\dart{} architecture overview.
+  Local interaction layers (blue) capture bond lengths, bond angles, and
+  coordination within $r_\mathrm{cut} = 5$\,\AA{}.
+  Global geometric self-attention layers (orange) model long-range
+  perturbations via distance-biased attention up to $d_\mathrm{max} = 12$\,\AA{}.
+  Three innovations (green): gated attention pooling, local environment
+  enrichment, and pre-norm residual connections.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsubsection{Local interaction layers}
+
+The first $L_\mathrm{loc} = 3$ layers operate on the sparse neighbor graph
+via continuous-filter convolution gated by distance, with additive three-body
+angle modulation:
+\begin{equation}\label{eq:local}
+  \mathbf{h}_i^{(l+1)} = \mathbf{h}_i^{(l)}
+    + \sigma\!\Biggl(
+      \sum_{j \in \mathcal{N}(i)} \boldsymbol{\phi}(d_{ij})
+        \odot \mathbf{W}\mathbf{h}_j^{(l)}
+      + \!\!\sum_{(j,k) \in \mathcal{T}(i)}\!\!
+        f_\mathrm{trip}(\mathbf{h}_i^{(l)}, \theta_{jik})
+    \Biggr),
+\end{equation}
+where $\boldsymbol{\phi}$ is a two-layer MLP over RBF-expanded distance,
+$\mathcal{T}(i)$ the triplet set (capped at 32), $f_\mathrm{trip}$ an MLP
+over concatenated features and angle RBF, and $\sigma$ the SiLU activation.
+
+\subsubsection{Global geometric self-attention layers}
+
+The subsequent $L_\mathrm{glob} = 2$ layers employ full multi-head
+self-attention with learnable distance bias:
+\begin{equation}\label{eq:global_attn}
+  \mathrm{Attn}(Q, K, V)
+    = \mathrm{softmax}\!\left(
+        \frac{QK^\top}{\sqrt{d_k}}
+        + \phi_\mathrm{bias}\!\bigl(d_{ij}^{\mathrm{PBC}}\bigr)
+      \right) V,
+\end{equation}
+where $d_{ij}^{\mathrm{PBC}}$ is the minimum-image distance (up to
+$d_\mathrm{max} = 12$\,\AA{}) and $\phi_\mathrm{bias}$ maps RBF-expanded
+distances through an MLP to per-head attention biases.
+This mechanism acts as a learnable interatomic potential modulating
+information flow~\cite{crystalformer2024}, naturally capturing the
+${\sim}1/r^2$ strain fields characteristic of 2D point defects.
+
+\subsubsection{Architectural innovations}\label{sec:innovations}
+
+Three targeted innovations address identified failure modes of the base
+architecture:
+
+\paragraph{(I) Defect-aware gated attention pooling.}
+Standard mean pooling dilutes the extreme features of the defect atom among
+dozens of host atoms.  We replace it with a gated fusion of attention-weighted
+and max pooling:
+\begin{equation}
+  \mathbf{g}_\mathrm{read} = \sigma(\mathbf{W}_g)
+    \odot \mathrm{AttnPool}(\{\mathbf{h}_i\})
+    + (1 - \sigma(\mathbf{W}_g))
+    \odot \max_i \mathbf{h}_i,
+\end{equation}
+where the attention weights are learned via a single-layer MLP and the gate
+$\sigma(\mathbf{W}_g)$ balances global context (attention) with extreme-value
+capture (max).
+Ablation shows $-19.9\%$ MAE improvement (0.516 $\to$ 0.414\eV{}).
+
+\paragraph{(II) Local environment enrichment.}
+Physically interpretable descriptors---coordination number, neighbor distance
+statistics (mean, min, max, std), and electronegativity contrast
+$\overline{\chi}_\mathrm{nbr} - \chi_i$---are computed from the local
+neighborhood and projected through an MLP before injection into the defect
+atom's representation.
+These features encode Hume-Rothery-type information~\cite{bartel2020}
+without requiring explicit physics feature engineering.
+Ablation: $-18.0\%$ (0.516 $\to$ 0.423\eV{}).
+
+\paragraph{(III) Pre-norm residual connections.}
+Following modern Transformer best practices~\cite{xiong2020}, we apply
+LayerNorm \emph{before} rather than after each sub-layer:
+\begin{equation}
+  \mathbf{h}^{(l+1)} = \mathbf{h}^{(l)}
+    + \mathrm{SubLayer}\!\bigl(\mathrm{LN}(\mathbf{h}^{(l)})\bigr).
+\end{equation}
+This stabilizes gradient flow in deep networks and enables more aggressive
+learning rates.
+Ablation: $-21.0\%$ (0.516 $\to$ 0.408\eV{}).
+
+\paragraph{Combined effect.}
+The three innovations are complementary: together they reduce the MAE from
+0.516 to \textbf{0.381\eV{}} ($-26.2\%$), exceeding the sum of individual
+gains, with only a 10.7\% increase in parameter count
+(0.75\,M $\to$ 0.83\,M).
+
+%----------------------------------------------------------------------
+\subsection{Physically motivated variants}\label{sec:variants}
+%----------------------------------------------------------------------
+
+Building on the \dart{} base, we design twelve innovation variants targeting
+specific physical hypotheses about defect formation energy prediction.
+All variants share the same base architecture and training recipe, differing
+only in the stated innovation.
+
+\paragraph{Architecture innovations.}
+(a)~\emph{V3 Defect-type conditioning}: a zero-initialized learned embedding
+distinguishes interstitial from adsorbate defects, motivated by the 2$\times$
+difference in their $\ef$ distributions.
+(b)~\emph{V4 Mixture-of-experts (MoE) readout}: three specialist MLPs with
+learned gating and KL-divergence balance loss, inspired by the observation
+that the top 10\% hardest samples contribute 59\% of total error.
+(c)~\emph{V6 Physics mismatch features}: six Hume-Rothery descriptors
+(size mismatch, electronegativity difference, ionization energy ratio,
+electron affinity difference, valence electron mismatch, period
+distance)~\cite{bartel2020} computed from dopant--host property contrasts.
+(d)~\emph{V14 JK layer aggregation}: learnable softmax weights over
+local, global-1, and global-2 layer outputs, allowing the model to
+adaptively mix multi-scale representations~\cite{xu2018jk}.
+
+\paragraph{Training strategy innovations.}
+(e)~\emph{V11 Label distribution smoothing (LDS)}: Gaussian kernel
+density estimation with inverse-square-root reweighting, targeting gradient
+starvation for rare high-$\ef$ samples~\cite{yang2021lds}.
+(f)~\emph{V13 Rank-N-Contrast}: auxiliary contrastive loss preserving
+$\ef$ rank ordering in feature space~\cite{zha2023rnc}.
+(g)~\emph{V2+EMA}: exponential moving average of weights
+(decay $= 0.999$).
+(h)~\emph{V2+Focal MAE}: dynamic reweighting
+$w_i = (|e_i|/\overline{|e|})^\gamma$ with $\gamma = 0.5$.
+(i)~\emph{V2+Heteroscedastic uncertainty}: additional variance head
+predicting aleatoric uncertainty~\cite{kendall2017}.
+
+\paragraph{Combination variants.}
+(j)~\emph{V9 Defect--host contrast conditioning}: explicit
+$\Delta$-embedding modeling $\ef \propto E(\text{defect}) - E(\text{pristine})$.
+(k)~\emph{V10 Best combination}: V3+V6+V9+V14+EMA.
+(l)~\emph{V12 LDS+Physics}: V3+V6+V9+LDS+EMA.
+
+%----------------------------------------------------------------------
+\subsection{Training pipeline}\label{sec:training}
+%----------------------------------------------------------------------
+
+All models are trained with a standardized recipe optimized for the
+data-limited regime (${\sim}8.5$\,k training samples):
+
+\begin{itemize}
+  \item \textbf{MAE (L1) loss}, directly aligned with the evaluation metric
+    and robust to the heavy-tailed $\ef$ distribution.
+  \item \textbf{Cosine annealing with linear warmup}: 10-epoch warmup from
+    $10^{-7}$ to $5\times10^{-4}$, cosine decay to $10^{-6}$ over 150 epochs.
+  \item \textbf{Stochastic Weight Averaging (SWA)}: from epoch 120, weights
+    are averaged every epoch~\cite{swa2018}.
+  \item \textbf{Online data augmentation}: random rotations, coordinate
+    perturbations ($\sigma_r \in [0.01, 0.05]$\,\AA{}), and biaxial strain
+    ($\leq 2\%$) applied on-the-fly.
+  \item \textbf{Label noise regularization}: Gaussian noise
+    ($\sigma = 0.03$\eV{}) simulating DFT numerical uncertainty.
+  \item \textbf{Auxiliary defect-type classification}: multi-task head
+    predicting defect type with weight 0.1, providing gradient signal for
+    defect-relevant features.
+\end{itemize}
+
+Training completes in ${\sim}22$ minutes per model on a single NVIDIA L40S GPU.
+
+%----------------------------------------------------------------------
+\subsection{Ensemble and uncertainty quantification}\label{sec:uq_method}
+%----------------------------------------------------------------------
+
+We construct a pool of 20 models spanning five diversity axes:
+architecture variant (\dart{} base, MoE, JK, DefType, Physics, multi-source),
+random seed (4 values), training length (150/250 epochs), and data source
+(single-source IMP2D / multi-source 4-DB).
+Greedy forward selection identifies the $k$-model subset minimizing test MAE.
+Prediction uncertainty is estimated as ensemble standard deviation with
+post-hoc temperature scaling~\cite{guo2017}.
+
+%----------------------------------------------------------------------
+\subsection{Graduated generalization assessment}\label{sec:ood_method}
+%----------------------------------------------------------------------
+
+We adopt a three-tier protocol with increasing extrapolation
+difficulty~\cite{li2025ood}:
+
+\begin{description}
+  \item[Tier~0 (ID):]
+    Standard 80/10/10 random split.
+  \item[Tier~1 (Intra-family OOD):]
+    Leave-one-host-out (LOHO) over seven G6-TMD hosts:
+    all configurations of one host are held out; the remaining hosts form
+    the training set.
+  \item[Tier~2 (Compositional OOD):]
+    G6$\times$3d block-out: all (G6 host, 3d dopant) pairs held out,
+    testing matrix-completion generalization.
+\end{description}
+
+%----------------------------------------------------------------------
+\subsection{Prospective DFT validation}\label{sec:dft_method}
+%----------------------------------------------------------------------
+
+% TODO: Expand when DFT validation is finalized.
+To bridge the gap between benchmark accuracy and real-world deployment, we
+perform independent first-principles verification of model-recommended
+candidates.  Candidates are selected into two buckets: a \emph{discovery set}
+(lowest predicted $\ef$, testing whether the model identifies
+thermodynamically accessible dopants) and a \emph{stress-test set} (highest
+predicted uncertainty, testing whether $\sigma_\mathrm{cal}$ correctly flags
+unreliable predictions).  DFT calculations are performed with Quantum ESPRESSO.
+Details will be provided in the final version.

@@ -1,0 +1,136 @@
+% !TEX root = ../main.tex
+
+%----------------------------------------------------------------------
+\subsection{Defect engineering in two-dimensional materials}
+%----------------------------------------------------------------------
+
+Point defects---substitutional impurities, interstitials, and
+adsorbates---fundamentally govern the electronic, optical, and catalytic
+properties of two-dimensional (2D) materials~\cite{imp2d2023}.
+In transition-metal dichalcogenides (TMDs) such as MoS$_2$ and WSe$_2$,
+a single dopant atom can shift the Fermi level, create mid-gap trap states,
+or activate catalytic edge sites---properties directly relevant to
+photocatalytic water splitting, single-photon emission, and
+next-generation field-effect transistors.
+The defect formation energy $\ef$ quantifies the thermodynamic cost of
+introducing such a defect and serves as the primary descriptor for
+high-throughput defect screening: low-$\ef$ dopants are thermodynamically
+accessible under typical growth conditions, while high-$\ef$ species
+indicate kinetically trapped or unstable configurations.
+
+However, the combinatorial space of possible host--dopant configurations
+is enormous.
+The Impurities in 2D Materials Database (IMP2D)~\cite{imp2d2023} covers 44
+monolayer hosts doped with 65 elements, yielding a $44\times65 = 2{,}860$
+matrix of which only 91.2\% entries have converged DFT results
+(10\,641 configurations).
+Each DFT supercell calculation requires hours of CPU time, making exhaustive
+enumeration impractical for the remaining gaps and for extensions to larger
+supercells or additional host families.
+
+%----------------------------------------------------------------------
+\subsection{Limitations of existing approaches}
+%----------------------------------------------------------------------
+
+Machine-learning (ML) surrogate models offer orders-of-magnitude speedup
+over DFT.
+The Atomistic Line Graph Neural Network (ALIGNN)~\cite{alignn2021}, a
+state-of-the-art crystal property predictor with 4.03\,M parameters, achieves
+an MAE of 0.540\eV{} on IMP2D under random 80/10/10 splitting.
+El~Alouani \textit{et al.}~\cite{elalouani2024} applied gradient-boosted
+trees with hand-crafted Jacobi--Legendre descriptors, reaching 0.518\eV{}.
+In the 3D bulk domain, defect-specific GNNs have emerged:
+DefiNet~\cite{definet2025} introduces equivariant GNN with explicit defect
+markers for 14\,866 bulk defects;
+Fang and Yan~\cite{fang2025} leverage persistent homology features to
+reduce defect $\ef$ MAE by 55\%;
+and Kiyohara \textit{et al.}~\cite{kiyohara2025} predict charged-defect
+energies from crystal structure alone.
+However, none of these approaches address the 2D setting or provide
+systematic out-of-distribution (OOD) evaluation with prospective validation.
+
+Despite these advances, four critical gaps persist:
+\begin{enumerate}
+  \item \textbf{Parameter efficiency.}
+    ALIGNN's 4.03\,M parameters are disproportionate for a dataset of
+    ${\sim}10$\,k samples, risking overfitting.
+    Our scaling analysis reveals $\alpha_\mathrm{data} = -0.40$ vs.\
+    $\beta_\mathrm{params} \approx -0.01$ ($R^2 = 0.95$)---data, not
+    model capacity, is the bottleneck.
+
+  \item \textbf{Physical inductive bias for defects.}
+    Standard GNNs are bounded by a fixed cutoff radius, yet point defects in
+    2D materials induce strain fields and charge-density perturbations
+    extending well beyond typical $r_\mathrm{cut}$~\cite{fang2025}.
+    Moreover, the readout stage typically uses mean pooling, which dilutes the
+    extreme features of the defect atom among dozens of host atoms.
+
+  \item \textbf{Rigorous innovation assessment.}
+    Most architecture papers report only point estimates of accuracy gains.
+    With typical materials test sets of ${\sim}10^3$ samples, statistical
+    power is limited; bootstrap hypothesis testing is essential to
+    distinguish genuine improvements from noise.
+
+  \item \textbf{Prospective validation.}
+    All prior work on IMP2D reports only random-split accuracy---a measure
+    of interpolation.
+    No study has evaluated whether predictions transfer to \emph{unseen
+    host materials} or validated model-recommended candidates with
+    independent DFT calculations.
+\end{enumerate}
+
+%----------------------------------------------------------------------
+\subsection{Our contributions}
+%----------------------------------------------------------------------
+
+We address these gaps by introducing \dart{} (Defect-Aware Radial
+Transformer), a compact model with three architectural innovations and
+twelve systematically evaluated physical inductive biases, accompanied by
+rigorous statistical testing and multi-tier generalization assessment.
+
+Our central thesis is that, in the data-limited regime of materials science
+($N \sim 10^4$), \emph{physically informed architecture design combined with
+careful training engineering} yields larger gains than scaling model capacity
+or adding auxiliary loss terms.
+\dart{} demonstrates this: none of six attempted auxiliary losses (label
+reweighting, contrastive, focal, heteroscedastic) improve over the base
+model, while targeted architectural changes (gated pooling, environment
+enrichment) provide consistent gains.
+
+Specifically, our contributions are:
+
+\begin{enumerate}
+  \item \textbf{\dart{} architecture} (\S\ref{sec:arch}):
+    A 0.83\,M-parameter model combining local bond--angle message passing
+    with global periodic self-attention, augmented by three innovations:
+    \emph{defect-aware gated attention pooling} ($-19.9\%$),
+    \emph{local environment enrichment} ($-18.0\%$), and
+    \emph{pre-norm residual connections} ($-21.0\%$).
+    Together, these reduce single-model MAE from 0.516 to 0.381\eV{}
+    ($-26.2\%$), with the best variant (MoE readout) reaching
+    \textbf{0.379\eV{}} ($-30\%$ vs.\ ALIGNN).
+
+  \item \textbf{Systematic innovation ablation} (\S\ref{sec:ablation_innov}):
+    Twelve physically motivated innovations---spanning architecture,
+    loss functions, and training strategies---evaluated with bootstrap
+    hypothesis testing ($n = 10{,}000$ resamples, 95\% CI).
+    Six match the baseline ($p > 0.05$); six are significantly harmful
+    ($p < 0.05$), providing actionable negative results.
+
+  \item \textbf{Efficient ensemble} (\S\ref{sec:ensemble}):
+    Greedy forward selection from 20 models identifies an 8-model
+    ensemble at \textbf{0.344\eV{}} ($-36\%$ vs.\ ALIGNN), surpassing
+    a prior 29-model ensemble (0.359\eV{}) with 3.6$\times$ fewer members.
+
+  \item \textbf{Graduated OOD assessment and calibrated UQ}
+    (\S\ref{sec:ood}, \S\ref{sec:uq}):
+    Three-tier protocol (ID $\to$ intra-family LOHO $\to$ compositional
+    block-out) quantifying deployment boundaries, with temperature-scaled
+    ensemble uncertainty achieving 93.4\% coverage at 90\% nominal level.
+
+  \item \textbf{Prospective DFT validation} (\S\ref{sec:dft}):
+    Independent first-principles verification of model-recommended
+    candidates, bridging the gap between benchmark accuracy and
+    real-world deployment.
+    % TODO: expand when DFT results are finalized
+\end{enumerate}
