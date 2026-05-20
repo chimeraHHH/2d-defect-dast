@@ -2,7 +2,7 @@
 
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.345%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
+[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.344%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![best single](https://img.shields.io/badge/best%20single-0.379%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
@@ -15,8 +15,8 @@
 
 * **0.84 M 参数的 CrystalTransformerV2+MoE 大幅超越 ALIGNN（4.03 M）**
   （V4 MoE best single 0.379 eV vs ALIGNN 0.540 eV，↓30%）
-* **8-model 贪心集成** 在 1065 测试样本上达 **0.345 eV**（↓36% vs ALIGNN），
-  含 V4 MoE + V3 DefType + V6 Physics 创新模型（提供架构多样性）
+* **8-model 贪心集成** 在 1065 测试样本上达 **0.344 eV**（↓36% vs ALIGNN），
+  含 V4 MoE + V14 JK + V6 Physics + V3 DefType 创新模型（提供架构多样性）
 * **约束 OOD 评估**：Leave-One-Host-Out 7-fold 平均 **0.540 eV**，
   从 ID 到族内 OOD 仅 1.5× 退化（而非全 OOD 的 7.3×），模型优雅降级
 * **ct-UAE 消融**：预训练原子嵌入对 ID 有 +1% 收益，但 OOD 场景无统计显著帮助（p=0.22）
@@ -82,11 +82,15 @@
 | V4 MoE vs V2 | −0.002 | [−0.021, +0.024] | 0.868 | 不显著（但点估计最优） |
 | V6 Physics vs V2 | +0.001 | [−0.022, +0.019] | 0.919 | 不显著（等价） |
 | V3 DefType vs V2 | +0.006 | [−0.025, +0.013] | 0.557 | 不显著（val MAE 最优） |
+| V14 JK vs V2 | +0.008 | [−0.012, +0.028] | 0.423 | 不显著（JK 权重偏好深层） |
 | V9 Contrast vs V2 | +0.029 | [+0.007, +0.052] | **0.009** | **显著更差** ★ |
+| V11 LDS vs V2 | +0.052 | [+0.026, +0.076] | **<0.001** | **显著更差** ★★ |
+| V13 RnC vs V2 | +0.061 | [+0.037, +0.085] | **<0.001** | **显著更差** ★★ |
 
 **关键洞察**：
-- 单模型创新均未显著超越 V2（1065 样本检验力不足），但 **4-model 贪心集成** (V4+V2+V3+V6) 达 **0.354 eV**
-- 加入多源模型后，**8-model 集成达 0.345 eV**（新 SOTA，↓36% vs ALIGNN）
+- 单模型创新均未显著超越 V2（1065 样本检验力不足），但 **8-model 贪心集成达 0.344 eV**（↓36% vs ALIGNN）
+- V14 JK 的 JK 权重 [0.30, 0.31, 0.39] 显示模型偏好最深全局层，被选入 ensemble k=4
+- V11 LDS 和 V13 RnC 均显著更差：LDS 在 [0,2) eV 退化最严重 (p<0.001)，重权策略过度偏移低能区梯度
 - V9 对比条件化在 [7,25) eV 范围显著退化 (ΔMAE=+0.23, p=0.014)
 - 创新模型的核心价值在于**集成多样性**，而非单模型提升
 
@@ -98,9 +102,9 @@
 | **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | ✅ **0.379 ★** | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
 | **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | ✅ 0.382 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
 | **V9 缺陷-宿主对比条件化** | Ef ∝ E(缺陷) − E(原始)，显式建模差值 | +8.5K | ✅ 0.410 | 物理先验，零初始化 |
-| **V11 LDS 标签分布平滑** | 高 Ef 样本（7.1%）贡献 29% 误差 → 逆密度重权 | 0 | ⏳ 待训练 | Yang et al., ICML 2021 (DIR) |
-| **V13 RnC 对比学习** | 排序保持的特征空间结构化，缓解预测压缩 | +128-dim proj | ⏳ 待训练 | Zha et al., NeurIPS 2023 (Rank-N-Contrast) |
-| **V14 JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ⏳ 待训练 | Xu et al., ICML 2018 (JK-Net) |
+| **V11 LDS 标签分布平滑** | 高 Ef 样本（7.1%）贡献 29% 误差 → 逆密度重权 | 0 | ❌ 0.433 | Yang et al., ICML 2021 (DIR) |
+| **V13 RnC 对比学习** | 排序保持的特征空间结构化，缓解预测压缩 | +128-dim proj | ❌ 0.442 | Zha et al., NeurIPS 2023 (Rank-N-Contrast) |
+| **V14 JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ✅ 0.389 | Xu et al., ICML 2018 (JK-Net) |
 | **V12 LDS+物理+全条件化** | V6+V3+V9+LDS+EMA 协同 | +17K | ⏳ 待训练 | 综合方案 |
 | **V10 最优组合** | 所有正面创新整合 | +31K | ⏳ 待训练 | — |
 | **异方差不确定性** | 自适应降权噪声样本 + 置信度估计 | +8.3K | ✅ 已实现 | Kendall & Gal, NeurIPS 2017; Hirschfeld, JCIM 2020 |
@@ -215,10 +219,13 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 | **CT-V2+MoE (V4)** | **0.84 M** | **0.379** | **−30%** |
 | CT-V2+DefType (V3) | 0.83 M | 0.387 | −28% |
 | CT-V2+Physics (V6) | 0.84 M | 0.382 | −29% |
+| CT-V2+JK (V14) | 0.83 M | 0.389 | −28% |
 | CT-V2+Contrast (V9) | 0.84 M | 0.410 | −24% |
+| CT-V2+LDS (V11) | 0.83 M | 0.433 | −20% |
+| CT-V2+RnC+LDS (V13) | 0.83 M | 0.442 | −18% |
 | CT v4 7-ensemble (SS+MS) | 7×(0.75–1.1) M | 0.359 | −34% |
 | CT-V2 8-ensemble greedy (v5) | 8×(0.83–1.1) M | 0.349 | −35% |
-| **CT-V2+innovations 8-ens (v5.1)** | **8×(0.83–1.1) M** | **0.345** | **−36%** |
+| **CT-V2+innovations 8-ens (v5.1)** | **8×(0.83–1.1) M** | **0.344** | **−36%** |
 
 集成成员选择（贪心法）：
 
@@ -510,7 +517,7 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|
-| 🥇 **v5.1 8-ens greedy (V2+innovations+MS)** | 8×(0.83–1.1) M | **0.345 eV** | — | V4+V2+MS+V3+V6+MS+V2×2，↓36% vs ALIGNN |
+| 🥇 **v5.1 8-ens greedy (V2+innovations+MS)** | 8×(0.83–1.1) M | **0.344 eV** | — | V4+V2+MS+V14+V6+V3+MS+V2，↓36% vs ALIGNN |
 | 🥈 v5 8-ens greedy (V2+MS) | 8×(0.83–1.1) M | 0.349 eV | 0.976 eV | V2 架构+多源，↓35% vs ALIGNN |
 | v4 7-ens (SS+MS combined) | 7×(0.75–1.1) M | 0.359 eV | — | 含多源模型，↓34% vs ALIGNN |
 | 🥉 **V4 MoE (V2+MoE readout)** | 0.84 M | **0.379 eV** | 1.001 eV | ★ 新最优单模型，↓30% vs ALIGNN |
@@ -518,7 +525,10 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 | V6 Physics (V2+Hume-Rothery) | 0.84 M | 0.382 eV | 1.020 eV | 物理失配特征 |
 | V3 DefType (V2+条件化) | 0.83 M | 0.387 eV | 1.009 eV | 缺陷类型条件化，val MAE 0.367 最优 |
 | v4 best single (150ep MAE+warmup+UAE) | 0.75 M | 0.407 eV | — | seed 45 |
+| V14 JK (V2+层聚合+条件化) | 0.83 M | 0.389 eV | 1.008 eV | JK 权重偏好深层 [0.30,0.31,0.39] |
 | V9 Contrast (V2+对比条件化) | 0.84 M | 0.410 eV | 1.070 eV | 缺陷-宿主差值条件化 |
+| V11 LDS (V2+标签分布平滑) | 0.83 M | 0.433 eV | 0.990 eV | LDS 在低能区退化严重 |
+| V13 RnC (V2+对比+LDS) | 0.83 M | 0.442 eV | 1.023 eV | RnC+LDS 双重损害 |
 | v1.2 6-member ensemble (τ=1.83) | 6×0.75 M | 0.443 eV | 1.094 eV | 4×50ep + 2×100ep |
 | v1.2 baseline (4-seed mean) | 0.75 M | 0.537 ± 0.014 | 1.169 ± 0.025 | 主结论数字 |
 | **ALIGNN** (团队前期复现) | 4.03 M | 0.540 | 1.167 | 文献基线 |
@@ -575,7 +585,7 @@ v1.2 legacy LOHO（5 host, 50ep）结果详见
 | CT-V2+DefType (V3, ours) | 0.83 | 0.387 |
 | CT v4 7-ensemble SS+MS (ours) | 7×(0.75–1.1) | 0.359 |
 | CT-V2 8-ensemble greedy (v5, ours) | 8×(0.83–1.1) | 0.349 |
-| **CT-V2+innovations 8-ens (v5.1, ours)** | **8×(0.83–1.1)** | **0.345** |
+| **CT-V2+innovations 8-ens (v5.1, ours)** | **8×(0.83–1.1)** | **0.344** |
 
 **经验缩放律** log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
 R² = 0.95 → **数据是瓶颈，模型容量超过 ~0.5–0.8 M 反而过拟合**。
@@ -780,9 +790,11 @@ python scripts/prospective_dft_analyze.py
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
 当前最优：**单模型 0.379 eV (V4 MoE) / 8-ensemble 0.349 eV**（V2 架构 + 创新变体）。
 
-**当前训练状态（2026-05-20）**：第一波 V3/V4/V6/V9 全部完成 ✅。
-V4 MoE 以 **0.379 eV** 成为新最优单模型（↓30% vs ALIGNN），V6 Physics (0.382) 和 V3 DefType (0.387) 均优于 V1 baseline。V9 对比条件化 (0.410) 未能超越 V2 基线。
-下一波：V11 LDS → V13 RnC → V14 JK → V2_ema → V2_focal → V12 → V10。
+**当前训练状态（2026-05-20）**：两波训练全部完成 ✅（共 7 个创新实验）。
+- **第一波** V3/V4/V6/V9：V4 MoE **0.379 eV** ★ 新最优单模型
+- **第二波** V11/V13/V14：V14 JK 0.389（等价 V2），V11 LDS 0.433 / V13 RnC 0.442（显著劣于 V2）
+- **8-model 集成 0.344 eV**（新 SOTA，↓36% vs ALIGNN）
+下一波训练：V2_ema → V2_focal → V2_uncertainty → V12 → V10。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
@@ -812,14 +824,14 @@ V4 MoE 以 **0.379 eV** 成为新最优单模型（↓30% vs ALIGNN），V6 Phys
   参考：[MoCE](https://openreview.net/forum?id=Oit5bHPmjx)（ICLR 2025）
 - [x] **缺陷-宿主对比条件化 (V9)**：✅ 完成。Test MAE 0.410 eV（劣于 V2 基线 0.381），
   差值条件化假设可能过于简化。
-- [x] **LDS 标签分布平滑 (V11)**：✅ 已实现。高斯核平滑 + sqrt_inv 重权，
-  直击 [7,25) eV 范围梯度饥饿问题。
+- [x] **LDS 标签分布平滑 (V11)**：❌ 完成。Test MAE 0.433 eV（显著劣于 V2，p<0.001），
+  LDS 在 [0,2) eV 范围退化最严重（ΔMAE=+0.074），重权策略过度牺牲常见样本精度。
   参考：Yang et al., ICML 2021 (Delving into Deep Imbalanced Regression)
-- [x] **RnC 排序对比学习 (V13)**：✅ 已实现。辅助损失在特征空间中保持 Ef 排序，
-  缓解预测压缩并提升集成多样性。
+- [x] **RnC 排序对比学习 (V13)**：❌ 完成。Test MAE 0.442 eV（显著劣于 V2，p<0.001），
+  RnC 对比损失 + LDS 重权双重损害。辅助对比目标可能干扰主回归。
   参考：Zha et al., NeurIPS 2023 (Rank-N-Contrast)
-- [x] **JK 层聚合 (V14)**：✅ 已实现。学习 softmax 权重混合 [local_out, global_1, global_2]，
-  让模型自适应选择局部 vs 全局特征。
+- [x] **JK 层聚合 (V14)**：✅ 完成。Test MAE **0.389 eV**（与 V2 等价，p=0.42），
+  JK 权重 [0.30, 0.31, 0.39] 偏好最深全局层。被选入 ensemble k=4（提供层聚合多样性）。
   参考：Xu et al., ICML 2018 (How Powerful are GNNs)
 - [x] **Focal MAE 损失**：✅ 已实现。动态上权困难样本 w_i = (|e_i|/mean)^γ。
   γ=0.5 使 5× 平均误差的样本获得 2.2× 梯度权重。
