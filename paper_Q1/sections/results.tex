@@ -4,8 +4,9 @@
 \subsection{Architecture ablation}\label{sec:arch_ablation}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:arch} presents the contribution of each architectural
-innovation, both in isolation and combined.
+Table~\ref{tab:arch} and Fig.~\ref{fig:arch_ablation} present the
+contribution of each architectural innovation, both in isolation and
+combined.
 
 \begin{table}[t]
 \centering
@@ -35,6 +36,16 @@ environment enrichment provides local chemical context, and pre-norm enables
 stable optimization at higher learning rates.
 The parameter overhead is modest (10.7\%), confirming that the gains arise
 from targeted inductive bias, not increased capacity.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig7_arch_ablation.pdf}
+\caption{Architecture ablation showing the MAE of each innovation in
+  isolation and combined.  The combined \dart{} model achieves
+  $-26.2\%$ over the base, exceeding the average of individual gains.
+  Dashed line: ALIGNN baseline (0.540\eV{}).}
+\label{fig:arch_ablation}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Systematic innovation ablation}\label{sec:ablation_innov}
@@ -125,11 +136,23 @@ in pursuit of marginal gains on rare high-$\ef$ samples ($[7, 25)$\eV{},
 7.1\%).  The net effect is always negative, as analyzed in
 \S\ref{sec:disc_negative}.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_innovation_forest.pdf}
+\caption{Bootstrap confidence intervals for twelve innovation variants
+  relative to the \dart{} baseline.
+  Blue circles: statistically equivalent ($p > 0.05$).
+  Red squares: significantly worse ($p < 0.05$).
+  Dashed line marks the $\alpha = 0.05$ significance boundary.}
+\label{fig:innovation_forest}
+\end{figure}
+
 %----------------------------------------------------------------------
 \subsection{Ensemble analysis}\label{sec:ensemble}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ensemble} shows the greedy forward selection from 20 models.
+Table~\ref{tab:ensemble} and Fig.~\ref{fig:ensemble_curve} show the greedy
+forward selection from 20 models.
 
 \begin{table}[t]
 \centering
@@ -149,7 +172,7 @@ $k$ & Added member & MAE (eV) \\
 7 & + Multi-source shallow   & 0.344 \\
 \textbf{8} & + \dart{} long-train & \textbf{0.344} \\
 \midrule
-\multicolumn{2}{l}{Prior 29-model ensemble~\cite{}} & 0.359 \\
+\multicolumn{2}{l}{Prior 29-model ensemble} & 0.359 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -165,11 +188,22 @@ process defect information through qualitatively different mechanisms
 (expert gating, multi-scale aggregation, physics descriptors, type
 conditioning), even when their solo MAE is statistically indistinguishable.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig3_ensemble_curve.pdf}
+\caption{Greedy forward selection curve.
+  Each step adds the model minimizing ensemble MAE.
+  The 8-model ensemble (circled) achieves 0.344\eV{}, outperforming a
+  prior 29-model ensemble (dashed gray) with $3.6\times$ fewer members.}
+\label{fig:ensemble_curve}
+\end{figure}
+
 %----------------------------------------------------------------------
 \subsection{Out-of-distribution evaluation}\label{sec:ood}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ood} presents the graduated OOD assessment.
+Table~\ref{tab:ood} and Fig.~\ref{fig:ood} present the graduated OOD
+assessment.
 
 \begin{table}[t]
 \centering
@@ -207,6 +241,19 @@ from 0.540 to 0.493\eV{}, though neither direction reaches significance
 This suggests that embeddings pretrained on bulk crystals may encode
 chemical priors partially misaligned with the 2D defect domain.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_ood_combined.pdf}
+\caption{Out-of-distribution evaluation.
+  (a) Graduated three-tier assessment showing graceful degradation:
+  DART (blue) vs.\ naive baseline (red).
+  Degradation factors annotated below each bar.
+  (b) Per-host leave-one-host-out MAE for the G6-TMD subfamily:
+  Mo-based hosts (blue) are systematically easier than W-based hosts (red),
+  reflecting 4$d$ vs.\ 5$d$ orbital delocalization.}
+\label{fig:ood}
+\end{figure*}
+
 %----------------------------------------------------------------------
 \subsection{Prospective DFT validation}\label{sec:dft}
 %----------------------------------------------------------------------
@@ -217,6 +264,15 @@ To validate \dart{}'s predictions beyond held-out test sets, we perform
 independent first-principles calculations on model-recommended candidates.
 Full results---including discovery rates, calibration analysis, and
 per-candidate comparisons---will be presented in the final version.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_parity.pdf}
+\caption{Parity plot for the best single model (V4 MoE, 0.379\eV{}).
+  Color intensity indicates sample density.
+  The shaded band marks $\pm 1$\eV{} around perfect prediction.}
+\label{fig:parity}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Uncertainty quantification}\label{sec:uq}
@@ -265,3 +321,18 @@ This is physically meaningful: interstitial defects involve atoms
 \emph{inserted into} the lattice, creating strong local strain, while
 adsorbates sit \emph{on top of} the surface with weaker mechanical
 coupling.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_interpretability.pdf}
+\caption{Physical interpretability analysis.
+  (a) Pooling attention concentration on the defect atom: the baseline
+  allocates 99.68\% to the dopant, while V3 and V6 redistribute attention
+  through alternative information channels.
+  (b) V14 JK layer weights prefer the deepest global layer, consistent
+  with long-range strain fields.
+  (c) Uncertainty calibration: temperature scaling ($\tau = 2.60$)
+  corrects raw ensemble underconfidence, achieving 93.4\% coverage at
+  90\% nominal level.}
+\label{fig:interpretability}
+\end{figure*}

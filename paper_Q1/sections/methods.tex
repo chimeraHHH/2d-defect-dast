@@ -49,12 +49,91 @@ processed by an MLP.
 \dart{} adopts a hierarchical design decoupling short-range chemical bonding
 from long-range defect-induced perturbations (Fig.~\ref{fig:architecture}).
 
+\definecolor{localblue}{HTML}{4393C3}
+\definecolor{globalorange}{HTML}{E66101}
+\definecolor{innovgreen}{HTML}{1B7837}
+\definecolor{readoutpurple}{HTML}{7B3294}
+\definecolor{inputgray}{HTML}{D9D9D9}
+\definecolor{bgblue}{HTML}{DEEBF7}
+\definecolor{bgorange}{HTML}{FEE6CE}
+\definecolor{bggreen}{HTML}{D5E8D4}
+
 \begin{figure*}[t]
 \centering
-% \includegraphics[width=\textwidth]{figures/architecture.pdf}
-\fbox{\parbox{0.95\textwidth}{\centering\vspace{2cm}
-  [Figure: \dart{} architecture overview]
-\vspace{2cm}}}
+\resizebox{0.75\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=0.45cm and 0.7cm,
+    block/.style={draw, rounded corners=2pt, minimum height=0.6cm,
+                  minimum width=2.2cm, font=\footnotesize, thick,
+                  align=center},
+    localblock/.style={block, fill=bgblue, draw=localblue},
+    globalblock/.style={block, fill=bgorange, draw=globalorange},
+    innovblock/.style={block, fill=bggreen, draw=innovgreen},
+    ioblock/.style={block, fill=inputgray!50, draw=gray},
+    readblock/.style={block, fill=readoutpurple!15, draw=readoutpurple},
+    arrow/.style={-{Stealth[length=4pt]}, thick},
+    bracetext/.style={font=\scriptsize, text=gray, align=center},
+]
+% Input
+\node[ioblock, minimum width=3.2cm] (input) {Crystal graph $\mathcal{G}$\\
+  \scriptsize $\mathbf{x}_i$ (9-dim) $+$ $\delta_i$ defect flag};
+% Embedding
+\node[ioblock, below=0.35cm of input, minimum width=3.2cm] (embed) {
+  Node embedding\\[-2pt]
+  \scriptsize $\mathbf{h}_i^{(0)} = \mathbf{W}\mathbf{x}_i + \mathbf{e}_{\mathrm{def}}(\delta_i)$};
+% Local layers
+\node[localblock, below=0.45cm of embed, minimum width=3.2cm] (local) {
+  Local interaction $\times 3$\\[-2pt]
+  \scriptsize Bond $+$ angle convolution};
+% Innovation: Env enrichment
+\node[innovblock, right=0.5cm of local, minimum width=2.5cm] (envrich) {
+  \textbf{(II)} Env enrichment\\[-2pt]
+  \scriptsize CN, $\bar{d}$, $\Delta\chi$};
+% Global layers
+\node[globalblock, below=0.45cm of local, minimum width=3.2cm] (global) {
+  Global self-attn $\times 2$\\[-2pt]
+  \scriptsize Distance bias $\phi(d_{ij}^{\mathrm{PBC}})$};
+% Innovation: Pre-norm
+\node[innovblock, right=0.5cm of global, minimum width=2.5cm] (prenorm) {
+  \textbf{(III)} Pre-norm residual\\[-2pt]
+  \scriptsize LN $\to$ SubLayer $\to$ Add};
+% Gated pooling
+\node[readblock, below=0.45cm of global, minimum width=3.2cm] (pool) {
+  \textbf{(I)} Gated attn pooling\\[-2pt]
+  \scriptsize $\sigma(\mathbf{W}_g)\!\odot\!$AttnPool $+$ MaxPool};
+% MLP
+\node[readblock, below=0.35cm of pool, minimum width=3.2cm] (mlp) {
+  MLP readout $\to$ $\hat{E}_f$};
+% Arrows
+\draw[arrow] (input)  -- (embed);
+\draw[arrow] (embed)  -- (local);
+\draw[arrow] (local)  -- (global);
+\draw[arrow] (global) -- (pool);
+\draw[arrow] (pool)   -- (mlp);
+\draw[arrow, innovgreen, dashed] (envrich) -- (local);
+\draw[arrow, innovgreen, dashed] (prenorm) -- (global);
+% Braces
+\draw[decorate, decoration={brace, amplitude=5pt, mirror},
+      localblue, thick]
+  ($(local.south west) + (-0.12, 0)$) --
+  ($(local.north west) + (-0.12, 0)$)
+  node[midway, left=5pt, bracetext, text=localblue]
+  {$r\!<\!5$\,\AA};
+\draw[decorate, decoration={brace, amplitude=5pt, mirror},
+      globalorange, thick]
+  ($(global.south west) + (-0.12, 0)$) --
+  ($(global.north west) + (-0.12, 0)$)
+  node[midway, left=5pt, bracetext, text=globalorange]
+  {$r\!<\!12$\,\AA};
+% Legend
+\node[below=0.5cm of mlp, font=\scriptsize, text=gray] {
+  \textcolor{localblue}{$\blacksquare$} Local \quad
+  \textcolor{globalorange}{$\blacksquare$} Global \quad
+  \textcolor{innovgreen}{$\blacksquare$} Innovations \quad
+  \textcolor{readoutpurple}{$\blacksquare$} Readout
+};
+\end{tikzpicture}%
+}% end resizebox
 \caption{\dart{} architecture overview.
   Local interaction layers (blue) capture bond lengths, bond angles, and
   coordination within $r_\mathrm{cut} = 5$\,\AA{}.
@@ -70,15 +149,15 @@ from long-range defect-induced perturbations (Fig.~\ref{fig:architecture}).
 The first $L_\mathrm{loc} = 3$ layers operate on the sparse neighbor graph
 via continuous-filter convolution gated by distance, with additive three-body
 angle modulation:
-\begin{equation}\label{eq:local}
+\begin{multline}\label{eq:local}
   \mathbf{h}_i^{(l+1)} = \mathbf{h}_i^{(l)}
-    + \sigma\!\Biggl(
-      \sum_{j \in \mathcal{N}(i)} \boldsymbol{\phi}(d_{ij})
-        \odot \mathbf{W}\mathbf{h}_j^{(l)}
-      + \!\!\sum_{(j,k) \in \mathcal{T}(i)}\!\!
+    + \sigma\Bigl(
+      \textstyle\sum_{j \in \mathcal{N}(i)} \boldsymbol{\phi}(d_{ij})
+        \odot \mathbf{W}\mathbf{h}_j^{(l)} \\
+      + \textstyle\sum_{(j,k) \in \mathcal{T}(i)}
         f_\mathrm{trip}(\mathbf{h}_i^{(l)}, \theta_{jik})
-    \Biggr),
-\end{equation}
+    \Bigr),
+\end{multline}
 where $\boldsymbol{\phi}$ is a two-layer MLP over RBF-expanded distance,
 $\mathcal{T}(i)$ the triplet set (capped at 32), $f_\mathrm{trip}$ an MLP
 over concatenated features and angle RBF, and $\sigma$ the SiLU activation.

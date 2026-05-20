@@ -17,7 +17,7 @@ architectural innovations (gated pooling, environment enrichment,
 pre-norm) contribute ${\sim}0.135$\eV{} (Table~\ref{tab:arch}), while
 the MoE readout adds a further ${\sim}0.002$\eV{}.
 This confirms that targeted inductive bias dominates over capacity
-scaling in data-limited materials science.
+scaling in data-limited materials science (Fig.~\ref{fig:scaling}).
 
 %----------------------------------------------------------------------
 \subsection{Why auxiliary losses fail}\label{sec:disc_negative}
@@ -28,9 +28,9 @@ A striking finding is that all six training-strategy innovations
 combinations) significantly \emph{worsen} performance.
 Per-range analysis reveals a consistent mechanism: these methods
 improve accuracy on rare high-$\ef$ samples ($[7, 25)$\eV{}) at the
-cost of degrading common low-$\ef$ samples ($[0, 2)$\eV{}$).
-Since the low-$\ef$ range contains 48.5\% of test data vs.\ 7.1\% for
-the high-$\ef$ range, the net effect is always negative.
+cost of degrading common low-$\ef$ samples ($[0, 2)$\eV{}).
+Since the low-$\ef$ range contains 48.5\% of test data vs.\ 7.1\%
+for the high-$\ef$ range, the net effect is always negative.
 
 LDS exemplifies this trade-off most clearly: it improves the $[7, 25)$
 range by 0.126\eV{} (not significant, $p = 0.16$) while degrading
@@ -46,6 +46,17 @@ techniques from computer vision to materials science: the underlying
 assumption---that improving tail performance is costless for the
 head---does not hold when model capacity is constrained and the
 regression target spans multiple orders of magnitude.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_per_range.pdf}
+\caption{Per-range MAE decomposition explaining why auxiliary losses
+  fail.  LDS and focal MAE sacrifice accuracy on the dominant
+  $[0, 2)$\eV{} range (48.5\% of data) for marginal gains at the tail.
+  Heteroscedastic uncertainty degrades all ranges through capacity
+  competition.}
+\label{fig:per_range}
+\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Ensemble diversity from architectural innovation}
@@ -106,3 +117,16 @@ pooling and environment enrichment---are transferable to other
 defect-property prediction tasks (formation energies in 3D, migration
 barriers, charged defects) and other crystal-property domains where local
 perturbations drive global behavior.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig6_scaling_law.pdf}
+\caption{Scaling analysis from abbreviated 30-epoch training runs.
+  (a) Data scaling at fixed model size ($d = 128$): power-law exponent
+  $\alpha \approx -0.4$ indicates strong data dependence.
+  (b) Parameter scaling at fixed data ($N = 8{,}000$): $\beta$ is near
+  zero, showing negligible improvement from larger models.
+  Both panels confirm that data, not capacity, is the bottleneck in the
+  $N \sim 10^4$ regime.}
+\label{fig:scaling}
+\end{figure*}
