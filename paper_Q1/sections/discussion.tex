@@ -19,6 +19,19 @@ the MoE readout adds a further ${\sim}0.002$\eV{}.
 This confirms that targeted inductive bias dominates over capacity
 scaling in data-limited materials science (Fig.~\ref{fig:scaling}).
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig6_scaling_law.pdf}
+\caption{Scaling analysis from abbreviated 30-epoch training runs.
+  (a) Data scaling at fixed model size ($d = 128$): power-law exponent
+  $\alpha \approx -0.4$ indicates strong data dependence.
+  (b) Parameter scaling at fixed data ($N = 8{,}000$): $\beta$ is near
+  zero, showing negligible improvement from larger models.
+  Both panels confirm that data, not capacity, is the bottleneck in the
+  $N \sim 10^4$ regime.}
+\label{fig:scaling}
+\end{figure}
+
 %----------------------------------------------------------------------
 \subsection{Why auxiliary losses fail}\label{sec:disc_negative}
 %----------------------------------------------------------------------
@@ -118,15 +131,3 @@ defect-property prediction tasks (formation energies in 3D, migration
 barriers, charged defects) and other crystal-property domains where local
 perturbations drive global behavior.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig6_scaling_law.pdf}
-\caption{Scaling analysis from abbreviated 30-epoch training runs.
-  (a) Data scaling at fixed model size ($d = 128$): power-law exponent
-  $\alpha \approx -0.4$ indicates strong data dependence.
-  (b) Parameter scaling at fixed data ($N = 8{,}000$): $\beta$ is near
-  zero, showing negligible improvement from larger models.
-  Both panels confirm that data, not capacity, is the bottleneck in the
-  $N \sim 10^4$ regime.}
-\label{fig:scaling}
-\end{figure*}

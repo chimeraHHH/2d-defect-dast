@@ -4,11 +4,10 @@
 \subsection{Architecture ablation}\label{sec:arch_ablation}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:arch} and Fig.~\ref{fig:arch_ablation} present the
-contribution of each architectural innovation, both in isolation and
-combined.
+Table~\ref{tab:arch} presents the contribution of each architectural
+innovation, both in isolation and combined.
 
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \caption{Architectural innovation ablation.  Each row adds one
   innovation to the base CrystalTransformer (0.516\eV{}).
@@ -36,16 +35,6 @@ environment enrichment provides local chemical context, and pre-norm enables
 stable optimization at higher learning rates.
 The parameter overhead is modest (10.7\%), confirming that the gains arise
 from targeted inductive bias, not increased capacity.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig7_arch_ablation.pdf}
-\caption{Architecture ablation showing the MAE of each innovation in
-  isolation and combined.  The combined \dart{} model achieves
-  $-26.2\%$ over the base, exceeding the average of individual gains.
-  Dashed line: ALIGNN baseline (0.540\eV{}).}
-\label{fig:arch_ablation}
-\end{figure}
 
 %----------------------------------------------------------------------
 \subsection{Systematic innovation ablation}\label{sec:ablation_innov}
@@ -190,7 +179,7 @@ conditioning), even when their solo MAE is statistically indistinguishable.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig3_ensemble_curve.pdf}
+\includegraphics[width=\columnwidth]{fig_ensemble_curve.pdf}
 \caption{Greedy forward selection curve.
   Each step adds the model minimizing ensemble MAE.
   The 8-model ensemble (circled) achieves 0.344\eV{}, outperforming a
