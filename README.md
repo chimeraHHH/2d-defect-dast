@@ -721,15 +721,25 @@ paper/
     ├── fig_uq_* / fig_loho_bars / fig_error_by_category
     ├── fig_cross_dataset_*                   # 跨数据集
     └── fig_prospective_dft.png               # ⭐ v3 DFT validation
-paper_Q1/                                        # ⭐ Q1 期刊论文（revtex4-2）
+paper_Q1/                                        # ⭐ Q1 期刊论文（revtex4-2, 11 pages）
 ├── main.tex                                     #   主文件（含摘要）
-├── references.bib                               #   22 条参考文献
+├── main.pdf                                     #   编译完成的 PDF（608 KB）
+├── references.bib                               #   18 条参考文献
+├── scripts/generate_figures.py                  #   可复现的图表生成脚本
+├── figures/                                     #   7 张出版级 PDF 图
+│   ├── fig_innovation_forest.pdf                #     12 创新 bootstrap CI 森林图
+│   ├── fig_ensemble_curve.pdf                   #     贪心集成选择曲线
+│   ├── fig_ood_combined.pdf                     #     3-tier OOD + per-host LOHO
+│   ├── fig_parity.pdf                           #     DFT vs 预测 parity 图
+│   ├── fig_interpretability.pdf                 #     注意力 + JK 权重 + 校准
+│   ├── fig_per_range.pdf                        #     按能量范围误差分解
+│   └── fig6_scaling_law.pdf                     #     数据/参数 scaling law
 └── sections/
     ├── introduction.tex                         #   4 gaps + 5 contributions
-    ├── methods.tex                              #   DART 架构 + 12 变体
+    ├── methods.tex                              #   DART 架构 + TikZ 图 + 12 变体
     ├── setup.tex                                #   数据集 / 基线 / 统计检验
-    ├── results.tex                              #   消融 / 集成 / OOD / UQ
-    ├── discussion.tex                           #   负面结果 / 集成多样性
+    ├── results.tex                              #   消融 / 集成 / OOD / UQ / 可解释性
+    ├── discussion.tex                           #   负面结果 / scaling / 集成多样性
     └── conclusion.tex                           #   5 findings
 ```
 
@@ -815,7 +825,7 @@ python scripts/prospective_dft_analyze.py
 - **12 创新实验**：6 等价基线，6 显著劣于基线（bootstrap p<0.05）
 - **最优单模型**：V4 MoE **0.379 eV**（↓30% vs ALIGNN）
 - **最优集成**：8-model **0.344 eV**（↓36% vs ALIGNN，含 V4/V14/V6/V3 创新变体）
-- **Q1 论文** `paper_Q1/`：6 节 + 22 参考文献，含 12 创新消融 + 3 tier OOD + UQ + DFT 占位符
+- **Q1 论文** `paper_Q1/`：11 页 PDF 已编译，8 张出版级图表，18 参考文献，含 12 创新消融 + 3-tier OOD + UQ + 可解释性 + DFT 占位符
 - 结论：V2 架构高度鲁棒，单项创新无法显著超越；核心价值在于集成多样性
 
 ### Tier 1 — 低成本高收益（不改架构）
