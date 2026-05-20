@@ -721,6 +721,16 @@ paper/
     ├── fig_uq_* / fig_loho_bars / fig_error_by_category
     ├── fig_cross_dataset_*                   # 跨数据集
     └── fig_prospective_dft.png               # ⭐ v3 DFT validation
+paper_Q1/                                        # ⭐ Q1 期刊论文（revtex4-2）
+├── main.tex                                     #   主文件（含摘要）
+├── references.bib                               #   22 条参考文献
+└── sections/
+    ├── introduction.tex                         #   4 gaps + 5 contributions
+    ├── methods.tex                              #   DART 架构 + 12 变体
+    ├── setup.tex                                #   数据集 / 基线 / 统计检验
+    ├── results.tex                              #   消融 / 集成 / OOD / UQ
+    ├── discussion.tex                           #   负面结果 / 集成多样性
+    └── conclusion.tex                           #   5 findings
 ```
 
 ---
@@ -801,12 +811,11 @@ python scripts/prospective_dft_analyze.py
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
 当前最优：**单模型 0.379 eV (V4 MoE) / 8-ensemble 0.349 eV**（V2 架构 + 创新变体）。
 
-**当前训练状态（2026-05-20）**：两波训练全部完成 ✅（共 7 个创新实验）。
-- **第一波** V3/V4/V6/V9：V4 MoE **0.379 eV** ★ 新最优单模型
-- **第二波** V11/V13/V14：V14 JK 0.389（等价 V2），V11 LDS 0.433 / V13 RnC 0.442（显著劣于 V2）
-- **第三波** V2_ema/V2_focal/V2_uncertainty：V2_ema 0.395（等价 V2），V2_focal 0.419 / V2_uncertainty 0.466（显著更差）
-- **第四波** V12/V10：V10 最优组合 0.392（等价 V2，val MAE 0.377 最优），V12 LDS+物理 0.413（LDS 拖累）
-- **全部 12 个创新实验完成** ✅，**8-model 集成 0.344 eV**（SOTA，↓36% vs ALIGNN）
+**当前状态（2026-05-20）**：全部 12 个创新实验完成 ✅ + Q1 论文初稿完成 ✅
+- **12 创新实验**：6 等价基线，6 显著劣于基线（bootstrap p<0.05）
+- **最优单模型**：V4 MoE **0.379 eV**（↓30% vs ALIGNN）
+- **最优集成**：8-model **0.344 eV**（↓36% vs ALIGNN，含 V4/V14/V6/V3 创新变体）
+- **Q1 论文** `paper_Q1/`：6 节 + 22 参考文献，含 12 创新消融 + 3 tier OOD + UQ + DFT 占位符
 - 结论：V2 架构高度鲁棒，单项创新无法显著超越；核心价值在于集成多样性
 
 ### Tier 1 — 低成本高收益（不改架构）
