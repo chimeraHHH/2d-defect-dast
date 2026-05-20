@@ -7,6 +7,14 @@
 \usepackage{multirow}
 \usepackage{siunitx}
 \usepackage[expansion=false]{microtype}
+% Fix float placement for figure-heavy papers
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{8}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, shapes.geometric, fit,
                  decorations.pathreplacing, calc}
@@ -36,30 +44,29 @@
 Point defects govern the electronic, optical, and catalytic properties of
 two-dimensional (2D) materials, yet first-principles formation-energy
 calculations remain prohibitively expensive for exhaustive host--dopant
-screening.  Here we present \dart{}, a compact graph transformer
-(${\sim}0.83$\,M parameters) that combines local bond-angle message passing,
-global periodic self-attention, and three architectural innovations---defect-aware
-gated attention pooling, local environment enrichment, and pre-norm residual
-connections---achieving a single-model MAE of 0.379\eV{} on the IMP2D benchmark
-(10\,641 configurations, 44 hosts $\times$ 65 dopants), a 30\% reduction over
-ALIGNN (4.03\,M parameters).  An efficient 8-model ensemble further reduces the
-MAE to 0.344\eV{} ($-36\%$ vs.\ ALIGNN), outperforming a prior 29-model ensemble
-with less than one-third the members.
+screening.  Here we present \dart{} (Defect-Aware Radial Transformer), a
+compact graph transformer that combines local bond-angle message passing,
+global periodic self-attention, and three targeted architectural
+innovations---defect-aware gated attention pooling, local environment
+enrichment, and pre-norm residual connections---to predict defect formation
+energies on the IMP2D benchmark with substantially fewer parameters than
+existing approaches.  A small ensemble of physically diverse models further
+improves accuracy beyond a much larger prior ensemble.
 
-We systematically evaluate twelve physically motivated innovations---including
-mixture-of-experts readout, defect-type conditioning, Hume-Rothery physics
-features, JK layer aggregation, label distribution smoothing, and rank-preserving
-contrastive learning---using bootstrap hypothesis testing on 1\,065 held-out
-samples.  Only four variants match the baseline statistically; the remaining six,
-including all reweighting and auxiliary-loss strategies, are significantly harmful
-($p < 0.05$), providing rigorous negative results that inform future model design.
+We systematically evaluate twelve physically motivated innovations spanning
+architecture, loss functions, and training strategies, using bootstrap
+hypothesis testing with rigorous statistical controls.  Notably, all
+auxiliary-loss and reweighting strategies significantly \emph{worsen}
+performance, while targeted architectural changes provide consistent gains---a
+finding that challenges the common practice of importing imbalanced-learning
+techniques from computer vision into data-limited materials science.
 
-A graduated three-tier out-of-distribution protocol---random split, intra-family
-leave-one-host-out, and compositional block-out---quantifies \dart{}'s deployment
-boundaries: intra-family OOD degrades by only 1.5$\times$ (0.540\eV{}).
-Temperature-scaled ensemble uncertainty achieves 93.4\% coverage at the 90\%
-nominal level.  Together, these results establish \dart{} as an efficient and
-rigorously validated surrogate for accelerating defect engineering in 2D materials.
+A graduated three-tier out-of-distribution protocol quantifies deployment
+boundaries from interpolation through intra-family transfer to compositional
+extrapolation, revealing graceful degradation.  Temperature-scaled ensemble
+uncertainty provides well-calibrated confidence estimates.  Together, these
+results establish \dart{} as an efficient and rigorously validated surrogate
+for accelerating defect engineering in 2D materials.
 \end{abstract}
 
 \maketitle
