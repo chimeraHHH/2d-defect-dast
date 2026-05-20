@@ -370,6 +370,8 @@ def main() -> None:
     parser.add_argument("--max-steps", type=int, default=0)
     parser.add_argument("--device", default=None)
     parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--resume", action="store_true",
+                        help="Resume training from latest.pt checkpoint")
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
@@ -641,27 +643,61 @@ def main() -> None:
 
     history = []
     best_val_mae = float("inf")
+    start_epoch = 1
 
-    with open(log_path, "w") as logf:
-        msg = (
-            f"Config: {json.dumps(cfg, ensure_ascii=False)}\n"
-            f"Device: {device}\n"
-            f"Model: {model_cls.__name__} | params={n_params / 1e6:.3f}M\n"
-            f"Train/Val/Test: {len(train_set)}/{len(val_set)}/{len(test_set)}\n"
-            f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
-            f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
-            f"droppath={drop_path_rate} label_noise={label_noise_std} "
-            f"ema={use_ema}(decay={ema_decay}) lds={use_lds} rnc={use_rnc} "
-            f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
-            f"distill={use_distill}(alpha={distill_alpha})\n"
-            f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
-        )
+    # ── Resume from checkpoint ──────────────────────────────────────────
+    if args.resume:
+        latest_path = out_dir / "latest.pt"
+        if latest_path.exists():
+            print(f"Loading resume checkpoint from {latest_path} ...")
+            resume_ckpt = torch.load(latest_path, map_location=device,
+                                     weights_only=False)
+            model.load_state_dict(resume_ckpt["model"])
+            optimizer.load_state_dict(resume_ckpt["optimizer"])
+            try:
+                scheduler.load_state_dict(resume_ckpt["scheduler"])
+            except Exception as e:
+                print(f"WARNING: Could not restore scheduler state: {e}")
+            best_val_mae = resume_ckpt.get("best_val_mae", float("inf"))
+            history = resume_ckpt.get("history", [])
+            start_epoch = resume_ckpt["epoch"] + 1
+            if ema is not None and "ema_shadow" in resume_ckpt:
+                ema.shadow = resume_ckpt["ema_shadow"]
+                ema.backup = resume_ckpt["ema_backup"]
+            if aux_defect_head is not None and "aux_defect_head" in resume_ckpt:
+                aux_defect_head.load_state_dict(resume_ckpt["aux_defect_head"])
+            if use_swa and "swa_model" in resume_ckpt:
+                swa_model.load_state_dict(resume_ckpt["swa_model"])
+            print(f"▶ Resumed from epoch {resume_ckpt['epoch']} "
+                  f"(best_val_mae={best_val_mae:.4f}, "
+                  f"remaining={epochs - resume_ckpt['epoch']} epochs)")
+        else:
+            print("WARNING: --resume specified but no latest.pt found, "
+                  "starting fresh")
+
+    with open(log_path, "a" if start_epoch > 1 else "w") as logf:
+        if start_epoch > 1:
+            msg = f"\n{'='*60}\nResumed from epoch {start_epoch - 1}, continuing...\n{'='*60}\n"
+        else:
+            msg = (
+                f"Config: {json.dumps(cfg, ensure_ascii=False)}\n"
+                f"Device: {device}\n"
+                f"Model: {model_cls.__name__} | params={n_params / 1e6:.3f}M\n"
+                f"Train/Val/Test: {len(train_set)}/{len(val_set)}/{len(test_set)}\n"
+                f"Enhancements: balanced={use_balanced} online_aug={use_online_aug} "
+                f"adv={use_adv}(eps={adv_eps},w={adv_weight}) "
+                f"droppath={drop_path_rate} label_noise={label_noise_std} "
+                f"ema={use_ema}(decay={ema_decay}) lds={use_lds} rnc={use_rnc} "
+                f"swa={use_swa}(ep{swa_start_epoch}) aux_defect={aux_defect_w} "
+                f"distill={use_distill}(alpha={distill_alpha})\n"
+                f"Target stats: mean={normalizer.mean:.4f} std={normalizer.std:.4f}\n"
+            )
         print(msg)
         logf.write(msg)
         logf.flush()
 
         global_step = 0
-        for epoch in range(1, epochs + 1):
+        for epoch in range(start_epoch, epochs + 1):
             t0 = time.time()
             model.train()
             if aux_defect_head is not None:
@@ -856,6 +892,28 @@ def main() -> None:
             }
             with open(metrics_path, "w") as _mf:
                 json.dump(_partial, _mf, indent=2)
+
+            # Save resume checkpoint (full training state for --resume)
+            _resume_state = {
+                "epoch": epoch,
+                "model": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+                "scheduler": scheduler.state_dict(),
+                "best_val_mae": best_val_mae,
+                "history": history,
+                "global_step": global_step,
+                "normalizer": normalizer.state_dict(),
+                "config": cfg,
+            }
+            if ema is not None:
+                _resume_state["ema_shadow"] = ema.shadow
+                _resume_state["ema_backup"] = ema.backup
+            if aux_defect_head is not None:
+                _resume_state["aux_defect_head"] = aux_defect_head.state_dict()
+            if use_swa and swa_model is not None:
+                _resume_state["swa_model"] = swa_model.state_dict()
+            torch.save(_resume_state, out_dir / "latest.pt")
+
             if args.max_steps and global_step >= args.max_steps:
                 break
 
