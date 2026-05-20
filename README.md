@@ -107,10 +107,10 @@
 | **V14 JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ✅ 0.389 | Xu et al., ICML 2018 (JK-Net) |
 | **V12 LDS+物理+全条件化** | V6+V3+V9+LDS+EMA 协同 | +17K | ⏳ 待训练 | 综合方案 |
 | **V10 最优组合** | 所有正面创新整合 | +31K | ⏳ 待训练 | — |
-| **异方差不确定性** | 自适应降权噪声样本 + 置信度估计 | +8.3K | ✅ 已实现 | Kendall & Gal, NeurIPS 2017; Hirschfeld, JCIM 2020 |
+| **异方差不确定性** | 自适应降权噪声样本 + 置信度估计 | +8.3K | ❌ 0.466 | Kendall & Gal, NeurIPS 2017; Hirschfeld, JCIM 2020 |
 | **ASPH 持久同调** | 拓扑描述缺陷局部环境 (0-dim 连通 + 1-dim 环) | 0 (输入特征) | ✅ 已计算 | Fang & Yan, Chem. Mater. 2025 (Ef MAE↓55%) |
-| **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | 0 | ⏳ 待训练 | Lin et al., ICCV 2017 (Focal Loss, Best Paper) |
-| **EMA 权重平均** | 训练过程中指数滑动平均，更平坦极小值 | 0 | ⏳ 待训练 | Polyak 1992; Izmailov et al., UAI 2018 |
+| **Focal MAE 损失** | 动态上权困难样本：w_i = (\|e_i\|/mean)^γ | 0 | ❌ 0.419 | Lin et al., ICCV 2017 (Focal Loss, Best Paper) |
+| **EMA 权重平均** | 训练过程中指数滑动平均，更平坦极小值 | 0 | ✅ 0.395 | Polyak 1992; Izmailov et al., UAI 2018 |
 
 #### V6 物理失配特征详解
 
@@ -793,8 +793,9 @@ python scripts/prospective_dft_analyze.py
 **当前训练状态（2026-05-20）**：两波训练全部完成 ✅（共 7 个创新实验）。
 - **第一波** V3/V4/V6/V9：V4 MoE **0.379 eV** ★ 新最优单模型
 - **第二波** V11/V13/V14：V14 JK 0.389（等价 V2），V11 LDS 0.433 / V13 RnC 0.442（显著劣于 V2）
-- **8-model 集成 0.344 eV**（新 SOTA，↓36% vs ALIGNN）
-下一波训练：V2_ema → V2_focal → V2_uncertainty → V12 → V10。
+- **第三波** V2_ema/V2_focal/V2_uncertainty：V2_ema 0.395（等价 V2），V2_focal 0.419 / V2_uncertainty 0.466（显著更差）
+- **8-model 集成 0.344 eV**（SOTA，↓36% vs ALIGNN）
+下一波：V12 LDS+物理+全条件化 → V10 最优组合。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
@@ -833,10 +834,12 @@ python scripts/prospective_dft_analyze.py
 - [x] **JK 层聚合 (V14)**：✅ 完成。Test MAE **0.389 eV**（与 V2 等价，p=0.42），
   JK 权重 [0.30, 0.31, 0.39] 偏好最深全局层。被选入 ensemble k=4（提供层聚合多样性）。
   参考：Xu et al., ICML 2018 (How Powerful are GNNs)
-- [x] **Focal MAE 损失**：✅ 已实现。动态上权困难样本 w_i = (|e_i|/mean)^γ。
-  γ=0.5 使 5× 平均误差的样本获得 2.2× 梯度权重。
-- [x] **EMA 权重平均**：✅ 已实现。训练中指数滑动平均 (decay=0.999)，
-  收敛到更平坦极小值。
+- [x] **Focal MAE 损失**：❌ 完成。Test MAE 0.419 eV（显著劣于 V2，p=0.001），
+  focal 上权困难样本会损害 [0,2) 和 [2,5) 常见范围精度（ΔMAE=+0.049, p<0.01）。
+  但 [7,25) 范围有微弱改善 (+0.124, ns)，代价过高。
+- [x] **EMA 权重平均**：✅ 完成。Test MAE **0.395 eV**（与 V2 等价，p=0.20），
+  EMA decay=0.999 + SWA 达到 val MAE 0.379（最优），但 test 不匹配 (0.395)。
+  在 V2 seed 方差范围内 (0.392 ± 0.007)。
 - [ ] **iComFormer 风格几何完备注意力**：用不变量（距离 + 键角）替代纯距离
   编码的全局 Transformer 层，不引入等变张量积开销。ICLR 2024 在 MatBench
   上超越 ALIGNN。
