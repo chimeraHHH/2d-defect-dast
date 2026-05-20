@@ -381,6 +381,16 @@ def main() -> None:
 
     split_seed = cfg.get("split_seed", 42)
 
+    # ── Limit CPU threads to avoid overloading shared servers ────────
+    # Without this, each process spawns ~200 OMP/MKL threads on a 256-core
+    # machine, causing severe contention when multiple runs share the node.
+    n_workers = cfg.get("num_workers", 4)
+    cpu_threads = cfg.get("cpu_threads", 8)
+    import os
+    os.environ.setdefault("OMP_NUM_THREADS", str(cpu_threads))
+    os.environ.setdefault("MKL_NUM_THREADS", str(cpu_threads))
+    torch.set_num_threads(cpu_threads)
+
     out_dir = ROOT / cfg["output_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "train.log"
@@ -442,17 +452,25 @@ def main() -> None:
         train_loader = DataLoader(
             loader_ds, batch_size=cfg.get("batch_size", 64),
             sampler=sampler, collate_fn=collate_fn,
+            num_workers=n_workers, pin_memory=True,
+            persistent_workers=(n_workers > 0),
         )
     else:
         loader_ds = OnlineAugDataset(train_set, transform=aug_transform) if use_online_aug else train_set
         train_loader = DataLoader(
             loader_ds, batch_size=cfg.get("batch_size", 64),
             shuffle=True, collate_fn=collate_fn,
+            num_workers=n_workers, pin_memory=True,
+            persistent_workers=(n_workers > 0),
         )
     val_loader = DataLoader(val_set, batch_size=cfg.get("batch_size", 64),
-                            shuffle=False, collate_fn=collate_fn)
+                            shuffle=False, collate_fn=collate_fn,
+                            num_workers=n_workers, pin_memory=True,
+                            persistent_workers=(n_workers > 0))
     test_loader = DataLoader(test_set, batch_size=cfg.get("batch_size", 64),
-                             shuffle=False, collate_fn=collate_fn)
+                             shuffle=False, collate_fn=collate_fn,
+                             num_workers=n_workers, pin_memory=True,
+                             persistent_workers=(n_workers > 0))
 
     # Normalizer
     targets = torch.tensor(

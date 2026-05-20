@@ -165,7 +165,8 @@ for i in "${!QUEUE_CONFIGS[@]}"; do
 
     echo "🚀 Launching: $name on GPU $GPU"
     mkdir -p "$outdir"
-    CUDA_VISIBLE_DEVICES=$GPU nohup $CONDA_PYTHON -u \
+    OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 CUDA_VISIBLE_DEVICES=$GPU \
+        nohup $CONDA_PYTHON -u \
         src/train_enhanced.py --config "$config" \
         > "$outdir/nohup.log" 2>&1 &
     PID=$!
