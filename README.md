@@ -2,7 +2,7 @@
 
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.349%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
+[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.345%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![best single](https://img.shields.io/badge/best%20single-0.379%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
@@ -15,7 +15,8 @@
 
 * **0.84 M 参数的 CrystalTransformerV2+MoE 大幅超越 ALIGNN（4.03 M）**
   （V4 MoE best single 0.379 eV vs ALIGNN 0.540 eV，↓30%）
-* **8-model 贪心集成** 在 1065 测试样本上达 **0.349 eV**（↓35% vs ALIGNN）
+* **8-model 贪心集成** 在 1065 测试样本上达 **0.345 eV**（↓36% vs ALIGNN），
+  含 V4 MoE + V3 DefType + V6 Physics 创新模型（提供架构多样性）
 * **约束 OOD 评估**：Leave-One-Host-Out 7-fold 平均 **0.540 eV**，
   从 ID 到族内 OOD 仅 1.5× 退化（而非全 OOD 的 7.3×），模型优雅降级
 * **ct-UAE 消融**：预训练原子嵌入对 ID 有 +1% 收益，但 OOD 场景无统计显著帮助（p=0.22）
@@ -71,6 +72,23 @@
 | s44 | 0.3943 | |
 | s45 | 0.3981 | |
 | **Mean ± Std** | **0.392 ± 0.007** | 显著优于 V1 的 0.537 ± 0.014 |
+
+### 第一波创新统计显著性分析（Bootstrap, 2026-05-20）
+
+对 V3/V4/V6/V9 四个创新与 V2 基线进行 10000 次 paired bootstrap 检验：
+
+| 对比 | ΔMAE | 95% CI | p-value | 结论 |
+|---|---|---|---|---|
+| V4 MoE vs V2 | −0.002 | [−0.021, +0.024] | 0.868 | 不显著（但点估计最优） |
+| V6 Physics vs V2 | +0.001 | [−0.022, +0.019] | 0.919 | 不显著（等价） |
+| V3 DefType vs V2 | +0.006 | [−0.025, +0.013] | 0.557 | 不显著（val MAE 最优） |
+| V9 Contrast vs V2 | +0.029 | [+0.007, +0.052] | **0.009** | **显著更差** ★ |
+
+**关键洞察**：
+- 单模型创新均未显著超越 V2（1065 样本检验力不足），但 **4-model 贪心集成** (V4+V2+V3+V6) 达 **0.354 eV**
+- 加入多源模型后，**8-model 集成达 0.345 eV**（新 SOTA，↓36% vs ALIGNN）
+- V9 对比条件化在 [7,25) eV 范围显著退化 (ΔMAE=+0.23, p=0.014)
+- 创新模型的核心价值在于**集成多样性**，而非单模型提升
 
 ### 物理驱动模型创新（V3–V7）
 
@@ -199,7 +217,8 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 | CT-V2+Physics (V6) | 0.84 M | 0.382 | −29% |
 | CT-V2+Contrast (V9) | 0.84 M | 0.410 | −24% |
 | CT v4 7-ensemble (SS+MS) | 7×(0.75–1.1) M | 0.359 | −34% |
-| **CT-V2 8-ensemble greedy (v5)** | **8×(0.83–1.1) M** | **0.349** | **−35%** |
+| CT-V2 8-ensemble greedy (v5) | 8×(0.83–1.1) M | 0.349 | −35% |
+| **CT-V2+innovations 8-ens (v5.1)** | **8×(0.83–1.1) M** | **0.345** | **−36%** |
 
 集成成员选择（贪心法）：
 
@@ -491,8 +510,9 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 
 | 配置 | Params | Test MAE | Test RMSE | 备注 |
 |---|---|---|---|---|
-| 🥇 **v5 8-ens greedy (V2+MS)** | 8×(0.83–1.1) M | **0.349 eV** | 0.976 eV | V2 架构+多源，↓35% vs ALIGNN |
-| 🥈 **v4 7-ens (SS+MS combined)** | 7×(0.75–1.1) M | 0.359 eV | — | 含多源模型，↓34% vs ALIGNN |
+| 🥇 **v5.1 8-ens greedy (V2+innovations+MS)** | 8×(0.83–1.1) M | **0.345 eV** | — | V4+V2+MS+V3+V6+MS+V2×2，↓36% vs ALIGNN |
+| 🥈 v5 8-ens greedy (V2+MS) | 8×(0.83–1.1) M | 0.349 eV | 0.976 eV | V2 架构+多源，↓35% vs ALIGNN |
+| v4 7-ens (SS+MS combined) | 7×(0.75–1.1) M | 0.359 eV | — | 含多源模型，↓34% vs ALIGNN |
 | 🥉 **V4 MoE (V2+MoE readout)** | 0.84 M | **0.379 eV** | 1.001 eV | ★ 新最优单模型，↓30% vs ALIGNN |
 | V2 gated s43 (v5 baseline) | 0.83 M | 0.381 eV | 1.004 eV | V2 架构最优种子 |
 | V6 Physics (V2+Hume-Rothery) | 0.84 M | 0.382 eV | 1.020 eV | 物理失配特征 |
@@ -554,7 +574,8 @@ v1.2 legacy LOHO（5 host, 50ep）结果详见
 | CT-V2+Physics (V6, ours) | 0.84 | 0.382 |
 | CT-V2+DefType (V3, ours) | 0.83 | 0.387 |
 | CT v4 7-ensemble SS+MS (ours) | 7×(0.75–1.1) | 0.359 |
-| **CT-V2 8-ensemble greedy (v5, ours)** | **8×(0.83–1.1)** | **0.349** |
+| CT-V2 8-ensemble greedy (v5, ours) | 8×(0.83–1.1) | 0.349 |
+| **CT-V2+innovations 8-ens (v5.1, ours)** | **8×(0.83–1.1)** | **0.345** |
 
 **经验缩放律** log(MAE) = 3.39 − **0.40**·log(N) − **0.01**·log(P)，
 R² = 0.95 → **数据是瓶颈，模型容量超过 ~0.5–0.8 M 反而过拟合**。
