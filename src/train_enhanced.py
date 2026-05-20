@@ -163,7 +163,7 @@ def compute_lds_weights(
     def weight_fn(target_values: torch.Tensor) -> torch.Tensor:
         idx = ((target_values.float() - t_min) / bin_width).long()
         idx = idx.clamp(0, n_bins - 1)
-        return bin_weights[idx].to(target_values.device)
+        return bin_weights[idx.cpu()].to(target_values.device)
 
     return weight_fn
 
