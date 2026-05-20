@@ -3,7 +3,7 @@
 [![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
 [![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
 [![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.349%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
-[![best single](https://img.shields.io/badge/best%20single-0.381%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
+[![best single](https://img.shields.io/badge/best%20single-0.379%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
 [![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
 [![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
 [![DFT discovery](https://img.shields.io/badge/prospective%20DFT-70%25%20A%20hit%20rate-9cf)](#v30-prospective-dft-验证-2026-05-07)
@@ -13,8 +13,8 @@
 **精度 + 校准 + OOD + 物理可解释性 + 真实 prospective DFT 验证**
 的五维评估。
 
-* **0.83 M 参数的 CrystalTransformerV2 大幅超越 ALIGNN（4.03 M）**
-  （v5 best single 0.381 eV vs ALIGNN 0.540 eV，↓29%）
+* **0.84 M 参数的 CrystalTransformerV2+MoE 大幅超越 ALIGNN（4.03 M）**
+  （V4 MoE best single 0.379 eV vs ALIGNN 0.540 eV，↓30%）
 * **8-model 贪心集成** 在 1065 测试样本上达 **0.349 eV**（↓35% vs ALIGNN）
 * **约束 OOD 评估**：Leave-One-Host-Out 7-fold 平均 **0.540 eV**，
   从 ID 到族内 OOD 仅 1.5× 退化（而非全 OOD 的 7.3×），模型优雅降级
@@ -76,10 +76,10 @@
 
 | 创新 | 物理动机 | +参数 | 状态 | 顶刊参考 |
 |---|---|---|---|---|
-| **V3 缺陷类型条件化** | 间隙/吸附缺陷 Ef 分布差异 2× | +512 | 🔄 WHU 训练中 | 首创；灵感来自条件生成 (Dhariwal, NeurIPS 2021) |
-| **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | 🔄 WHU 训练中 | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
-| **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | 🔄 WHU 训练中 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
-| **V9 缺陷-宿主对比条件化** | Ef ∝ E(缺陷) − E(原始)，显式建模差值 | +8.5K | ⏳ 待训练 | 物理先验，零初始化 |
+| **V3 缺陷类型条件化** | 间隙/吸附缺陷 Ef 分布差异 2× | +512 | ✅ 0.387 | 首创；灵感来自条件生成 (Dhariwal, NeurIPS 2021) |
+| **V4 MoE Readout** | 59% 误差来自 top 10% 困难样本 → 专家化 | +13K | ✅ **0.379 ★** | MoCE (ICLR 2025); Switch Transformer (JMLR 2022) |
+| **V6 物理失配特征** | Hume-Rothery 固溶度规则 → 6 维掺杂-宿主描述符 | +8.7K | ✅ 0.382 | Bartel, Sci. Adv. 2020; Ward, npj Comput. Mater. 2016; Goodall, Nature Commun. 2020 |
+| **V9 缺陷-宿主对比条件化** | Ef ∝ E(缺陷) − E(原始)，显式建模差值 | +8.5K | ✅ 0.410 | 物理先验，零初始化 |
 | **V11 LDS 标签分布平滑** | 高 Ef 样本（7.1%）贡献 29% 误差 → 逆密度重权 | 0 | ⏳ 待训练 | Yang et al., ICML 2021 (DIR) |
 | **V13 RnC 对比学习** | 排序保持的特征空间结构化，缓解预测压缩 | +128-dim proj | ⏳ 待训练 | Zha et al., NeurIPS 2023 (Rank-N-Contrast) |
 | **V14 JK 层聚合** | 缺陷需多尺度理解（局部应变 + 全局电子） | +3 | ⏳ 待训练 | Xu et al., ICML 2018 (JK-Net) |
@@ -193,7 +193,11 @@ V3 缺陷类型条件化和 V4 MoE 专家化直接针对此问题。
 | ALIGNN | 4.03 M | 0.540 | — |
 | CrystalTransformer v1.2 (single) | 0.75 M | 0.516 | −4% |
 | CT v4 best single | 0.75 M | 0.407 | −25% |
-| **CT-V2 best single (v5)** | **0.83 M** | **0.381** | **−29%** |
+| CT-V2 best single (v5) | 0.83 M | 0.381 | −29% |
+| **CT-V2+MoE (V4)** | **0.84 M** | **0.379** | **−30%** |
+| CT-V2+DefType (V3) | 0.83 M | 0.387 | −28% |
+| CT-V2+Physics (V6) | 0.84 M | 0.382 | −29% |
+| CT-V2+Contrast (V9) | 0.84 M | 0.410 | −24% |
 | CT v4 7-ensemble (SS+MS) | 7×(0.75–1.1) M | 0.359 | −34% |
 | **CT-V2 8-ensemble greedy (v5)** | **8×(0.83–1.1) M** | **0.349** | **−35%** |
 
@@ -489,8 +493,12 @@ PFA 等 inductive bias 的边际收益被数据规模吞没**（与 §scaling-la
 |---|---|---|---|---|
 | 🥇 **v5 8-ens greedy (V2+MS)** | 8×(0.83–1.1) M | **0.349 eV** | 0.976 eV | V2 架构+多源，↓35% vs ALIGNN |
 | 🥈 **v4 7-ens (SS+MS combined)** | 7×(0.75–1.1) M | 0.359 eV | — | 含多源模型，↓34% vs ALIGNN |
-| 🥉 **v5 best single (V2 gated s43)** | 0.83 M | **0.381 eV** | 1.004 eV | V2 架构最优种子 |
+| 🥉 **V4 MoE (V2+MoE readout)** | 0.84 M | **0.379 eV** | 1.001 eV | ★ 新最优单模型，↓30% vs ALIGNN |
+| V2 gated s43 (v5 baseline) | 0.83 M | 0.381 eV | 1.004 eV | V2 架构最优种子 |
+| V6 Physics (V2+Hume-Rothery) | 0.84 M | 0.382 eV | 1.020 eV | 物理失配特征 |
+| V3 DefType (V2+条件化) | 0.83 M | 0.387 eV | 1.009 eV | 缺陷类型条件化，val MAE 0.367 最优 |
 | v4 best single (150ep MAE+warmup+UAE) | 0.75 M | 0.407 eV | — | seed 45 |
+| V9 Contrast (V2+对比条件化) | 0.84 M | 0.410 eV | 1.070 eV | 缺陷-宿主差值条件化 |
 | v1.2 6-member ensemble (τ=1.83) | 6×0.75 M | 0.443 eV | 1.094 eV | 4×50ep + 2×100ep |
 | v1.2 baseline (4-seed mean) | 0.75 M | 0.537 ± 0.014 | 1.169 ± 0.025 | 主结论数字 |
 | **ALIGNN** (团队前期复现) | 4.03 M | 0.540 | 1.167 | 文献基线 |
@@ -541,7 +549,10 @@ v1.2 legacy LOHO（5 host, 50ep）结果详见
 | ALIGNN | 4.03 | 0.540 |
 | CrystalTransformer v1.2 (ours) | 0.75 | 0.516 |
 | CT v4 best single (ours) | 0.75 | 0.407 |
-| **CT-V2 best single (v5, ours)** | **0.83** | **0.381** |
+| CT-V2 best single (v5, ours) | 0.83 | 0.381 |
+| **CT-V2+MoE (V4, ours)** | **0.84** | **0.379** |
+| CT-V2+Physics (V6, ours) | 0.84 | 0.382 |
+| CT-V2+DefType (V3, ours) | 0.83 | 0.387 |
 | CT v4 7-ensemble SS+MS (ours) | 7×(0.75–1.1) | 0.359 |
 | **CT-V2 8-ensemble greedy (v5, ours)** | **8×(0.83–1.1)** | **0.349** |
 
@@ -746,11 +757,11 @@ python scripts/prospective_dft_analyze.py
 ## Roadmap / TODO
 
 基于 2024–2026 最新文献的改进方向，按投入产出比分三档。
-当前最优：**单模型 0.381 eV / 8-ensemble 0.349 eV**（V2 架构 + 多源模型）。
+当前最优：**单模型 0.379 eV (V4 MoE) / 8-ensemble 0.349 eV**（V2 架构 + 创新变体）。
 
-**当前训练状态（2026-05-20）**：V3/V4/V6 在 WHU 8×L40S 服务器训练中（150 epochs），
-训练完成后依次启动 V9 → V11 → V12 → V13 → V14 → V2_ema → V2_focal → V10。
-优先级：物理动机最强的创新先训练，组合方案等单项验证后再启动。
+**当前训练状态（2026-05-20）**：第一波 V3/V4/V6/V9 全部完成 ✅。
+V4 MoE 以 **0.379 eV** 成为新最优单模型（↓30% vs ALIGNN），V6 Physics (0.382) 和 V3 DefType (0.387) 均优于 V1 baseline。V9 对比条件化 (0.410) 未能超越 V2 基线。
+下一波：V11 LDS → V13 RnC → V14 JK → V2_ema → V2_focal → V12 → V10。
 
 ### Tier 1 — 低成本高收益（不改架构）
 
@@ -773,12 +784,13 @@ python scripts/prospective_dft_analyze.py
 
 - [x] **CrystalTransformerV2 架构改进**：✅ 已完成并验证。门控注意力池化 +
   局部环境富集 + Pre-Norm 残差，单模型 0.381 eV（↓26% vs V1）。
-- [x] **缺陷类型条件化 (V3)**：✅ 已实现，WHU 训练中。零初始化嵌入，不影响 V2 起点。
-  IMP2D 仅含间隙和吸附两类，但架构支持 4 类。首创，无先例。
-- [x] **MoE Readout (V4)**：✅ 已实现，WHU 训练中。3/5 专家 MLP + 学习门控 + KL 平衡损失。
+- [x] **缺陷类型条件化 (V3)**：✅ 完成。Test MAE **0.387 eV**（val MAE 0.367 最优），
+  零初始化嵌入。SWA 阶段 val MAE 从 0.382→0.367 显著提升。首创，无先例。
+- [x] **MoE Readout (V4)**：✅ 完成。Test MAE **0.379 eV** ★ 新最优单模型（↓30% vs ALIGNN）。
+  3 专家 MLP + 学习门控 + KL 平衡损失，RMSE 1.001 也是最低。
   参考：[MoCE](https://openreview.net/forum?id=Oit5bHPmjx)（ICLR 2025）
-- [x] **缺陷-宿主对比条件化 (V9)**：✅ 已实现。显式建模 Ef ∝ E(缺陷)−E(原始)，
-  零初始化，为高 Ef 样本提供物理先验通路。
+- [x] **缺陷-宿主对比条件化 (V9)**：✅ 完成。Test MAE 0.410 eV（劣于 V2 基线 0.381），
+  差值条件化假设可能过于简化。
 - [x] **LDS 标签分布平滑 (V11)**：✅ 已实现。高斯核平滑 + sqrt_inv 重权，
   直击 [7,25) eV 范围梯度饥饿问题。
   参考：Yang et al., ICML 2021 (Delving into Deep Imbalanced Regression)
