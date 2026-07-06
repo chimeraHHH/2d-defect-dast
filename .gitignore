@@ -74,3 +74,6 @@ results/logs/*.txt
 .vscode/
 .idea/
 self-check/
+
+# Raw DFT server backup (420MB, keep local only)
+backup_data 2/
