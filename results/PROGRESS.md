@@ -116,3 +116,22 @@ v1.0 中"0.21 eV 达成 < 0.2 eV 项目目标 / 击败 ALIGNN 2.6×"的表述基
   - ``scripts/predict_blind_ood.py`` / ``scripts/analyze_blind_ood.py`` / ``scripts/plot_blind_ood.py``
   - 结果: results/blind_ood_analysis.md + blind_ood_predictions.csv/json + blind_ood_analysis.json
   - 论文: paper/sec_blind_ood.tex + figures/fig_blind_ood_parity.png / fig_blind_ood_kshot.png
+
+## 2026-07-07 (evening): Limitation 1 (test partitions) resolved without retraining
+
+- Found local v2-multi checkpoints absent (best.pt saved only on the remote
+  GPU box), but every run's `test_predictions.npz` (preds + targets) is
+  present in `weights&results/project/results/`.
+- Key discovery: the leak-free 1065-sample "canonical" fold was itself built
+  with `split_indices(seed=42)` on the cleaned corpus, so the multi-source
+  seed=42 partition is ELEMENT-WISE IDENTICAL to the canonical fold.
+  Verified across 7 runs by comparing stored target arrays
+  (`scripts/verify_v2_test_partition.py` ->
+  `results/v2_test_partition_verification.json`; all 1065 labels match
+  in order to 1e-6).
+- Consequence: v1-single 0.516 / v1-multi 0.555 / PeriDefT 0.4929 (all
+  seed=42) are already apples-to-apples on one fixed test partition; the
+  residual caveat only concerns the 4-seed mean (0.486) whose seed-0/1/2
+  members use different (equally leak-free) partitions.
+- Paper updated: sec:multi caveat paragraph rewritten, Limitation 1
+  re-labelled "(largely resolved)", headline table caption updated.

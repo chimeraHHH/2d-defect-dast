@@ -548,10 +548,11 @@ the dual-stream variant.
 \caption{Test MAE on IMP2D, all configurations evaluated under
 leak-free augmentation. Single-source rows ($\dagger$) use the
 ordered 1065-sample test fold of the leak-free dataset; multi-source
-rows use the random-split test fold of the cleaned IMP2D, giving an
-apples-to-apples comparison \emph{within} the multi-source family
-(v1 multi-source vs.\ \modelname). 4-seed entries report
-mean~$\pm$~standard deviation across seeds 42, 0, 1, 2.}
+rows use \texttt{split\_indices(seed=$N$)} folds of the cleaned
+IMP2D, whose seed=42 fold is verified element-wise identical to the
+canonical 1065-sample fold (Sec.~\ref{sec:multi}), so all seed=42
+rows in this table share one fixed test partition. 4-seed entries
+report mean~$\pm$~standard deviation across seeds 42, 0, 1, 2.}
 \label{tab:headline}
 \begin{tabular}{lrrr}
 \toprule
@@ -763,14 +764,21 @@ first quantitative \emph{prospective} verification of an empirical
 scaling law on an unseen $N_{\mathrm{train}}$ regime in materials
 property regression.
 
-\paragraph{Caveat on test partitions.} The multi-source pipeline uses
-\texttt{split\_indices(seed=$N$)} to partition IMP2D, so the IMP2D
-test sample set differs across seeds and from the leak-free
-1065-sample test set used by single-source baselines. The
-\texttt{split\_indices(seed=42)} v1 multi-source single-seed result
-(0.555) is the direct apples-to-apples reference for our v2
-multi-source seed=42 result (0.4929), giving a clean 11.2\,\%
-improvement on a fixed test partition.
+\paragraph{Test partitions: seed=42 is exactly the canonical fold.}
+The multi-source pipeline uses \texttt{split\_indices(seed=$N$)} to
+partition IMP2D, so the test fold differs across seeds 0/1/2. For
+seed=42, however, the partition is \emph{element-wise identical} to
+the canonical leak-free 1065-sample test fold used by all
+single-source baselines, because the leak-free dataset itself was
+constructed with \texttt{split\_indices(seed=42)}. We verify this by
+comparing the stored DFT target arrays of the saved
+\texttt{test\_predictions.npz} across runs
+(\texttt{scripts/verify\_v2\_test\_partition.py};
+all 1065 labels match in order to $10^{-6}$). The seed=42 comparisons
+--- v1 single-source 0.516, v1 multi-source 0.555, \modelname\
+0.4929 --- are therefore apples-to-apples on one fixed test
+partition; only the 4-seed mean (0.486) additionally averages over
+the seed-0/1/2 partitions.
 
 \paragraph{Augmentation does not substitute for chemistry diversity.}
 A natural follow-up question is whether one could obtain the same
@@ -1120,14 +1128,17 @@ We highlight four limitations that frame the scope of the present
 study and suggest immediate follow-up work:
 
 \begin{enumerate}[leftmargin=20pt, itemsep=2pt]
-\item \textbf{Test partitions differ.} Single-source baselines use
-the leak-free 1065-sample ordered test fold;
-multi-source experiments use \texttt{split\_indices(seed=$N$)}
-random folds that vary across seeds. The v1 single-source vs.\ v2
-multi-source comparison is therefore not strictly apples-to-apples.
-A leak-free re-evaluation of \modelname\ on the canonical 1065
-test set is a natural follow-up; we expect the multi-source
-advantage to persist but the absolute MAE to shift slightly.
+\item \textbf{Test partitions (largely resolved).} Multi-source
+experiments use \texttt{split\_indices(seed=$N$)} random folds. A
+post-hoc verification
+(\texttt{scripts/verify\_v2\_test\_partition.py},
+\texttt{results/v2\_test\_partition\_verification.json}) shows the
+seed=42 fold is element-wise identical to the canonical leak-free
+1065-sample fold, so the seed=42 single-source vs.\ multi-source
+comparison (0.516 vs.\ 0.4929) is exactly apples-to-apples. The
+residual caveat is confined to the 4-seed mean (0.486), whose
+seed-0/1/2 members are evaluated on different (equally leak-free)
+partitions of the same cleaned corpus.
 
 \item \textbf{LOHO partial.} The LOHO ID/OOD trade-off
 (Sec.~\ref{sec:loho}) is reported on 3/5 hosts and conflates the v3
