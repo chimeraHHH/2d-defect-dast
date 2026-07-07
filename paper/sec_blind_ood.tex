@@ -8,7 +8,8 @@ graphene, VS$_2$, and CrS$_2$}
 
 The prospective validation of Sec.~\ref{sec:prospective} tested
 model-\emph{selected} candidates. As a final, harder stress test we
-evaluate the same 4-seed ensemble (identical checkpoints, identical
+evaluate the same 4-seed v1 ensemble used for candidate scoring in
+Sec.~\ref{sec:prospective} (identical checkpoints, identical
 temperature factor $\tau=2.60$) on a defect dataset that was produced
 \emph{entirely independently} of the model: 38 usable adsorbate/dopant
 formation energies computed with GPAW (PAW, PBE) on three hosts ---
@@ -57,8 +58,18 @@ and evaluating on the remainder (Fig.~\ref{fig:blindood_kshot}, left)
 recovers most of the gap: with $k{=}3$ the test MAE drops to
 $1.14\pm0.27$\,eV (VS$_2$), $1.80\pm0.34$\,eV (graphene) and
 $2.07\pm0.41$\,eV (CrS$_2$); the pooled leave-one-out estimate is
-$1.55$\,eV (CI $1.20$--$1.90$), inside the $1.4$--$2.1$\,eV LOHO
-band. Operationally this reproduces the deployment recipe of
+$1.55$\,eV (CI $1.20$--$1.90$), inside the $0.45$--$2.40$\,eV range
+spanned by the five v1 single-source LOHO hosts
+(Sec.~\ref{sec:loho}) and comparable to its harder hosts
+(Cr$_2$I$_6$ $0.84$\,eV, C$_2$H$_2$ $2.40$\,eV). In other words,
+once the reference shift is removed, the residual error is the
+familiar cost of host-chemistry transfer, with no measurable
+\emph{additional} cross-code penalty. We correct per \emph{host}
+rather than per dopant (as in Sec.~\ref{sec:prospective}) because
+here each host subset shares a single pristine-host reference and
+GPAW numerical setup, whose shift empirically dominates the
+per-dopant $\mu$ differences. Operationally this reproduces the
+deployment recipe of
 Sec.~\ref{sec:deploy}: when extending screening to a new host
 \emph{and} a new DFT workflow, $\sim$3 anchor calculations suffice to
 re-reference the model.
@@ -87,7 +98,15 @@ included, and after the per-host offset correction the coverage
 profile becomes close to nominal (68\%$\to$89\%, 90\%$\to$97\%;
 Fig.~\ref{fig:blindood_kshot}, right). $\sigma_{\mathrm{cal}}$
 retains a positive correlation with the realised absolute error
-($r=0.27$). For screening purposes, an uncertainty that degrades
+($r=0.27$) --- note this does not contradict the negative
+within-bucket correlation of Sec.~\ref{sec:prospective}: there the
+correlation was computed \emph{within} a set pre-selected for
+maximal $\sigma$, a range restriction that removes the
+between-group signal measured here on an unselected sample. At
+$n=38$ both point estimates carry wide intervals, and we read them
+jointly as ``$\sigma_{\mathrm{cal}}$ is informative at the
+cohort/gating level, unproven at the sample-ranking level''.
+For screening purposes, an uncertainty that degrades
 \emph{gracefully and conservatively} under a simultaneous
 host-, code-, and convention-shift is precisely the behaviour needed
 to keep a human-in-the-loop pipeline safe.

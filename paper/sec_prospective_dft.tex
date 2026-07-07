@@ -223,8 +223,9 @@ not have surfaced.
 \textbf{(iii) On this OOD subset, MAE is materially larger than the
 IMP2D test-fold MAE.} Per-dopant-corrected MAE on this specific
 37-candidate prospective set is 2.66\,eV (95\% bootstrap CI
-$[1.59, 3.97]$), a factor of $\sim 5.5\times$ the
-in-distribution IMP2D test MAE of 0.486\,eV (Sec.~\ref{sec:headline}).
+$[1.59, 3.97]$), a factor of $\sim 5\times$ the
+in-distribution IMP2D test MAE of 0.537\,eV of the v1 4-seed
+ensemble used for candidate scoring (Sec.~\ref{sec:headline}).
 This factor is a property of \emph{this specific OOD subset}
 (287 v1.2-generated candidates filtered by predicted-$\mu$ and
 predicted-$\sigma_{\mathrm{cal}}$); we do not claim it as a
@@ -255,7 +256,8 @@ DFT validation here measures the cost of a chemistry-shift to a
 held-out (host, dopant) interstitial pair drawn by the model's own
 $\sigma_{\mathrm{cal}}$-aware ranking (overall MAE
 2.66\,eV, 95\% CI $[1.59, 3.97]$, on this 37-candidate subset
-versus the in-distribution 0.486\,eV). The two bounds are
+versus the in-distribution 0.537\,eV of the same v1 ensemble). The
+two bounds are
 qualitatively consistent: on the chemistry distributions of
 practical interest tested here, \modelname's residual is several
 times the IMP2D test-fold MAE. We make the existence of this gap
