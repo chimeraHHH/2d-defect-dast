@@ -14,6 +14,9 @@
 
 ## 关键里程碑
 
+- 2026-07-07 (盲测跨代码 OOD 基准) 用找回的 38 个独立 GPAW 样本 (graphene 16 / VS2 11 / CrS2 11, 均非训练宿主) 盲测 4-seed 集成: raw MAE 2.56 eV (~5× ID), 误差由每宿主常数偏移主导; 3-shot 偏移校准恢复至 pooled LOO 1.55 eV (落入 LOHO 1.4-2.1 eV 区间); UQ 自觉放大 4.3× 且覆盖保守; 独立佐证 #81 (Mg@CrS2) 为疑似 SCF 异常。详 [blind_ood_analysis.md](blind_ood_analysis.md), 论文新增章节 paper/sec_blind_ood.tex
+- 2026-07-06 (原始数据找回) 从服务器备份恢复第 70-89 批 TMD GPAW 形成能 16/20, 见 backup_data/tmd_samples_70_89_summary.md
+
 - 2026-05-04 23:33 (v2 LOHO 取消) 多源 LOHO 3/5 hosts (MoS2/MoSSe/TaSe2) 均比 v1 单源 LOHO 恶化 22-65%；val→test gap 1.32-1.76× 显示 OOD 泛化崩溃。Cr2I6 + C2H2 取消，待补 v2 单源 LOHO + v1 多源 LOHO 控制实验。详 [V2_LOHO_FINDINGS.md](V2_LOHO_FINDINGS.md)
 - 2026-05-04 22:09 (paper draft commit e91ba3d) LaTeX v2.0 草稿 + 4 张 v2 图 + v2_summary.csv 推送 GitHub
 - 2026-05-04 21:28 (v2 phase 1 + multi-source) 4-seed v2-PFA-only 多源 mean 0.486 ± 0.025 eV，比 v1 多源 0.555 改善 −12.5% (seed=42 头条 0.4929)
@@ -108,3 +111,8 @@ v1.0 中"0.21 eV 达成 < 0.2 eV 项目目标 / 击败 ALIGNN 2.6×"的表述基
   - ``scripts/error_decomposition.py`` — 6 维误差分解
   - ``scripts/loho_summary.py`` — LOHO 结果汇总
 - leak-free 数据增强脚本: scripts/build_leak_free_aug.py (社区参考)
+- 盲测跨代码 OOD 基准 (2026-07-07 新增):
+  - ``scripts/build_blind_ood_benchmark.py`` — 从 GPAW 原始备份构建 38 样本基准
+  - ``scripts/predict_blind_ood.py`` / ``scripts/analyze_blind_ood.py`` / ``scripts/plot_blind_ood.py``
+  - 结果: results/blind_ood_analysis.md + blind_ood_predictions.csv/json + blind_ood_analysis.json
+  - 论文: paper/sec_blind_ood.tex + figures/fig_blind_ood_parity.png / fig_blind_ood_kshot.png

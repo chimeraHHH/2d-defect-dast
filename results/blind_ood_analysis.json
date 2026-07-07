@@ -1,0 +1,211 @@
+{
+  "n_usable": 38,
+  "n_total": 39,
+  "tau": 2.5953441155091057,
+  "global_raw": {
+    "n": 38,
+    "mae": 2.5575157894736846,
+    "mae_ci": [
+      2.1249176315789478,
+      2.980324342105263
+    ],
+    "rmse": 2.893722815718625,
+    "bias": 2.147010526315789,
+    "bias_ci": [
+      1.4978098026315794,
+      2.750909210526316
+    ],
+    "pearson": 0.5017959679412771,
+    "pearson_ci": [
+      0.2263161719003906,
+      0.6916941112973682
+    ],
+    "spearman": 0.4487361855782908
+  },
+  "per_host": {
+    "graphene": {
+      "n": 16,
+      "mae": 2.1000375,
+      "mae_ci": [
+        1.576393125,
+        2.656205
+      ],
+      "rmse": 2.3759527057582606,
+      "bias": 1.4973750000000003,
+      "bias_ci": [
+        0.5888120312500003,
+        2.3770254687500003
+      ],
+      "pearson": -0.22353059342340958,
+      "pearson_ci": [
+        -0.6093587061378796,
+        0.27264700423232335
+      ],
+      "spearman": -0.2823529411764706,
+      "offset_oracle": 1.4973750000000003,
+      "mae_offset_oracle": 1.5316187499999998,
+      "mae_offset_loo": 1.6337266666666665,
+      "mae_offset_loo_ci": [
+        1.107993833333333,
+        2.1709791666666662
+      ],
+      "kshot_offset": {
+        "k=1": {
+          "mae_mean": 2.214258666666667,
+          "mae_std": 0.6827560965693874
+        },
+        "k=2": {
+          "mae_mean": 1.8977852428571427,
+          "mae_std": 0.4180986780854714
+        },
+        "k=3": {
+          "mae_mean": 1.8033574974358977,
+          "mae_std": 0.33794390376778244
+        },
+        "k=5": {
+          "mae_mean": 1.701155389090909,
+          "mae_std": 0.2898254859096522
+        }
+      }
+    },
+    "VS2": {
+      "n": 11,
+      "mae": 3.4491363636363643,
+      "mae_ci": [
+        2.7196975,
+        4.100336590909092
+      ],
+      "rmse": 3.6423789644831155,
+      "bias": 3.4491363636363643,
+      "bias_ci": [
+        2.71926,
+        4.104588636363637
+      ],
+      "pearson": 0.4853904847862516,
+      "pearson_ci": [
+        0.10492832273189492,
+        0.8920757679426807
+      ],
+      "spearman": 0.5545454545454546,
+      "offset_oracle": 3.4491363636363643,
+      "mae_offset_oracle": 0.9252694214876033,
+      "mae_offset_loo": 1.0177963636363638,
+      "mae_offset_loo_ci": [
+        0.5782482045454547,
+        1.5033221363636362
+      ],
+      "kshot_offset": {
+        "k=1": {
+          "mae_mean": 1.4095372200000003,
+          "mae_std": 0.5170432270107321
+        },
+        "k=2": {
+          "mae_mean": 1.2194722888888891,
+          "mae_std": 0.29919838879252836
+        },
+        "k=3": {
+          "mae_mean": 1.1422160833333335,
+          "mae_std": 0.2660556215794636
+        },
+        "k=5": {
+          "mae_mean": 1.0629772866666667,
+          "mae_std": 0.25215753568556226
+        }
+      }
+    },
+    "CrS2": {
+      "n": 11,
+      "mae": 2.3313181818181823,
+      "mae_ci": [
+        1.4701606818181818,
+        3.1774870454545447
+      ],
+      "rmse": 2.729292549194921,
+      "bias": 1.789809090909091,
+      "bias_ci": [
+        0.5002563636363636,
+        2.9715679545454527
+      ],
+      "pearson": 0.045904338448610735,
+      "pearson_ci": [
+        -0.5285640637888123,
+        0.47653147882707236
+      ],
+      "spearman": -0.1272727272727273,
+      "offset_oracle": 1.789809090909091,
+      "mae_offset_oracle": 1.7741900826446282,
+      "mae_offset_loo": 1.9516090909090913,
+      "mae_offset_loo_ci": [
+        1.2838640681818183,
+        2.6499261363636366
+      ],
+      "kshot_offset": {
+        "k=1": {
+          "mae_mean": 2.56920042,
+          "mae_std": 0.6838322716450457
+        },
+        "k=2": {
+          "mae_mean": 2.245448611111111,
+          "mae_std": 0.5080031887301344
+        },
+        "k=3": {
+          "mae_mean": 2.0702286250000004,
+          "mae_std": 0.40582228011729765
+        },
+        "k=5": {
+          "mae_mean": 1.9946436933333336,
+          "mae_std": 0.4183045734601675
+        }
+      }
+    }
+  },
+  "pooled_offset_loo": {
+    "mae": 1.5474496491228071,
+    "mae_ci": [
+      1.2035170438596492,
+      1.8969536842105261
+    ],
+    "rmse": 1.8966666859322294
+  },
+  "uq": {
+    "mean_sigma_cal": 3.7669342105263146,
+    "id_mean_sigma_cal": 0.874,
+    "sigma_amplification": 4.309993375888232,
+    "coverage": {
+      "nominal_68": 0.7631578947368421,
+      "nominal_90": 1.0,
+      "nominal_95": 1.0
+    },
+    "coverage_68_ci": [
+      0.631578947368421,
+      0.8947368421052632
+    ],
+    "coverage_90_ci": [
+      1.0,
+      1.0
+    ],
+    "pearson_sigma_abs_err": 0.27477925706954115,
+    "coverage_after_loo_debias": {
+      "nominal_68": 0.8947368421052632,
+      "nominal_90": 0.9736842105263158,
+      "nominal_95": 1.0
+    }
+  },
+  "sample_81": {
+    "pred": 4.0777,
+    "dft": 5.2794,
+    "raw_err": -1.2017,
+    "crs2_host_bias": 1.789809090909091,
+    "offset_corrected_pred": 2.287890909090909,
+    "residual_vs_dft_after_offset": -2.9915090909090907,
+    "comment": "After removing the CrS2 host offset the model expects ~2.29 eV, i.e. the DFT value 5.28 eV is ~3 eV higher than the ML expectation -- independent corroboration of the suspected SCF high-energy state flagged in the raw data notes."
+  },
+  "paper_context": {
+    "id_test_mae": 0.537,
+    "loho_mae_range": [
+      1.4,
+      2.1
+    ],
+    "note": "LOHO (Sec 5.7) removes one host from IMP2D but stays within the same DFT code/workflow; this benchmark additionally crosses DFT code (GPAW vs source data), pseudopotentials, mu conventions, and structure-generation protocol."
+  }
+}

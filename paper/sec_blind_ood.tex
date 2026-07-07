@@ -1,0 +1,117 @@
+% =====================================================================
+% Blind cross-code OOD benchmark (GPAW, graphene/VS2/CrS2).
+% Inserted into main.tex after \input{sec_prospective_dft}.
+% =====================================================================
+\subsection{A blind cross-code benchmark: GPAW adsorbates on
+graphene, VS$_2$, and CrS$_2$}
+\label{sec:blindood}
+
+The prospective validation of Sec.~\ref{sec:prospective} tested
+model-\emph{selected} candidates. As a final, harder stress test we
+evaluate the same 4-seed ensemble (identical checkpoints, identical
+temperature factor $\tau=2.60$) on a defect dataset that was produced
+\emph{entirely independently} of the model: 38 usable adsorbate/dopant
+formation energies computed with GPAW (PAW, PBE) on three hosts ---
+graphene ($n{=}16$), 1T-VS$_2$ ($n{=}11$), and 1T-CrS$_2$ ($n{=}11$)
+--- none of which appear among the 44 IMP2D training hosts. The
+benchmark crosses, simultaneously: (i) host chemistry, (ii) DFT code
+and PAW setups (GPAW vs.\ the source data), (iii) the
+chemical-potential convention used for $\mu_{\mathrm{dopant}}$, and
+(iv) the structure-generation protocol (two-stage GPAW relaxations,
+not curated database geometries). The dopant/site selection was made
+before any model prediction was run, so the evaluation is blind in
+the sense that neither the candidates nor the DFT workflow were
+influenced by the model.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_blind_ood_parity.png}
+\caption{Blind cross-code benchmark. Left: raw ensemble predictions
+vs.\ GPAW formation energies; error bars are $\sigma_{\mathrm{cal}}$.
+The purple cross is sample \#81 (Mg@CrS$_2$), flagged on the DFT side
+as a suspected SCF high-energy state and excluded from all statistics.
+Right: the same predictions after removing one constant offset per
+host (leave-one-out estimate).}
+\label{fig:blindood_parity}
+\end{figure}
+
+\paragraph{Raw transfer: a per-host constant dominates the error.}
+
+Uncorrected, the ensemble reaches MAE $2.56$\,eV (bootstrap 95\% CI
+$2.12$--$2.98$) with a strongly significant positive bias of
+$+2.15$\,eV (CI $+1.50$--$+2.75$) and Pearson $r=0.50$ (CI
+$0.23$--$0.69$) --- roughly $5\times$ the in-distribution test MAE of
+$0.537$\,eV, and consistent with the LOHO observation
+(Sec.~\ref{sec:loho}) that host-chemistry transfer is the binding
+constraint at this data scale. Decomposing by host, however, shows
+the error is dominated by a \emph{constant shift per host}
+($+1.50$\,eV graphene, $+3.45$\,eV VS$_2$, $+1.79$\,eV CrS$_2$),
+exactly the signature expected when the reference chemical potentials
+and DFT numerics differ between the training corpus and the target
+workflow, rather than a failure of the learned structure--energy map.
+
+\paragraph{Few-shot offset calibration recovers LOHO-level accuracy.}
+
+Estimating a single scalar offset per host from $k$ DFT calculations
+and evaluating on the remainder (Fig.~\ref{fig:blindood_kshot}, left)
+recovers most of the gap: with $k{=}3$ the test MAE drops to
+$1.14\pm0.27$\,eV (VS$_2$), $1.80\pm0.34$\,eV (graphene) and
+$2.07\pm0.41$\,eV (CrS$_2$); the pooled leave-one-out estimate is
+$1.55$\,eV (CI $1.20$--$1.90$), inside the $1.4$--$2.1$\,eV LOHO
+band. Operationally this reproduces the deployment recipe of
+Sec.~\ref{sec:deploy}: when extending screening to a new host
+\emph{and} a new DFT workflow, $\sim$3 anchor calculations suffice to
+re-reference the model.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_blind_ood_kshot.png}
+\caption{Left: $k$-shot per-host offset calibration (mean $\pm$ std
+over 500 random calibration subsets; dotted lines are the raw
+uncorrected MAEs). Right: empirical coverage of the
+temperature-scaled uncertainty under blind OOD, before and after
+per-host offset correction.}
+\label{fig:blindood_kshot}
+\end{figure}
+
+\paragraph{The calibrated uncertainty survives the code transfer.}
+
+The most important observation concerns
+$\sigma_{\mathrm{cal}}$. Without any re-calibration, the ensemble
+raises its mean predicted uncertainty from $0.87$\,eV
+(in-distribution) to $3.77$\,eV on this benchmark --- a $4.3\times$
+self-aware amplification. The resulting intervals are conservative
+but never over-confident: the nominal 90\% and 95\% intervals achieve
+100\% empirical coverage even with the systematic host shift
+included, and after the per-host offset correction the coverage
+profile becomes close to nominal (68\%$\to$89\%, 90\%$\to$97\%;
+Fig.~\ref{fig:blindood_kshot}, right). $\sigma_{\mathrm{cal}}$
+retains a positive correlation with the realised absolute error
+($r=0.27$). For screening purposes, an uncertainty that degrades
+\emph{gracefully and conservatively} under a simultaneous
+host-, code-, and convention-shift is precisely the behaviour needed
+to keep a human-in-the-loop pipeline safe.
+
+\paragraph{UQ as an anomaly detector.}
+
+One sample, Mg@CrS$_2$ (\#81), had been flagged during the GPAW
+campaign as a suspected SCF convergence to a high-energy state
+($E_f=5.28$\,eV, anomalously high against its chemical neighbours).
+The model provides independent corroboration: after removing the
+CrS$_2$ host offset it expects $\approx 2.3$\,eV for this defect,
+$\sim$3\,eV below the reported DFT value --- the largest
+model--DFT disagreement in the CrS$_2$ subset. The blind benchmark
+thus illustrates a secondary use of a calibrated surrogate:
+cross-checking the DFT pipeline itself.
+
+\paragraph{Scope.}
+
+We emphasise what this benchmark does \emph{not} show: with
+$n=38$ and three hosts, per-host correlations are noisy, and the
+raw (uncorrected) model is not usable for quantitative prediction in
+a foreign DFT workflow --- re-referencing is mandatory. The benchmark
+data (39 relaxed structures with GPAW formation energies), the
+construction script, and the analysis are released with the
+repository
+(\texttt{scripts/build\_blind\_ood\_benchmark.py},
+\texttt{results/blind\_ood\_analysis.md}).

@@ -77,3 +77,6 @@ self-check/
 
 # Raw DFT server backup (420MB, keep local only)
 backup_data 2/
+
+# Large local model weights / raw results (3.7GB, not for git)
+weights&results/

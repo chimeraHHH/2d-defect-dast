@@ -1,0 +1,51 @@
+sample_id,batch,host,dopant,formula,E_defect_eV,E_host_eV,host_source,mu_eV,E_form_eV,convergence,status,usable,notes
+40,40-49,graphene,Li,LiC50,-461.0448,-460.4330,self,-1.9028,1.2911,stage2,Completed,yes,
+41,40-49,graphene,Na,NaC50,-460.6312,-460.4330,self,-1.3245,1.1263,stage2,Completed,yes,
+42,40-49,graphene,K,KC50,-461.1459,-460.4330,self,-1.2223,0.5094,stage2,Completed,yes,
+43,40-49,graphene,Mg,MgC50,-460.5711,-460.4330,self,-1.6222,1.4841,stage2,Completed,yes,
+44,40-49,graphene,Ca,CaC50,-460.5455,-460.4330,self,-2.0232,1.9108,stage2,Completed,yes,
+45,40-49,graphene,F,C50F,-462.1752,-460.4330,self,-1.9988,0.2566,stage2,Completed,yes,
+46,40-49,graphene,Cl,C50Cl,-461.1947,-460.4330,self,-1.7315,0.9699,stage2,Completed,yes,
+47,40-49,graphene,Br,BrC50,-460.9230,-460.4330,self,-1.4714,0.9814,stage2,Completed,yes,
+48,40-49,graphene,I,C50I,-460.7100,,missing,-1.2885,,,Terminated/Incomplete,no,host energy missing
+49,40-49,graphene,O,C50O,-464.6039,-460.4330,self,-5.3145,1.1436,stage2,Completed,yes,
+50,50-59,graphene,Al,AlC50,-461.1056,-460.4330,self,-3.7362,3.0637,stage2,Completed,yes,
+51,50-59,graphene,Si,C50Si,-461.4300,-460.4330,self,-5.4000,4.4030,stage2,Completed,yes,
+52,50-59,graphene,P,C50P,-461.8815,-460.4330,self,-5.2538,3.8054,stage2,Completed,yes,
+53,50-59,graphene,S,C50S,-462.1363,-460.4330,self,-3.4959,1.7927,stage2,Completed,yes,
+54,50-59,graphene,B,BC50,-461.4893,-460.4330,self,-5.6077,4.5514,stage2,Completed,yes,
+55,50-59,graphene,N,C50N,-463.9971,-460.4330,self,-8.4814,4.9174,stage2,Completed,yes,
+56,50-59,graphene,Sc,ScC50,-461.5086,-460.4330,self,-4.6687,3.5932,stage2,Completed,yes,
+57,50-59,graphene,Ti,TiC50,-461.9621,,missing,,,,Terminated/Incomplete,no,host + mu missing
+58,50-59,graphene,V,VC50,-459.7626,,missing,,,,Terminated/Incomplete,no,host + mu missing
+59,50-59,graphene,Cr,CrC50,-460.4251,,missing,,,,Terminated/Incomplete,no,host + mu missing
+60,60-69,VS2,Li,LiV16S32,-311.2927,-307.1942,self,-1.9028,-2.1956,stage2,Completed,yes,
+61,60-69,VS2,O,V16OS32,-309.3039,,missing,-5.3145,,,Incomplete/Failed,no,host energy missing
+62,60-69,VS2,F,V16FS32,-309.4378,,missing,-1.9988,,,Incomplete/Failed,no,host energy missing
+63,60-69,VS2,Co,CoV16S32,-312.9716,,missing,-8.2784,,,Incomplete/Failed,no,host energy missing
+64,60-69,VS2,Au,AuV16S32,-309.2186,-307.1942,self,-3.1644,1.1400,stage2,Completed,yes,
+65,60-69,CrS2,Na,Cr16NaS32,-315.0712,-313.3187,self,-1.3245,-0.4281,stage2,Completed,yes,
+66,60-69,CrS2,Cl,Cr16ClS32,-314.0910,-313.3187,self,-1.7315,0.9593,stage2,Completed,yes,
+67,60-69,CrS2,N,Cr16NS32,-316.6898,-313.3187,self,-8.4814,5.1104,stage2,Completed,yes,
+68,60-69,CrS2,Ni,Cr16NiS32,-319.1608,-313.3187,self,-7.2878,1.4457,stage2,Completed,yes,
+69,60-69,CrS2,Ag,AgCr16S32,-314.2542,-313.3187,self,-2.8683,1.9328,stage2,Completed,yes,
+70,70-89,VS2,K,KV16S32,-311.1498,-307.1932,self(stage2),-1.2223,-2.7344,stage2,Completed,yes,
+71,70-89,VS2,Mg,MgV16S32,-310.0953,-307.1932,reuse#70,-1.6222,-1.2800,stage2,Completed,yes,
+72,70-89,VS2,Ca,CaV16S32,-312.3376,-307.1932,reuse#70,-2.0232,-3.1212,stage2,Completed,yes,
+73,70-89,VS2,Sc,ScV16S32,-314.2747,-307.1942,self(stage2),-4.6687,-2.4117,stage2,Completed,yes,
+74,70-89,VS2,Ti,TiV16S32,-315.9119,-307.1932,reuse#70,-6.6704,-2.0483,stage1,Completed(stage1),yes,stage1 only - slightly lower precision
+75,70-89,VS2,Cr,CrV16S32,-316.4286,-307.1942,self(stage2),-9.3807,0.1464,stage2,Completed,yes,
+76,70-89,VS2,Mn,MnV16S32,-316.7748,-307.1942,self(stage2),-8.7544,-0.8262,stage2,Completed,yes,
+77,70-89,VS2,Fe,FeV16S32,-309.4415,-307.1932,reuse#70,,,,Incomplete,no,mu_Fe missing
+78,70-89,VS2,Cu,CuV16S32,-310.7302,-307.1942,self(stage2),-3.6754,0.1395,stage2,Completed,yes,
+79,70-89,VS2,Zn,ZnV16S32,-309.4601,-307.1932,reuse#70,-1.1932,-1.0737,stage1,Completed(stage1),yes,stage1 only - slightly lower precision
+80,70-89,CrS2,K,Cr16KS32,-315.5458,-313.3187,self(stage2),-1.2223,-1.0048,stage2,Completed,yes,
+81,70-89,CrS2,Mg,Cr16MgS32,-309.6615,-313.3187,self(stage2),-1.6222,5.2794,stage2,Completed,needs_review,E_form anomalously high; suspected SCF high-energy state; verify gpaw_sample_81_defect_stage2.txt before use
+82,70-89,CrS2,Ca,Cr16CaS32,-315.1878,-313.3187,self(stage2),-2.0232,0.1541,stage2,Completed,yes,
+83,70-89,CrS2,Sc,Cr16ScS32,-316.5063,-313.3187,self(stage2),-4.6687,1.4811,stage2,Completed,yes,
+84,70-89,CrS2,Ti,Cr16TiS32,-317.4497,-313.3187,self(stage2),-6.6704,2.5394,stage2,Completed,yes,
+85,70-89,CrS2,V,Cr16VS32,-318.3955,-313.3187,self(stage2),-8.5190,3.4422,stage2,Completed,yes,
+86,70-89,CrS2,Mn,Cr16MnS32,-316.5175,-313.3187,reuse#80,-8.7544,5.5556,stage1,Completed(stage1),yes,stage1 only - slightly lower precision
+87,70-89,CrS2,Fe,Cr16FeS32,,-313.3187,reuse#80,,,,Incomplete,no,defect energy + mu_Fe missing
+88,70-89,CrS2,Cu,Cr16CuS32,,-313.3187,reuse#80,-3.6754,,,Incomplete,no,defect energy missing
+89,70-89,CrS2,Zn,Cr16ZnS32,,-313.3187,reuse#80,-1.1932,,,Incomplete,no,defect energy missing

@@ -1,0 +1,795 @@
+{
+  "description": "4-seed leak-free baseline ensemble predictions on the blind GPAW OOD benchmark (graphene/VS2/CrS2, hosts not in IMP2D). sigma_cal = tau * ensemble std, tau from uq_calibration.json.",
+  "tau": 2.5953441155091057,
+  "n_samples": 39,
+  "n_seeds": 4,
+  "seed_dirs": [
+    "baseline_h128_aug_long_safe",
+    "baseline_h128_aug_long_safe_seed0",
+    "baseline_h128_aug_long_safe_seed1",
+    "baseline_h128_aug_long_safe_seed2"
+  ],
+  "predictions": [
+    {
+      "sample_id": 40,
+      "host": "graphene",
+      "dopant": "Li",
+      "formula": "LiC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.4547,
+      "sigma_raw_eV": 1.1276,
+      "sigma_cal_eV": 2.9265,
+      "E_dft_eV": 1.2911,
+      "err_eV": 2.1636,
+      "per_seed": [
+        1.5131,
+        4.1793,
+        4.2226,
+        3.9037
+      ]
+    },
+    {
+      "sample_id": 41,
+      "host": "graphene",
+      "dopant": "Na",
+      "formula": "NaC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.9942,
+      "sigma_raw_eV": 1.1775,
+      "sigma_cal_eV": 3.056,
+      "E_dft_eV": 1.1263,
+      "err_eV": 1.8679,
+      "per_seed": [
+        0.9586,
+        3.7897,
+        3.6001,
+        3.6286
+      ]
+    },
+    {
+      "sample_id": 42,
+      "host": "graphene",
+      "dopant": "K",
+      "formula": "KC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.3994,
+      "sigma_raw_eV": 1.7409,
+      "sigma_cal_eV": 4.5181,
+      "E_dft_eV": 0.5094,
+      "err_eV": 3.89,
+      "per_seed": [
+        1.7738,
+        6.6629,
+        4.7214,
+        4.4393
+      ]
+    },
+    {
+      "sample_id": 43,
+      "host": "graphene",
+      "dopant": "Mg",
+      "formula": "MgC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.7862,
+      "sigma_raw_eV": 0.983,
+      "sigma_cal_eV": 2.5511,
+      "E_dft_eV": 1.4841,
+      "err_eV": 1.3021,
+      "per_seed": [
+        1.1041,
+        3.5826,
+        3.1614,
+        3.2965
+      ]
+    },
+    {
+      "sample_id": 44,
+      "host": "graphene",
+      "dopant": "Ca",
+      "formula": "CaC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.487,
+      "sigma_raw_eV": 2.0942,
+      "sigma_cal_eV": 5.4352,
+      "E_dft_eV": 1.9108,
+      "err_eV": 2.5762,
+      "per_seed": [
+        2.1115,
+        7.7245,
+        3.3324,
+        4.7797
+      ]
+    },
+    {
+      "sample_id": 45,
+      "host": "graphene",
+      "dopant": "F",
+      "formula": "C50F",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.8005,
+      "sigma_raw_eV": 2.5403,
+      "sigma_cal_eV": 6.5928,
+      "E_dft_eV": 0.2566,
+      "err_eV": 4.5439,
+      "per_seed": [
+        1.6677,
+        8.4717,
+        3.4417,
+        5.6208
+      ]
+    },
+    {
+      "sample_id": 46,
+      "host": "graphene",
+      "dopant": "Cl",
+      "formula": "C50Cl",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.5192,
+      "sigma_raw_eV": 1.8531,
+      "sigma_cal_eV": 4.8095,
+      "E_dft_eV": 0.9699,
+      "err_eV": 2.5493,
+      "per_seed": [
+        0.9298,
+        5.3371,
+        2.5956,
+        5.2142
+      ]
+    },
+    {
+      "sample_id": 47,
+      "host": "graphene",
+      "dopant": "Br",
+      "formula": "BrC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.187,
+      "sigma_raw_eV": 2.2119,
+      "sigma_cal_eV": 5.7407,
+      "E_dft_eV": 0.9814,
+      "err_eV": 3.2056,
+      "per_seed": [
+        1.1055,
+        6.9814,
+        3.2758,
+        5.3852
+      ]
+    },
+    {
+      "sample_id": 49,
+      "host": "graphene",
+      "dopant": "O",
+      "formula": "C50O",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.6861,
+      "sigma_raw_eV": 1.1223,
+      "sigma_cal_eV": 2.9129,
+      "E_dft_eV": 1.1436,
+      "err_eV": 2.5425,
+      "per_seed": [
+        2.1981,
+        5.2544,
+        4.0712,
+        3.2208
+      ]
+    },
+    {
+      "sample_id": 50,
+      "host": "graphene",
+      "dopant": "Al",
+      "formula": "AlC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 5.1552,
+      "sigma_raw_eV": 3.0114,
+      "sigma_cal_eV": 7.8156,
+      "E_dft_eV": 3.0637,
+      "err_eV": 2.0915,
+      "per_seed": [
+        2.3622,
+        10.0242,
+        2.9746,
+        5.2597
+      ]
+    },
+    {
+      "sample_id": 51,
+      "host": "graphene",
+      "dopant": "Si",
+      "formula": "C50Si",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.0925,
+      "sigma_raw_eV": 1.1703,
+      "sigma_cal_eV": 3.0374,
+      "E_dft_eV": 4.403,
+      "err_eV": -0.3105,
+      "per_seed": [
+        2.997,
+        5.5546,
+        2.8909,
+        4.9275
+      ]
+    },
+    {
+      "sample_id": 52,
+      "host": "graphene",
+      "dopant": "P",
+      "formula": "C50P",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.0559,
+      "sigma_raw_eV": 1.4011,
+      "sigma_cal_eV": 3.6363,
+      "E_dft_eV": 3.8054,
+      "err_eV": 0.2505,
+      "per_seed": [
+        2.411,
+        5.566,
+        2.9281,
+        5.3185
+      ]
+    },
+    {
+      "sample_id": 53,
+      "host": "graphene",
+      "dopant": "S",
+      "formula": "C50S",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.5889,
+      "sigma_raw_eV": 1.2292,
+      "sigma_cal_eV": 3.1902,
+      "E_dft_eV": 1.7927,
+      "err_eV": 1.7962,
+      "per_seed": [
+        1.9736,
+        4.8976,
+        2.8271,
+        4.6574
+      ]
+    },
+    {
+      "sample_id": 54,
+      "host": "graphene",
+      "dopant": "B",
+      "formula": "BC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.4304,
+      "sigma_raw_eV": 1.3729,
+      "sigma_cal_eV": 3.5631,
+      "E_dft_eV": 4.5514,
+      "err_eV": -1.121,
+      "per_seed": [
+        1.1712,
+        4.8667,
+        3.7125,
+        3.9712
+      ]
+    },
+    {
+      "sample_id": 55,
+      "host": "graphene",
+      "dopant": "N",
+      "formula": "C50N",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.0814,
+      "sigma_raw_eV": 0.7734,
+      "sigma_cal_eV": 2.0072,
+      "E_dft_eV": 4.9174,
+      "err_eV": -1.836,
+      "per_seed": [
+        2.1374,
+        4.1563,
+        3.4266,
+        2.6053
+      ]
+    },
+    {
+      "sample_id": 56,
+      "host": "graphene",
+      "dopant": "Sc",
+      "formula": "ScC50",
+      "natoms": 51,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.0394,
+      "sigma_raw_eV": 1.3081,
+      "sigma_cal_eV": 3.395,
+      "E_dft_eV": 3.5932,
+      "err_eV": -1.5538,
+      "per_seed": [
+        1.3196,
+        4.1701,
+        1.9629,
+        0.7049
+      ]
+    },
+    {
+      "sample_id": 60,
+      "host": "VS2",
+      "dopant": "Li",
+      "formula": "LiV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.3295,
+      "sigma_raw_eV": 1.0602,
+      "sigma_cal_eV": 2.7516,
+      "E_dft_eV": -2.1956,
+      "err_eV": 4.5251,
+      "per_seed": [
+        1.4581,
+        3.9452,
+        1.3057,
+        2.6089
+      ]
+    },
+    {
+      "sample_id": 64,
+      "host": "VS2",
+      "dopant": "Au",
+      "formula": "AuV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.2973,
+      "sigma_raw_eV": 1.1418,
+      "sigma_cal_eV": 2.9634,
+      "E_dft_eV": 1.14,
+      "err_eV": 1.1573,
+      "per_seed": [
+        0.7766,
+        3.9408,
+        1.9245,
+        2.5472
+      ]
+    },
+    {
+      "sample_id": 65,
+      "host": "CrS2",
+      "dopant": "Na",
+      "formula": "Cr16NaS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.8654,
+      "sigma_raw_eV": 1.6618,
+      "sigma_cal_eV": 4.313,
+      "E_dft_eV": -0.4281,
+      "err_eV": 4.2935,
+      "per_seed": [
+        2.1602,
+        6.3962,
+        2.618,
+        4.2872
+      ]
+    },
+    {
+      "sample_id": 66,
+      "host": "CrS2",
+      "dopant": "Cl",
+      "formula": "Cr16ClS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.4076,
+      "sigma_raw_eV": 2.1156,
+      "sigma_cal_eV": 5.4907,
+      "E_dft_eV": 0.9593,
+      "err_eV": 3.4483,
+      "per_seed": [
+        2.746,
+        8.021,
+        3.1311,
+        3.7324
+      ]
+    },
+    {
+      "sample_id": 67,
+      "host": "CrS2",
+      "dopant": "N",
+      "formula": "Cr16NS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.2026,
+      "sigma_raw_eV": 1.8149,
+      "sigma_cal_eV": 4.7103,
+      "E_dft_eV": 5.1104,
+      "err_eV": -0.9078,
+      "per_seed": [
+        3.0078,
+        7.1301,
+        2.4206,
+        4.252
+      ]
+    },
+    {
+      "sample_id": 68,
+      "host": "CrS2",
+      "dopant": "Ni",
+      "formula": "Cr16NiS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.4545,
+      "sigma_raw_eV": 1.779,
+      "sigma_cal_eV": 4.6171,
+      "E_dft_eV": 1.4457,
+      "err_eV": 3.0088,
+      "per_seed": [
+        2.2235,
+        7.2001,
+        4.1214,
+        4.273
+      ]
+    },
+    {
+      "sample_id": 69,
+      "host": "CrS2",
+      "dopant": "Ag",
+      "formula": "AgCr16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.5431,
+      "sigma_raw_eV": 2.0665,
+      "sigma_cal_eV": 5.3632,
+      "E_dft_eV": 1.9328,
+      "err_eV": 1.6103,
+      "per_seed": [
+        1.2952,
+        6.8444,
+        2.4801,
+        3.5525
+      ]
+    },
+    {
+      "sample_id": 70,
+      "host": "VS2",
+      "dopant": "K",
+      "formula": "KV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 1.1516,
+      "sigma_raw_eV": 1.256,
+      "sigma_cal_eV": 3.2598,
+      "E_dft_eV": -2.7344,
+      "err_eV": 3.886,
+      "per_seed": [
+        0.0361,
+        2.9063,
+        -0.1121,
+        1.7762
+      ]
+    },
+    {
+      "sample_id": 71,
+      "host": "VS2",
+      "dopant": "Mg",
+      "formula": "MgV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 0.2229,
+      "sigma_raw_eV": 0.5189,
+      "sigma_cal_eV": 1.3468,
+      "E_dft_eV": -1.28,
+      "err_eV": 1.5029,
+      "per_seed": [
+        -0.5173,
+        0.7787,
+        0.634,
+        -0.0038
+      ]
+    },
+    {
+      "sample_id": 72,
+      "host": "VS2",
+      "dopant": "Ca",
+      "formula": "CaV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 1.6338,
+      "sigma_raw_eV": 1.9236,
+      "sigma_cal_eV": 4.9924,
+      "E_dft_eV": -3.1212,
+      "err_eV": 4.755,
+      "per_seed": [
+        4.4158,
+        2.4285,
+        -0.2829,
+        -0.0264
+      ]
+    },
+    {
+      "sample_id": 73,
+      "host": "VS2",
+      "dopant": "Sc",
+      "formula": "ScV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.5813,
+      "sigma_raw_eV": 1.3353,
+      "sigma_cal_eV": 3.4655,
+      "E_dft_eV": -2.4117,
+      "err_eV": 4.993,
+      "per_seed": [
+        1.6819,
+        4.8592,
+        1.5884,
+        2.1958
+      ]
+    },
+    {
+      "sample_id": 74,
+      "host": "VS2",
+      "dopant": "Ti",
+      "formula": "TiV16S32",
+      "natoms": 49,
+      "traj_stage": "s1",
+      "usable_flag": "yes",
+      "E_pred_eV": 1.2443,
+      "sigma_raw_eV": 0.7791,
+      "sigma_cal_eV": 2.0221,
+      "E_dft_eV": -2.0483,
+      "err_eV": 3.2926,
+      "per_seed": [
+        0.1554,
+        2.3393,
+        1.0939,
+        1.3884
+      ]
+    },
+    {
+      "sample_id": 75,
+      "host": "VS2",
+      "dopant": "Cr",
+      "formula": "CrV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.4064,
+      "sigma_raw_eV": 0.8047,
+      "sigma_cal_eV": 2.0885,
+      "E_dft_eV": 0.1464,
+      "err_eV": 3.26,
+      "per_seed": [
+        3.8084,
+        4.2596,
+        2.1032,
+        3.4544
+      ]
+    },
+    {
+      "sample_id": 76,
+      "host": "VS2",
+      "dopant": "Mn",
+      "formula": "MnV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.0787,
+      "sigma_raw_eV": 0.9351,
+      "sigma_cal_eV": 2.4268,
+      "E_dft_eV": -0.8262,
+      "err_eV": 3.9049,
+      "per_seed": [
+        3.1713,
+        4.1805,
+        1.5979,
+        3.3651
+      ]
+    },
+    {
+      "sample_id": 78,
+      "host": "VS2",
+      "dopant": "Cu",
+      "formula": "CuV16S32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.0834,
+      "sigma_raw_eV": 1.9496,
+      "sigma_cal_eV": 5.0599,
+      "E_dft_eV": 0.1395,
+      "err_eV": 2.9439,
+      "per_seed": [
+        0.8992,
+        4.4365,
+        1.4671,
+        5.5308
+      ]
+    },
+    {
+      "sample_id": 79,
+      "host": "VS2",
+      "dopant": "Zn",
+      "formula": "ZnV16S32",
+      "natoms": 49,
+      "traj_stage": "s1",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.6461,
+      "sigma_raw_eV": 1.2117,
+      "sigma_cal_eV": 3.1447,
+      "E_dft_eV": -1.0737,
+      "err_eV": 3.7198,
+      "per_seed": [
+        1.4806,
+        3.7443,
+        1.3942,
+        3.9655
+      ]
+    },
+    {
+      "sample_id": 80,
+      "host": "CrS2",
+      "dopant": "K",
+      "formula": "Cr16KS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.7311,
+      "sigma_raw_eV": 2.4364,
+      "sigma_cal_eV": 6.3232,
+      "E_dft_eV": -1.0048,
+      "err_eV": 4.7359,
+      "per_seed": [
+        2.3769,
+        7.3187,
+        0.8053,
+        4.4233
+      ]
+    },
+    {
+      "sample_id": 81,
+      "host": "CrS2",
+      "dopant": "Mg",
+      "formula": "Cr16MgS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "needs_review",
+      "E_pred_eV": 4.0777,
+      "sigma_raw_eV": 1.4584,
+      "sigma_cal_eV": 3.785,
+      "E_dft_eV": 5.2794,
+      "err_eV": -1.2017,
+      "per_seed": [
+        2.8964,
+        6.171,
+        2.5459,
+        4.6974
+      ]
+    },
+    {
+      "sample_id": 82,
+      "host": "CrS2",
+      "dopant": "Ca",
+      "formula": "Cr16CaS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 2.6145,
+      "sigma_raw_eV": 0.6588,
+      "sigma_cal_eV": 1.7098,
+      "E_dft_eV": 0.1541,
+      "err_eV": 2.4604,
+      "per_seed": [
+        1.9858,
+        3.7121,
+        2.2657,
+        2.4943
+      ]
+    },
+    {
+      "sample_id": 83,
+      "host": "CrS2",
+      "dopant": "Sc",
+      "formula": "Cr16ScS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 4.0311,
+      "sigma_raw_eV": 1.1944,
+      "sigma_cal_eV": 3.1,
+      "E_dft_eV": 1.4811,
+      "err_eV": 2.55,
+      "per_seed": [
+        2.9939,
+        5.9375,
+        3.0402,
+        4.1528
+      ]
+    },
+    {
+      "sample_id": 84,
+      "host": "CrS2",
+      "dopant": "Ti",
+      "formula": "Cr16TiS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.0984,
+      "sigma_raw_eV": 0.9158,
+      "sigma_cal_eV": 2.3768,
+      "E_dft_eV": 2.5394,
+      "err_eV": 0.559,
+      "per_seed": [
+        2.0723,
+        4.3202,
+        2.3722,
+        3.6289
+      ]
+    },
+    {
+      "sample_id": 85,
+      "host": "CrS2",
+      "dopant": "V",
+      "formula": "Cr16VS32",
+      "natoms": 49,
+      "traj_stage": "s2",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.3299,
+      "sigma_raw_eV": 1.3639,
+      "sigma_cal_eV": 3.5399,
+      "E_dft_eV": 3.4422,
+      "err_eV": -0.1123,
+      "per_seed": [
+        2.0681,
+        5.5751,
+        2.4352,
+        3.2411
+      ]
+    },
+    {
+      "sample_id": 86,
+      "host": "CrS2",
+      "dopant": "Mn",
+      "formula": "Cr16MnS32",
+      "natoms": 49,
+      "traj_stage": "s1",
+      "usable_flag": "yes",
+      "E_pred_eV": 3.5974,
+      "sigma_raw_eV": 1.1137,
+      "sigma_cal_eV": 2.8904,
+      "E_dft_eV": 5.5556,
+      "err_eV": -1.9582,
+      "per_seed": [
+        2.945,
+        5.4569,
+        3.4117,
+        2.5761
+      ]
+    }
+  ],
+  "wall_time_min": 0.03706765174865723
+}
