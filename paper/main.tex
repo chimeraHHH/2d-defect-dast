@@ -82,7 +82,7 @@ negative but the CI weakly straddles zero, placing a candidate
 deployment caveat that $\sigma_{\mathrm{cal}}$ may be useful as
 an in-vs-OOD bucket gate but not as a sample-level reliability
 score on truly unseen chemistry. On this 37-candidate OOD
-subset specifically, the per-dopant-corrected MAE is $\sim 5.5\times$
+subset specifically, the per-dopant-corrected MAE is $\sim 5\times$
 the in-distribution IMP2D test MAE, a concrete deployment-relevant
 gap that we do not extrapolate to a universal bound. \emph{Third}, we release the full pipeline, including
 125 Quantum-ESPRESSO SCF outputs, leak-free augmentation contracts,
@@ -205,8 +205,9 @@ $\sigma_{\mathrm{cal}}$ may be informative for in-vs-OOD bucket
 triage but not for sample-level error ranking on OOD, though the
 within-bucket sample size warrants confirmation at larger N.
 On this 37-candidate OOD subset, the per-dopant-corrected MAE
-is $\sim 5.5\times$ the in-distribution test MAE: a concrete
-deployment-relevant gap, not a universal upper bound.
+is $\sim 5\times$ the in-distribution test MAE of the scoring
+ensemble: a concrete deployment-relevant gap, not a universal
+upper bound.
 
 \item We release the full pipeline as \textbf{open infrastructure}:
 the trained \modelname\ ensemble, leak-free augmentation contracts
@@ -1100,8 +1101,9 @@ pool, where there is no positive evidence that higher $\sigma$
 predicts larger error.
 \item \textbf{Validate decision-critical candidates with DFT.} On
 the 37-candidate OOD subset tested here, the per-dopant-corrected
-MAE is 2.66\,eV (95\% CI $[1.59, 3.97]$), a factor of $\sim 5.5\times$
-the IMP2D test-fold MAE of 0.486\,eV. Any deployment that uses a
+MAE is 2.66\,eV (95\% CI $[1.59, 3.97]$), a factor of $\sim 5\times$
+the IMP2D test-fold MAE of 0.537\,eV of the v1 scoring ensemble
+(Sec.~\ref{sec:prospective}). Any deployment that uses a
 single-point \modelname\ prediction without DFT follow-up therefore
 implicitly accepts an absolute uncertainty of order eV on candidates
 that look similar to this OOD subset. The 125-SCF pipeline released
@@ -1181,8 +1183,9 @@ Pearson($\sigma_{\mathrm{cal}}$, $|\mathrm{error}|$) $= -0.288$
 $\sigma_{\mathrm{cal}}$ is more useful as an in-vs-OOD bucket gate
 than as a sample-level reliability score on OOD, but the within-bucket
 sample size warrants confirmation at larger N. On this 37-candidate
-OOD subset, the per-dopant-corrected MAE is $\sim 5.5\times$ the
-in-distribution test MAE: a concrete deployment-relevant gap that
+OOD subset, the per-dopant-corrected MAE is $\sim 5\times$ the
+in-distribution test MAE of the scoring ensemble: a concrete
+deployment-relevant gap that
 no test-fold benchmark could have surfaced, but one we report as a
 property of this specific subset, not as a universal upper bound.
 
