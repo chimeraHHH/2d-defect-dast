@@ -62,9 +62,12 @@ uncertainty identifies a useful selective-prediction domain.
 
 ## Current route
 
-The final 10,572-structure protocol, test suite, remote smoke test, periodic
-SchNet implementation, result collectors, and manuscript protocol sections are
-complete. Descriptor baselines are frozen for all 27 formal splits, with
-LightGBM selected by validation MAE in every paper regime. The paired 2^3
-factorial is queued behind currently occupied GPUs; validation-only promotion,
-transfer, SchNet, ensemble-UQ, and paper result generation follow automatically.
+The final 10,572-structure protocol, periodic SchNet implementation, result
+collectors, and manuscript protocol sections are complete. Descriptor
+baselines are frozen for all 27 formal splits, with LightGBM selected by
+validation MAE in every paper regime. The two DART initialization assets are
+now pinned by SHA-256, and formal runs must record a fail-closed parameter-load
+report. The paired 2^3 factorial remains the next compute stage; it will be
+restarted from the latest clean commit when the remote GPU host is reachable,
+followed by validation-only promotion, transfer, SchNet, ensemble UQ, and paper
+result generation.

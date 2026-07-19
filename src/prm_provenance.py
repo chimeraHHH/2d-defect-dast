@@ -3,11 +3,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping
 
 import yaml
+
+
+DART_ASSET_KEYS = ("ct_uae", "pretrained_embed")
+_EDGE_GATE_PATTERN = re.compile(r"^\d+\.edge_gate\.")
 
 
 @dataclass(frozen=True)
@@ -68,3 +74,92 @@ def validate_manifest_config(
             f"stale run configuration at {manifest_path}; expected {expected.path}"
         )
     return expected
+
+
+def validate_dart_assets(
+    manifest: Mapping[str, Any],
+    manifest_path: Path,
+) -> None:
+    """Reject DART runs without the exact assets and audited partial load."""
+    config = manifest.get("config")
+    if not isinstance(config, Mapping) or not config.get("asset_integrity_required"):
+        raise ValueError(f"DART run has no required asset contract: {manifest_path}")
+    expected = config.get("asset_sha256")
+    if not isinstance(expected, Mapping) or set(expected) != set(DART_ASSET_KEYS):
+        raise ValueError(f"DART asset hash contract is incomplete: {manifest_path}")
+    assets = manifest.get("assets")
+    if not isinstance(assets, Mapping) or set(assets) != set(DART_ASSET_KEYS):
+        raise ValueError(f"DART run asset records are incomplete: {manifest_path}")
+    for key in DART_ASSET_KEYS:
+        record = assets[key]
+        if not isinstance(record, Mapping):
+            raise ValueError(f"invalid {key} asset record: {manifest_path}")
+        if record.get("sha256") != expected[key]:
+            raise ValueError(f"{key} asset hash mismatch: {manifest_path}")
+        if record.get("expected_sha256") != expected[key]:
+            raise ValueError(f"{key} expected hash was not enforced: {manifest_path}")
+        if int(record.get("size_bytes", 0)) <= 0:
+            raise ValueError(f"empty {key} asset: {manifest_path}")
+
+    report = manifest.get("pretraining")
+    if not isinstance(report, Mapping):
+        raise ValueError(f"DART run has no pretraining report: {manifest_path}")
+    if report.get("schema_version") != "prm_pretraining_report_v1":
+        raise ValueError(f"unsupported DART pretraining report: {manifest_path}")
+    if report.get("checkpoint_sha256") != expected["pretrained_embed"]:
+        raise ValueError(f"pretraining checkpoint/report mismatch: {manifest_path}")
+    if not report.get("source_dataset"):
+        raise ValueError(f"pretraining source dataset is missing: {manifest_path}")
+    source_test_mae = report.get("source_test_mae_eV")
+    if not isinstance(source_test_mae, (int, float)) or not math.isfinite(source_test_mae):
+        raise ValueError(f"pretraining source metric is invalid: {manifest_path}")
+    if report.get("all_model_parameters_trainable") is not True:
+        raise ValueError(f"pretrained DART parameters were not all trainable: {manifest_path}")
+
+    model_kwargs = config.get("model_kwargs", {})
+    hidden_dim = int(model_kwargs.get("hidden_dim", 0))
+    atom_fea_len = int(model_kwargs.get("atom_fea_len", 0))
+    projection = report.get("input_projection", {})
+    checkpoint_shape = projection.get("checkpoint_weight_shape")
+    model_shape = projection.get("model_weight_shape")
+    if checkpoint_shape != [hidden_dim, atom_fea_len]:
+        raise ValueError(f"pretraining input slice is incompatible: {manifest_path}")
+    if (
+        not isinstance(model_shape, list)
+        or len(model_shape) != 2
+        or model_shape[0] != hidden_dim
+        or model_shape[1] < atom_fea_len
+    ):
+        raise ValueError(f"invalid DART input projection report: {manifest_path}")
+    if projection.get("copied_rows") != [0, hidden_dim]:
+        raise ValueError(f"incomplete pretrained input rows: {manifest_path}")
+    if projection.get("copied_columns") != [0, atom_fea_len]:
+        raise ValueError(f"incomplete pretrained input columns: {manifest_path}")
+    if projection.get("bias_copied") is not True:
+        raise ValueError(f"pretrained input bias was not copied: {manifest_path}")
+    if projection.get("seeded_model_columns") != model_shape[1] - atom_fea_len:
+        raise ValueError(f"seeded input-column count is inconsistent: {manifest_path}")
+
+    local = report.get("local_layers", {})
+    loaded_keys = local.get("loaded_keys")
+    seeded_keys = local.get("seeded_model_keys")
+    if not isinstance(loaded_keys, list) or not isinstance(seeded_keys, list):
+        raise ValueError(f"invalid local-layer pretraining report: {manifest_path}")
+    if len(set(loaded_keys)) != len(loaded_keys) or len(set(seeded_keys)) != len(seeded_keys):
+        raise ValueError(f"duplicate local-layer keys in report: {manifest_path}")
+    if local.get("loaded_tensor_count") != len(loaded_keys):
+        raise ValueError(f"loaded local-layer count is inconsistent: {manifest_path}")
+    if local.get("checkpoint_tensor_count") != len(loaded_keys):
+        raise ValueError(f"not all checkpoint local tensors were loaded: {manifest_path}")
+    if local.get("model_tensor_count") != len(loaded_keys) + len(seeded_keys):
+        raise ValueError(f"model local-layer count is inconsistent: {manifest_path}")
+    if local.get("unexpected_checkpoint_keys") or local.get("shape_mismatches"):
+        raise ValueError(f"incompatible checkpoint tensors were accepted: {manifest_path}")
+    if any(_EDGE_GATE_PATTERN.match(key) is None for key in seeded_keys):
+        raise ValueError(f"non-gate local tensors remained seeded: {manifest_path}")
+    expected_seeded = (
+        4 * int(model_kwargs.get("n_local_layers", 0))
+        if model_kwargs.get("use_prenorm_local") else 0
+    )
+    if len(seeded_keys) != expected_seeded:
+        raise ValueError(f"unexpected number of seeded edge-gate tensors: {manifest_path}")

@@ -19,6 +19,7 @@ from scipy.stats import spearmanr
 from src.prm_provenance import (
     ExpectedConfig,
     load_expected_configs,
+    validate_dart_assets,
     validate_manifest_config,
 )
 
@@ -94,6 +95,7 @@ def load_oof_predictions(
         expected_config = validate_manifest_config(
             manifest, expected_configs, manifest_path
         )
+        validate_dart_assets(manifest, manifest_path)
         data_sha256 = manifest["data"]["data_sha256"]
         if expected_data_sha256 is not None and data_sha256 != expected_data_sha256:
             raise ValueError(f"dataset hash mismatch: {manifest_path}")

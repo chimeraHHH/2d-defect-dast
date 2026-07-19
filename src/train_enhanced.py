@@ -41,6 +41,7 @@ if str(ROOT) not in sys.path:
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
 from src.splits import load_split
 from src.sampler import HostBalancedSampler
+from src.prm_assets import load_pretrained_initialization, verify_training_assets
 from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
 from src.models import (
@@ -510,6 +511,7 @@ def main() -> None:
         ct_uae_override=os.environ.get("PRM_CT_UAE_PATH"),
         pretrained_override=os.environ.get("PRM_PRETRAINED_EMBED"),
     )
+    asset_records = verify_training_assets(cfg)
 
     split_seed = cfg.get("split_seed", 42)
 
@@ -598,6 +600,7 @@ def main() -> None:
         "config_sha256": config_sha256(controlled_cfg),
         "runtime_config": cfg,
         "runtime_config_sha256": config_sha256(cfg),
+        "assets": asset_records,
         "data": {
             "path": str(data_path),
             "size_bytes": data_path.stat().st_size,
@@ -725,30 +728,24 @@ def main() -> None:
         aux_defect_head = DefectClassifierHead(hidden_dim).to(device)
         n_params += sum(p.numel() for p in aux_defect_head.parameters())
 
-    # P1-2: Load pretrained element embeddings + local layers
+    # Load the exact shared input/local initialization and record what matched.
     pretrained_embed_path = cfg.get("pretrained_embed", None)
     if pretrained_embed_path:
-        embed_ckpt = torch.load(
-            resolve_path(pretrained_embed_path), map_location=device, weights_only=False
+        pretraining_report = load_pretrained_initialization(
+            model, resolve_path(pretrained_embed_path)
         )
-        loaded = []
-        if "embed_weight" in embed_ckpt and hasattr(model, "embed"):
-            with torch.no_grad():
-                pre_w = embed_ckpt["embed_weight"]
-                cur_w = model.embed.weight
-                if pre_w.shape == cur_w.shape:
-                    cur_w.copy_(pre_w)
-                else:
-                    # UAE widens input dim: copy pretrained cols into first slice
-                    n_pre = pre_w.shape[1]
-                    cur_w[:, :n_pre].copy_(pre_w)
-                if "embed_bias" in embed_ckpt:
-                    model.embed.bias.copy_(embed_ckpt["embed_bias"])
-            loaded.append("embed")
-        if "local_layers" in embed_ckpt and hasattr(model, "local_layers"):
-            model.local_layers.load_state_dict(embed_ckpt["local_layers"], strict=False)
-            loaded.append("local_layers")
-        print(f"Loaded pretrained {'+'.join(loaded)} from {pretrained_embed_path}")
+        expected_checkpoint_hash = asset_records.get("pretrained_embed", {}).get("sha256")
+        if pretraining_report["checkpoint_sha256"] != expected_checkpoint_hash:
+            raise RuntimeError("pretraining report does not match the verified checkpoint")
+        run_manifest["pretraining"] = pretraining_report
+        write_json(out_dir / "run_manifest.json", run_manifest)
+        local_report = pretraining_report["local_layers"]
+        print(
+            "Loaded pretrained input slice and "
+            f"{local_report['loaded_tensor_count']} local tensors from "
+            f"{pretrained_embed_path}; "
+            f"{len(local_report['seeded_model_keys'])} model tensors remain seeded"
+        )
 
     # ---- Optimizer ----
     all_params = list(model.parameters())

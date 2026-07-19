@@ -10,6 +10,8 @@
 - [x] Freeze the canonical 10,572-structure modeling set and dedicated UQ split.
 - [x] Add split-file support and sample-index preservation to the trainer.
 - [x] Add run manifest and canonical prediction schema.
+- [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
+      the exact copied versus seeded parameter sets in every DART run.
 - [x] Pass unit tests and one bounded remote smoke run.
 
 ## Experiments

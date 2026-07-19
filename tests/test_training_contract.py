@@ -27,6 +27,10 @@ FORBIDDEN_DART_KEYS = {
     "swa_start_epoch",
     "swa_lr",
 }
+EXPECTED_ASSET_HASHES = {
+    "ct_uae": "ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc",
+    "pretrained_embed": "5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc",
+}
 
 
 def _load(path: Path) -> dict:
@@ -36,6 +40,8 @@ def _load(path: Path) -> dict:
 def _assert_canonical_dart(config: dict) -> None:
     assert config["online_aug"] is False
     assert FORBIDDEN_DART_KEYS.isdisjoint(config)
+    assert config["asset_integrity_required"] is True
+    assert config["asset_sha256"] == EXPECTED_ASSET_HASHES
 
 
 def _assert_canonical_schnet(config: dict) -> None:

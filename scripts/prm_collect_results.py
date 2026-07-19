@@ -19,6 +19,7 @@ from src.prm_metrics import low_energy_metrics, macro_group_mae
 from src.prm_provenance import (
     ExpectedConfig,
     load_expected_configs,
+    validate_dart_assets,
     validate_manifest_config,
 )
 
@@ -92,6 +93,8 @@ def load_neural_runs(
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty run is inadmissible: {path}")
         expected_config = validate_manifest_config(manifest, expected_configs, path)
+        if model == "dart":
+            validate_dart_assets(manifest, path)
         if manifest["data"]["data_sha256"] != expected_data_sha256:
             raise ValueError(f"dataset mismatch: {path}")
         split_id = manifest["split"]["split_id"]

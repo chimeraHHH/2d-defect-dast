@@ -139,9 +139,14 @@ recipe is limited to 0.1 dropout and additive Gaussian target noise with
 standard deviation 0.03~eV; no coordinate or strain augmentation is applied.
 A host-balanced sampler draws 200 structures per host per epoch; its sequence
 is deterministically indexed by model seed and epoch so paired variants see
-the same batches.  The input projection and compatible local-layer weights are
-initialized from the same frozen pretraining checkpoint for every factorial
-variant.
+the same batches.  Every factorial variant uses the same fixed pretraining
+checkpoint.  Its nine-feature input-projection block and bias, together with
+all 51 shape-matched V1 local-message tensors, initialize the corresponding
+DART parameters.  The 128 input-projection columns associated with the fixed
+ct-UAE vectors retain their seeded initialization; for P-enabled variants, the
+12 new edge-gate tensors do likewise.  All trainable model parameters are then
+optimized.  Both input assets are verified against SHA-256 digests, and each
+run manifest records the exact copied and seeded parameter sets.
 
 The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved

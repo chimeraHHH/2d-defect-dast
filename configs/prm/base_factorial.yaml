@@ -13,6 +13,10 @@ host_balanced: true
 samples_per_host: 200
 label_noise_std: 0.03
 pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+asset_integrity_required: true
+asset_sha256:
+  ct_uae: ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc
+  pretrained_embed: 5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc
 scheduler_type: cosine
 warmup_epochs: 10
 optimizer:

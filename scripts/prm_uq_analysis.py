@@ -19,6 +19,7 @@ from scipy.stats import spearmanr
 from src.prm_provenance import (
     ExpectedConfig,
     load_expected_configs,
+    validate_dart_assets,
     validate_manifest_config,
 )
 
@@ -210,6 +211,7 @@ def validate_runs(
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty UQ member is not admissible: {path}")
         expected_config = validate_manifest_config(manifest, expected_configs, path)
+        validate_dart_assets(manifest, path)
         bits = [bool(manifest["config"]["model_kwargs"][name]) for name in COMPONENTS]
         if bits != expected_bits:
             raise ValueError(f"UQ member does not use selected architecture: {path}")

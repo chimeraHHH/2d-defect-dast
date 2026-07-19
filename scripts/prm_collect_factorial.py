@@ -16,6 +16,7 @@ import numpy as np
 from src.prm_provenance import (
     ExpectedConfig,
     load_expected_configs,
+    validate_dart_assets,
     validate_manifest_config,
 )
 
@@ -218,6 +219,7 @@ def load_runs(
             raise ValueError(f"dirty training run is not admissible: {path}")
         config = payload["config"]
         expected_config = validate_manifest_config(payload, expected_configs, path)
+        validate_dart_assets(payload, path)
         variant, bits = variant_from_config(config)
         if path.parent.parent.name != variant:
             raise ValueError(f"variant path/config mismatch: {path}")
