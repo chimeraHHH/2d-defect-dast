@@ -62,6 +62,24 @@ the full 10,641-row container through mutually disjoint train, validation,
 test, optional calibration, and exclusion sets; their SHA256 hashes are stored
 in every run manifest.
 
+Figure~\ref{fig:protocol} summarizes the sequential data audit, canonical
+chemical coverage, target distribution, and fixed partition geometry.
+\begin{figure*}[t]
+ \centering
+ \includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
+ \caption{Data provenance and frozen evaluation protocol. (a) Sequential
+ source filtering, raw-energy reconstruction audit, and structure
+ canonicalization. The final set excludes four rows with zero sentinels in a
+ raw energy component and 65 redundant structures. (b) Formation-energy
+ distributions for the two incorporation classes in the canonical set.
+ (c) Number of structures for each of 44 hosts and 65 impurity elements;
+ white cells are unobserved combinations. (d) Train, validation, calibration,
+ and test fractions for each evaluation regime. Bars for fivefold protocols
+ show fold averages. All regimes cover the same 10,572 retained structures;
+ the common 69-row exclusion set is omitted from the bars.}
+ \label{fig:protocol}
+\end{figure*}
+
 %----------------------------------------------------------------------
 \subsection{Defect-aware graph transformer}
 \label{sec:architecture}
