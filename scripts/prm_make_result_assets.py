@@ -642,6 +642,19 @@ def save_figure(figure: plt.Figure, output_pdf: Path) -> list[Path]:
     return [output_pdf, output_png]
 
 
+def invalidate_ready_marker(generated_dir: Path) -> Path:
+    ready_path = generated_dir / "results_ready.tex"
+    ready_path.unlink(missing_ok=True)
+    return ready_path
+
+
+def write_ready_marker(ready_path: Path) -> None:
+    ready_path.write_text(
+        "% Auto-generated after all canonical paper assets succeeded; do not edit.\n"
+        "\\def\\PRMResultAssetsReady{1}\n"
+    )
+
+
 def plot_factorial(factorial: Mapping[str, Any], output_pdf: Path) -> list[Path]:
     configure_style()
     figure, axes = plt.subplots(1, 2, figsize=(7.05, 2.75), gridspec_kw={"width_ratios": [1.05, 0.95]})
@@ -895,6 +908,7 @@ def write_outputs(
     figure_dir = paper_dir / "figures"
     generated_dir.mkdir(parents=True, exist_ok=True)
     figure_dir.mkdir(parents=True, exist_ok=True)
+    ready_path = invalidate_ready_marker(generated_dir)
 
     output_paths = []
     claims_path = generated_dir / "claims.json"
@@ -932,6 +946,8 @@ def write_outputs(
             figure_dir / "fig_screening.pdf",
         )
     )
+    write_ready_marker(ready_path)
+    output_paths.append(ready_path)
 
     manifest = {
         "schema_version": "prm_paper_assets_v1",

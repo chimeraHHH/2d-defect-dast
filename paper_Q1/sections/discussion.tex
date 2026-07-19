@@ -1,133 +1,105 @@
 % !TEX root = ../main.tex
 
-%----------------------------------------------------------------------
-\subsection{Why a compact model suffices}
-%----------------------------------------------------------------------
-
-\dart{}'s 0.83\,M parameters outperform ALIGNN's 4.03\,M by 30\%.
-Our scaling analysis finds power-law exponents
-$\alpha_\mathrm{data} = -0.40$ for data scaling but
-$\beta_\mathrm{params} \approx -0.01$ for parameter scaling ($R^2 = 0.95$),
-confirming that \emph{more data, not more parameters}, is the primary lever
-in the $N \sim 10^4$ regime.
-
-The decomposition of \dart{}'s improvement is instructive:
-of the total 0.137\eV{} reduction (0.516 $\to$ 0.379\eV{}), the
-architectural innovations (gated pooling, environment enrichment,
-pre-norm) contribute ${\sim}0.135$\eV{} (Table~\ref{tab:arch}), while
-the MoE readout adds a further ${\sim}0.002$\eV{}.
-This confirms that targeted inductive bias dominates over capacity
-scaling in data-limited materials science (Fig.~\ref{fig:scaling}).
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig6_scaling_law.pdf}
-\caption{Scaling analysis from abbreviated 30-epoch training runs.
-  (a) Data scaling at fixed model size ($d = 128$): power-law exponent
-  $\alpha \approx -0.4$ indicates strong data dependence.
-  (b) Parameter scaling at fixed data ($N = 8{,}000$): $\beta$ is near
-  zero, showing negligible improvement from larger models.
-  Both panels confirm that data, not capacity, is the bottleneck in the
-  $N \sim 10^4$ regime.}
-\label{fig:scaling}
-\end{figure}
+\ifprmresultsready
 
 %----------------------------------------------------------------------
-\subsection{Why auxiliary losses fail}\label{sec:disc_negative}
+\subsection{What the paired factorial establishes}
 %----------------------------------------------------------------------
 
-A striking finding is that all six training-strategy innovations
-(LDS, focal MAE, RnC contrastive, heteroscedastic uncertainty, and their
-combinations) significantly \emph{worsen} performance.
-Per-range analysis reveals a consistent mechanism: these methods
-improve accuracy on rare high-$\ef$ samples ($[7, 25)$\eV{}) at the
-cost of degrading common low-$\ef$ samples ($[0, 2)$\eV{}).
-Since the low-$\ef$ range contains 48.5\% of test data vs.\ 7.1\%
-for the high-$\ef$ range, the net effect is always negative.
-
-LDS exemplifies this trade-off most clearly: it improves the $[7, 25)$
-range by 0.126\eV{} (not significant, $p = 0.16$) while degrading
-$[0, 2)$ by 0.074\eV{} ($p < 0.001$)---a 1.7$\times$ net loss.
-Focal MAE shows the same pattern with smaller magnitude.
-Heteroscedastic uncertainty produces the most extreme failure: the
-variance prediction head competes with the mean prediction head for
-model capacity, catastrophically degrading the $[7, 25)$ range by
-0.695\eV{} ($p < 0.001$).
-
-These results caution against na\"{i}vely importing imbalanced-learning
-techniques from computer vision to materials science: the underlying
-assumption---that improving tail performance is costless for the
-head---does not hold when model capacity is constrained and the
-regression target spans multiple orders of magnitude.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_per_range.pdf}
-\caption{Per-range MAE decomposition explaining why auxiliary losses
-  fail.  LDS and focal MAE sacrifice accuracy on the dominant
-  $[0, 2)$\eV{} range (48.5\% of data) for marginal gains at the tail.
-  Heteroscedastic uncertainty degrades all ranges through capacity
-  competition.}
-\label{fig:per_range}
-\end{figure}
+The factorial addresses a narrower and more defensible question than a
+collection of sequential ablations: whether each prespecified module changes
+error after averaging over the other two modules on the same data partitions.
+The validation-selected configuration, \PRMSelectedVariant, is therefore tied
+to a reproducible selection rule rather than to its best observed test split.
+Locked-test contrasts are useful confirmation of direction and magnitude, but
+they do not retroactively participate in architecture choice.  Likewise, the
+P factor remains a composite intervention, so any mechanistic attribution to
+pre-normalization or distance gating separately would require another
+factorial.
 
 %----------------------------------------------------------------------
-\subsection{Ensemble diversity from architectural innovation}
+\subsection{Transfer results define a bounded applicability domain}
 %----------------------------------------------------------------------
 
-Although no single innovation significantly outperforms the \dart{}
-baseline, four innovation variants (V4 MoE, V14 JK, V6 Physics,
-V3 DefType) are selected into the optimal 8-model ensemble, reducing
-the MAE from 0.349\eV{} (prior best) to 0.344\eV{}.
-This resolves an apparent paradox: innovations that are individually
-neutral become collectively valuable through error decorrelation.
+Random out-of-fold prediction (\PRMIdCvDARTMAE\eV{}) and the grouped protocols
+answer different questions.  Pair-, host-, impurity-, and chemistry-block MAEs
+were \PRMPairCvDARTMAE, \PRMHostCvDARTMAE, \PRMDopantCvDARTMAE, and
+\PRMChemistryBlockDARTMAE\eV{}, respectively.  These values should not be
+collapsed into one headline score: holding out an entire host probes a
+different extrapolation axis from holding out an impurity or only their
+combination.  The paired confidence intervals against SchNet and the selected
+descriptor baseline further distinguish a supported model difference from a
+small aggregate fluctuation.
 
-The mechanism is clear from the attention analysis: the baseline
-concentrates 99.68\% of pooling attention on the defect atom, while
-V3 (11.4\%) and V6 (6.0\%) distribute attention more broadly.
-These distinct information-processing strategies produce diverse error
-patterns---the prerequisite for effective ensembling.
-
-%----------------------------------------------------------------------
-\subsection{Self-attention as learned potential summation}
-%----------------------------------------------------------------------
-
-The global attention layers' success can be understood through the
-``neural potential summation'' framework~\cite{crystalformer2024}:
-the distance bias $\phi_\mathrm{bias}(d_{ij}^{\mathrm{PBC}})$ acts
-as a non-parametric interatomic potential gating information flow.
-For 2D point defects, whose strain fields decay as ${\sim}1/r^2$,
-this mechanism naturally allocates higher attention to nearby atoms
-while retaining non-zero coupling to distant atoms---precisely matching
-the physics of defect-induced perturbation.
-
-V14's JK weights [0.30, 0.31, 0.39] empirically confirm this:
-the model assigns the highest weight to the deepest global layer,
-where long-range interactions have been most thoroughly processed.
+All grouped tests remain internal to the 44-host, 65-impurity IMP2D chemical
+universe.  They therefore quantify transfer across defined partitions of this
+database, not generalization to arbitrary 2D compounds, charge states, defect
+families, or chemical-potential conventions.  Macro errors and low-energy
+diagnostics are important because a favorable pooled MAE can coexist with
+poor performance for rare hosts or the candidates most relevant to screening.
 
 %----------------------------------------------------------------------
-\subsection{Limitations and outlook}
+\subsection{Uncertainty supports abstention, not universal reliability}
 %----------------------------------------------------------------------
 
-Several limitations warrant acknowledgment:
-(1)~IMP2D covers only 44 host materials with substitutional adsorbates
-and interstitials; vacancy-type defects are absent from both training
-and evaluation.
-(2)~We predict only defect formation energies; extending to charge
-transition levels, migration barriers, and optical transition energies
-would broaden utility.
-(3)~The OOD evaluation is limited to the G6-TMD subfamily; broader
-cross-family assessment awaits datasets with sufficient diversity.
-(4)~The 8-model ensemble, while efficient, still requires $8\times$
-inference cost; knowledge distillation into a single student model
-would be desirable for deployment.
+At 90\% nominal coverage, observed marginal coverage was
+\PRMUQNinetyCoverage\% with mean interval width \PRMUQNinetyWidth\eV{}.
+Coverage and width must be interpreted together: a wide interval can satisfy
+coverage while offering little screening resolution.  Error discrimination is
+separately summarized by the uncertainty--error correlation
+(\PRMUQErrorSpearman) and excess AURC (\PRMUQExcessAURC\eV{}).  The oracle gap
+in Fig.~\ref{fig:uq} makes explicit how much rejection performance remains
+unrecovered.
 
-Looking forward, integration with active learning could efficiently expand
-the training distribution into unexplored host--dopant space, guided by
-calibrated uncertainty.
-The architectural innovations demonstrated here---particularly the gated
-pooling and environment enrichment---are transferable to other
-defect-property prediction tasks (formation energies in 3D, migration
-barriers, charged defects) and other crystal-property domains where local
-perturbations drive global behavior.
+The conformal guarantee depends on exchangeability between the calibration
+and test examples.  It is marginal rather than host-conditional or
+impurity-conditional, and it does not automatically extend to the grouped
+transfer regimes.  The ensemble spread should consequently be treated as a
+calibrated model-disagreement score for selective prediction, not as a complete
+physical uncertainty decomposition.
 
+%----------------------------------------------------------------------
+\subsection{Screening utility and interpretation boundary}
+%----------------------------------------------------------------------
+
+The out-of-fold materials analysis converts per-structure regression into
+decisions that a screening workflow actually makes.  Incorporation-class
+accuracy (\PRMPreferenceAccuracy\%) tests whether adsorbate and interstitial
+minima are ordered correctly, while exact-site accuracy and regret distinguish
+recovering the precise minimum from choosing a near-degenerate alternative.
+The within-class top-two result (\PRMWithinTypeTopTwoAccuracy\%) additionally
+measures whether a small follow-up queue retains the reference minimum.
+
+These are retrospective decisions against IMP2D labels.  They do not establish
+thermodynamic prevalence, kinetic accessibility, synthesis feasibility, or a
+new materials discovery.  In particular, no archived calculation that cannot
+be matched to the canonical target definition is used as prospective
+validation.
+
+%----------------------------------------------------------------------
+\subsection{Limitations and next experiments}
+%----------------------------------------------------------------------
+
+The evidence is limited to neutral adsorbates and interstitial impurities and
+to the source database's reference energies and structural relaxations.
+Vacancies, substitutions, charged defects, transition levels, migration
+barriers, finite-temperature free energies, and competing phases are outside
+scope.  Duplicate control removes numerical equivalents detectable by the two
+declared fingerprints but cannot prove that every physically redundant
+configuration has been identified.  SchNet and the descriptor families are
+strong split-aligned comparators, not an exhaustive benchmark of all atomistic
+architectures.
+
+The highest-value extension is a preregistered external validation set whose
+structures, chemical potentials, convergence settings, and target formula are
+matched exactly to the training evidence.  Such calculations are deliberately
+not claimed here.  A second useful extension would calibrate and evaluate
+uncertainty separately on chemically shifted partitions, where the
+exchangeability assumption is intentionally stressed.
+
+\else
+
+\noindent\textit{Discussion will be populated only from the canonical result
+assets after all prespecified non-DFT experiments finish.}
+
+\fi

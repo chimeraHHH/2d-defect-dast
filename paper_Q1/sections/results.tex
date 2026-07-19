@@ -1,327 +1,152 @@
 % !TEX root = ../main.tex
 
-%----------------------------------------------------------------------
-\subsection{Architecture ablation}\label{sec:arch_ablation}
-%----------------------------------------------------------------------
-
-Table~\ref{tab:arch} presents the contribution of each architectural
-innovation, both in isolation and combined.
-
-\begin{table}[h]
-\centering
-\caption{Architectural innovation ablation.  Each row adds one
-  innovation to the base CrystalTransformer (0.516\eV{}).
-  ``Combined'' uses all three simultaneously.}
-\label{tab:arch}
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-Innovation & Params & MAE (eV) & $\Delta$ & $\Delta\%$ \\
-\midrule
-Base (mean pool, post-norm) & 0.75\,M & 0.516 & --- & --- \\
-\midrule
-+ Gated attention pooling   & 0.76\,M & 0.414 & $-0.102$ & $-19.9\%$ \\
-+ Local env.\ enrichment    & 0.77\,M & 0.423 & $-0.093$ & $-18.0\%$ \\
-+ Pre-norm residual         & 0.75\,M & 0.408 & $-0.108$ & $-21.0\%$ \\
-\midrule
-\textbf{Combined (\dart{})} & \textbf{0.83\,M} & \textbf{0.381} &
-  $\mathbf{-0.135}$ & $\mathbf{-26.2\%}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The combined improvement ($-26.2\%$) exceeds the average of individual gains,
-indicating complementarity: gated pooling captures defect-atom extremes,
-environment enrichment provides local chemical context, and pre-norm enables
-stable optimization at higher learning rates.
-The parameter overhead is modest (10.7\%), confirming that the gains arise
-from targeted inductive bias, not increased capacity.
+\ifprmresultsready
 
 %----------------------------------------------------------------------
-\subsection{Systematic innovation ablation}\label{sec:ablation_innov}
+\subsection{Validation-locked architecture selection}
+\label{sec:factorial_results}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:innovations} presents the central experimental result:
-a controlled comparison of twelve physically motivated innovations against
-the \dart{} baseline (0.381\eV{}), each evaluated with bootstrap hypothesis
-testing.
+The complete paired factorial is reported in Table~\ref{tab:factorial} and
+Fig.~\ref{fig:factorial}.  Validation MAE selected variant
+\PRMSelectedVariant, with a mean of
+\PRMSelectedValidationMAE\eV{} (95\% bootstrap interval
+[\PRMSelectedValidationMAELow, \PRMSelectedValidationMAEHigh]\eV{}) across
+the five paired repeats.  Its locked test MAE was
+\PRMSelectedTestMAE\eV{} [\PRMSelectedTestMAELow,
+\PRMSelectedTestMAEHigh]\eV{}.  The test values were exposed only after the
+selection rule had fixed the promoted architecture.
 
-\begin{table*}[t]
-\centering
-\caption{Systematic ablation of twelve physical innovations against the
-  \dart{} baseline (0.381\eV{}).  All use identical training recipe;
-  differences arise solely from the stated innovation.
-  $\Delta\mae$ = innovation $-$ baseline (positive = worse).
-  95\% CI and $p$-values from 10\,000 bootstrap resamples on 1\,065 test
-  samples.  Innovations are grouped by statistical outcome.}
-\label{tab:innovations}
-\begin{tabular}{@{}llccccl@{}}
-\toprule
-& Innovation & Test MAE (eV) & $\Delta\mae$ (eV) & 95\% CI &
-  $p$-value & Physical mechanism \\
-\midrule
-\multicolumn{7}{l}{\textit{Statistically equivalent to baseline ($p > 0.05$)}} \\
-\midrule
-V4  & MoE readout (3 experts) &
-  \textbf{0.379} & $-0.002$ & $[-0.021, +0.024]$ & 0.87 &
-  Expert specialization for hard samples \\
-V6  & Physics mismatch features &
-  0.382 & $+0.001$ & $[-0.022, +0.019]$ & 0.92 &
-  Hume-Rothery descriptors \\
-V3  & Defect-type conditioning &
-  0.387 & $+0.006$ & $[-0.025, +0.013]$ & 0.56 &
-  Interstitial/adsorbate separation \\
-V14 & JK layer aggregation &
-  0.389 & $+0.008$ & $[-0.012, +0.028]$ & 0.42 &
-  Multi-scale readout \\
-V10 & All-innovation combination &
-  0.392 & $+0.011$ & $[-0.011, +0.032]$ & 0.31 &
-  V3+V6+V9+V14+EMA \\
-    & EMA weight averaging &
-  0.395 & $+0.014$ & $[-0.008, +0.034]$ & 0.20 &
-  Polyak averaging (decay 0.999) \\
-\midrule
-\multicolumn{7}{l}{\textit{Significantly worse than baseline ($p < 0.05$)}} \\
-\midrule
-V9  & Defect--host contrast &
-  0.410 & $+0.029$ & $[+0.007, +0.052]$ & 0.009 &
-  $\Delta$-embedding oversimplification \\
-V12 & LDS + physics combined &
-  0.413 & $+0.032$ & $[+0.009, +0.055]$ & 0.006 &
-  LDS component dominates harm \\
-    & Focal MAE ($\gamma\!=\!0.5$) &
-  0.419 & $+0.038$ & $[+0.014, +0.062]$ & 0.001 &
-  Hurts $[0,2)$\eV{} common range \\
-V11 & LDS reweighting &
-  0.433 & $+0.052$ & $[+0.026, +0.076]$ & $<$0.001 &
-  Catastrophic $[0,2)$\eV{} degradation \\
-V13 & RnC contrastive + LDS &
-  0.442 & $+0.061$ & $[+0.037, +0.085]$ & $<$0.001 &
-  Auxiliary loss interferes with regression \\
-    & Heteroscedastic uncertainty &
-  0.466 & $+0.085$ & $[+0.044, +0.128]$ & $<$0.001 &
-  Variance head absorbs capacity \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-\paragraph{Key findings.}
-The best single model is V4 MoE at \textbf{0.379\eV{}} ($-30\%$ vs.\
-ALIGNN), though the improvement over the \dart{} baseline (0.381\eV{}) is
-not statistically significant ($p = 0.87$).
-This is consistent with the limited statistical power of 1\,065 test
-samples for detecting ${\sim}0.002$\eV{} differences.
-
-Among the six statistically equivalent innovations, four provide
-structurally distinct models (MoE, DefType, Physics, JK) that contribute
-to ensemble diversity (\S\ref{sec:ensemble}).
-The all-innovation combination V10 achieves the best \emph{validation}
-MAE (0.377\eV{}) but exhibits a val--test gap of 0.015\eV{},
-suggesting mild overfitting from stacking multiple conditioning
-mechanisms.
-
-All six harmful innovations share a common failure mode: they sacrifice
-accuracy on common low-$\ef$ samples ($[0, 2)$\eV{}, 48.5\% of test data)
-in pursuit of marginal gains on rare high-$\ef$ samples ($[7, 25)$\eV{},
-7.1\%).  The net effect is always negative, as analyzed in
-\S\ref{sec:disc_negative}.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_innovation_forest.pdf}
-\caption{Bootstrap confidence intervals for twelve innovation variants
-  relative to the \dart{} baseline.
-  Blue circles: statistically equivalent ($p > 0.05$).
-  Red squares: significantly worse ($p < 0.05$).
-  Dashed line marks the $\alpha = 0.05$ significance boundary.}
-\label{fig:innovation_forest}
-\end{figure}
-
-%----------------------------------------------------------------------
-\subsection{Ensemble analysis}\label{sec:ensemble}
-%----------------------------------------------------------------------
-
-Table~\ref{tab:ensemble} and Fig.~\ref{fig:ensemble_curve} show the greedy
-forward selection from 20 models.
-
-\begin{table}[t]
-\centering
-\caption{Greedy ensemble construction from 20 candidate models.
-  Each row adds the model that minimizes ensemble MAE on the test set.}
-\label{tab:ensemble}
-\begin{tabular}{@{}clc@{}}
-\toprule
-$k$ & Added member & MAE (eV) \\
-\midrule
-1 & V4 MoE                  & 0.379 \\
-2 & + \dart{} baseline s43  & 0.360 \\
-3 & + Multi-source deep     & 0.350 \\
-4 & + V14 JK aggregation    & 0.347 \\
-5 & + V6 Physics features   & 0.345 \\
-6 & + V3 DefType cond.      & 0.345 \\
-7 & + Multi-source shallow   & 0.344 \\
-\textbf{8} & + \dart{} long-train & \textbf{0.344} \\
-\midrule
-\multicolumn{2}{l}{Prior 29-model ensemble} & 0.359 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The optimal 8-model ensemble achieves \textbf{0.344\eV{}} ($-36\%$ vs.\
-ALIGNN), outperforming a prior 29-model ensemble (0.359\eV{}) with
-3.6$\times$ fewer members.
-Critically, four of the top eight members are physically motivated
-innovation variants (V4, V14, V6, V3), confirming that their primary
-value lies in \emph{ensemble diversity} rather than individual superiority.
-The innovation variants provide distinct error patterns because they
-process defect information through qualitatively different mechanisms
-(expert gating, multi-scale aggregation, physics descriptors, type
-conditioning), even when their solo MAE is statistically indistinguishable.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_ensemble_curve.pdf}
-\caption{Greedy forward selection curve.
-  Each step adds the model minimizing ensemble MAE.
-  The 8-model ensemble (circled) achieves 0.344\eV{}, outperforming a
-  prior 29-model ensemble (dashed gray) with $3.6\times$ fewer members.}
-\label{fig:ensemble_curve}
-\end{figure}
-
-%----------------------------------------------------------------------
-\subsection{Out-of-distribution evaluation}\label{sec:ood}
-%----------------------------------------------------------------------
-
-Table~\ref{tab:ood} and Fig.~\ref{fig:ood} present the graduated OOD
-assessment.
-
-\begin{table}[t]
-\centering
-\caption{Graduated generalization assessment.
-  Tier~0: random split; Tier~1: leave-one-host-out (G6-TMDs, 7-fold);
-  Tier~2: compositional block-out (G6$\times$3d).}
-\label{tab:ood}
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Tier & \dart{} MAE & Naive MAE & Degradation \\
-\midrule
-0 (ID, ensemble)           & 0.344 & --- & $1.0\times$ \\
-0 (ID, single)             & 0.379 & --- & $1.0\times$ \\
-1 (LOHO, 7-fold mean)      & $0.540 \pm 0.117$ & 2.636 & $1.5\times$ \\
-2 (G6$\times$3d block-out) & 0.534 & 1.754 & $1.5\times$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Graceful degradation.}
-Moving from Tier~0 to Tier~1 increases the single-model MAE by only
-1.5$\times$ (0.381 $\to$ 0.540\eV{}), far below the naive-baseline
-collapse (4.9$\times$).
-Mo-based hosts (mean MAE $= 0.453$\eV{}) are systematically easier than
-W-based hosts (mean MAE $= 0.639$\eV{}), reflecting the greater spatial
-extent of W\,$5d$ vs.\ Mo\,$4d$ orbitals.
-Tier~2 compositional block-out (0.534\eV{}) matches Tier~1, demonstrating
-that \dart{}'s compositional generalization is comparable to its
-host-transfer capability.
-
-\paragraph{ct-UAE ablation.}
-Removing ct-UAE pretrained embeddings \emph{improves} the mean LOHO MAE
-from 0.540 to 0.493\eV{}, though neither direction reaches significance
-($p = 0.22$).
-This suggests that embeddings pretrained on bulk crystals may encode
-chemical priors partially misaligned with the 2D defect domain.
+\input{generated/tab_factorial.tex}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_ood_combined.pdf}
-\caption{Out-of-distribution evaluation.
-  (a) Graduated three-tier assessment showing graceful degradation:
-  DART (blue) vs.\ naive baseline (red).
-  Degradation factors annotated below each bar.
-  (b) Per-host leave-one-host-out MAE for the G6-TMD subfamily:
-  Mo-based hosts (blue) are systematically easier than W-based hosts (red),
-  reflecting 4$d$ vs.\ 5$d$ orbital delocalization.}
-\label{fig:ood}
+\includegraphics[width=\textwidth]{fig_factorial.pdf}
+\caption{Paired architecture experiment.
+  (a) Validation and locked-test MAE for all eight G/E/P variants; shading
+  marks the validation-selected variant.
+  (b) Orthogonal main effects and interactions on validation and locked-test
+  MAE, with 95\% bootstrap intervals over paired repeats.  Negative effects
+  reduce MAE.}
+\label{fig:factorial}
 \end{figure*}
 
-%----------------------------------------------------------------------
-\subsection{Prospective DFT validation}\label{sec:dft}
-%----------------------------------------------------------------------
-
-% TODO: This section will be expanded with full DFT results.
-
-To validate \dart{}'s predictions beyond held-out test sets, we perform
-independent first-principles calculations on model-recommended candidates.
-Full results---including discovery rates, calibration analysis, and
-per-candidate comparisons---will be presented in the final version.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_parity.pdf}
-\caption{Parity plot for the best single model (V4 MoE, 0.379\eV{}).
-  Color intensity indicates sample density.
-  The shaded band marks $\pm 1$\eV{} around perfect prediction.}
-\label{fig:parity}
-\end{figure}
+The orthogonal contrasts separate evidence for the three prespecified modules
+from variation between random partitions.  Because P jointly changes
+normalization placement and distance gating, its contrast supports or rejects
+that composite block only; it does not identify either subchange as the causal
+source of an effect.
 
 %----------------------------------------------------------------------
-\subsection{Uncertainty quantification}\label{sec:uq}
+\subsection{Interpolation, chemical transfer, and low-energy behavior}
+\label{sec:transfer_results}
 %----------------------------------------------------------------------
 
-The 8-model ensemble provides calibrated uncertainty estimates after
-temperature scaling ($\tau = 2.57$).
-At the 90\% nominal coverage level, the empirical coverage reaches
-93.4\%, with an expected calibration error (ECE) of 0.037.
-The Spearman correlation between predicted $\sigma$ and absolute error
-is 0.577 ($p < 10^{-5}$), confirming that ensemble variance is a
-meaningful proxy for prediction confidence.
+Using the promoted architecture, pooled DART test MAEs were
+\PRMIdCvDARTMAE\eV{} for random out-of-fold prediction,
+\PRMPairCvDARTMAE\eV{} when host--impurity pairs were held out,
+\PRMHostCvDARTMAE\eV{} for held-out hosts,
+\PRMDopantCvDARTMAE\eV{} for held-out impurities, and
+\PRMChemistryBlockDARTMAE\eV{} for the predefined chemistry block.
+Table~\ref{tab:benchmark} compares the aligned DART, periodic SchNet, and
+validation-selected descriptor predictions.  The paired intervals, rather
+than unpaired differences between aggregate scores, determine whether a
+directional model difference is supported.
 
-%----------------------------------------------------------------------
-\subsection{Physical interpretability}\label{sec:interpret}
-%----------------------------------------------------------------------
-
-\paragraph{Attention concentration.}
-Extracting pooling attention weights from the \dart{} baseline reveals
-extreme defect-atom concentration: the dopant atom receives
-\textbf{99.68\%} of total attention weight (expected uniform:
-${\sim}2.4\%$), corresponding to a 41.3$\times$ concentration factor.
-This emergent behavior mirrors the physical reality that the dopant is the
-dominant perturbation source.
-
-Interestingly, the innovation variants redistribute this attention:
-V3 DefType reduces concentration to 11.4\% (5.1$\times$) and V6 Physics
-to 6.0\% (2.2$\times$), providing alternative information pathways through
-the conditioning and physics-feature channels.
-This redistribution explains their ensemble value: they process the same
-structural information through qualitatively different attention patterns.
-
-\paragraph{JK weight analysis.}
-V14's learned JK aggregation weights are [0.30, 0.31, 0.39] for
-[local, global-1, global-2] layers, showing a preference for the deepest
-global representation.
-This indicates that long-range interactions captured by the second global
-attention layer are most informative for $\ef$ prediction, consistent
-with the extended strain fields of 2D point defects.
-
-\paragraph{Defect-type specificity.}
-The learned defect-type embedding norms (V3: [0, 0, 0.94, 0.66]) show
-that the model learns distinct representations for interstitial vs.\
-adsorbate defects.
-This is physically meaningful: interstitial defects involve atoms
-\emph{inserted into} the lattice, creating strong local strain, while
-adsorbates sit \emph{on top of} the surface with weaker mechanical
-coupling.
+\input{generated/tab_benchmark.tex}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_interpretability.pdf}
-\caption{Physical interpretability analysis.
-  (a) Pooling attention concentration on the defect atom: the baseline
-  allocates 99.68\% to the dopant, while V3 and V6 redistribute attention
-  through alternative information channels.
-  (b) V14 JK layer weights prefer the deepest global layer, consistent
-  with long-range strain fields.
-  (c) Uncertainty calibration: temperature scaling ($\tau = 2.60$)
-  corrects raw ensemble underconfidence, achieving 93.4\% coverage at
-  90\% nominal level.}
-\label{fig:interpretability}
+\includegraphics[width=\textwidth]{fig_transfer.pdf}
+\caption{Interpolation and chemical-transfer evaluation.
+  (a) Pooled test MAE for DART, periodic SchNet, the descriptor family selected
+  within each regime using validation data, and a training-target mean
+  predictor.
+  (b) Paired differences in absolute error relative to DART with 95\%
+  sample-bootstrap intervals.  Positive values favor DART.}
+\label{fig:transfer}
 \end{figure*}
+
+Aggregate MAE can hide failures in chemically sparse or screening-relevant
+subsets.  Table~\ref{tab:applicability} therefore reports equal-weight host and
+impurity macro errors together with performance on nonpositive formation
+energies and the lowest-energy decile.  For example, on pair-held-out
+predictions, the true low-decile MAE was
+\PRMPairCvDARTLowEnergyMAE\eV{} and its recall by the predicted low decile was
+\PRMPairCvDARTLowEnergyRecall\%.  None of these low-energy summaries entered
+architecture or hyperparameter selection.
+
+\input{generated/tab_applicability.tex}
+
+%----------------------------------------------------------------------
+\subsection{Held-out uncertainty and selective prediction}
+\label{sec:uq_results}
+%----------------------------------------------------------------------
+
+On the untouched uncertainty test partition, the five-member ensemble had
+MAE \PRMUQTestMAE\eV{}, Gaussian negative log likelihood \PRMUQNLL, and mean
+Gaussian CRPS \PRMUQCRPS\eV{}.  The Spearman correlation between calibrated
+standard deviation and absolute error was \PRMUQErrorSpearman.  The
+risk--coverage curve had AURC \PRMUQAURC\eV{} and excess AURC
+\PRMUQExcessAURC\eV{} relative to oracle error ordering.
+
+\input{generated/tab_uq.tex}
+
+At 90\% nominal coverage, the split-conformal interval covered
+\PRMUQNinetyCoverage\% of test structures with mean width
+\PRMUQNinetyWidth\eV{}.  Table~\ref{tab:uq} reports all prespecified nominal
+levels.  These are marginal held-out coverage results; they do not establish
+conditional coverage for every host or impurity.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_uq.pdf}
+\caption{Held-out uncertainty evaluation.
+  (a) Nominal versus observed split-conformal coverage; annotations give mean
+  interval widths.
+  (b) MAE risk as increasingly uncertain predictions are rejected, compared
+  with oracle ordering by realized error.
+  (c) Calibrated standard deviation versus absolute error on the untouched
+  test partition.}
+\label{fig:uq}
+\end{figure*}
+
+%----------------------------------------------------------------------
+\subsection{Out-of-fold screening decisions within IMP2D}
+\label{sec:screening_results}
+%----------------------------------------------------------------------
+
+The host--impurity-pair folds provide one out-of-fold prediction for every
+retained structure.  Across pairs containing both incorporation classes, DART
+recovered the lower-energy class with
+\PRMPreferenceAccuracy\% accuracy; the predicted and reference class margins
+had Spearman correlation \PRMPreferenceMarginSpearman and margin MAE
+\PRMPreferenceMarginMAE\eV{}.  Selecting one configuration globally gave
+\PRMGlobalExactAccuracy\% exact-site accuracy and mean regret
+\PRMGlobalRegret\eV{}.  When the incorporation class was fixed, exact and
+top-two site accuracies were \PRMWithinTypeExactAccuracy\% and
+\PRMWithinTypeTopTwoAccuracy\%, respectively, with mean regret
+\PRMWithinTypeRegret\eV{}.
+
+\input{generated/tab_screening.tex}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_screening.pdf}
+\caption{Screening analysis from pair-held-out predictions.
+  (a) Predicted versus reference preference margins between adsorbate and
+  interstitial configurations.
+  (b) Empirical cumulative distributions of global and within-class screening
+  regret.
+  (c) Bootstrap intervals for incorporation-class, exact-site, and top-two
+  decision accuracy.}
+\label{fig:screening}
+\end{figure*}
+
+\else
+
+\noindent\textit{Canonical result assets are pending completion of the
+predefined GPU experiment chain.  Historical exploratory scores and unmatched
+first-principles calculations are intentionally excluded from this draft.}
+
+\fi

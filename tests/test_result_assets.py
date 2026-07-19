@@ -1,12 +1,17 @@
+import re
+from pathlib import Path
+
 import pytest
 
 from scripts.prm_make_result_assets import (
     comparison_status,
     effect_status,
     finite_format,
+    invalidate_ready_marker,
     latex_escape,
     render_macros,
     validate_contract,
+    write_ready_marker,
 )
 
 
@@ -72,6 +77,33 @@ def test_macro_rendering_uses_machine_values_without_placeholders():
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
     assert "TODO" not in macros
+
+
+def test_ready_marker_is_invalidated_until_all_assets_succeed(tmp_path):
+    generated = tmp_path / "generated"
+    generated.mkdir()
+    stale = generated / "results_ready.tex"
+    stale.write_text("stale\n")
+
+    ready = invalidate_ready_marker(generated)
+    assert ready == stale
+    assert not ready.exists()
+
+    write_ready_marker(ready)
+    assert ready.read_text().endswith(r"\def\PRMResultAssetsReady{1}" + "\n")
+
+
+def test_manuscript_uses_only_macros_emitted_by_result_generator():
+    definitions = set(
+        re.findall(r"\\newcommand\{\\(PRM[A-Za-z]+)\}", render_macros(minimal_claims()))
+    )
+    paper_root = Path(__file__).resolve().parents[1] / "paper_Q1/sections"
+    manuscript = "\n".join(
+        (paper_root / name).read_text()
+        for name in ("results.tex", "discussion.tex", "conclusion.tex")
+    )
+    uses = set(re.findall(r"\\(PRM[A-Za-z]+)", manuscript))
+    assert uses <= definitions
 
 
 def contract_inputs():

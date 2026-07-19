@@ -26,6 +26,16 @@
 \newcommand{\mae}{\mathrm{MAE}}
 \newcommand{\eV}{\ensuremath{\,\mathrm{eV}}}
 
+% Canonical result assets are exposed to the manuscript only after every
+% generated table and figure has completed successfully.
+\newif\ifprmresultsready
+\IfFileExists{generated/results_ready.tex}{%
+  \prmresultsreadytrue
+  \input{generated/results_macros.tex}%
+}{%
+  \prmresultsreadyfalse
+}
+
 \begin{document}
 
 \title{Defect-aware graph learning of impurity incorporation energetics and
