@@ -14,6 +14,7 @@ from src.prm_provenance import (
     load_expected_configs,
     load_protocol_targets,
     load_verified_factorial_selection,
+    validate_descriptor_evidence_bundle,
     validate_manifest_config,
     validate_protocol_targets,
     validate_training_completion,
@@ -282,6 +283,19 @@ def test_training_evidence_archive_copies_numerical_outputs_not_checkpoint(tmp_p
             repository_root=tmp_path,
             strip_output_prefix="factorial",
         )
+
+
+def test_repository_descriptor_evidence_matches_frozen_protocol():
+    root = Path(__file__).resolve().parent.parent
+
+    bundle = validate_descriptor_evidence_bundle(
+        root / "artifacts/prm_results/descriptors/manifest.json",
+        root / "artifacts/prm_protocol_v2",
+        repository_root=root,
+    )
+
+    assert bundle["n_archived_runs"] == 27
+    assert bundle["n_sources"] == 26
 
 
 def _complete_manifest():

@@ -23,6 +23,7 @@ from src.prm_provenance import (
     load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
+    validate_descriptor_evidence_bundle,
     validate_manifest_config,
     validate_protocol_targets,
     validate_training_completion,
@@ -502,6 +503,10 @@ def main() -> None:
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/comparison",
     )
+    parser.add_argument(
+        "--descriptor-evidence", type=Path,
+        default=ROOT / "artifacts/prm_results/descriptors/manifest.json",
+    )
     parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()
 
@@ -541,6 +546,15 @@ def main() -> None:
     )
     descriptor_root = result_root / "baselines" / "descriptors"
     validate_descriptor_root(descriptor_root, protocol_dir)
+    descriptor_evidence = validate_descriptor_evidence_bundle(
+        args.descriptor_evidence,
+        protocol_dir,
+        repository_root=ROOT,
+    )
+    if file_sha256(descriptor_root / "manifest.json") != descriptor_evidence[
+        "descriptor_manifest"
+    ]["sha256"]:
+        raise ValueError("comparison descriptor source differs from GitHub evidence")
     rows += load_descriptor_runs(descriptor_root, protocol_dir)
 
     if not args.allow_incomplete:
@@ -677,6 +691,12 @@ def main() -> None:
             "factorial_collector_git": factorial_bundle["collector_git"],
         },
         "data_sha256": protocol["data_sha256"],
+        "descriptor_evidence": {
+            "path": str(args.descriptor_evidence.resolve()),
+            "sha256": file_sha256(args.descriptor_evidence),
+            "collector_git": descriptor_evidence["collector_git"],
+            "training_git": descriptor_evidence["descriptor_manifest"]["training_git"],
+        },
         "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),
         "neural_campaign_commits": campaign_commits,
         "archive_policy": {

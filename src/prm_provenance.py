@@ -406,6 +406,100 @@ def archive_training_artifacts(
     return records
 
 
+def validate_descriptor_evidence_bundle(
+    bundle_path: Path,
+    protocol_dir: Path,
+    *,
+    repository_root: Path,
+) -> Dict[str, Any]:
+    """Verify the repository copy of every formal descriptor artifact."""
+    resolved_bundle = bundle_path.resolve()
+    resolved_protocol = protocol_dir.resolve()
+    resolved_repository = repository_root.resolve()
+    try:
+        bundle = json.loads(resolved_bundle.read_text())
+        protocol = json.loads((resolved_protocol / "manifest.json").read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("descriptor evidence bundle or protocol is unreadable") from exc
+    if bundle.get("schema_version") != "prm_descriptor_bundle_v2":
+        raise ValueError(f"unsupported descriptor evidence schema: {resolved_bundle}")
+    if (
+        bundle.get("data_sha256") != protocol.get("data_sha256")
+        or bundle.get("selection_data") != "validation only"
+        or bundle.get("n_archived_runs") != 27
+        or bundle.get("n_sources") != 26
+    ):
+        raise ValueError(f"descriptor evidence contract is incomplete: {resolved_bundle}")
+    descriptor_manifest_record = bundle.get("descriptor_manifest")
+    descriptor_training_git = (
+        descriptor_manifest_record.get("training_git")
+        if isinstance(descriptor_manifest_record, Mapping) else None
+    )
+    for label, git in (
+        ("collector", bundle.get("collector_git")),
+        ("training", descriptor_training_git),
+    ):
+        if (
+            not isinstance(git, Mapping)
+            or not git.get("commit")
+            or git.get("dirty")
+        ):
+            raise ValueError(f"descriptor {label} Git provenance is inadmissible")
+
+    def verified_path(record: Mapping[str, Any], label: str) -> Path:
+        reference = Path(str(record.get("path", "")))
+        expected_sha256 = str(record.get("sha256", ""))
+        path = (resolved_repository / reference).resolve()
+        if (
+            not reference.parts
+            or reference.is_absolute()
+            or ".." in reference.parts
+            or not path.is_relative_to(resolved_repository)
+            or _SHA256_PATTERN.fullmatch(expected_sha256) is None
+            or not path.is_file()
+            or file_sha256(path) != expected_sha256
+        ):
+            raise ValueError(f"descriptor {label} artifact hash mismatch: {path}")
+        return path
+
+    protocol_record = bundle.get("protocol_manifest")
+    descriptor_record = descriptor_manifest_record
+    if not isinstance(protocol_record, Mapping) or not isinstance(
+        descriptor_record, Mapping
+    ):
+        raise ValueError("descriptor evidence lacks source manifests")
+    if verified_path(protocol_record, "protocol manifest") != (
+        resolved_protocol / "manifest.json"
+    ):
+        raise ValueError("descriptor evidence references a different protocol manifest")
+    verified_path(descriptor_record, "source manifest")
+
+    expected_splits = {
+        path.stem for path in (resolved_protocol / "splits").glob("*.json")
+        if path.stem not in {"id_historical_s42", "smoke_protocol"}
+    }
+    archived_runs = bundle.get("archived_runs")
+    if not isinstance(archived_runs, list) or len(archived_runs) != len(expected_splits):
+        raise ValueError("descriptor evidence archive has incomplete split coverage")
+    observed_splits = set()
+    for record in archived_runs:
+        if not isinstance(record, Mapping):
+            raise ValueError("descriptor archived run record is invalid")
+        split_id = str(record.get("split_id", ""))
+        observed_splits.add(split_id)
+        for kind in ("metrics", "predictions"):
+            verified_path(
+                {
+                    "path": record.get(f"{kind}_path"),
+                    "sha256": record.get(f"{kind}_sha256"),
+                },
+                f"{split_id} {kind}",
+            )
+    if observed_splits != expected_splits:
+        raise ValueError("descriptor archived split IDs differ from the frozen protocol")
+    return bundle
+
+
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:
     expected: Dict[str, ExpectedConfig] = {}
     for path in paths:
