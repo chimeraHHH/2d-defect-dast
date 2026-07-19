@@ -1,0 +1,434 @@
+"""Collect DART, SchNet and descriptor results under the frozen PRM splits."""
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import math
+import subprocess
+from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+
+import numpy as np
+
+
+ROOT = Path(__file__).resolve().parent.parent
+SCALAR_METRICS = ("mae", "rmse", "bias", "spearman", "r2")
+EXPECTED_RUNS = {
+    "dart": {
+        "id_repeat": 5, "id_cv": 5, "pair_cv": 5,
+        "host_cv": 15, "dopant_cv": 15, "chemistry_block": 3,
+    },
+    "schnet": {
+        "id_repeat": 5, "id_cv": 5, "pair_cv": 5,
+        "host_cv": 15, "dopant_cv": 15, "chemistry_block": 3,
+    },
+}
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def git_snapshot() -> Dict[str, Any]:
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    return {"commit": commit or None, "dirty": bool(status), "status_porcelain": status.splitlines()}
+
+
+def regime_for_split(split_id: str) -> str:
+    if split_id.startswith("id_repeat_s"):
+        return "id_repeat"
+    if split_id.startswith("id_cv5_f"):
+        return "id_cv"
+    if split_id.startswith("pair_cv5_f"):
+        return "pair_cv"
+    if split_id.startswith("host_cv5_f"):
+        return "host_cv"
+    if split_id.startswith("dopant_cv5_f"):
+        return "dopant_cv"
+    if split_id == "chemistry_block_g6x3d":
+        return "chemistry_block"
+    raise ValueError(f"unrecognized result split: {split_id}")
+
+
+def expected_split_hash(protocol_dir: Path, split_id: str) -> str:
+    return file_sha256(protocol_dir / "splits" / f"{split_id}.json")
+
+
+def load_neural_runs(
+    manifest_paths: Sequence[Path], model: str, protocol_dir: Path,
+    expected_data_sha256: str,
+) -> List[Dict[str, Any]]:
+    rows = []
+    for path in manifest_paths:
+        manifest = json.loads(path.read_text())
+        if manifest.get("status") != "complete":
+            continue
+        if manifest.get("git", {}).get("dirty"):
+            raise ValueError(f"dirty run is inadmissible: {path}")
+        if manifest["data"]["data_sha256"] != expected_data_sha256:
+            raise ValueError(f"dataset mismatch: {path}")
+        split_id = manifest["split"]["split_id"]
+        if manifest["split"].get("sha256") != expected_split_hash(protocol_dir, split_id):
+            raise ValueError(f"split mismatch: {path}")
+        metrics = manifest["metrics"]
+        row: Dict[str, Any] = {
+            "model": model, "family": model, "regime": regime_for_split(split_id),
+            "split_id": split_id, "seed": int(manifest["seed"]),
+            "manifest_path": str(path), "manifest_sha256": file_sha256(path),
+            "prediction_path": str(path.parent / "test_predictions.npz"),
+            "git_commit": manifest["git"]["commit"],
+        }
+        for partition in ("validation", "test"):
+            for metric in SCALAR_METRICS:
+                row[f"{partition}_{metric}"] = float(metrics[partition][metric])
+        rows.append(row)
+    return rows
+
+
+def load_descriptor_runs(
+    descriptor_root: Path, protocol_dir: Path,
+) -> List[Dict[str, Any]]:
+    rows = []
+    for path in sorted(descriptor_root.glob("*/metrics.json")):
+        payload = json.loads(path.read_text())
+        split_id = payload["split_id"]
+        try:
+            regime = regime_for_split(split_id)
+        except ValueError:
+            continue
+        if payload.get("split_sha256") != expected_split_hash(protocol_dir, split_id):
+            raise ValueError(f"stale descriptor split: {path}")
+        for family, result in sorted(payload["results"].items()):
+            row: Dict[str, Any] = {
+                "model": f"descriptor:{family}", "family": family,
+                "regime": regime, "split_id": split_id, "seed": 42,
+                "manifest_path": str(path), "manifest_sha256": file_sha256(path),
+                "prediction_path": str(path.parent / "predictions.npz"),
+                "git_commit": None,
+            }
+            for partition in ("validation", "test"):
+                for metric in SCALAR_METRICS:
+                    row[f"{partition}_{metric}"] = float(result[partition][metric])
+            rows.append(row)
+    return rows
+
+
+def select_descriptor_families(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    selected = {}
+    regimes = sorted({row["regime"] for row in rows if str(row["model"]).startswith("descriptor:")})
+    for regime in regimes:
+        candidates = []
+        families = sorted({
+            str(row["family"]) for row in rows
+            if row["regime"] == regime and str(row["model"]).startswith("descriptor:")
+        })
+        for family in families:
+            values = [
+                float(row["validation_mae"]) for row in rows
+                if row["regime"] == regime and row["family"] == family
+                and str(row["model"]).startswith("descriptor:")
+            ]
+            candidates.append(
+                {"family": family, "mean_validation_mae_eV": float(np.mean(values)), "n": len(values)}
+            )
+        candidates.sort(key=lambda item: (item["mean_validation_mae_eV"], item["family"]))
+        selected[regime] = {
+            "selection_data": "validation only", "selected_family": candidates[0]["family"],
+            "candidates": candidates,
+        }
+    return selected
+
+
+def aggregate_fold_rows(rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+    groups: Dict[Tuple[str, str, str], List[Mapping[str, Any]]] = defaultdict(list)
+    for row in rows:
+        groups[(str(row["model"]), str(row["regime"]), str(row["split_id"]))].append(row)
+    outputs = []
+    for (model, regime, split_id), members in sorted(groups.items()):
+        output: Dict[str, Any] = {
+            "model": model, "regime": regime, "split_id": split_id,
+            "n_seeds": len(members),
+        }
+        for partition in ("validation", "test"):
+            for metric in SCALAR_METRICS:
+                output[f"{partition}_{metric}"] = float(
+                    np.mean([member[f"{partition}_{metric}"] for member in members])
+                )
+        outputs.append(output)
+    return outputs
+
+
+def bootstrap_ci(values: Sequence[float], seed: int, draws: int = 50_000) -> Dict[str, float]:
+    array = np.asarray(values, dtype=float)
+    if len(array) == 1:
+        return {"mean": float(array[0]), "std": 0.0, "ci_low": float("nan"), "ci_high": float("nan"), "n": 1}
+    rng = np.random.default_rng(seed)
+    means = rng.choice(array, size=(draws, len(array)), replace=True).mean(axis=1)
+    low, high = np.quantile(means, [0.025, 0.975])
+    return {
+        "mean": float(array.mean()), "std": float(array.std(ddof=1)),
+        "ci_low": float(low), "ci_high": float(high), "n": len(array),
+    }
+
+
+def summarize_folds(fold_rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+    groups: Dict[Tuple[str, str], List[Mapping[str, Any]]] = defaultdict(list)
+    for row in fold_rows:
+        groups[(str(row["model"]), str(row["regime"]))].append(row)
+    outputs = []
+    for index, ((model, regime), members) in enumerate(sorted(groups.items())):
+        output: Dict[str, Any] = {"model": model, "regime": regime, "n_folds": len(members)}
+        for partition in ("validation", "test"):
+            for metric in SCALAR_METRICS:
+                values = [float(member[f"{partition}_{metric}"]) for member in members]
+                stats = bootstrap_ci(values, seed=20264000 + index * 20 + len(output))
+                for key, value in stats.items():
+                    output[f"{partition}_{metric}_{key}"] = value
+        outputs.append(output)
+    return outputs
+
+
+def load_prediction_array(path: Path, model: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    with np.load(path, allow_pickle=False) as archive:
+        if model.startswith("descriptor:"):
+            family = model.split(":", 1)[1]
+            names = [str(name) for name in archive["model_names"].tolist()]
+            position = names.index(family)
+            indices = np.asarray(archive["test_indices"], dtype=np.int64)
+            targets = np.asarray(archive["test_targets"], dtype=float)
+            predictions = np.asarray(archive["test_predictions"][position], dtype=float)
+        else:
+            indices = np.asarray(archive["indices"], dtype=np.int64)
+            targets = np.asarray(archive["targets"], dtype=float)
+            predictions = np.asarray(archive["preds"], dtype=float)
+    order = np.argsort(indices)
+    return indices[order], targets[order], predictions[order]
+
+
+def seed_averaged_prediction(
+    rows: Sequence[Mapping[str, Any]], model: str, split_id: str,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    members = [row for row in rows if row["model"] == model and row["split_id"] == split_id]
+    if not members:
+        raise ValueError(f"no predictions for {model} on {split_id}")
+    reference_indices = None
+    reference_targets = None
+    predictions = []
+    for member in members:
+        indices, targets, values = load_prediction_array(Path(member["prediction_path"]), model)
+        if reference_indices is None:
+            reference_indices, reference_targets = indices, targets
+        elif not np.array_equal(indices, reference_indices) or not np.allclose(
+            targets, reference_targets, rtol=0.0, atol=1e-10,
+        ):
+            raise ValueError(f"seed predictions do not align for {model} on {split_id}")
+        predictions.append(values)
+    return reference_indices, reference_targets, np.mean(predictions, axis=0)
+
+
+def pooled_predictions(
+    rows: Sequence[Mapping[str, Any]], model: str, regime: str,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    split_ids = sorted({
+        str(row["split_id"]) for row in rows
+        if row["model"] == model and row["regime"] == regime
+    })
+    all_indices, all_targets, all_predictions = [], [], []
+    for split_id in split_ids:
+        indices, targets, predictions = seed_averaged_prediction(rows, model, split_id)
+        all_indices.append(indices)
+        all_targets.append(targets)
+        all_predictions.append(predictions)
+    indices = np.concatenate(all_indices)
+    if len(np.unique(indices)) != len(indices):
+        raise ValueError(f"{regime} is not an out-of-fold or single-holdout prediction set")
+    order = np.argsort(indices)
+    return (
+        indices[order], np.concatenate(all_targets)[order],
+        np.concatenate(all_predictions)[order],
+    )
+
+
+def regression_metrics(targets: np.ndarray, predictions: np.ndarray) -> Dict[str, float]:
+    residual = np.asarray(predictions) - np.asarray(targets)
+    denominator = np.sum((targets - np.mean(targets)) ** 2)
+    return {
+        "mae": float(np.mean(np.abs(residual))),
+        "rmse": float(np.sqrt(np.mean(residual ** 2))),
+        "bias": float(np.mean(residual)),
+        "r2": float(1.0 - np.sum(residual ** 2) / denominator),
+    }
+
+
+def paired_sample_comparison(
+    targets: np.ndarray, reference: np.ndarray, comparator: np.ndarray,
+    seed: int, draws: int = 10_000,
+) -> Dict[str, float]:
+    differences = np.abs(comparator - targets) - np.abs(reference - targets)
+    rng = np.random.default_rng(seed)
+    chunks = []
+    for start in range(0, draws, 256):
+        size = min(256, draws - start)
+        indices = rng.integers(0, len(differences), size=(size, len(differences)))
+        chunks.append(differences[indices].mean(axis=1))
+    means = np.concatenate(chunks)
+    low, high = np.quantile(means, [0.025, 0.975])
+    return {
+        "mae_difference_comparator_minus_dart_eV": float(differences.mean()),
+        "ci_low_eV": float(low), "ci_high_eV": float(high), "n": len(differences),
+    }
+
+
+def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    if not rows:
+        return
+    with path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--result-root", type=Path, required=True)
+    parser.add_argument(
+        "--selection", type=Path,
+        default=ROOT / "artifacts/prm_results/factorial/selection.json",
+    )
+    parser.add_argument(
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+    )
+    parser.add_argument(
+        "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/comparison",
+    )
+    parser.add_argument("--allow-incomplete", action="store_true")
+    args = parser.parse_args()
+
+    result_root = args.result_root.resolve()
+    protocol_dir = args.protocol_dir.resolve()
+    protocol = json.loads((protocol_dir / "manifest.json").read_text())
+    selection = json.loads(args.selection.read_text())
+    if selection.get("selection_data") != "validation only":
+        raise ValueError("DART architecture was not selected on validation data")
+    variant = selection["selected_variant"]
+    dart_paths = sorted((result_root / "factorial" / variant).glob("split*_seed*/run_manifest.json"))
+    dart_paths += sorted(
+        (result_root / "selected" / variant / "transfer").glob("*/seed*/run_manifest.json")
+    )
+    schnet_paths = sorted((result_root / "baselines" / "schnet").glob("*/seed*/run_manifest.json"))
+    rows = load_neural_runs(
+        dart_paths, "dart", protocol_dir, protocol["data_sha256"],
+    )
+    rows += load_neural_runs(
+        schnet_paths, "schnet", protocol_dir, protocol["data_sha256"],
+    )
+    rows += load_descriptor_runs(result_root / "baselines" / "descriptors", protocol_dir)
+
+    if not args.allow_incomplete:
+        for model, regimes in EXPECTED_RUNS.items():
+            for regime, expected in regimes.items():
+                observed = sum(row["model"] == model and row["regime"] == regime for row in rows)
+                if observed != expected:
+                    raise ValueError(
+                        f"expected {expected} {model}/{regime} runs, found {observed}"
+                    )
+
+    descriptor_selection = select_descriptor_families(rows)
+    retained_rows = [
+        row for row in rows
+        if not str(row["model"]).startswith("descriptor:")
+        or row["family"] == descriptor_selection[row["regime"]]["selected_family"]
+        or row["family"] == "mean"
+    ]
+    fold_rows = aggregate_fold_rows(retained_rows)
+    summary_rows = summarize_folds(fold_rows)
+
+    pooled_rows = []
+    comparison_rows = []
+    pooled_regimes = ("id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block")
+    for regime_index, regime in enumerate(pooled_regimes):
+        models = ["dart", "schnet"]
+        selected_descriptor = f"descriptor:{descriptor_selection[regime]['selected_family']}"
+        models.extend([selected_descriptor, "descriptor:mean"])
+        models = list(dict.fromkeys(models))
+        pooled = {}
+        for model in models:
+            try:
+                indices, targets, predictions = pooled_predictions(retained_rows, model, regime)
+            except ValueError:
+                if args.allow_incomplete:
+                    continue
+                raise
+            pooled[model] = (indices, targets, predictions)
+            pooled_rows.append(
+                {"model": model, "regime": regime, "n": len(indices), **regression_metrics(targets, predictions)}
+            )
+        if "dart" not in pooled:
+            continue
+        reference_indices, reference_targets, reference_predictions = pooled["dart"]
+        for comparator_index, comparator in enumerate(models[1:]):
+            if comparator not in pooled:
+                continue
+            indices, targets, predictions = pooled[comparator]
+            if not np.array_equal(indices, reference_indices) or not np.allclose(
+                targets, reference_targets, rtol=0.0, atol=1e-10,
+            ):
+                raise ValueError(f"pooled predictions do not align for {regime}/{comparator}")
+            comparison_rows.append(
+                {
+                    "regime": regime, "reference": "dart", "comparator": comparator,
+                    **paired_sample_comparison(
+                        targets, reference_predictions, predictions,
+                        seed=20265000 + 10 * regime_index + comparator_index,
+                    ),
+                }
+            )
+
+    out_dir = args.out_dir.resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_csv(out_dir / "run_metrics.csv", retained_rows)
+    write_csv(out_dir / "fold_metrics.csv", fold_rows)
+    write_csv(out_dir / "summary.csv", summary_rows)
+    write_csv(out_dir / "pooled_metrics.csv", pooled_rows)
+    write_csv(out_dir / "paired_comparisons.csv", comparison_rows)
+    (out_dir / "descriptor_selection.json").write_text(
+        json.dumps(descriptor_selection, indent=2, sort_keys=True) + "\n"
+    )
+    manifest = {
+        "schema_version": "prm_comparison_bundle_v1",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "collector_git": git_snapshot(),
+        "selection": {
+            "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
+            "selected_variant": variant, "selection_data": selection["selection_data"],
+        },
+        "data_sha256": protocol["data_sha256"],
+        "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),
+        "descriptor_selection": descriptor_selection,
+        "aggregation": {
+            "fold_metrics": "mean over model seeds within each split",
+            "pooled_metrics": "mean prediction over model seeds, then concatenate disjoint test folds",
+            "paired_ci": "nonparametric bootstrap over aligned test samples",
+        },
+    }
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    print(json.dumps(manifest, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
