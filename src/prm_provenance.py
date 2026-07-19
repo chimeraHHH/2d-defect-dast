@@ -1,13 +1,14 @@
 """Fail-closed provenance checks shared by PRM schedulers and collectors."""
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping
+from typing import Any, Dict, Iterable, Mapping, Sequence
 
 import numpy as np
 import yaml
@@ -46,6 +47,61 @@ def file_sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def load_protocol_targets(path: Path) -> Dict[int, float]:
+    with path.open(newline="") as handle:
+        reader = csv.DictReader(handle)
+        if not {"sample_index", "target_eV"}.issubset(reader.fieldnames or ()):
+            raise ValueError(f"protocol sample table lacks target fields: {path}")
+        targets: Dict[int, float] = {}
+        for row in reader:
+            index = int(row["sample_index"])
+            target = float(row["target_eV"])
+            if index in targets:
+                raise ValueError(f"duplicate protocol sample index {index}: {path}")
+            if not math.isfinite(target):
+                raise ValueError(f"non-finite protocol target at sample {index}: {path}")
+            targets[index] = target
+    if not targets:
+        raise ValueError(f"protocol sample table is empty: {path}")
+    return targets
+
+
+def validate_protocol_targets(
+    indices: Sequence[int] | np.ndarray,
+    targets: Sequence[float] | np.ndarray,
+    protocol_targets: Mapping[int, float],
+    *,
+    context: str,
+) -> None:
+    raw_indices = np.asarray(indices)
+    values = np.asarray(targets, dtype=float)
+    if (
+        raw_indices.ndim != 1
+        or not np.issubdtype(raw_indices.dtype, np.integer)
+        or values.ndim != 1
+        or len(raw_indices) != len(values)
+        or len(np.unique(raw_indices)) != len(raw_indices)
+    ):
+        raise ValueError(f"{context} target vectors are not uniquely aligned")
+    if not np.isfinite(values).all():
+        raise ValueError(f"{context} contains non-finite targets")
+    normalized_indices = raw_indices.astype(np.int64, copy=False)
+    missing = [int(index) for index in normalized_indices if int(index) not in protocol_targets]
+    if missing:
+        raise ValueError(f"{context} contains unknown protocol indices: {missing[:10]}")
+    expected = np.asarray(
+        [protocol_targets[int(index)] for index in normalized_indices], dtype=float
+    )
+    matches = np.isclose(values, expected, rtol=0.0, atol=1e-10)
+    if not np.all(matches):
+        position = int(np.flatnonzero(~matches)[0])
+        index = int(normalized_indices[position])
+        raise ValueError(
+            f"{context} target mismatch at sample {index}: "
+            f"observed={values[position]:.16g}, protocol={expected[position]:.16g}"
+        )
 
 
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:

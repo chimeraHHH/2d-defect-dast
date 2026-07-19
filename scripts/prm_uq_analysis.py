@@ -18,9 +18,11 @@ from scipy.stats import spearmanr
 
 from src.prm_provenance import (
     ExpectedConfig,
+    load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
     validate_manifest_config,
+    validate_protocol_targets,
     validate_training_completion,
 )
 
@@ -308,6 +310,15 @@ def main() -> None:
     )
     cal_indices, cal_targets, cal_members = load_aligned_predictions(run_dirs, "calibration")
     test_indices, test_targets, test_members = load_aligned_predictions(run_dirs, "test")
+    protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
+    validate_protocol_targets(
+        cal_indices, cal_targets, protocol_targets,
+        context="UQ calibration predictions",
+    )
+    validate_protocol_targets(
+        test_indices, test_targets, protocol_targets,
+        context="UQ test predictions",
+    )
 
     cal_mean = cal_members.mean(axis=0)
     cal_raw_std = cal_members.std(axis=0, ddof=1)

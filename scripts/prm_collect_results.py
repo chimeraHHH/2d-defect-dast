@@ -18,9 +18,11 @@ from scipy.stats import spearmanr
 from src.prm_metrics import low_energy_metrics, macro_group_mae
 from src.prm_provenance import (
     ExpectedConfig,
+    load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
     validate_manifest_config,
+    validate_protocol_targets,
     validate_training_completion,
 )
 
@@ -321,12 +323,13 @@ def pooled_predictions(
     )
 
 
-def read_sample_metadata(path: Path) -> Dict[int, Dict[str, str]]:
+def read_sample_metadata(path: Path) -> Dict[int, Dict[str, Any]]:
     with path.open(newline="") as handle:
         rows = list(csv.DictReader(handle))
     return {
         int(row["sample_index"]): {
             "host": str(row["host"]), "dopant": str(row["dopant"]),
+            "target_eV": float(row["target_eV"]),
         }
         for row in rows
     }
@@ -447,6 +450,7 @@ def main() -> None:
     protocol_dir = args.protocol_dir.resolve()
     protocol = json.loads((protocol_dir / "manifest.json").read_text())
     sample_metadata = read_sample_metadata(protocol_dir / "samples.csv")
+    protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
     selection = json.loads(args.selection.read_text())
     if selection.get("selection_data") != "validation only":
         raise ValueError("DART architecture was not selected on validation data")
@@ -513,6 +517,10 @@ def main() -> None:
                 if args.allow_incomplete:
                     continue
                 raise
+            validate_protocol_targets(
+                indices, targets, protocol_targets,
+                context=f"{regime}/{model} pooled predictions",
+            )
             pooled[model] = (indices, targets, predictions)
             hosts = [sample_metadata[int(index)]["host"] for index in indices]
             dopants = [sample_metadata[int(index)]["dopant"] for index in indices]

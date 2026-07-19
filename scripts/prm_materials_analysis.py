@@ -18,9 +18,11 @@ from scipy.stats import spearmanr
 
 from src.prm_provenance import (
     ExpectedConfig,
+    load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
     validate_manifest_config,
+    validate_protocol_targets,
     validate_training_completion,
 )
 
@@ -84,6 +86,7 @@ def load_oof_predictions(
     predictions: Dict[int, float] = {}
     sources = []
     observed_splits = set()
+    protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
     for run_dir in run_dirs:
         manifest_path = run_dir / "run_manifest.json"
         manifest = json.loads(manifest_path.read_text())
@@ -115,6 +118,11 @@ def load_oof_predictions(
                 raise ValueError(f"unsupported prediction schema: {prediction_path}")
             indices = np.asarray(archive["indices"], dtype=np.int64)
             values = np.asarray(archive["preds"], dtype=float)
+            targets = np.asarray(archive["targets"], dtype=float)
+        validate_protocol_targets(
+            indices, targets, protocol_targets,
+            context=f"pair-OOF predictions in {prediction_path}",
+        )
         for index, value in zip(indices, values):
             if int(index) in predictions:
                 raise ValueError(f"duplicate out-of-fold prediction for sample {index}")

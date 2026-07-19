@@ -11,7 +11,9 @@ from src.prm_provenance import (
     config_sha256,
     file_sha256,
     load_expected_configs,
+    load_protocol_targets,
     validate_manifest_config,
+    validate_protocol_targets,
     validate_training_completion,
 )
 
@@ -59,6 +61,23 @@ def test_expected_configs_require_unique_output_directories(tmp_path):
     _write_config(second, "same/output")
     with pytest.raises(ValueError, match="duplicate expected output_dir"):
         load_expected_configs([first, second])
+
+
+def test_prediction_targets_must_match_protocol_sample_table(tmp_path):
+    sample_table = tmp_path / "samples.csv"
+    sample_table.write_text("sample_index,target_eV\n0,1.5\n1,-0.25\n")
+    targets = load_protocol_targets(sample_table)
+
+    validate_protocol_targets(
+        np.asarray([1, 0]), np.asarray([-0.25, 1.5]), targets,
+        context="test predictions",
+    )
+
+    with pytest.raises(ValueError, match="target mismatch at sample 1"):
+        validate_protocol_targets(
+            np.asarray([1, 0]), np.asarray([-0.2, 1.5]), targets,
+            context="test predictions",
+        )
 
 
 def _complete_manifest():
