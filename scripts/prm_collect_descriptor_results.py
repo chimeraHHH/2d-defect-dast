@@ -1,0 +1,161 @@
+"""Freeze completed descriptor baselines before neural runs are available."""
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Mapping
+
+from scripts.prm_collect_results import (
+    aggregate_fold_rows,
+    file_sha256,
+    load_descriptor_runs,
+    select_descriptor_families,
+    summarize_folds,
+    write_csv,
+)
+
+
+ROOT = Path(__file__).resolve().parent.parent
+EXPECTED_PAPER_SPLITS = {
+    "id_repeat": 5,
+    "id_cv": 5,
+    "pair_cv": 5,
+    "host_cv": 5,
+    "dopant_cv": 5,
+    "chemistry_block": 1,
+}
+
+
+def git_snapshot() -> Dict[str, Any]:
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    return {
+        "commit": commit or None, "dirty": bool(status),
+        "status_porcelain": status.splitlines(),
+    }
+
+
+def validate_descriptor_manifest(
+    manifest: Mapping[str, Any], protocol: Mapping[str, Any],
+    protocol_manifest_sha256: str,
+) -> None:
+    if manifest.get("schema_version") != "prm_descriptor_manifest_v1":
+        raise ValueError("unsupported descriptor manifest schema")
+    if manifest.get("status") != "complete":
+        raise ValueError("descriptor baseline batch is incomplete")
+    coverage = manifest.get("formal_split_coverage", {})
+    if coverage != {"complete": 27, "total": 27, "all_complete": True}:
+        raise ValueError(f"formal descriptor split coverage is incomplete: {coverage}")
+    if manifest.get("selection_data") != "validation only":
+        raise ValueError("descriptor hyperparameters were not selected on validation data")
+    if manifest.get("data_sha256") != protocol.get("data_sha256"):
+        raise ValueError("descriptor dataset hash does not match the frozen protocol")
+    if manifest.get("protocol_manifest_sha256") != protocol_manifest_sha256:
+        raise ValueError("descriptor protocol manifest hash mismatch")
+    if manifest.get("git", {}).get("dirty"):
+        raise ValueError("final descriptor batch was produced from a dirty worktree")
+
+
+def repository_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(ROOT.resolve()))
+    except ValueError:
+        return str(resolved)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--descriptor-root", type=Path, required=True)
+    parser.add_argument(
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+    )
+    parser.add_argument(
+        "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/descriptors",
+    )
+    args = parser.parse_args()
+
+    descriptor_root = args.descriptor_root.resolve()
+    protocol_dir = args.protocol_dir.resolve()
+    protocol_path = protocol_dir / "manifest.json"
+    descriptor_manifest_path = descriptor_root / "manifest.json"
+    protocol = json.loads(protocol_path.read_text())
+    descriptor_manifest = json.loads(descriptor_manifest_path.read_text())
+    validate_descriptor_manifest(
+        descriptor_manifest, protocol, file_sha256(protocol_path),
+    )
+
+    rows = load_descriptor_runs(descriptor_root, protocol_dir)
+    observed = {
+        regime: len({row["split_id"] for row in rows if row["regime"] == regime})
+        for regime in EXPECTED_PAPER_SPLITS
+    }
+    if observed != EXPECTED_PAPER_SPLITS:
+        raise ValueError(f"paper descriptor split counts differ: {observed}")
+    selection = select_descriptor_families(rows)
+    fold_rows = aggregate_fold_rows(rows)
+    summary_rows = summarize_folds(fold_rows)
+    selected_rows = [
+        row for row in summary_rows
+        if row["model"] == "descriptor:mean"
+        or row["model"] == f"descriptor:{selection[row['regime']]['selected_family']}"
+    ]
+
+    out_dir = args.out_dir.resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_csv(out_dir / "run_metrics.csv", rows)
+    write_csv(out_dir / "summary.csv", summary_rows)
+    write_csv(out_dir / "selected_summary.csv", selected_rows)
+    (out_dir / "selection.json").write_text(
+        json.dumps(selection, indent=2, sort_keys=True) + "\n"
+    )
+
+    sources = []
+    for path in sorted(descriptor_root.glob("*/metrics.json")):
+        split_id = path.parent.name
+        if split_id == "uq_calibration_s62":
+            continue
+        sources.append(
+            {
+                "split_id": split_id,
+                "path": str(path.relative_to(descriptor_root.parent.parent)),
+                "sha256": file_sha256(path),
+            }
+        )
+    bundle = {
+        "schema_version": "prm_descriptor_bundle_v1",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "collector_git": git_snapshot(),
+        "data_sha256": protocol["data_sha256"],
+        "protocol_manifest": {
+            "path": repository_path(protocol_path), "sha256": file_sha256(protocol_path),
+        },
+        "descriptor_manifest": {
+            "path": str(descriptor_manifest_path.relative_to(descriptor_root.parent.parent)),
+            "sha256": file_sha256(descriptor_manifest_path),
+            "training_git": descriptor_manifest["git"],
+        },
+        "selection_data": "validation only",
+        "expected_split_counts": EXPECTED_PAPER_SPLITS,
+        "n_metric_rows": len(rows),
+        "n_sources": len(sources),
+        "selection": selection,
+        "sources": sources,
+    }
+    (out_dir / "manifest.json").write_text(
+        json.dumps(bundle, indent=2, sort_keys=True) + "\n"
+    )
+    print(json.dumps(selection, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
