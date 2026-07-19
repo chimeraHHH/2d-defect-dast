@@ -65,6 +65,8 @@ results/checkpoints/*.pth
 results/checkpoints/*.pt
 results/*/best.pt
 results/*/test_predictions.npz
+results_prm/
+artifacts/prm_runs/
 
 # Logs
 results/logs/*.log

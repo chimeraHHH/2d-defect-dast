@@ -12,13 +12,19 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import os
+import platform
 import random
+import socket
+import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import numpy as np
 import torch
@@ -32,6 +38,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
+from src.splits import load_split
 from src.sampler import HostBalancedSampler
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
 from src.models import (
@@ -50,6 +57,52 @@ MODEL_REGISTRY = {
     "dualstream": DualStreamPeriodicTransformer,
     "v2": CrystalTransformerV2,
 }
+
+
+def resolve_path(value: str | Path, root: Path = ROOT) -> Path:
+    path = Path(value).expanduser()
+    return path if path.is_absolute() else root / path
+
+
+def git_snapshot() -> Dict[str, Any]:
+    def run(*args: str) -> str:
+        result = subprocess.run(
+            ["git", *args], cwd=ROOT, text=True, capture_output=True, check=False
+        )
+        return result.stdout.strip()
+
+    commit = run("rev-parse", "HEAD")
+    status = run("status", "--porcelain")
+    return {
+        "commit": commit or None,
+        "dirty": bool(status),
+        "status_porcelain": status.splitlines(),
+    }
+
+
+def config_sha256(config: Dict[str, Any]) -> str:
+    payload = json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def environment_snapshot(device: torch.device) -> Dict[str, Any]:
+    cuda_name = None
+    if device.type == "cuda" and torch.cuda.is_available():
+        cuda_name = torch.cuda.get_device_name(device)
+    return {
+        "hostname": socket.gethostname(),
+        "platform": platform.platform(),
+        "python": sys.version,
+        "torch": torch.__version__,
+        "cuda_runtime": torch.version.cuda,
+        "cuda_available": torch.cuda.is_available(),
+        "device": str(device),
+        "device_name": cuda_name,
+    }
+
+
+def write_json(path: Path, payload: Dict[str, Any]) -> None:
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
 class Normalizer:
@@ -340,7 +393,7 @@ def evaluate(model, loader, normalizer, device, swa_model=None):
     eval_model = swa_model if swa_model is not None else model
     eval_model.eval()
     abs_err, sq_err, n = 0.0, 0.0, 0
-    preds_all, targets_all = [], []
+    preds_all, targets_all, indices_all = [], [], []
     with torch.no_grad():
         for batch in loader:
             batch = move_batch(batch, device)
@@ -355,12 +408,28 @@ def evaluate(model, loader, normalizer, device, swa_model=None):
             n += target.numel()
             preds_all.append(preds.cpu())
             targets_all.append(target.cpu())
+            indices_all.append(batch["sample_index"].detach().cpu())
     mae = abs_err / max(n, 1)
     rmse = math.sqrt(sq_err / max(n, 1))
+    preds_np = torch.cat(preds_all).numpy() if preds_all else np.array([])
+    targets_np = torch.cat(targets_all).numpy() if targets_all else np.array([])
+    indices_np = torch.cat(indices_all).numpy() if indices_all else np.array([], dtype=int)
+    bias = float(np.mean(preds_np - targets_np)) if len(preds_np) else float("nan")
+    if len(preds_np) > 1 and np.std(preds_np) > 0 and np.std(targets_np) > 0:
+        pearson = float(np.corrcoef(preds_np, targets_np)[0, 1])
+        pred_rank = np.argsort(np.argsort(preds_np, kind="stable"), kind="stable")
+        target_rank = np.argsort(np.argsort(targets_np, kind="stable"), kind="stable")
+        spearman = float(np.corrcoef(pred_rank, target_rank)[0, 1])
+    else:
+        pearson = float("nan")
+        spearman = float("nan")
+    target_ss = float(np.sum((targets_np - np.mean(targets_np)) ** 2)) if len(targets_np) else 0.0
+    residual_ss = float(np.sum((preds_np - targets_np) ** 2)) if len(preds_np) else 0.0
+    r2 = 1.0 - residual_ss / target_ss if target_ss > 0 else float("nan")
     return {
         "mae": mae, "rmse": rmse,
-        "preds": torch.cat(preds_all).numpy() if preds_all else np.array([]),
-        "targets": torch.cat(targets_all).numpy() if targets_all else np.array([]),
+        "bias": bias, "pearson": pearson, "spearman": spearman, "r2": r2,
+        "preds": preds_np, "targets": targets_np, "indices": indices_np,
     }
 
 
@@ -372,14 +441,37 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--resume", action="store_true",
                         help="Resume training from latest.pt checkpoint")
+    parser.add_argument("--data-path", default=None)
+    parser.add_argument("--split-path", default=None)
+    parser.add_argument("--output-dir", default=None)
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
 
+    # Resolve large, machine-specific assets without committing them to Git.
+    # The resolved paths remain part of the saved config and run manifest.
+    if os.environ.get("PRM_CT_UAE_PATH"):
+        cfg.setdefault("model_kwargs", {})["ct_uae_path"] = os.environ["PRM_CT_UAE_PATH"]
+    elif cfg.get("model_kwargs", {}).get("ct_uae_path"):
+        cfg["model_kwargs"]["ct_uae_path"] = str(
+            resolve_path(cfg["model_kwargs"]["ct_uae_path"])
+        )
+    if os.environ.get("PRM_PRETRAINED_EMBED"):
+        cfg["pretrained_embed"] = os.environ["PRM_PRETRAINED_EMBED"]
+    elif cfg.get("pretrained_embed"):
+        cfg["pretrained_embed"] = str(resolve_path(cfg["pretrained_embed"]))
+
     if args.seed is not None:
         cfg["seed"] = args.seed
         cfg["output_dir"] = cfg["output_dir"] + f"_s{args.seed}"
+
+    if args.data_path is not None:
+        cfg["data_path"] = args.data_path
+    if args.split_path is not None:
+        cfg["split_path"] = args.split_path
+    if args.output_dir is not None:
+        cfg["output_dir"] = args.output_dir
 
     split_seed = cfg.get("split_seed", 42)
 
@@ -388,12 +480,18 @@ def main() -> None:
     # machine, causing severe contention when multiple runs share the node.
     n_workers = cfg.get("num_workers", 4)
     cpu_threads = cfg.get("cpu_threads", 8)
-    import os
     os.environ.setdefault("OMP_NUM_THREADS", str(cpu_threads))
     os.environ.setdefault("MKL_NUM_THREADS", str(cpu_threads))
     torch.set_num_threads(cpu_threads)
 
-    out_dir = ROOT / cfg["output_dir"]
+    configured_output = Path(cfg["output_dir"]).expanduser()
+    results_root = os.environ.get("PRM_RESULTS_ROOT")
+    if configured_output.is_absolute():
+        out_dir = configured_output
+    elif results_root:
+        out_dir = Path(results_root).expanduser() / configured_output
+    else:
+        out_dir = ROOT / configured_output
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "train.log"
     metrics_path = out_dir / "metrics.json"
@@ -414,14 +512,63 @@ def main() -> None:
     soft_labels_path = cfg.get("soft_labels_path")
     if soft_labels_path:
         soft_labels_path = ROOT / soft_labels_path
-    dataset = CrystalGraphDataset(ROOT / cfg["data_path"],
+    data_value = os.environ.get("PRM_DATA_PATH", cfg["data_path"])
+    data_path = resolve_path(data_value)
+    dataset = CrystalGraphDataset(data_path,
                                    asph_features_path=asph_path,
                                    soft_labels_path=soft_labels_path)
-    train_set, val_set, test_set = make_splits(
-        dataset,
-        train_ratio=cfg.get("train_ratio", 0.8),
-        val_ratio=cfg.get("val_ratio", 0.1),
-        seed=split_seed,
+    split_payload = None
+    if cfg.get("split_path"):
+        split_path = resolve_path(cfg["split_path"])
+        split_payload = load_split(
+            split_path,
+            len(dataset),
+            expected_data_sha256=cfg.get("data_sha256"),
+        )
+        train_set = Subset(dataset, split_payload["train"])
+        val_set = Subset(dataset, split_payload["val"])
+        test_set = Subset(dataset, split_payload["test"])
+        split_id = split_payload["split_id"]
+    else:
+        split_path = None
+        train_set, val_set, test_set = make_splits(
+            dataset,
+            train_ratio=cfg.get("train_ratio", 0.8),
+            val_ratio=cfg.get("val_ratio", 0.1),
+            seed=split_seed,
+        )
+        split_id = f"legacy_random_s{split_seed}"
+
+    run_manifest = {
+        "schema_version": "prm_run_manifest_v1",
+        "status": "running",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "command": [sys.executable, *sys.argv],
+        "git": git_snapshot(),
+        "config": cfg,
+        "config_sha256": config_sha256(cfg),
+        "data": {
+            "path": str(data_path),
+            "size_bytes": data_path.stat().st_size,
+            "data_sha256": split_payload.get("data_sha256") if split_payload else cfg.get("data_sha256"),
+        },
+        "split": {
+            "split_id": split_id,
+            "path": str(split_path) if split_path else None,
+            "counts": {
+                "train": len(train_set), "val": len(val_set), "test": len(test_set)
+            },
+        },
+        "seed": cfg.get("seed", 42),
+        "environment": environment_snapshot(device),
+    }
+    write_json(out_dir / "run_manifest.json", run_manifest)
+    np.savez(
+        out_dir / "split_indices.npz",
+        train=np.asarray(train_set.indices, dtype=np.int64),
+        val=np.asarray(val_set.indices, dtype=np.int64),
+        test=np.asarray(test_set.indices, dtype=np.int64),
+        split_id=np.asarray(split_id),
     )
 
     set_seed(cfg.get("seed", 42))
@@ -518,7 +665,9 @@ def main() -> None:
     # P1-2: Load pretrained element embeddings + local layers
     pretrained_embed_path = cfg.get("pretrained_embed", None)
     if pretrained_embed_path:
-        embed_ckpt = torch.load(ROOT / pretrained_embed_path, map_location=device, weights_only=False)
+        embed_ckpt = torch.load(
+            resolve_path(pretrained_embed_path), map_location=device, weights_only=False
+        )
         loaded = []
         if "embed_weight" in embed_ckpt and hasattr(model, "embed"):
             with torch.no_grad():
@@ -929,6 +1078,13 @@ def main() -> None:
     summary = {
         "config": cfg, "n_params": n_params, "history": history,
         "best_val_mae": best_val_mae,
+        "split_id": split_id,
+        "validation": {
+            key: val_final[key] for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+        },
+        "test": {
+            key: test_metrics[key] for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+        },
         "test_mae": test_metrics["mae"], "test_rmse": test_metrics["rmse"],
     }
     # Save model internals for interpretability analysis
@@ -947,10 +1103,30 @@ def main() -> None:
     with open(metrics_path, "w") as f:
         json.dump(summary, f, indent=2)
     np.savez(out_dir / "test_predictions.npz",
+             schema_version=np.asarray("prm_predictions_v1"),
+             split_id=np.asarray(split_id), split=np.asarray("test"),
+             indices=test_metrics["indices"],
              preds=test_metrics["preds"], targets=test_metrics["targets"])
     # Save validation predictions for post-hoc calibration
     np.savez(out_dir / "val_predictions.npz",
+             schema_version=np.asarray("prm_predictions_v1"),
+             split_id=np.asarray(split_id), split=np.asarray("val"),
+             indices=val_final["indices"],
              preds=val_final["preds"], targets=val_final["targets"])
+    run_manifest.update(
+        {
+            "status": "complete",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "outputs": {
+                "metrics": str(metrics_path),
+                "checkpoint": str(ckpt_path),
+                "validation_predictions": str(out_dir / "val_predictions.npz"),
+                "test_predictions": str(out_dir / "test_predictions.npz"),
+            },
+            "metrics": summary,
+        }
+    )
+    write_json(out_dir / "run_manifest.json", run_manifest)
 
 
 if __name__ == "__main__":

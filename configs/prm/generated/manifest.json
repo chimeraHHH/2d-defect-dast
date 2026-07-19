@@ -1,0 +1,519 @@
+{
+  "base_config": "configs/prm/base_factorial.yaml",
+  "configs": [
+    {
+      "config_sha256": "4a6a95fa09ba73a8345e6716ad1de6d503d36b3b50a0223c1c979a67c5b29dad",
+      "output_dir": "factorial/g000/split42_seed142",
+      "path": "configs/prm/generated/factorial/g000_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "c9bc017dc952216cdb1d06658e749f5b7cd0f298a66dc4533355c7434f9a00a6",
+      "output_dir": "factorial/g001/split42_seed142",
+      "path": "configs/prm/generated/factorial/g001_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "68d1f0856e07c0a8b8df6c3621371bf076fe3a2967c97b7ce7ef016906105655",
+      "output_dir": "factorial/g010/split42_seed142",
+      "path": "configs/prm/generated/factorial/g010_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "265aedc1b0c981ab751df741a5dac4f42c926f69d2cbcb06680dcb10008c9b96",
+      "output_dir": "factorial/g011/split42_seed142",
+      "path": "configs/prm/generated/factorial/g011_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "4623f24951b5919ba1cb33598a678c6d85751783658b4f363caca23790cd92af",
+      "output_dir": "factorial/g100/split42_seed142",
+      "path": "configs/prm/generated/factorial/g100_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "8a34f7a97febb13c6776161523b3685ac1e09606fc53f2f1e65127cb14b1aa69",
+      "output_dir": "factorial/g101/split42_seed142",
+      "path": "configs/prm/generated/factorial/g101_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "e0448f9ecbea061baf7d03785ef579c0cae8e136a4273119147d0acd2fd90cf9",
+      "output_dir": "factorial/g110/split42_seed142",
+      "path": "configs/prm/generated/factorial/g110_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "b62ca4c68095d2c588ef5cc0e4fba5cfe60a536c72cf871069deeb200e7b448d",
+      "output_dir": "factorial/g111/split42_seed142",
+      "path": "configs/prm/generated/factorial/g111_split42_seed142.yaml",
+      "seed": 142,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s42.json"
+    },
+    {
+      "config_sha256": "239668d396731d18ea8d4577147e190adc3aec0ecafbfa637cdbfb2b13e3e973",
+      "output_dir": "factorial/g000/split43_seed143",
+      "path": "configs/prm/generated/factorial/g000_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "6d3fbde3929e36589b9668ce45a247487189012cebca8e720868b1d4ca47f3a7",
+      "output_dir": "factorial/g001/split43_seed143",
+      "path": "configs/prm/generated/factorial/g001_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "7685b8d573cc7613a84f3ddec65a33fb46e07f550f3a91fd1a9233a557f9ebe9",
+      "output_dir": "factorial/g010/split43_seed143",
+      "path": "configs/prm/generated/factorial/g010_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "859045c792b043a1b34e39e9a9e826ad3266e2adc932cc7c9f0788522abbdf1e",
+      "output_dir": "factorial/g011/split43_seed143",
+      "path": "configs/prm/generated/factorial/g011_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "45443b4f60505d03fa19a03f7c8074b1307dc552df705a25d5acca9b868eddeb",
+      "output_dir": "factorial/g100/split43_seed143",
+      "path": "configs/prm/generated/factorial/g100_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "0f24cd8e1d7db3a2a8e550ad994ba2219856c2cf1bb493d4d9c0381469a2dbc9",
+      "output_dir": "factorial/g101/split43_seed143",
+      "path": "configs/prm/generated/factorial/g101_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "72ad3a70854908abaaacaea34055dc7f3ffcddfe363d0d8418c720161cca2a87",
+      "output_dir": "factorial/g110/split43_seed143",
+      "path": "configs/prm/generated/factorial/g110_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "b405b318a8f95d879ac9ef77488e32a1ce23548af09d00b3e45f445fc084945f",
+      "output_dir": "factorial/g111/split43_seed143",
+      "path": "configs/prm/generated/factorial/g111_split43_seed143.yaml",
+      "seed": 143,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s43.json"
+    },
+    {
+      "config_sha256": "b2257b450073f906029343b400db070b66130eac48efdb9c9861272919c619c2",
+      "output_dir": "factorial/g000/split44_seed144",
+      "path": "configs/prm/generated/factorial/g000_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "c2b02c98ec78dbbb4e0d20f87aa6afe0d83f250156517b40d099db1cecf904a2",
+      "output_dir": "factorial/g001/split44_seed144",
+      "path": "configs/prm/generated/factorial/g001_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "3363ba36c10a21c54d60481888251b60172746d0891d506142e436ae3049f361",
+      "output_dir": "factorial/g010/split44_seed144",
+      "path": "configs/prm/generated/factorial/g010_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "4bbf690275889c42ae666a0da5107c9b3afada8e964d1a793fa6855fc635368b",
+      "output_dir": "factorial/g011/split44_seed144",
+      "path": "configs/prm/generated/factorial/g011_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "6887cfa3720b8ff77678557231adc53e0183189540b3b6c0e9d60b408b8ef1ee",
+      "output_dir": "factorial/g100/split44_seed144",
+      "path": "configs/prm/generated/factorial/g100_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "4667d7d9fbf00c903bf3128e9dbc373f54576a2106b963a416c1cb5dfecd9ac0",
+      "output_dir": "factorial/g101/split44_seed144",
+      "path": "configs/prm/generated/factorial/g101_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "58848ea05c06c4e4b5f84560c4c14323d88275bb4527f7d042b11bcba850f8e2",
+      "output_dir": "factorial/g110/split44_seed144",
+      "path": "configs/prm/generated/factorial/g110_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "3714c37e2d4e9587afb6771740d3c3806ae939d6a1d2312e3942d8f907bba5a4",
+      "output_dir": "factorial/g111/split44_seed144",
+      "path": "configs/prm/generated/factorial/g111_split44_seed144.yaml",
+      "seed": 144,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s44.json"
+    },
+    {
+      "config_sha256": "123310b5f833f4cda1e31a9fa073eba7f1bb45af0551d83cf6f33bf72db472f1",
+      "output_dir": "factorial/g000/split45_seed145",
+      "path": "configs/prm/generated/factorial/g000_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "971dc741adb560f7ec494136be291d68b6e5fb884179d4585d1196df18207496",
+      "output_dir": "factorial/g001/split45_seed145",
+      "path": "configs/prm/generated/factorial/g001_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "a81a3ce949c64432e2a2b51f0838739920249ca022d92b3f813bdafa9fb691ed",
+      "output_dir": "factorial/g010/split45_seed145",
+      "path": "configs/prm/generated/factorial/g010_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "65f0f131e90c3d6fa0f31050aef31dcea529bc9e4a6d65b4a353d3e172bd54b5",
+      "output_dir": "factorial/g011/split45_seed145",
+      "path": "configs/prm/generated/factorial/g011_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "5972eb195b34e960b9e240567d56d90825c8f9aa1d628e2561530567735ec554",
+      "output_dir": "factorial/g100/split45_seed145",
+      "path": "configs/prm/generated/factorial/g100_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "0a9a826f178929823bae81244cce73efd12d28ad630540c34d99a01791f3c0b0",
+      "output_dir": "factorial/g101/split45_seed145",
+      "path": "configs/prm/generated/factorial/g101_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "9a0c4c321bc686c03770b9a73227bf31195caa5b713b253ac1917e666aac1a89",
+      "output_dir": "factorial/g110/split45_seed145",
+      "path": "configs/prm/generated/factorial/g110_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "9ceba7598259827cd016e461346bd1029aaa222666d438ba014fb57c5b04f96f",
+      "output_dir": "factorial/g111/split45_seed145",
+      "path": "configs/prm/generated/factorial/g111_split45_seed145.yaml",
+      "seed": 145,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s45.json"
+    },
+    {
+      "config_sha256": "f7bd8c62b2686edaea664020dd3960230c4f3fe2148c364d6d91fdae7b6177ea",
+      "output_dir": "factorial/g000/split46_seed146",
+      "path": "configs/prm/generated/factorial/g000_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "d246188493e58d827a5e29c8ae74704d3bd9e33da85928ec746caeecff20baf2",
+      "output_dir": "factorial/g001/split46_seed146",
+      "path": "configs/prm/generated/factorial/g001_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "f9bb3ef8068d70949a77348823881077365d1d3751a0b6c015bfe7ef8a45bcc1",
+      "output_dir": "factorial/g010/split46_seed146",
+      "path": "configs/prm/generated/factorial/g010_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "0277b9d078cfacfb265a8e406d0a6acf4c5df8264a5e2b91cfee3c5351e9afbd",
+      "output_dir": "factorial/g011/split46_seed146",
+      "path": "configs/prm/generated/factorial/g011_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "dc1d9cafb7effaca6d5272e4f541b3459924bb97ec41a9c334d97e90e29e2ce6",
+      "output_dir": "factorial/g100/split46_seed146",
+      "path": "configs/prm/generated/factorial/g100_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "2768e478d6088aa86d42a965b30a10f46311d39f49d05d4a0c9d9efaf4d3240a",
+      "output_dir": "factorial/g101/split46_seed146",
+      "path": "configs/prm/generated/factorial/g101_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "79741d99d22954996413ca9a155b8dcd6d731d29199b4df2cad5d47bf5f32e50",
+      "output_dir": "factorial/g110/split46_seed146",
+      "path": "configs/prm/generated/factorial/g110_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "ba4cb86180cf51f3e40485e6a03f3c15f72887eb3886e5fb7a33cceb494bd05c",
+      "output_dir": "factorial/g111/split46_seed146",
+      "path": "configs/prm/generated/factorial/g111_split46_seed146.yaml",
+      "seed": 146,
+      "split_path": "artifacts/prm_protocol_v1/splits/id_repeat_s46.json"
+    },
+    {
+      "config_sha256": "1ef3e1cfb59ad4ce5143d3d3099cf9e77757d0e58662d7a9f1e548985976951f",
+      "output_dir": "transfer/host_cv5_f0/seed242",
+      "path": "configs/prm/generated/transfer/host_cv5_f0_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f0.json"
+    },
+    {
+      "config_sha256": "349ef8acf1592d52bcfeafc521c4291736093e4dfb7af1b572c80d061e0c6f91",
+      "output_dir": "transfer/host_cv5_f0/seed243",
+      "path": "configs/prm/generated/transfer/host_cv5_f0_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f0.json"
+    },
+    {
+      "config_sha256": "bec0c349364926216fe12fb0bc3d0c2bc7529e61ef2eb43e8897d1e8c48fd0eb",
+      "output_dir": "transfer/host_cv5_f0/seed244",
+      "path": "configs/prm/generated/transfer/host_cv5_f0_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f0.json"
+    },
+    {
+      "config_sha256": "f11dd83cdd7a8e64cc836fa900ed9e239ff29ef9113db7f23055eb16622e841b",
+      "output_dir": "transfer/host_cv5_f1/seed242",
+      "path": "configs/prm/generated/transfer/host_cv5_f1_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f1.json"
+    },
+    {
+      "config_sha256": "806ef962e742b4cc11e686e9730c94962eeb517f1e244d5017d5161b29bcd2dd",
+      "output_dir": "transfer/host_cv5_f1/seed243",
+      "path": "configs/prm/generated/transfer/host_cv5_f1_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f1.json"
+    },
+    {
+      "config_sha256": "96d990920c91784cf6c40bb31a7c7b184969b26162c30f7e144e5e0043ced013",
+      "output_dir": "transfer/host_cv5_f1/seed244",
+      "path": "configs/prm/generated/transfer/host_cv5_f1_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f1.json"
+    },
+    {
+      "config_sha256": "4172b3f0d2fdc7bb99869fae243111c32e90522ac7b1bb2f078427cfb1abafde",
+      "output_dir": "transfer/host_cv5_f2/seed242",
+      "path": "configs/prm/generated/transfer/host_cv5_f2_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f2.json"
+    },
+    {
+      "config_sha256": "613c2ac3137dfa002b8dd9cbdcdc1af6ea6f7201caac7e4e0cecae6793a5f139",
+      "output_dir": "transfer/host_cv5_f2/seed243",
+      "path": "configs/prm/generated/transfer/host_cv5_f2_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f2.json"
+    },
+    {
+      "config_sha256": "33c5b26c965eb84a619762aa7471ab4175ccfc0104e0b1dc196615b04b8c6cfa",
+      "output_dir": "transfer/host_cv5_f2/seed244",
+      "path": "configs/prm/generated/transfer/host_cv5_f2_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f2.json"
+    },
+    {
+      "config_sha256": "e72286fd57746231085fa2e225c396ffe44d295c7fa40abf527e5ad05cbf22db",
+      "output_dir": "transfer/host_cv5_f3/seed242",
+      "path": "configs/prm/generated/transfer/host_cv5_f3_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f3.json"
+    },
+    {
+      "config_sha256": "f3b3f56202694b3e0dd9917c5de23c3b96bd95b53a2dc0f649ff7aa0142aeb1d",
+      "output_dir": "transfer/host_cv5_f3/seed243",
+      "path": "configs/prm/generated/transfer/host_cv5_f3_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f3.json"
+    },
+    {
+      "config_sha256": "34a31c32bce8aa505e520d0ddb564ca8d90868a9bd4c446a1b5806095082c7e3",
+      "output_dir": "transfer/host_cv5_f3/seed244",
+      "path": "configs/prm/generated/transfer/host_cv5_f3_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f3.json"
+    },
+    {
+      "config_sha256": "a2a3f05b8a7d77a7320780747102c5f4f744dcbfc046757b02d8af7f6c3c5f44",
+      "output_dir": "transfer/host_cv5_f4/seed242",
+      "path": "configs/prm/generated/transfer/host_cv5_f4_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f4.json"
+    },
+    {
+      "config_sha256": "644d6af84f8c43a58a22005b104bc5fa14129fc0a752b97dd57cc91250e75e26",
+      "output_dir": "transfer/host_cv5_f4/seed243",
+      "path": "configs/prm/generated/transfer/host_cv5_f4_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f4.json"
+    },
+    {
+      "config_sha256": "7ab2b379ad334606e7ca30f36783db9034e45dbb597b4e0c6f55f64062e9e79f",
+      "output_dir": "transfer/host_cv5_f4/seed244",
+      "path": "configs/prm/generated/transfer/host_cv5_f4_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/host_cv5_f4.json"
+    },
+    {
+      "config_sha256": "3c3cd52a09e4564d216b698e434cfd220446a4525a0cc5de8f4f578c9584712b",
+      "output_dir": "transfer/dopant_cv5_f0/seed242",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f0_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f0.json"
+    },
+    {
+      "config_sha256": "9498f0fd140ac161e425e9ec45606d2467cab2f8514b827b032c40506acf141c",
+      "output_dir": "transfer/dopant_cv5_f0/seed243",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f0_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f0.json"
+    },
+    {
+      "config_sha256": "8b03b80319bf961669888bd8c6903f17fd2c36f5e2bc24a513ede17769b4cce2",
+      "output_dir": "transfer/dopant_cv5_f0/seed244",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f0_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f0.json"
+    },
+    {
+      "config_sha256": "dad20c1d7e2694ed6c98826cbf4843e3d788626829e14bf3cc23bbae243e08c8",
+      "output_dir": "transfer/dopant_cv5_f1/seed242",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f1_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f1.json"
+    },
+    {
+      "config_sha256": "03d710fc0b5830a8d1cc19b99ffefa800ca11b116564249509fffd642f3b0bac",
+      "output_dir": "transfer/dopant_cv5_f1/seed243",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f1_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f1.json"
+    },
+    {
+      "config_sha256": "15d2e4b4038995a44dac8bd7380646ed77f4da81b5843cfb7a0ecd5a1090b1ea",
+      "output_dir": "transfer/dopant_cv5_f1/seed244",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f1_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f1.json"
+    },
+    {
+      "config_sha256": "71e903678a9c47d0b60c3dd3f69387b1c8998743dc98b4171ea94a5cdf33aa48",
+      "output_dir": "transfer/dopant_cv5_f2/seed242",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f2_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f2.json"
+    },
+    {
+      "config_sha256": "1dca4847b74f201ce98abf0323b97072e49d8fadae33bd70c749ec6e13ed81f3",
+      "output_dir": "transfer/dopant_cv5_f2/seed243",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f2_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f2.json"
+    },
+    {
+      "config_sha256": "74c3ac52f7be2855a9b9d0a4afcc3d21ae76942b3f843dff75917fe33cdc91df",
+      "output_dir": "transfer/dopant_cv5_f2/seed244",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f2_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f2.json"
+    },
+    {
+      "config_sha256": "65095a077be73626bd19bf1eadb4563cafcb00b045c17ebab353f524f5fb0499",
+      "output_dir": "transfer/dopant_cv5_f3/seed242",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f3_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f3.json"
+    },
+    {
+      "config_sha256": "70ef45951aa16e165980363505aa83bcd5b7fa98bd4b6ea378caebc6b26fa64e",
+      "output_dir": "transfer/dopant_cv5_f3/seed243",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f3_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f3.json"
+    },
+    {
+      "config_sha256": "984faa37cf3e3cf3e3bc7c9282c16f5ad41f5cb4e8992e3f6e0eef220df73a95",
+      "output_dir": "transfer/dopant_cv5_f3/seed244",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f3_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f3.json"
+    },
+    {
+      "config_sha256": "753abe6368b2c56cf0950e805fa13a2e13f2f603caab75c2eb07f6971b2f684f",
+      "output_dir": "transfer/dopant_cv5_f4/seed242",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f4_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f4.json"
+    },
+    {
+      "config_sha256": "450002f0945e201d197d4f2f08cc65c7b238a5fc47c364181d1cf86447f932f0",
+      "output_dir": "transfer/dopant_cv5_f4/seed243",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f4_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f4.json"
+    },
+    {
+      "config_sha256": "c915d8a9894c0e93e518f64c88f9901613cea1b857dde6fac327c8055cb8859c",
+      "output_dir": "transfer/dopant_cv5_f4/seed244",
+      "path": "configs/prm/generated/transfer/dopant_cv5_f4_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/dopant_cv5_f4.json"
+    },
+    {
+      "config_sha256": "3f654ebaa8954205951ddeedd1dcf10c01cdf533a5b5ea77341018cd89e31436",
+      "output_dir": "transfer/chemistry_block_g6x3d/seed242",
+      "path": "configs/prm/generated/transfer/chemistry_block_g6x3d_seed242.yaml",
+      "seed": 242,
+      "split_path": "artifacts/prm_protocol_v1/splits/chemistry_block_g6x3d.json"
+    },
+    {
+      "config_sha256": "5221d82a32f62400ee75b92b5ab26201c0b3aa13ff29bdde38907289a63abff5",
+      "output_dir": "transfer/chemistry_block_g6x3d/seed243",
+      "path": "configs/prm/generated/transfer/chemistry_block_g6x3d_seed243.yaml",
+      "seed": 243,
+      "split_path": "artifacts/prm_protocol_v1/splits/chemistry_block_g6x3d.json"
+    },
+    {
+      "config_sha256": "0ff2ead11f8f4cf2328c78e3a2eb72c0c130d05c1a13e27c2c6667ed6fc118ba",
+      "output_dir": "transfer/chemistry_block_g6x3d/seed244",
+      "path": "configs/prm/generated/transfer/chemistry_block_g6x3d_seed244.yaml",
+      "seed": 244,
+      "split_path": "artifacts/prm_protocol_v1/splits/chemistry_block_g6x3d.json"
+    }
+  ],
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "n_configs": 73,
+  "schema_version": "prm_config_manifest_v1"
+}

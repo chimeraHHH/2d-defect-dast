@@ -140,6 +140,7 @@ class CrystalGraphDataset(Dataset):
         defect_type_str = sample.get("metadata", {}).get("defecttype", "vacancy")
         defect_type_idx = DEFECT_TYPE_MAP.get(defect_type_str, 0)
         item = {
+            "sample_index": torch.tensor(idx, dtype=torch.long),
             "x": x,
             "atomic_numbers": numbers,
             "defect_mask": defect_mask,
@@ -190,6 +191,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     positions = torch.zeros(batch_size, n_max, 3, dtype=torch.float32)
     target = torch.zeros(batch_size, dtype=torch.float32)
     num_atoms = torch.zeros(batch_size, dtype=torch.long)
+    sample_index = torch.zeros(batch_size, dtype=torch.long)
 
     edge_index_list, edge_dist_list, edge_offset_list = [], [], []
     triplet_index_list, angles_list = [], []
@@ -207,6 +209,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
             positions[i, :n] = item["positions"]
         target[i] = item["target"]
         num_atoms[i] = n
+        sample_index[i] = item.get("sample_index", i)
         cell[i] = item["cell"]
         edge_index_list.append(item["edge_index"])
         edge_dist_list.append(item["edge_dist"])
@@ -230,6 +233,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "cell": cell,
         "target": target,
         "num_atoms": num_atoms,
+        "sample_index": sample_index,
         "num_atoms_list": natoms_list,
         "edge_index_list": edge_index_list,
         "edge_dist_list": edge_dist_list,
