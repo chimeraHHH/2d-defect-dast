@@ -15,7 +15,7 @@ from typing import Any, Dict, List
 
 import yaml
 
-from src.prm_provenance import config_sha256
+from src.prm_provenance import config_sha256, validate_training_completion
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -90,6 +90,7 @@ def existing_run_status(
         raise ValueError(f"dirty existing run is inadmissible: {manifest}")
     status = payload.get("status")
     if status == "complete":
+        validate_training_completion(payload, manifest)
         return "complete"
     if status != "running":
         raise ValueError(f"unsupported existing run status {status!r}: {manifest}")

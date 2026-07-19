@@ -600,6 +600,10 @@ def main() -> None:
         "config_sha256": config_sha256(controlled_cfg),
         "runtime_config": cfg,
         "runtime_config_sha256": config_sha256(cfg),
+        "execution": {
+            "max_steps": int(args.max_steps),
+            "resume_requested": bool(args.resume),
+        },
         "assets": asset_records,
         "data": {
             "path": str(data_path),
@@ -1209,7 +1213,7 @@ def main() -> None:
         )
     run_manifest.update(
         {
-            "status": "complete",
+            "status": "truncated" if args.max_steps else "complete",
             "completed_at": datetime.now(timezone.utc).isoformat(),
             "outputs": output_paths,
             "metrics": summary,

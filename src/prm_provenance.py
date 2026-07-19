@@ -76,6 +76,69 @@ def validate_manifest_config(
     return expected
 
 
+def validate_training_completion(
+    manifest: Mapping[str, Any],
+    manifest_path: Path,
+) -> None:
+    """Require a full epoch history before a neural run can be admitted."""
+    if manifest.get("status") != "complete":
+        raise ValueError(f"training run is not complete: {manifest_path}")
+    execution = manifest.get("execution")
+    if not isinstance(execution, Mapping):
+        raise ValueError(f"training execution contract is missing: {manifest_path}")
+    if int(execution.get("max_steps", -1)) != 0:
+        raise ValueError(f"truncated training run is inadmissible: {manifest_path}")
+
+    config = manifest.get("config")
+    metrics = manifest.get("metrics")
+    if not isinstance(config, Mapping) or not isinstance(metrics, Mapping):
+        raise ValueError(f"training config or metrics are missing: {manifest_path}")
+    epochs = int(config.get("epochs", 0))
+    history = metrics.get("history")
+    if epochs <= 0 or not isinstance(history, list) or len(history) != epochs:
+        raise ValueError(
+            f"training history does not cover all {epochs} epochs: {manifest_path}"
+        )
+    observed_epochs = [int(row.get("epoch", -1)) for row in history]
+    if observed_epochs != list(range(1, epochs + 1)):
+        raise ValueError(f"training epoch sequence is incomplete: {manifest_path}")
+    history_values = [row.get("val_mae") for row in history]
+    if any(
+        not isinstance(value, (int, float)) or not math.isfinite(value)
+        for value in history_values
+    ):
+        raise ValueError(f"training history contains invalid validation MAE: {manifest_path}")
+
+    best_val = metrics.get("best_val_mae")
+    if not isinstance(best_val, (int, float)) or not math.isfinite(best_val):
+        raise ValueError(f"best validation MAE is invalid: {manifest_path}")
+    if not math.isclose(best_val, min(history_values), rel_tol=1e-7, abs_tol=1e-8):
+        raise ValueError(f"best validation MAE disagrees with history: {manifest_path}")
+    required_metrics = ("mae", "rmse", "bias", "spearman", "r2")
+    for partition in ("validation", "test"):
+        values = metrics.get(partition)
+        if not isinstance(values, Mapping):
+            raise ValueError(f"{partition} metrics are missing: {manifest_path}")
+        for key in required_metrics:
+            value = values.get(key)
+            if not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError(
+                    f"invalid {partition} {key} metric in {manifest_path}"
+                )
+    if not math.isclose(
+        float(metrics["validation"]["mae"]), float(best_val),
+        rel_tol=1e-7, abs_tol=1e-8,
+    ):
+        raise ValueError(f"final validation MAE is not the selected checkpoint: {manifest_path}")
+    if int(metrics.get("n_params", 0)) <= 0:
+        raise ValueError(f"model parameter count is invalid: {manifest_path}")
+    split = manifest.get("split", {})
+    if metrics.get("split_id") != split.get("split_id"):
+        raise ValueError(f"metric/split identity mismatch: {manifest_path}")
+    if manifest.get("seed") != config.get("seed"):
+        raise ValueError(f"manifest/config seed mismatch: {manifest_path}")
+
+
 def validate_dart_assets(
     manifest: Mapping[str, Any],
     manifest_path: Path,

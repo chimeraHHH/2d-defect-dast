@@ -41,6 +41,23 @@ def _write_run_manifest(result_root, config, *, status="complete", dirty=False, 
         "git": {"commit": commit, "dirty": dirty},
         "config": config,
         "config_sha256": prm_scheduler.config_sha256(config),
+        "execution": {"max_steps": 0, "resume_requested": False},
+        "seed": config["seed"],
+        "split": {"split_id": "id_repeat_s42"},
+        "metrics": {
+            "split_id": "id_repeat_s42",
+            "n_params": 100,
+            "best_val_mae": 0.4,
+            "history": [{"epoch": 1, "val_mae": 0.4}],
+            "validation": {
+                "mae": 0.4, "rmse": 0.5, "bias": 0.0,
+                "spearman": 0.7, "r2": 0.6,
+            },
+            "test": {
+                "mae": 0.45, "rmse": 0.55, "bias": 0.01,
+                "spearman": 0.65, "r2": 0.5,
+            },
+        },
     }
     path = run_dir / "run_manifest.json"
     path.write_text(json.dumps(manifest))
@@ -52,11 +69,12 @@ def test_existing_complete_run_requires_the_current_config(tmp_path):
         "output_dir": "factorial/g000/split42_seed142",
         "split_path": "split.json",
         "seed": 142,
+        "epochs": 1,
     }
     _write_run_manifest(tmp_path, config)
     assert prm_scheduler.existing_run_status(tmp_path, config, "abc") == "complete"
 
-    changed = {**config, "epochs": 151}
+    changed = {**config, "epochs": 2}
     with pytest.raises(ValueError, match="stale run config"):
         prm_scheduler.existing_run_status(tmp_path, changed, "abc")
 
@@ -66,6 +84,7 @@ def test_existing_dirty_run_is_rejected(tmp_path):
         "output_dir": "factorial/g000/split42_seed142",
         "split_path": "split.json",
         "seed": 142,
+        "epochs": 1,
     }
     _write_run_manifest(tmp_path, config, dirty=True)
     with pytest.raises(ValueError, match="dirty existing run"):
@@ -77,6 +96,7 @@ def test_partial_run_cannot_resume_across_commits(tmp_path):
         "output_dir": "factorial/g000/split42_seed142",
         "split_path": "split.json",
         "seed": 142,
+        "epochs": 1,
     }
     _write_run_manifest(tmp_path, config, status="running", commit="old")
     with pytest.raises(ValueError, match="refusing to resume"):

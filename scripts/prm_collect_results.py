@@ -21,6 +21,7 @@ from src.prm_provenance import (
     load_expected_configs,
     validate_dart_assets,
     validate_manifest_config,
+    validate_training_completion,
 )
 
 
@@ -93,6 +94,7 @@ def load_neural_runs(
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty run is inadmissible: {path}")
         expected_config = validate_manifest_config(manifest, expected_configs, path)
+        validate_training_completion(manifest, path)
         if model == "dart":
             validate_dart_assets(manifest, path)
         if manifest["data"]["data_sha256"] != expected_data_sha256:

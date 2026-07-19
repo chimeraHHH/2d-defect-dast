@@ -216,6 +216,10 @@ def main() -> None:
         "git": git_snapshot(),
         "config": cfg,
         "config_sha256": config_sha256(cfg),
+        "execution": {
+            "max_steps": int(args.max_steps),
+            "resume_requested": bool(args.resume),
+        },
         "data": {
             "path": str(data_path), "size_bytes": data_path.stat().st_size,
             "data_sha256": split["data_sha256"],
@@ -345,7 +349,8 @@ def main() -> None:
         )
     manifest.update(
         {
-            "status": "complete", "completed_at": datetime.now(timezone.utc).isoformat(),
+            "status": "truncated" if args.max_steps else "complete",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
             "metrics": metrics,
             "outputs": {
                 "metrics": str(output_dir / "metrics.json"),
