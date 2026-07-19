@@ -15,6 +15,7 @@ import numpy as np
 
 from src.prm_provenance import (
     ExpectedConfig,
+    archive_training_artifacts,
     load_expected_configs,
     validate_dart_assets,
     validate_manifest_config,
@@ -307,6 +308,12 @@ def main() -> None:
     collector_git = git_snapshot()
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    archived_runs = archive_training_artifacts(
+        [Path(row["manifest_path"]) for row in rows],
+        out_dir / "runs",
+        repository_root=ROOT,
+        strip_output_prefix="factorial",
+    )
 
     run_fields = [
         "variant", "repeat", "seed", "n_params", "git_commit",
@@ -349,6 +356,15 @@ def main() -> None:
         },
         "n_runs": len(rows),
         "sources": sources,
+        "archive_policy": {
+            "included": [
+                "run_manifest.json", "metrics.json", "split_indices.npz",
+                "val_predictions.npz", "test_predictions.npz",
+            ],
+            "checkpoint": "SHA-256 recorded; binary retained outside Git",
+        },
+        "n_archived_runs": len(archived_runs),
+        "archived_runs": archived_runs,
         **summary,
     }
     bundle_path = out_dir / "bundle.json"

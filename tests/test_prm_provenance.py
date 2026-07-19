@@ -8,6 +8,7 @@ import pytest
 
 from src.prm_metrics import regression_metrics
 from src.prm_provenance import (
+    archive_training_artifacts,
     config_sha256,
     file_sha256,
     load_expected_configs,
@@ -124,11 +125,45 @@ def _write_verified_factorial_selection(tmp_path):
     collector_git = {
         "commit": "collector-commit", "dirty": False, "status_porcelain": []
     }
+    archive_records = []
+    archive_names = {
+        "manifest": "run_manifest.json",
+        "metrics": "metrics.json",
+        "split_indices": "split_indices.npz",
+        "validation_predictions": "val_predictions.npz",
+        "test_predictions": "test_predictions.npz",
+    }
+    for index in range(40):
+        run_dir = tmp_path / "runs" / f"run{index:02d}"
+        run_dir.mkdir(parents=True)
+        artifacts = {}
+        for key, name in archive_names.items():
+            path = run_dir / name
+            path.write_text(f"{key}-{index}")
+            artifacts[key] = {
+                "path": str(path),
+                "archive_relative_path": str(path.relative_to(tmp_path)),
+                "sha256": file_sha256(path),
+            }
+        archive_records.append(
+            {
+                "output_dir": f"factorial/g{index % 8:03b}/run{index:02d}",
+                "artifacts": artifacts,
+                "omitted_outputs": {
+                    "checkpoint": {
+                        "sha256": "a" * 64,
+                        "reason": "checkpoint retained outside Git",
+                    }
+                },
+            }
+        )
     bundle = {
         "schema_version": "prm_factorial_bundle_v1",
         "collector_git": collector_git,
         "data_sha256": "data-sha",
         "n_runs": 40,
+        "n_archived_runs": 40,
+        "archived_runs": archive_records,
         "repeats": list(range(42, 47)),
         "selection": selection_core,
         "sources": [
@@ -186,6 +221,67 @@ def test_factorial_selection_rejects_dirty_training_source(tmp_path):
 
     with pytest.raises(ValueError, match="inadmissible training sources"):
         load_verified_factorial_selection(selection_path)
+
+
+def test_factorial_selection_rejects_archived_artifact_mutation(tmp_path):
+    selection_path, _, _, _ = _write_verified_factorial_selection(tmp_path)
+    (tmp_path / "runs" / "run00" / "metrics.json").write_text("mutated")
+
+    with pytest.raises(ValueError, match="archived artifact hash mismatch"):
+        load_verified_factorial_selection(selection_path)
+
+
+def test_training_evidence_archive_copies_numerical_outputs_not_checkpoint(tmp_path):
+    run_dir = tmp_path / "source" / "factorial" / "g000" / "run00"
+    run_dir.mkdir(parents=True)
+    output_names = {
+        "metrics": "metrics.json",
+        "checkpoint": "best.pt",
+        "split_indices": "split_indices.npz",
+        "validation_predictions": "val_predictions.npz",
+        "test_predictions": "test_predictions.npz",
+    }
+    for key, name in output_names.items():
+        (run_dir / name).write_bytes(f"{key}-content".encode())
+    output_hashes = {
+        key: file_sha256(run_dir / name) for key, name in output_names.items()
+    }
+    manifest = {
+        "schema_version": "prm_run_manifest_v1",
+        "status": "complete",
+        "config": {"output_dir": "factorial/g000/run00"},
+        "config_sha256": "config-sha",
+        "git": {"commit": "training-commit", "dirty": False},
+        "outputs": output_names,
+        "output_sha256": output_hashes,
+    }
+    manifest_path = run_dir / "run_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True))
+
+    records = archive_training_artifacts(
+        [manifest_path],
+        tmp_path / "evidence" / "runs",
+        repository_root=tmp_path,
+        strip_output_prefix="factorial",
+    )
+
+    archived_dir = tmp_path / "evidence" / "runs" / "g000" / "run00"
+    assert (archived_dir / "run_manifest.json").is_file()
+    assert (archived_dir / "metrics.json").is_file()
+    assert (archived_dir / "test_predictions.npz").is_file()
+    assert not (archived_dir / "best.pt").exists()
+    assert records[0]["omitted_outputs"]["checkpoint"]["sha256"] == (
+        output_hashes["checkpoint"]
+    )
+
+    (run_dir / "metrics.json").write_text("mutated")
+    with pytest.raises(ValueError, match="metrics source hash mismatch"):
+        archive_training_artifacts(
+            [manifest_path],
+            tmp_path / "invalid" / "runs",
+            repository_root=tmp_path,
+            strip_output_prefix="factorial",
+        )
 
 
 def _complete_manifest():

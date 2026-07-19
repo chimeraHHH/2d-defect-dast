@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import re
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
@@ -26,6 +27,10 @@ _OUTPUT_NAMES = {
     "validation_predictions": "val_predictions.npz",
     "test_predictions": "test_predictions.npz",
     "calibration_predictions": "calibration_predictions.npz",
+}
+_PAPER_ARCHIVE_OUTPUTS = {
+    "metrics", "split_indices", "validation_predictions", "test_predictions",
+    "calibration_predictions",
 }
 
 
@@ -158,14 +163,61 @@ def load_verified_factorial_selection(
     if bundle.get("schema_version") != "prm_factorial_bundle_v1":
         raise ValueError(f"unsupported factorial bundle schema: {resolved_bundle}")
     sources = bundle.get("sources")
+    archived_runs = bundle.get("archived_runs")
     if (
         bundle.get("n_runs") != 40
         or selection.get("n_runs") != 40
         or not isinstance(sources, list)
         or len(sources) != 40
+        or bundle.get("n_archived_runs") != 40
+        or not isinstance(archived_runs, list)
+        or len(archived_runs) != 40
         or bundle.get("repeats") != list(range(42, 47))
     ):
         raise ValueError(f"factorial selection is not backed by all 40 runs: {resolved_bundle}")
+    expected_archive_keys = {
+        "manifest", "metrics", "split_indices", "validation_predictions",
+        "test_predictions",
+    }
+    archived_output_dirs = []
+    for record in archived_runs:
+        if not isinstance(record, Mapping):
+            raise ValueError(f"factorial archived run record is invalid: {resolved_bundle}")
+        archived_output_dirs.append(record.get("output_dir"))
+        artifacts = record.get("artifacts")
+        omitted_outputs = record.get("omitted_outputs")
+        checkpoint = (
+            omitted_outputs.get("checkpoint", {})
+            if isinstance(omitted_outputs, Mapping) else {}
+        )
+        if (
+            not isinstance(artifacts, Mapping)
+            or set(artifacts) != expected_archive_keys
+            or not isinstance(checkpoint, Mapping)
+            or _SHA256_PATTERN.fullmatch(str(checkpoint.get("sha256", ""))) is None
+        ):
+            raise ValueError(f"factorial archived artifact set is incomplete: {resolved_bundle}")
+        for artifact in artifacts.values():
+            if not isinstance(artifact, Mapping):
+                raise ValueError(f"factorial archived artifact is invalid: {resolved_bundle}")
+            relative = Path(str(artifact.get("archive_relative_path", "")))
+            expected_sha256 = str(artifact.get("sha256", ""))
+            path = (resolved_bundle.parent / relative).resolve()
+            if (
+                not relative.parts
+                or relative.is_absolute()
+                or ".." in relative.parts
+                or not path.is_relative_to(resolved_bundle.parent)
+                or _SHA256_PATTERN.fullmatch(expected_sha256) is None
+                or not path.is_file()
+                or file_sha256(path) != expected_sha256
+            ):
+                raise ValueError(f"factorial archived artifact hash mismatch: {path}")
+    if (
+        any(not isinstance(output_dir, str) or not output_dir for output_dir in archived_output_dirs)
+        or len(set(archived_output_dirs)) != 40
+    ):
+        raise ValueError(f"factorial archived output directories are not unique: {resolved_bundle}")
     collector_git = bundle.get("collector_git")
     if (
         not isinstance(collector_git, Mapping)
@@ -202,6 +254,156 @@ def load_verified_factorial_selection(
     ):
         raise ValueError(f"factorial selection has inconsistent training commits: {resolved_bundle}")
     return selection, bundle
+
+
+def archive_training_artifacts(
+    manifest_paths: Sequence[Path],
+    archive_root: Path,
+    *,
+    repository_root: Path,
+    strip_output_prefix: str | None = None,
+) -> list[Dict[str, Any]]:
+    """Atomically archive numerical run evidence while omitting checkpoints."""
+    if not manifest_paths:
+        raise ValueError("no training manifests supplied for archival")
+    resolved_archive = archive_root.resolve()
+    resolved_repository = repository_root.resolve()
+    staging_root = resolved_archive.parent / f".{resolved_archive.name}.tmp"
+    if staging_root.exists():
+        shutil.rmtree(staging_root)
+    staging_root.mkdir(parents=True)
+
+    def portable(path: Path) -> str:
+        resolved = path.resolve()
+        try:
+            return str(resolved.relative_to(resolved_repository))
+        except ValueError:
+            return str(resolved)
+
+    records = []
+    try:
+        for manifest_path in sorted(path.resolve() for path in manifest_paths):
+            try:
+                manifest = json.loads(manifest_path.read_text())
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ValueError(f"unreadable training manifest: {manifest_path}") from exc
+            if (
+                manifest.get("schema_version") != "prm_run_manifest_v1"
+                or manifest.get("status") != "complete"
+            ):
+                raise ValueError(f"inadmissible training manifest for archival: {manifest_path}")
+            output_dir = Path(str(manifest.get("config", {}).get("output_dir", "")))
+            if (
+                not output_dir.parts
+                or output_dir.is_absolute()
+                or ".." in output_dir.parts
+            ):
+                raise ValueError(f"unsafe training output_dir in {manifest_path}")
+            if strip_output_prefix is not None:
+                try:
+                    output_dir = output_dir.relative_to(Path(strip_output_prefix))
+                except ValueError as exc:
+                    raise ValueError(
+                        f"training output_dir lacks prefix {strip_output_prefix!r}: "
+                        f"{manifest_path}"
+                    ) from exc
+            target_dir = staging_root / output_dir
+            if target_dir.exists():
+                raise ValueError(f"duplicate archived training output_dir: {output_dir}")
+            target_dir.mkdir(parents=True)
+
+            outputs = manifest.get("outputs")
+            hashes = manifest.get("output_sha256")
+            if not isinstance(outputs, Mapping) or not isinstance(hashes, Mapping):
+                raise ValueError(f"training output contract is missing: {manifest_path}")
+            required = {
+                "metrics", "split_indices", "validation_predictions",
+                "test_predictions", "checkpoint",
+            }
+            allowed = _PAPER_ARCHIVE_OUTPUTS | {"checkpoint"}
+            if (
+                not required.issubset(outputs)
+                or not set(outputs).issubset(allowed)
+                or set(outputs) != set(hashes)
+            ):
+                raise ValueError(f"training output contract is incomplete: {manifest_path}")
+
+            final_dir = resolved_archive / output_dir
+            manifest_target = target_dir / "run_manifest.json"
+            shutil.copyfile(manifest_path, manifest_target)
+            manifest_sha256 = file_sha256(manifest_path)
+            if file_sha256(manifest_target) != manifest_sha256:
+                raise OSError(f"archived manifest hash mismatch: {manifest_path}")
+            artifacts: Dict[str, Dict[str, str]] = {
+                "manifest": {
+                    "path": portable(final_dir / "run_manifest.json"),
+                    "archive_relative_path": str(
+                        (final_dir / "run_manifest.json").relative_to(
+                            resolved_archive.parent
+                        )
+                    ),
+                    "sha256": manifest_sha256,
+                }
+            }
+            for key in sorted(set(outputs) & _PAPER_ARCHIVE_OUTPUTS):
+                relative = str(outputs[key])
+                expected_sha256 = hashes.get(key)
+                if (
+                    not relative
+                    or Path(relative).name != relative
+                    or not isinstance(expected_sha256, str)
+                    or _SHA256_PATTERN.fullmatch(expected_sha256) is None
+                ):
+                    raise ValueError(f"invalid {key} output contract: {manifest_path}")
+                source = manifest_path.parent / relative
+                if not source.is_file() or file_sha256(source) != expected_sha256:
+                    raise ValueError(f"{key} source hash mismatch: {source}")
+                target = target_dir / relative
+                shutil.copyfile(source, target)
+                if file_sha256(target) != expected_sha256:
+                    raise OSError(f"archived {key} hash mismatch: {target}")
+                artifacts[key] = {
+                    "path": portable(final_dir / relative),
+                    "archive_relative_path": str(
+                        (final_dir / relative).relative_to(resolved_archive.parent)
+                    ),
+                    "sha256": expected_sha256,
+                }
+            checkpoint_sha256 = hashes.get("checkpoint")
+            if (
+                not isinstance(checkpoint_sha256, str)
+                or _SHA256_PATTERN.fullmatch(checkpoint_sha256) is None
+            ):
+                raise ValueError(f"invalid checkpoint hash: {manifest_path}")
+            checkpoint_source = manifest_path.parent / str(outputs["checkpoint"])
+            if (
+                Path(str(outputs["checkpoint"])).name != outputs["checkpoint"]
+                or not checkpoint_source.is_file()
+                or file_sha256(checkpoint_source) != checkpoint_sha256
+            ):
+                raise ValueError(f"checkpoint source hash mismatch: {checkpoint_source}")
+            records.append(
+                {
+                    "output_dir": str(manifest["config"]["output_dir"]),
+                    "config_sha256": manifest.get("config_sha256"),
+                    "git": manifest.get("git"),
+                    "artifacts": artifacts,
+                    "omitted_outputs": {
+                        "checkpoint": {
+                            "sha256": checkpoint_sha256,
+                            "reason": "checkpoint retained outside Git; digest preserved",
+                        }
+                    },
+                }
+            )
+        if resolved_archive.exists():
+            shutil.rmtree(resolved_archive)
+        staging_root.replace(resolved_archive)
+    except Exception:
+        if staging_root.exists():
+            shutil.rmtree(staging_root)
+        raise
+    return records
 
 
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:
