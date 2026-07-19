@@ -1,3 +1,5 @@
+import pytest
+
 from scripts.prm_collect_factorial import contract_hash, summarize_factorial
 
 
@@ -61,3 +63,10 @@ def test_contract_hash_ignores_pairing_fields_and_component_flags():
         },
     }
     assert contract_hash(first) == contract_hash(second)
+
+
+def test_partial_factorial_cannot_select_an_architecture():
+    partial = [row for row in synthetic_rows() if row["repeat"] == 42]
+
+    with pytest.raises(ValueError, match="paired repeats 42--46"):
+        summarize_factorial(partial, bootstrap_samples=100)

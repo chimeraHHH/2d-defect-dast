@@ -113,6 +113,8 @@ def summarize_factorial(
     repeats = sorted({int(row["repeat"]) for row in rows})
     if variants != [f"g{mask:03b}" for mask in range(8)]:
         raise ValueError(f"expected all eight variants, found {variants}")
+    if repeats != list(range(42, 47)):
+        raise ValueError(f"expected paired repeats 42--46, found {repeats}")
     expected_pairs = {(variant, repeat) for variant in variants for repeat in repeats}
     observed_pairs = {(str(row["variant"]), int(row["repeat"])) for row in rows}
     if observed_pairs != expected_pairs or len(rows) != len(expected_pairs):
