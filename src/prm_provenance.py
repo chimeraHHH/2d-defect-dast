@@ -14,6 +14,15 @@ import yaml
 
 DART_ASSET_KEYS = ("ct_uae", "pretrained_embed")
 _EDGE_GATE_PATTERN = re.compile(r"^\d+\.edge_gate\.")
+_SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+_OUTPUT_NAMES = {
+    "metrics": "metrics.json",
+    "checkpoint": "best.pt",
+    "split_indices": "split_indices.npz",
+    "validation_predictions": "val_predictions.npz",
+    "test_predictions": "test_predictions.npz",
+    "calibration_predictions": "calibration_predictions.npz",
+}
 
 
 @dataclass(frozen=True)
@@ -26,6 +35,14 @@ class ExpectedConfig:
 def config_sha256(config: Mapping[str, Any]) -> str:
     payload = json.dumps(dict(config), sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(payload).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:
@@ -79,6 +96,8 @@ def validate_manifest_config(
 def validate_training_completion(
     manifest: Mapping[str, Any],
     manifest_path: Path,
+    *,
+    verify_outputs: bool = True,
 ) -> None:
     """Require a full epoch history before a neural run can be admitted."""
     if manifest.get("status") != "complete":
@@ -141,6 +160,50 @@ def validate_training_completion(
         raise ValueError(f"metric/split identity mismatch: {manifest_path}")
     if manifest.get("seed") != config.get("seed"):
         raise ValueError(f"manifest/config seed mismatch: {manifest_path}")
+    if verify_outputs:
+        validate_output_artifacts(manifest, manifest_path)
+
+
+def validate_output_artifacts(
+    manifest: Mapping[str, Any],
+    manifest_path: Path,
+) -> None:
+    """Verify every paper-facing output against its recorded digest."""
+    outputs = manifest.get("outputs")
+    hashes = manifest.get("output_sha256")
+    if not isinstance(outputs, Mapping) or not isinstance(hashes, Mapping):
+        raise ValueError(f"output artifact contract is missing: {manifest_path}")
+    required = {
+        "metrics", "checkpoint", "split_indices",
+        "validation_predictions", "test_predictions",
+    }
+    split_counts = manifest.get("split", {}).get("counts", {})
+    if int(split_counts.get("calibration", 0)) > 0:
+        required.add("calibration_predictions")
+    if set(outputs) != required or set(hashes) != required:
+        raise ValueError(f"output artifact set is incomplete: {manifest_path}")
+
+    resolved: Dict[str, Path] = {}
+    for key in sorted(required):
+        relative = outputs.get(key)
+        if relative != _OUTPUT_NAMES[key]:
+            raise ValueError(f"noncanonical {key} output path: {manifest_path}")
+        expected_hash = hashes.get(key)
+        if not isinstance(expected_hash, str) or _SHA256_PATTERN.fullmatch(expected_hash) is None:
+            raise ValueError(f"invalid {key} output hash: {manifest_path}")
+        path = manifest_path.parent / relative
+        if not path.is_file():
+            raise ValueError(f"missing {key} output artifact: {path}")
+        if file_sha256(path) != expected_hash:
+            raise ValueError(f"{key} output hash mismatch: {path}")
+        resolved[key] = path
+
+    try:
+        recorded_metrics = json.loads(resolved["metrics"].read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"unreadable metrics artifact: {resolved['metrics']}") from exc
+    if recorded_metrics != manifest.get("metrics"):
+        raise ValueError(f"metrics file/manifest mismatch: {manifest_path}")
 
 
 def validate_dart_assets(

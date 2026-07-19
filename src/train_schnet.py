@@ -364,13 +364,18 @@ def main() -> None:
             "completed_at": datetime.now(timezone.utc).isoformat(),
             "metrics": metrics,
             "outputs": {
-                "metrics": str(output_dir / "metrics.json"),
-                "checkpoint": str(checkpoint_path),
-                "validation_predictions": str(output_dir / "val_predictions.npz"),
-                "test_predictions": str(output_dir / "test_predictions.npz"),
+                "metrics": "metrics.json",
+                "checkpoint": "best.pt",
+                "split_indices": "split_indices.npz",
+                "validation_predictions": "val_predictions.npz",
+                "test_predictions": "test_predictions.npz",
             },
         }
     )
+    manifest["output_sha256"] = {
+        key: file_sha256(output_dir / relative_path)
+        for key, relative_path in manifest["outputs"].items()
+    }
     (output_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
 

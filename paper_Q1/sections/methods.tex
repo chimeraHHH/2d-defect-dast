@@ -153,7 +153,8 @@ The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved
 configuration, command, Python/PyTorch/CUDA environment, data and split
 hashes, seed, partition indices, epoch history, checkpoint, and validation and
-test predictions.  Interrupted jobs resume from complete optimizer,
+test predictions.  SHA-256 digests bind the metrics, checkpoint, split-index,
+and prediction files to that manifest.  Interrupted jobs resume from complete optimizer,
 scheduler, model, and random-number-generator state.
 
 %----------------------------------------------------------------------

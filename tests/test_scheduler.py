@@ -6,6 +6,7 @@ import pytest
 import yaml
 
 from scripts import prm_scheduler
+from src.prm_provenance import file_sha256
 
 
 def test_atomic_json_round_trip(tmp_path):
@@ -35,6 +36,33 @@ def test_config_record_reads_output_contract(tmp_path, monkeypatch):
 def _write_run_manifest(result_root, config, *, status="complete", dirty=False, commit="abc"):
     run_dir = result_root / config["output_dir"]
     run_dir.mkdir(parents=True)
+    metrics = {
+        "split_id": "id_repeat_s42",
+        "n_params": 100,
+        "best_val_mae": 0.4,
+        "history": [{"epoch": 1, "val_mae": 0.4}],
+        "validation": {
+            "mae": 0.4, "rmse": 0.5, "bias": 0.0,
+            "spearman": 0.7, "r2": 0.6,
+        },
+        "test": {
+            "mae": 0.45, "rmse": 0.55, "bias": 0.01,
+            "spearman": 0.65, "r2": 0.5,
+        },
+    }
+    outputs = {
+        "metrics": "metrics.json",
+        "checkpoint": "best.pt",
+        "split_indices": "split_indices.npz",
+        "validation_predictions": "val_predictions.npz",
+        "test_predictions": "test_predictions.npz",
+    }
+    for key, name in outputs.items():
+        path = run_dir / name
+        if key == "metrics":
+            path.write_text(json.dumps(metrics, sort_keys=True))
+        else:
+            path.write_bytes(key.encode())
     manifest = {
         "schema_version": "prm_run_manifest_v1",
         "status": status,
@@ -43,20 +71,14 @@ def _write_run_manifest(result_root, config, *, status="complete", dirty=False, 
         "config_sha256": prm_scheduler.config_sha256(config),
         "execution": {"max_steps": 0, "resume_requested": False},
         "seed": config["seed"],
-        "split": {"split_id": "id_repeat_s42"},
-        "metrics": {
+        "split": {
             "split_id": "id_repeat_s42",
-            "n_params": 100,
-            "best_val_mae": 0.4,
-            "history": [{"epoch": 1, "val_mae": 0.4}],
-            "validation": {
-                "mae": 0.4, "rmse": 0.5, "bias": 0.0,
-                "spearman": 0.7, "r2": 0.6,
-            },
-            "test": {
-                "mae": 0.45, "rmse": 0.55, "bias": 0.01,
-                "spearman": 0.65, "r2": 0.5,
-            },
+            "counts": {"train": 8, "val": 1, "test": 1},
+        },
+        "metrics": metrics,
+        "outputs": outputs,
+        "output_sha256": {
+            key: file_sha256(run_dir / name) for key, name in outputs.items()
         },
     }
     path = run_dir / "run_manifest.json"

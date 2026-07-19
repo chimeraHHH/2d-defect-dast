@@ -1224,20 +1224,24 @@ def main() -> None:
             targets=calibration_metrics["targets"],
         )
     output_paths = {
-        "metrics": str(metrics_path),
-        "checkpoint": str(ckpt_path),
-        "validation_predictions": str(out_dir / "val_predictions.npz"),
-        "test_predictions": str(out_dir / "test_predictions.npz"),
+        "metrics": "metrics.json",
+        "checkpoint": "best.pt",
+        "split_indices": "split_indices.npz",
+        "validation_predictions": "val_predictions.npz",
+        "test_predictions": "test_predictions.npz",
     }
     if calibration_metrics is not None:
-        output_paths["calibration_predictions"] = str(
-            out_dir / "calibration_predictions.npz"
-        )
+        output_paths["calibration_predictions"] = "calibration_predictions.npz"
+    output_sha256 = {
+        key: file_sha256(out_dir / relative_path)
+        for key, relative_path in output_paths.items()
+    }
     run_manifest.update(
         {
             "status": "truncated" if args.max_steps else "complete",
             "completed_at": datetime.now(timezone.utc).isoformat(),
             "outputs": output_paths,
+            "output_sha256": output_sha256,
             "metrics": summary,
         }
     )
