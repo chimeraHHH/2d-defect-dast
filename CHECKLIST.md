@@ -18,9 +18,9 @@
 ## Experiments
 
 - [ ] Run 2^3 architecture factorial for seeds 42-46.
-- [ ] Rerun descriptor baselines on protocol v2 with validation-only tuning
+- [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
-- [ ] Hash the actual descriptor input file and all 27 metrics/prediction pairs
+- [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs
       on the result store.
 - [ ] Run SchNet comparator under the same split contract. (Implementation and
       configurations complete; runs await GPU capacity.)

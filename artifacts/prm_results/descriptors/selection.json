@@ -3,27 +3,27 @@
     "candidates": [
       {
         "family": "lightgbm",
-        "mean_validation_mae_eV": 0.6298162072805723,
+        "mean_validation_mae_eV": 0.5478046892353602,
         "n": 1
       },
       {
         "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 0.6660305014375592,
+        "mean_validation_mae_eV": 0.5720369330847043,
         "n": 1
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 0.7902055695770619,
+        "mean_validation_mae_eV": 0.69419757957394,
         "n": 1
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 1.4878634065051957,
+        "mean_validation_mae_eV": 1.4305364420744426,
         "n": 1
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.0443961592451765,
+        "mean_validation_mae_eV": 2.013688528995043,
         "n": 1
       }
     ],
@@ -33,90 +33,90 @@
   "dopant_cv": {
     "candidates": [
       {
-        "family": "lightgbm",
-        "mean_validation_mae_eV": 1.2005975418562005,
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 1.2383378297105243,
         "n": 5
       },
       {
-        "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 1.221314831963419,
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 1.2423726176663774,
         "n": 5
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 1.2516086155888637,
+        "mean_validation_mae_eV": 1.33395165464243,
         "n": 5
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 1.8271042648951532,
+        "mean_validation_mae_eV": 1.821050789167955,
         "n": 5
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.299330037052742,
+        "mean_validation_mae_eV": 2.3117860674626978,
         "n": 5
       }
     ],
-    "selected_family": "lightgbm",
+    "selected_family": "hist_gradient_boosting",
     "selection_data": "validation only"
   },
   "host_cv": {
     "candidates": [
       {
-        "family": "lightgbm",
-        "mean_validation_mae_eV": 1.2299816492125712,
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 1.1968318829081224,
         "n": 5
       },
       {
-        "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 1.230664654479473,
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 1.2074608791745483,
         "n": 5
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 1.2396829199032768,
+        "mean_validation_mae_eV": 1.2408844268625194,
         "n": 5
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 2.150991217585733,
+        "mean_validation_mae_eV": 2.087702603615802,
         "n": 5
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.311882291797398,
+        "mean_validation_mae_eV": 2.3202482204477457,
         "n": 5
       }
     ],
-    "selected_family": "lightgbm",
+    "selected_family": "hist_gradient_boosting",
     "selection_data": "validation only"
   },
   "id_cv": {
     "candidates": [
       {
         "family": "lightgbm",
-        "mean_validation_mae_eV": 0.6332638545183336,
+        "mean_validation_mae_eV": 0.6263364146941375,
         "n": 5
       },
       {
         "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 0.6451499088975521,
+        "mean_validation_mae_eV": 0.6403892955539279,
         "n": 5
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 0.7516457885965038,
+        "mean_validation_mae_eV": 0.7287382052984871,
         "n": 5
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 1.73806467281412,
+        "mean_validation_mae_eV": 1.72607059676203,
         "n": 5
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.296922193859364,
+        "mean_validation_mae_eV": 2.2986330168649745,
         "n": 5
       }
     ],
@@ -127,27 +127,27 @@
     "candidates": [
       {
         "family": "lightgbm",
-        "mean_validation_mae_eV": 0.5635007532988381,
+        "mean_validation_mae_eV": 0.5780924113336037,
         "n": 5
       },
       {
         "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 0.5766808950638638,
+        "mean_validation_mae_eV": 0.5956343861925288,
         "n": 5
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 0.6697800890394837,
+        "mean_validation_mae_eV": 0.6730316046640177,
         "n": 5
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 1.7398281926809254,
+        "mean_validation_mae_eV": 1.707513777852866,
         "n": 5
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.3095689263942902,
+        "mean_validation_mae_eV": 2.2884138988710694,
         "n": 5
       }
     ],
@@ -158,27 +158,27 @@
     "candidates": [
       {
         "family": "lightgbm",
-        "mean_validation_mae_eV": 0.7006076604107004,
+        "mean_validation_mae_eV": 0.6743579148705988,
         "n": 5
       },
       {
         "family": "hist_gradient_boosting",
-        "mean_validation_mae_eV": 0.7120295855578959,
+        "mean_validation_mae_eV": 0.688512537937714,
         "n": 5
       },
       {
         "family": "random_forest",
-        "mean_validation_mae_eV": 0.8305855627753932,
+        "mean_validation_mae_eV": 0.7997874849991785,
         "n": 5
       },
       {
         "family": "ridge",
-        "mean_validation_mae_eV": 1.7477625288429213,
+        "mean_validation_mae_eV": 1.7334914322123864,
         "n": 5
       },
       {
         "family": "mean",
-        "mean_validation_mae_eV": 2.2976196487230434,
+        "mean_validation_mae_eV": 2.2986139223167545,
         "n": 5
       }
     ],

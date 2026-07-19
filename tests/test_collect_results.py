@@ -10,6 +10,7 @@ from scripts.prm_collect_results import (
     regime_for_split,
     select_descriptor_families,
     validate_descriptor_root,
+    write_csv,
 )
 
 
@@ -104,3 +105,11 @@ def test_descriptor_root_requires_observed_data_and_artifact_hashes(tmp_path):
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="independently verified"):
         validate_descriptor_root(descriptor_root, protocol_dir)
+
+
+def test_write_csv_uses_lf_line_endings(tmp_path):
+    output = tmp_path / "metrics.csv"
+
+    write_csv(output, [{"split": "id_cv5_f0", "mae": 0.5}])
+
+    assert output.read_bytes() == b"split,mae\nid_cv5_f0,0.5\n"

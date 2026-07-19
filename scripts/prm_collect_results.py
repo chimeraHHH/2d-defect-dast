@@ -398,7 +398,12 @@ def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
     if not rows:
         return
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0]),
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 

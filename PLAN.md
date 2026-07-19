@@ -64,12 +64,13 @@ uncertainty identifies a useful selective-prediction domain.
 ## Current route
 
 The final 10,224-structure protocol v2, periodic SchNet implementation, result
-collectors, and manuscript protocol sections are complete. Descriptor values
-from protocol v1 are superseded because their sample set and site encoding no
-longer match protocol v2; all 27 formal descriptor splits must be rerun. The
-two DART initialization
+collectors, and manuscript protocol sections are complete. All 27 descriptor
+splits have been rerun from a clean commit and passed a second content-level
+validation plus artifact-hash collection. Validation selects LightGBM for the
+random, pair, and chemistry-block regimes and histogram gradient boosting for
+host- and dopant-held-out evaluation. The two DART initialization
 assets are pinned by SHA-256, and formal runs must record a fail-closed
 parameter-load report. When the remote host is reachable, descriptor
-baselines are regenerated first and the paired 2^3 factorial is restarted from
+the paired 2^3 factorial is restarted from
 the latest clean commit, followed by validation-only promotion, transfer,
 SchNet, ensemble UQ, and paper result generation.
