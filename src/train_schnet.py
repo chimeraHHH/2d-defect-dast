@@ -72,6 +72,34 @@ def evaluate(model, loader, normalizer, device) -> Dict[str, Any]:
     }
 
 
+def build_scheduler(
+    optimizer: torch.optim.Optimizer,
+    *,
+    epochs: int,
+    warmup_epochs: int,
+    eta_min: float,
+) -> torch.optim.lr_scheduler.LRScheduler:
+    """Build the shared linear-warmup/cosine schedule used by neural models."""
+    if warmup_epochs < 0 or warmup_epochs >= epochs:
+        raise ValueError("warmup_epochs must satisfy 0 <= warmup_epochs < epochs")
+    cosine = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=epochs - warmup_epochs, eta_min=eta_min
+    )
+    if warmup_epochs == 0:
+        return cosine
+    warmup = torch.optim.lr_scheduler.LinearLR(
+        optimizer,
+        start_factor=0.1,
+        end_factor=1.0,
+        total_iters=warmup_epochs,
+    )
+    return torch.optim.lr_scheduler.SequentialLR(
+        optimizer,
+        schedulers=[warmup, cosine],
+        milestones=[warmup_epochs],
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, type=Path)
@@ -170,8 +198,11 @@ def main() -> None:
         weight_decay=float(cfg.get("weight_decay", 1e-4)),
     )
     epochs = int(cfg.get("epochs", 150))
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=epochs, eta_min=float(cfg.get("eta_min", 1e-6))
+    scheduler = build_scheduler(
+        optimizer,
+        epochs=epochs,
+        warmup_epochs=int(cfg.get("warmup_epochs", 0)),
+        eta_min=float(cfg.get("eta_min", 1e-6)),
     )
 
     manifest = {
@@ -233,7 +264,9 @@ def main() -> None:
                 loss = torch.mean(torch.abs(prediction_norm - target_norm))
                 optimizer.zero_grad(set_to_none=True)
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+                torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), float(cfg.get("grad_clip", 5.0))
+                )
                 optimizer.step()
                 with torch.no_grad():
                     prediction = normalizer.denorm(prediction_norm)
@@ -254,7 +287,8 @@ def main() -> None:
             row = {
                 "epoch": epoch, "train_mae": train_error / max(n_seen, 1),
                 "val_mae": validation["mae"], "val_rmse": validation["rmse"],
-                "best": improved, "seconds": time.time() - epoch_start,
+                "best": improved, "lr": optimizer.param_groups[0]["lr"],
+                "seconds": time.time() - epoch_start,
             }
             history.append(row)
             line = (

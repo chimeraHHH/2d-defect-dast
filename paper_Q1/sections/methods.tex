@@ -132,24 +132,21 @@ binary variant code.  Test metrics are not part of the ordering rule.
 Networks are optimized for 150 epochs with AdamW, an initial learning rate of
 $5\times10^{-4}$, weight decay $10^{-4}$, a ten-epoch linear warmup, and
 cosine decay to $10^{-6}$.  The objective is mean absolute error (MAE), batch
-size is 64 for DART, and gradient norms are clipped at 5.  The fixed
-regularization recipe includes 0.1 dropout, stochastic depth with rate 0.1,
-Gaussian target noise with standard deviation 0.03~eV, and stochastic weight
-averaging from epoch 120~\cite{swa2018}.  Online geometric augmentation applies
-rotations,
-coordinate perturbations with standard deviation sampled from
-$[0.01,0.05]$~\AA, and up to 2\% strain.  A host-balanced sampler draws up to
-200 structures per host per epoch.  An auxiliary adsorbate/interstitial
-classification head is trained with weight 0.1 and discarded at inference.
-The input projection and compatible local-layer weights are initialized from
-the same frozen pretraining checkpoint for every factorial variant.
+size is 64 for DART, and gradient norms are clipped at 5.  Targets are
+standardized using training-partition statistics for optimization and
+transformed back to eV for all reported errors.  The fixed DART regularization
+recipe is limited to 0.1 dropout and additive Gaussian target noise with
+standard deviation 0.03~eV; no coordinate or strain augmentation is applied.
+A host-balanced sampler draws 200 structures per host per epoch.  The input
+projection and compatible local-layer weights are initialized from the same
+frozen pretraining checkpoint for every factorial variant.
 
 The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved
 configuration, command, Python/PyTorch/CUDA environment, data and split
 hashes, seed, partition indices, epoch history, checkpoint, and validation and
 test predictions.  Interrupted jobs resume from complete optimizer,
-scheduler, model, and stochastic-weight-averaging state.
+scheduler, and model state.
 
 %----------------------------------------------------------------------
 \subsection{Baselines}
@@ -169,11 +166,13 @@ reported regime is likewise chosen by mean validation MAE across folds.
 
 Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
 channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA cutoff.
-It follows the same 150-epoch optimization, host balancing, augmentation, and
-target-noise protocol as DART.  For grouped transfer and the chemistry block,
-both neural architectures use the same three prespecified model seeds; their
-predictions are averaged within each split before pooled out-of-fold metrics
-are calculated.
+It uses batch size 32 but otherwise follows the same target normalization,
+150-epoch AdamW schedule, host balancing, gradient clipping, and target-noise
+protocol as DART; it uses a conventional learned atomic-number embedding and
+no DART pretraining.  For grouped transfer and the chemistry block, each
+architecture uses three independently prespecified seeds (242--244 for DART
+and 342--344 for SchNet).  Predictions are averaged within each split before
+pooled out-of-fold metrics are calculated.
 
 %----------------------------------------------------------------------
 \subsection{Held-out uncertainty calibration and screening analysis}
