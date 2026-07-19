@@ -81,3 +81,59 @@ def test_partial_run_cannot_resume_across_commits(tmp_path):
     _write_run_manifest(tmp_path, config, status="running", commit="old")
     with pytest.raises(ValueError, match="refusing to resume"):
         prm_scheduler.existing_run_status(tmp_path, config, "new")
+
+
+def test_queue_terminal_status_distinguishes_failure_from_completion():
+    complete = [{"status": "complete", "attempts": 1}]
+    exhausted = [{"status": "failed", "attempts": 2}]
+    retryable = [{"status": "failed", "attempts": 1}]
+    assert prm_scheduler.queue_terminal_status(complete, 0, 2) == "complete"
+    assert prm_scheduler.queue_terminal_status(exhausted, 0, 2) == "failed"
+    assert prm_scheduler.queue_terminal_status(retryable, 0, 2) is None
+    assert prm_scheduler.queue_terminal_status(complete, 1, 2) is None
+
+
+def test_changed_config_paths_detects_runtime_edits(tmp_path, monkeypatch):
+    monkeypatch.setattr(prm_scheduler, "ROOT", tmp_path)
+    path = tmp_path / "config.yaml"
+    path.write_text(
+        "output_dir: factorial/g000/split42_seed142\n"
+        "split_path: artifacts/split.json\n"
+        "seed: 142\n"
+    )
+    record = prm_scheduler.config_record(path)
+    assert prm_scheduler.changed_config_paths([record]) == []
+    path.write_text(path.read_text() + "epochs: 151\n")
+    assert prm_scheduler.changed_config_paths([record]) == [str(path)]
+
+
+def test_terminate_running_reaps_process_and_closes_log():
+    class Process:
+        terminated = False
+
+        def poll(self):
+            return None
+
+        def terminate(self):
+            self.terminated = True
+
+        def wait(self, timeout):
+            assert timeout == 30
+            return -15
+
+    class Log:
+        closed = False
+
+        def close(self):
+            self.closed = True
+
+    process = Process()
+    log = Log()
+    record = {"status": "running"}
+    running = {0: {"process": process, "log_handle": log, "record": record}}
+    prm_scheduler.terminate_running(running)
+    assert running == {}
+    assert process.terminated is True
+    assert log.closed is True
+    assert record["status"] == "stopped"
+    assert record["return_code"] == -15

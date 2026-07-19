@@ -120,6 +120,65 @@ def config_record(path: Path) -> Dict[str, Any]:
     }
 
 
+def changed_config_paths(records: List[Dict[str, Any]]) -> List[str]:
+    changed = []
+    for record in records:
+        path = Path(record["config_path"])
+        try:
+            current = yaml.safe_load(path.read_text())
+            current_hash = config_sha256(current)
+        except (OSError, yaml.YAMLError, TypeError) as exc:
+            changed.append(f"{path}: {type(exc).__name__}")
+            continue
+        if current_hash != record["config_sha256"]:
+            changed.append(str(path))
+    return changed
+
+
+def queue_terminal_status(
+    records: List[Dict[str, Any]], running_count: int, max_attempts: int,
+) -> str | None:
+    if running_count:
+        return None
+    retryable = any(
+        record["status"] in ("pending", "failed")
+        and record["attempts"] < max_attempts
+        for record in records
+    )
+    if retryable:
+        return None
+    return "complete" if all(record["status"] == "complete" for record in records) else "failed"
+
+
+def state_counts(records: List[Dict[str, Any]]) -> Dict[str, int]:
+    return {
+        status: sum(record["status"] == status for record in records)
+        for status in ("pending", "running", "complete", "failed", "stopped")
+    }
+
+
+def terminate_running(running: Dict[int, Dict[str, Any]]) -> None:
+    for active in running.values():
+        if active["process"].poll() is None:
+            active["process"].terminate()
+    for gpu, active in list(running.items()):
+        process = active["process"]
+        try:
+            return_code = process.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            return_code = process.wait(timeout=10)
+        active["log_handle"].close()
+        active["record"].update(
+            {
+                "finished_at": utc_now(),
+                "return_code": return_code,
+                "status": "stopped",
+            }
+        )
+        del running[gpu]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--glob", default="configs/prm/generated/factorial/*.yaml")
@@ -206,6 +265,7 @@ def main() -> None:
     signal.signal(signal.SIGTERM, request_stop)
     signal.signal(signal.SIGINT, request_stop)
 
+    exit_error = None
     while True:
         for gpu, active in list(running.items()):
             return_code = active["process"].poll()
@@ -214,7 +274,12 @@ def main() -> None:
             active["log_handle"].close()
             record = active["record"]
             config = config_by_path[record["config_path"]]
-            complete = return_code == 0 and is_complete(result_root, config)
+            validation_error = None
+            try:
+                complete = return_code == 0 and is_complete(result_root, config)
+            except ValueError as exc:
+                complete = False
+                validation_error = str(exc)
             record.update(
                 {
                     "finished_at": utc_now(),
@@ -222,24 +287,53 @@ def main() -> None:
                     "status": "complete" if complete else "failed",
                 }
             )
+            if validation_error is not None:
+                record["validation_error"] = validation_error
             del running[gpu]
+
+        changed_configs = changed_config_paths(records)
+        if changed_configs:
+            state["status"] = "invalidated"
+            state["error"] = "controlled configurations changed while the queue was running"
+            state["changed_configs"] = changed_configs
+            terminate_running(running)
+            state["updated_at"] = utc_now()
+            state["running_gpus"] = []
+            state["counts"] = state_counts(records)
+            atomic_json(state_path, state)
+            exit_error = state["error"]
+            break
 
         if stop_requested:
             state["status"] = "stopping"
-            for active in running.values():
-                active["process"].terminate()
+            atomic_json(state_path, state)
+            terminate_running(running)
+            state["status"] = "stopped"
+            state["stopped_at"] = utc_now()
+            state["updated_at"] = utc_now()
+            state["running_gpus"] = []
+            state["counts"] = state_counts(records)
             atomic_json(state_path, state)
             break
 
-        pending = [
-            record for record in records
-            if record["status"] in ("pending", "failed")
-            and record["attempts"] < args.max_attempts
-        ]
-        if not pending and not running:
-            state["status"] = "complete"
-            state["completed_at"] = utc_now()
+        terminal_status = queue_terminal_status(
+            records, len(running), args.max_attempts
+        )
+        if terminal_status is not None:
+            state["status"] = terminal_status
+            timestamp_key = "completed_at" if terminal_status == "complete" else "failed_at"
+            state[timestamp_key] = utc_now()
             state["updated_at"] = utc_now()
+            state["counts"] = state_counts(records)
+            if terminal_status == "failed":
+                state["failed_jobs"] = [
+                    record["config_relative"]
+                    for record in records if record["status"] != "complete"
+                ]
+                exit_error = (
+                    f"scheduler {args.queue_id!r} exhausted retries for "
+                    f"{len(state['failed_jobs'])} job(s)"
+                )
             atomic_json(state_path, state)
             break
 
@@ -325,12 +419,12 @@ def main() -> None:
         state["updated_at"] = utc_now()
         state["gpu_status"] = observed
         state["running_gpus"] = sorted(running)
-        state["counts"] = {
-            status: sum(record["status"] == status for record in records)
-            for status in ("pending", "running", "complete", "failed")
-        }
+        state["counts"] = state_counts(records)
         atomic_json(state_path, state)
         time.sleep(args.poll_seconds)
+
+    if exit_error is not None:
+        raise SystemExit(exit_error)
 
 
 if __name__ == "__main__":
