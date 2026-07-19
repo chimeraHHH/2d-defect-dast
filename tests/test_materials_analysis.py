@@ -63,6 +63,20 @@ def test_site_selection_accepts_tied_true_minimum_and_requires_three_for_top2():
     assert sites[0]["true_best_in_predicted_top2"] == 1
 
 
+def test_tied_defect_type_minima_are_ineligible_for_binary_preference():
+    samples = [
+        row(0, "H1", "C", "adsorbate", "ads0", 0.0, 1.0),
+        row(1, "H1", "C", "interstitial", "int0", 5e-9, 0.0),
+    ]
+
+    pairs, _ = analyse_preferences(samples)
+
+    assert len(pairs) == 1
+    assert pairs[0]["true_preference"] == "tie"
+    assert pairs[0]["preference_eligible"] == 0
+    assert pairs[0]["preference_correct"] is None
+
+
 def test_materials_bootstrap_is_chunked_and_requires_multiple_units():
     result = bootstrap_mean([0.0, 1.0, 2.0, 3.0], seed=1, draws=513)
 

@@ -7,6 +7,24 @@ import numpy as np
 from scipy.stats import spearmanr
 
 
+def finite_spearman(
+    left: Sequence[float], right: Sequence[float], *, context: str
+) -> float:
+    """Return a rank correlation only when it is a finite statistic."""
+    x = np.asarray(left, dtype=float)
+    y = np.asarray(right, dtype=float)
+    if x.shape != y.shape or x.ndim != 1 or len(x) < 2:
+        raise ValueError(f"{context} requires aligned vectors with at least two values")
+    if not np.isfinite(x).all() or not np.isfinite(y).all():
+        raise ValueError(f"{context} contains non-finite values")
+    if len(np.unique(x)) < 2 or len(np.unique(y)) < 2:
+        raise ValueError(f"{context} is undefined for constant ranked values")
+    statistic = float(spearmanr(x, y).statistic)
+    if not np.isfinite(statistic):
+        raise ValueError(f"{context} is undefined for constant ranked values")
+    return statistic
+
+
 def regression_metrics(
     targets: Sequence[float], predictions: Sequence[float]
 ) -> Dict[str, float]:

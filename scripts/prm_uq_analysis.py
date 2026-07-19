@@ -14,8 +14,8 @@ from typing import Any, Dict, List, Mapping, Sequence, Tuple
 import numpy as np
 from scipy.optimize import minimize
 from scipy.special import ndtr
-from scipy.stats import spearmanr
 
+from src.prm_metrics import finite_spearman
 from src.prm_provenance import (
     ExpectedConfig,
     archive_training_artifacts,
@@ -31,6 +31,10 @@ from src.prm_provenance import (
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
+
+
+def strict_json(payload: Any) -> str:
+    return json.dumps(payload, indent=2, sort_keys=True, allow_nan=False)
 
 
 def file_sha256(path: Path) -> str:
@@ -69,6 +73,18 @@ def load_aligned_predictions(
             indices = np.asarray(archive["indices"], dtype=np.int64)
             targets = np.asarray(archive["targets"])
             predictions = np.asarray(archive["preds"], dtype=float)
+        if (
+            indices.ndim != 1
+            or targets.ndim != 1
+            or predictions.ndim != 1
+            or len(indices) == 0
+            or len(indices) != len(targets)
+            or len(indices) != len(predictions)
+            or len(np.unique(indices)) != len(indices)
+        ):
+            raise ValueError(f"unaligned prediction vectors: {path}")
+        if not np.isfinite(targets).all() or not np.isfinite(predictions).all():
+            raise ValueError(f"non-finite prediction values: {path}")
         order = np.argsort(indices)
         indices, targets, predictions = indices[order], targets[order], predictions[order]
         if reference_indices is None:
@@ -94,20 +110,65 @@ def calibration_subsets(indices: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 
 
 def calibrated_sigma(raw_std: np.ndarray, scale: float, floor: float) -> np.ndarray:
-    return np.sqrt(np.square(scale * np.asarray(raw_std, dtype=float)) + floor ** 2)
+    raw_std = np.asarray(raw_std, dtype=float)
+    if (
+        raw_std.ndim != 1
+        or not np.isfinite(raw_std).all()
+        or np.any(raw_std < 0.0)
+        or not math.isfinite(scale)
+        or not math.isfinite(floor)
+        or scale < 0.0
+        or floor <= 0.0
+    ):
+        raise ValueError("variance calibration parameters must be finite and admissible")
+    return np.sqrt(np.square(scale * raw_std) + floor ** 2)
 
 
 def gaussian_nll(targets: np.ndarray, mean: np.ndarray, sigma: np.ndarray) -> float:
-    sigma = np.maximum(np.asarray(sigma, dtype=float), 1e-12)
-    residual = np.asarray(targets, dtype=float) - np.asarray(mean, dtype=float)
-    return float(np.mean(0.5 * np.log(2.0 * np.pi * sigma ** 2) + 0.5 * (residual / sigma) ** 2))
+    targets = np.asarray(targets, dtype=float)
+    mean = np.asarray(mean, dtype=float)
+    sigma = np.asarray(sigma, dtype=float)
+    if (
+        targets.shape != mean.shape
+        or targets.shape != sigma.shape
+        or targets.ndim != 1
+        or len(targets) == 0
+        or not np.isfinite(targets).all()
+        or not np.isfinite(mean).all()
+        or not np.isfinite(sigma).all()
+        or np.any(sigma <= 0.0)
+    ):
+        raise ValueError("Gaussian NLL requires finite aligned vectors and positive sigma")
+    residual = targets - mean
+    value = float(
+        np.mean(
+            0.5 * np.log(2.0 * np.pi * sigma ** 2)
+            + 0.5 * (residual / sigma) ** 2
+        )
+    )
+    if not math.isfinite(value):
+        raise ValueError("Gaussian NLL is non-finite")
+    return value
 
 
 def fit_variance_calibration(
     targets: np.ndarray, mean: np.ndarray, raw_std: np.ndarray,
 ) -> Dict[str, Any]:
-    residual = np.asarray(targets, dtype=float) - np.asarray(mean, dtype=float)
+    targets = np.asarray(targets, dtype=float)
+    mean = np.asarray(mean, dtype=float)
     raw_std = np.asarray(raw_std, dtype=float)
+    if (
+        targets.shape != mean.shape
+        or targets.shape != raw_std.shape
+        or targets.ndim != 1
+        or len(targets) == 0
+        or not np.isfinite(targets).all()
+        or not np.isfinite(mean).all()
+        or not np.isfinite(raw_std).all()
+        or np.any(raw_std < 0.0)
+    ):
+        raise ValueError("variance calibration requires finite aligned vectors")
+    residual = targets - mean
     residual_scale = max(float(np.sqrt(np.mean(residual ** 2))), 1e-4)
 
     def objective(parameters: np.ndarray) -> float:
@@ -120,7 +181,7 @@ def fit_variance_calibration(
         method="L-BFGS-B",
         bounds=[(-8.0, 8.0), (math.log(1e-5), math.log(20.0 * residual_scale))],
     )
-    if not result.success:
+    if not result.success or not math.isfinite(float(result.fun)):
         raise RuntimeError(f"variance calibration failed: {result.message}")
     scale, floor = np.exp(result.x)
     return {
@@ -135,34 +196,77 @@ def conformal_quantile(scores: np.ndarray, coverage: float) -> float:
     if not 0.0 < coverage < 1.0:
         raise ValueError("coverage must be between zero and one")
     scores = np.sort(np.asarray(scores, dtype=float))
+    if scores.ndim != 1 or len(scores) == 0 or not np.isfinite(scores).all():
+        raise ValueError("conformal scores must be a non-empty finite vector")
     rank = min(len(scores), int(math.ceil((len(scores) + 1) * coverage)))
     return float(scores[rank - 1])
 
 
 def gaussian_crps(targets: np.ndarray, mean: np.ndarray, sigma: np.ndarray) -> np.ndarray:
-    sigma = np.maximum(np.asarray(sigma, dtype=float), 1e-12)
-    z = (np.asarray(targets, dtype=float) - np.asarray(mean, dtype=float)) / sigma
+    targets = np.asarray(targets, dtype=float)
+    mean = np.asarray(mean, dtype=float)
+    sigma = np.asarray(sigma, dtype=float)
+    if (
+        targets.shape != mean.shape
+        or targets.shape != sigma.shape
+        or targets.ndim != 1
+        or len(targets) == 0
+        or not np.isfinite(targets).all()
+        or not np.isfinite(mean).all()
+        or not np.isfinite(sigma).all()
+        or np.any(sigma <= 0.0)
+    ):
+        raise ValueError("Gaussian CRPS requires finite aligned vectors and positive sigma")
+    z = (targets - mean) / sigma
     phi = np.exp(-0.5 * z ** 2) / math.sqrt(2.0 * math.pi)
     return sigma * (z * (2.0 * ndtr(z) - 1.0) + 2.0 * phi - 1.0 / math.sqrt(math.pi))
 
 
 def regression_metrics(targets: np.ndarray, predictions: np.ndarray) -> Dict[str, float]:
-    residual = np.asarray(predictions, dtype=float) - np.asarray(targets, dtype=float)
+    targets = np.asarray(targets, dtype=float)
+    predictions = np.asarray(predictions, dtype=float)
+    if (
+        targets.shape != predictions.shape
+        or targets.ndim != 1
+        or len(targets) < 2
+        or not np.isfinite(targets).all()
+        or not np.isfinite(predictions).all()
+    ):
+        raise ValueError("regression metrics require finite aligned vectors")
+    residual = predictions - targets
     denominator = float(np.sum((targets - np.mean(targets)) ** 2))
+    if denominator <= 0.0:
+        raise ValueError("regression metrics require non-constant targets")
     return {
         "mae": float(np.mean(np.abs(residual))),
         "rmse": float(np.sqrt(np.mean(residual ** 2))),
         "bias": float(np.mean(residual)),
         "r2": float(1.0 - np.sum(residual ** 2) / denominator),
-        "spearman": float(spearmanr(targets, predictions).statistic),
+        "spearman": finite_spearman(
+            targets, predictions, context="point-prediction Spearman correlation"
+        ),
     }
 
 
 def risk_coverage(
     targets: np.ndarray, predictions: np.ndarray, uncertainty: np.ndarray,
 ) -> Tuple[Dict[str, Any], List[Dict[str, float]]]:
-    error = np.abs(np.asarray(predictions) - np.asarray(targets))
-    order = np.argsort(np.asarray(uncertainty), kind="stable")
+    targets = np.asarray(targets, dtype=float)
+    predictions = np.asarray(predictions, dtype=float)
+    uncertainty = np.asarray(uncertainty, dtype=float)
+    if (
+        targets.shape != predictions.shape
+        or targets.shape != uncertainty.shape
+        or targets.ndim != 1
+        or len(targets) == 0
+        or not np.isfinite(targets).all()
+        or not np.isfinite(predictions).all()
+        or not np.isfinite(uncertainty).all()
+        or np.any(uncertainty < 0.0)
+    ):
+        raise ValueError("risk coverage requires finite aligned vectors")
+    error = np.abs(predictions - targets)
+    order = np.argsort(uncertainty, kind="stable")
     sorted_error = error[order]
     coverage = np.arange(1, len(error) + 1, dtype=float) / len(error)
     risk = np.cumsum(sorted_error) / np.arange(1, len(error) + 1)
@@ -367,8 +471,10 @@ def main() -> None:
 
     test_crps = gaussian_crps(test_targets, test_mean, test_sigma)
     point_metrics = regression_metrics(test_targets, test_mean)
-    uncertainty_error_spearman = float(
-        spearmanr(test_sigma, np.abs(test_targets - test_mean)).statistic
+    uncertainty_error_spearman = finite_spearman(
+        test_sigma,
+        np.abs(test_targets - test_mean),
+        context="uncertainty-error Spearman correlation",
     )
     risk_metrics, risk_rows = risk_coverage(
         test_targets, test_mean, test_sigma,
@@ -409,6 +515,7 @@ def main() -> None:
             "selective_prediction": risk_metrics,
         },
     }
+    strict_json(metrics)
 
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -461,8 +568,8 @@ def main() -> None:
             "risk_coverage": "risk_coverage.csv",
         }.items()
     }
-    (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(metrics["test"], indent=2, sort_keys=True))
+    (out_dir / "metrics.json").write_text(strict_json(metrics) + "\n")
+    print(strict_json(metrics["test"]))
 
 
 if __name__ == "__main__":

@@ -229,6 +229,7 @@ pair we compare the minimum predicted and reference energies of adsorbate and
 interstitial configurations, identify the predicted lowest-energy site, and
 report preference accuracy and screening regret.  Exact-site metrics require at
 least two candidate sites, whereas top-two accuracy requires at least three;
-reference minima within $10^{-8}$~eV are treated as tied.  These are predictive
-associations within IMP2D, not causal mechanism assignments or external DFT
-validation.
+reference minima within $10^{-8}$~eV are treated as tied, and tied
+adsorbate--interstitial pairs are excluded from binary preference accuracy.
+These are predictive associations within IMP2D, not causal mechanism
+assignments or external DFT validation.

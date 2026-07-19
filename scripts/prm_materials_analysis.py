@@ -14,8 +14,8 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 import numpy as np
 from ase.data import atomic_numbers
-from scipy.stats import spearmanr
 
+from src.prm_metrics import finite_spearman
 from src.prm_provenance import (
     ExpectedConfig,
     load_verified_factorial_selection,
@@ -31,6 +31,10 @@ from src.prm_provenance import (
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
 ENERGY_TIE_TOLERANCE_EV = 1e-8
+
+
+def strict_json(payload: Any) -> str:
+    return json.dumps(payload, indent=2, sort_keys=True, allow_nan=False)
 
 
 def file_sha256(path: Path) -> str:
@@ -172,6 +176,10 @@ def bootstrap_mean(
     array = np.asarray(values, dtype=float)
     if len(array) < 2:
         raise ValueError("bootstrap mean requires at least two decision units")
+    if array.ndim != 1 or not np.isfinite(array).all():
+        raise ValueError("bootstrap mean requires a finite one-dimensional sample")
+    if draws < 1:
+        raise ValueError("bootstrap mean requires at least one draw")
     rng = np.random.default_rng(seed)
     chunks = []
     for start in range(0, draws, 256):
@@ -267,7 +275,12 @@ def analyse_preferences(
             predicted_min["interstitial"]["prediction_eV"]
             - predicted_min["adsorbate"]["prediction_eV"]
         )
-        true_preference = "adsorbate" if true_margin >= 0 else "interstitial"
+        preference_eligible = abs(true_margin) > ENERGY_TIE_TOLERANCE_EV
+        true_preference = (
+            "adsorbate" if true_margin > ENERGY_TIE_TOLERANCE_EV
+            else "interstitial" if true_margin < -ENERGY_TIE_TOLERANCE_EV
+            else "tie"
+        )
         predicted_preference = "adsorbate" if predicted_margin >= 0 else "interstitial"
         true_global = min(members, key=lambda row: (row["target_eV"], row["sample_index"]))
         true_global_indices = {
@@ -285,7 +298,11 @@ def analyse_preferences(
                 "dopant_period": dopant_period(dopant), "n_sites": len(members),
                 "true_preference": true_preference,
                 "predicted_preference": predicted_preference,
-                "preference_correct": int(true_preference == predicted_preference),
+                "preference_eligible": int(preference_eligible),
+                "preference_correct": (
+                    int(true_preference == predicted_preference)
+                    if preference_eligible else None
+                ),
                 "true_margin_eV": float(true_margin),
                 "predicted_margin_eV": float(predicted_margin),
                 "margin_absolute_error_eV": float(abs(predicted_margin - true_margin)),
@@ -369,7 +386,8 @@ def main() -> None:
         sample_rows.append(row)
 
     pair_rows, site_rows = analyse_preferences(sample_rows)
-    preference_correct = [row["preference_correct"] for row in pair_rows]
+    preference_rows = [row for row in pair_rows if row["preference_eligible"]]
+    preference_correct = [row["preference_correct"] for row in preference_rows]
     margin_errors = [row["margin_absolute_error_eV"] for row in pair_rows]
     global_regret = [row["global_screening_regret_eV"] for row in pair_rows]
     exact_site = [row["exact_site_correct"] for row in site_rows]
@@ -396,13 +414,18 @@ def main() -> None:
             "bias_eV": float(np.mean(residual)),
         },
         "defect_type_preference": {
+            "eligibility": {
+                "binary_accuracy": "non-tied reference adsorbate/interstitial minima",
+                "true_energy_tie_tolerance_eV": ENERGY_TIE_TOLERANCE_EV,
+                "n_pairs_with_both_defect_types": len(pair_rows),
+                "n_binary_eligible_pairs": len(preference_rows),
+            },
             "accuracy": bootstrap_mean(preference_correct, seed=20263001),
             "margin_mae_eV": bootstrap_mean(margin_errors, seed=20263002),
-            "margin_spearman": float(
-                spearmanr(
-                    [row["true_margin_eV"] for row in pair_rows],
-                    [row["predicted_margin_eV"] for row in pair_rows],
-                ).statistic
+            "margin_spearman": finite_spearman(
+                [row["true_margin_eV"] for row in pair_rows],
+                [row["predicted_margin_eV"] for row in pair_rows],
+                context="adsorbate-interstitial margin Spearman correlation",
             ),
             "global_screening_regret_eV": bootstrap_mean(global_regret, seed=20263003),
             "global_exact_site_accuracy": bootstrap_mean(
@@ -429,6 +452,7 @@ def main() -> None:
             "they are not causal mechanisms or external DFT validation."
         ),
     }
+    strict_json(summary)
 
     group_rows = []
     for axis in ("host", "dopant", "defecttype", "site"):
@@ -448,8 +472,8 @@ def main() -> None:
             "group_errors": "group_errors.csv",
         }.items()
     }
-    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(summary, indent=2, sort_keys=True))
+    (out_dir / "summary.json").write_text(strict_json(summary) + "\n")
+    print(strict_json(summary))
 
 
 if __name__ == "__main__":

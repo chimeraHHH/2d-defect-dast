@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from src.prm_metrics import (
+    finite_spearman,
     low_energy_metrics,
     macro_group_mae,
     paired_bootstrap_delta,
     regression_metrics,
 )
+
+
+def test_finite_spearman_rejects_undefined_or_nonfinite_statistics():
+    with pytest.raises(ValueError, match="constant ranked values"):
+        finite_spearman([1.0, 2.0], [3.0, 3.0], context="test correlation")
+    with pytest.raises(ValueError, match="non-finite"):
+        finite_spearman([1.0, np.nan], [2.0, 3.0], context="test correlation")
 
 
 def test_regression_metrics_exact_prediction():

@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from scripts.prm_uq_analysis import (
     calibration_subsets,
@@ -36,6 +37,20 @@ def test_prediction_members_align_by_sample_index(tmp_path):
     assert members.tolist() == [[9.0, 19.0], [11.0, 21.0]]
 
 
+def test_prediction_loader_rejects_nonfinite_member_values(tmp_path):
+    run = tmp_path / "seed1"
+    run.mkdir()
+    np.savez(
+        run / "test_predictions.npz",
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"), split_id=np.asarray("uq_calibration_s62"),
+        indices=np.asarray([1, 2]), targets=np.asarray([1.0, 2.0]),
+        preds=np.asarray([1.0, np.nan]),
+    )
+    with pytest.raises(ValueError, match="non-finite prediction"):
+        load_aligned_predictions([run], "test")
+
+
 def test_calibration_halves_are_label_independent_and_disjoint():
     indices = np.asarray([8, 2, 6, 4, 0, 10])
     variance, conformal = calibration_subsets(indices)
@@ -47,6 +62,13 @@ def test_calibration_halves_are_label_independent_and_disjoint():
 def test_finite_sample_conformal_quantile_uses_higher_rank():
     scores = np.arange(1.0, 11.0)
     assert conformal_quantile(scores, 0.8) == 9.0
+
+
+def test_conformal_quantile_rejects_empty_or_nonfinite_scores():
+    with pytest.raises(ValueError, match="non-empty finite"):
+        conformal_quantile(np.asarray([]), 0.8)
+    with pytest.raises(ValueError, match="non-empty finite"):
+        conformal_quantile(np.asarray([1.0, np.nan]), 0.8)
 
 
 def test_risk_coverage_recovers_oracle_when_uncertainty_orders_error():
