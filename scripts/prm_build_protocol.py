@@ -149,7 +149,7 @@ def write_sample_table(
         "dopant_candidate_count", "canonical_retained", "exclusion_reasons",
     ]
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for index, sample in enumerate(samples):
             meta = sample.get("metadata", {})
