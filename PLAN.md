@@ -65,20 +65,22 @@ uncertainty identifies a useful selective-prediction domain.
 
 The final 10,224-structure protocol v2, periodic SchNet implementation, result
 collectors, and manuscript protocol sections are complete. All 27 descriptor
-splits have been rerun from a clean commit and passed a second content-level
-validation plus artifact-hash collection. Validation selects LightGBM for the
-random, pair, and chemistry-block regimes and histogram gradient boosting for
-host- and dopant-held-out evaluation. The two DART initialization
-assets are pinned by SHA-256, and formal runs must record a fail-closed
-parameter-load report. On WHUServer-L40S, clean training commit `af6eeec`
-passed bounded protocol-v2 DART and SchNet CPU smoke runs. All 9,871,460 stored
-periodic graph edges were independently reconstructed without topology or
-cutoff violations. GitHub code commit `38f8a2b` passes all 126 tests in an
-isolated remote checkout. UQ and materials collectors now reject non-finite
-inputs, undefined rank statistics, non-standard JSON numbers, and trivial or
-tied decision sets where the corresponding accuracy is not defined. The stale
-protocol-v1 queue was stopped before it launched any jobs. The systemd-managed
-`factorial-v2` queue now waits for the declared GPU idle thresholds, with all 40
-paired runs pending and no failures. After completion, the route is
-validation-only promotion, transfer, SchNet, ensemble UQ, and paper result
-generation.
+splits have been rerun from a clean commit and passed content-level validation,
+artifact-hash collection, and a strict-JSON normalization in which undefined
+constant-baseline correlations are represented as `null`. The verified 55-file
+descriptor archive is mirrored byte-for-byte to the formal result store.
+Validation selects LightGBM for the random, pair, and chemistry-block regimes
+and histogram gradient boosting for host- and dopant-held-out evaluation. The
+two DART initialization assets are pinned by SHA-256, and formal runs must record
+a fail-closed parameter-load report. On WHUServer-L40S, clean training commit
+`af6eeec` passed bounded protocol-v2 DART and SchNet CPU smoke runs. All
+9,871,460 stored periodic graph edges were independently reconstructed without
+topology or cutoff violations. GitHub code and evidence commit `866fcd4` passes
+all 133 tests in an isolated remote checkout. UQ and materials collectors reject
+non-finite inputs, undefined rank statistics, non-standard JSON numbers, and
+trivial or tied decision sets where the corresponding accuracy is not defined.
+The stale protocol-v1 queue was stopped before it launched any jobs. The
+systemd-managed `factorial-v2` queue waits for the declared GPU idle thresholds;
+the latest audit found all 40 paired runs pending, no attempts consumed, and no
+failures. After completion, the route is validation-only promotion, transfer,
+SchNet, ensemble UQ, and paper result generation.

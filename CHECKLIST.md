@@ -13,7 +13,7 @@
 - [x] Add run manifest and canonical prediction schema.
 - [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
       the exact copied versus seeded parameter sets in every DART run.
-- [x] Pass 126 remote unit tests from clean GitHub commit `38f8a2b` in an
+- [x] Pass 133 remote unit tests from clean GitHub commit `866fcd4` in an
       isolated verification checkout.
 - [x] Complete bounded protocol-v2 DART and periodic-SchNet CPU smoke runs
       from clean training commit `af6eeec`.
@@ -27,8 +27,9 @@
       GPUs to satisfy the declared idle thresholds.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
-- [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs
-      on the result store.
+- [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,
+      encode undefined constant-baseline correlations as strict-JSON `null`, and
+      mirror the verified 55-file archive to the formal result store.
 - [ ] Run SchNet comparator under the same split contract. (Implementation,
       configurations, periodic-edge audit, and bounded smoke run complete;
       formal runs await GPU capacity.)
