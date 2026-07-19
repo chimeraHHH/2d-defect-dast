@@ -26,6 +26,14 @@ def test_regression_metrics_exact_prediction():
     assert metrics["r2"] == 1
 
 
+def test_regression_metrics_encode_constant_prediction_correlations_as_null():
+    metrics = regression_metrics([0.0, 1.0, 2.0], [4.0, 4.0, 4.0])
+
+    assert metrics["pearson"] is None
+    assert metrics["spearman"] is None
+    assert metrics["r2"] is not None
+
+
 def test_macro_group_mae_weights_groups_equally():
     metrics = macro_group_mae([0, 0, 0], [1, 1, 3], ["large", "large", "small"])
     assert metrics["macro_mae"] == 2

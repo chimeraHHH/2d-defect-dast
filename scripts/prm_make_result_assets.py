@@ -207,8 +207,9 @@ def validate_contract(
     return selected_variant
 
 
-def float_value(row: Mapping[str, Any], key: str) -> float:
-    return float(row[key])
+def nullable_float(row: Mapping[str, Any], key: str) -> float | None:
+    value = row[key]
+    return None if value in (None, "") else float(value)
 
 
 def find_row(
@@ -360,7 +361,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
         for model in ("dart", "schnet", descriptor_model, "descriptor:mean"):
             row = find_row(pooled, regime=regime, model=model)
             models[model] = {
-                key: float(row[key])
+                key: nullable_float(row, key)
                 for key in (
                     "mae", "rmse", "bias", "spearman", "r2",
                     "host_macro_mae", "dopant_macro_mae", "favorable_mae",

@@ -435,6 +435,22 @@ def validate_descriptor_evidence_bundle(
         descriptor_manifest_record.get("training_git")
         if isinstance(descriptor_manifest_record, Mapping) else None
     )
+    metric_encoding = (
+        descriptor_manifest_record.get("metric_encoding")
+        if isinstance(descriptor_manifest_record, Mapping) else None
+    )
+    normalizer_git = (
+        metric_encoding.get("normalizer_git")
+        if isinstance(metric_encoding, Mapping) else None
+    )
+    if (
+        not isinstance(metric_encoding, Mapping)
+        or metric_encoding.get("schema_version") != "prm_nullable_correlations_v1"
+        or not isinstance(normalizer_git, Mapping)
+        or not normalizer_git.get("commit")
+        or normalizer_git.get("dirty")
+    ):
+        raise ValueError("descriptor metric normalization provenance is inadmissible")
     for label, git in (
         ("collector", bundle.get("collector_git")),
         ("training", descriptor_training_git),

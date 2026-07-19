@@ -64,8 +64,19 @@ def validate_descriptor_manifest(
         raise ValueError("descriptor input file hash was not independently verified")
     if manifest.get("protocol_manifest_sha256") != protocol_manifest_sha256:
         raise ValueError("descriptor protocol manifest hash mismatch")
-    if manifest.get("git", {}).get("dirty"):
-        raise ValueError("final descriptor batch was produced from a dirty worktree")
+    if (
+        not manifest.get("git", {}).get("commit")
+        or manifest.get("git", {}).get("dirty")
+    ):
+        raise ValueError("final descriptor batch Git provenance is inadmissible")
+    encoding = manifest.get("metric_encoding", {})
+    normalizer_git = encoding.get("normalizer_git", {})
+    if (
+        encoding.get("schema_version") != "prm_nullable_correlations_v1"
+        or not normalizer_git.get("commit")
+        or normalizer_git.get("dirty")
+    ):
+        raise ValueError("descriptor nullable-metric normalization is inadmissible")
     artifacts = manifest.get("split_artifacts", {})
     if set(artifacts) != set(manifest.get("splits", [])) or len(artifacts) != 27:
         raise ValueError("descriptor split artifact hashes are incomplete")
@@ -173,6 +184,8 @@ def main() -> None:
         or row["model"] == f"descriptor:{selection[row['regime']]['selected_family']}"
     ]
     collector_git = git_snapshot()
+    if not collector_git["commit"] or collector_git["dirty"]:
+        raise ValueError("descriptor collection requires a clean Git commit")
 
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -180,7 +193,7 @@ def main() -> None:
     write_csv(out_dir / "summary.csv", summary_rows)
     write_csv(out_dir / "selected_summary.csv", selected_rows)
     (out_dir / "selection.json").write_text(
-        json.dumps(selection, indent=2, sort_keys=True) + "\n"
+        json.dumps(selection, indent=2, sort_keys=True, allow_nan=False) + "\n"
     )
 
     archive = archive_descriptor_artifacts(
@@ -201,6 +214,7 @@ def main() -> None:
         "descriptor_manifest": {
             **archive["manifest"],
             "training_git": descriptor_manifest["git"],
+            "metric_encoding": descriptor_manifest["metric_encoding"],
         },
         "selection_data": "validation only",
         "expected_split_counts": EXPECTED_PAPER_SPLITS,
@@ -212,9 +226,9 @@ def main() -> None:
         "archived_runs": archive["runs"],
     }
     (out_dir / "manifest.json").write_text(
-        json.dumps(bundle, indent=2, sort_keys=True) + "\n"
+        json.dumps(bundle, indent=2, sort_keys=True, allow_nan=False) + "\n"
     )
-    print(json.dumps(selection, indent=2, sort_keys=True))
+    print(json.dumps(selection, indent=2, sort_keys=True, allow_nan=False))
 
 
 if __name__ == "__main__":

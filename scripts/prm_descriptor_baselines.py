@@ -295,7 +295,9 @@ def evaluate_split(
         "selection_data": "validation only",
         "results": results,
     }
-    (output_dir / "metrics.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    (output_dir / "metrics.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    )
     return payload
 
 
@@ -309,9 +311,13 @@ def _metric_blocks_match(
             if int(recorded[key]) != int(recomputed[key]):
                 return False
             continue
-        left, right = float(recorded[key]), float(recomputed[key])
-        if math.isnan(left) and math.isnan(right):
+        if recorded[key] is None or recomputed[key] is None:
+            if recorded[key] is not None or recomputed[key] is not None:
+                return False
             continue
+        left, right = float(recorded[key]), float(recomputed[key])
+        if not math.isfinite(left) or not math.isfinite(right):
+            return False
         if not math.isclose(left, right, rel_tol=1e-7, abs_tol=1e-8):
             return False
     return True
@@ -456,7 +462,9 @@ def ensure_mean_baseline(
     np.savez_compressed(temporary_predictions, **arrays)
     temporary_predictions.replace(predictions_path)
     temporary_metrics = metrics_path.with_suffix(".tmp.json")
-    temporary_metrics.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    temporary_metrics.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    )
     temporary_metrics.replace(metrics_path)
     return True
 
@@ -663,8 +671,10 @@ def main() -> None:
         "batches": batches,
         "wall_seconds": batch["wall_seconds"],
     }
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(manifest, indent=2))
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    )
+    print(json.dumps(manifest, indent=2, allow_nan=False))
 
 
 if __name__ == "__main__":

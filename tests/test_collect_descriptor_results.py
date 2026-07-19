@@ -24,6 +24,10 @@ def valid_manifest():
         "data_file_sha256": DATA_SHA,
         "protocol_manifest_sha256": PROTOCOL_SHA,
         "git": {"dirty": False, "commit": "abc"},
+        "metric_encoding": {
+            "schema_version": "prm_nullable_correlations_v1",
+            "normalizer_git": {"dirty": False, "commit": "normalizer"},
+        },
         "splits": splits,
         "split_artifacts": {split: {} for split in splits},
     }

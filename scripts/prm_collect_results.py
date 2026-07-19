@@ -13,9 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 import numpy as np
-from scipy.stats import spearmanr
 
-from src.prm_metrics import low_energy_metrics, macro_group_mae
+from src.prm_metrics import finite_spearman, low_energy_metrics, macro_group_mae
 from src.prm_provenance import (
     ExpectedConfig,
     archive_training_artifacts,
@@ -101,8 +100,19 @@ def validate_descriptor_root(descriptor_root: Path, protocol_dir: Path) -> None:
         raise ValueError("descriptor input file hash was not independently verified")
     if manifest.get("protocol_manifest_sha256") != file_sha256(protocol_path):
         raise ValueError("descriptor protocol manifest hash mismatch")
-    if manifest.get("git", {}).get("dirty"):
-        raise ValueError("descriptor baseline batch came from a dirty worktree")
+    if (
+        not manifest.get("git", {}).get("commit")
+        or manifest.get("git", {}).get("dirty")
+    ):
+        raise ValueError("descriptor baseline Git provenance is inadmissible")
+    encoding = manifest.get("metric_encoding", {})
+    normalizer_git = encoding.get("normalizer_git", {})
+    if (
+        encoding.get("schema_version") != "prm_nullable_correlations_v1"
+        or not normalizer_git.get("commit")
+        or normalizer_git.get("dirty")
+    ):
+        raise ValueError("descriptor nullable-metric normalization is inadmissible")
 
     expected_splits = {
         path.stem for path in (protocol_dir / "splits").glob("*.json")
@@ -185,7 +195,10 @@ def load_descriptor_runs(
             }
             for partition in ("validation", "test"):
                 for metric in SCALAR_METRICS:
-                    row[f"{partition}_{metric}"] = float(result[partition][metric])
+                    value = result[partition][metric]
+                    row[f"{partition}_{metric}"] = (
+                        None if value is None else float(value)
+                    )
             rows.append(row)
     return rows
 
@@ -261,6 +274,8 @@ def select_descriptor_families(rows: Sequence[Mapping[str, Any]]) -> Dict[str, A
                 if row["regime"] == regime and row["family"] == family
                 and str(row["model"]).startswith("descriptor:")
             ]
+            if not values or not np.isfinite(values).all():
+                raise ValueError(f"invalid descriptor validation MAE for {regime}/{family}")
             candidates.append(
                 {"family": family, "mean_validation_mae_eV": float(np.mean(values)), "n": len(values)}
             )
@@ -284,23 +299,45 @@ def aggregate_fold_rows(rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any
         }
         for partition in ("validation", "test"):
             for metric in SCALAR_METRICS:
-                output[f"{partition}_{metric}"] = float(
-                    np.mean([member[f"{partition}_{metric}"] for member in members])
+                values = [member[f"{partition}_{metric}"] for member in members]
+                output[f"{partition}_{metric}"] = (
+                    None if any(value is None for value in values)
+                    else float(np.mean(values))
                 )
         outputs.append(output)
     return outputs
 
 
-def bootstrap_ci(values: Sequence[float], seed: int, draws: int = 50_000) -> Dict[str, float]:
+def bootstrap_ci(
+    values: Sequence[float | None], seed: int, draws: int = 50_000,
+) -> Dict[str, Any]:
+    if not values:
+        raise ValueError("fold summary requires at least one value")
+    if any(value is None for value in values):
+        n_defined = sum(value is not None for value in values)
+        return {
+            "mean": None, "std": None, "ci_low": None, "ci_high": None,
+            "n": len(values), "n_defined": n_defined,
+            "interval_status": "undefined_or_incomplete_metric",
+        }
     array = np.asarray(values, dtype=float)
+    if not np.isfinite(array).all():
+        raise ValueError("fold summary contains non-finite values")
     if len(array) == 1:
-        return {"mean": float(array[0]), "std": 0.0, "ci_low": float("nan"), "ci_high": float("nan"), "n": 1}
+        return {
+            "mean": float(array[0]), "std": 0.0, "ci_low": None,
+            "ci_high": None, "n": 1, "n_defined": 1,
+            "interval_status": "not_estimable_single_fold",
+        }
+    if draws < 1:
+        raise ValueError("fold bootstrap requires at least one draw")
     rng = np.random.default_rng(seed)
     means = rng.choice(array, size=(draws, len(array)), replace=True).mean(axis=1)
     low, high = np.quantile(means, [0.025, 0.975])
     return {
         "mean": float(array.mean()), "std": float(array.std(ddof=1)),
         "ci_low": float(low), "ci_high": float(high), "n": len(array),
+        "n_defined": len(array), "interval_status": "estimated",
     }
 
 
@@ -313,7 +350,7 @@ def summarize_folds(fold_rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, An
         output: Dict[str, Any] = {"model": model, "regime": regime, "n_folds": len(members)}
         for partition in ("validation", "test"):
             for metric in SCALAR_METRICS:
-                values = [float(member[f"{partition}_{metric}"]) for member in members]
+                values = [member[f"{partition}_{metric}"] for member in members]
                 stats = bootstrap_ci(values, seed=20264000 + index * 20 + len(output))
                 for key, value in stats.items():
                     output[f"{partition}_{metric}_{key}"] = value
@@ -321,19 +358,58 @@ def summarize_folds(fold_rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, An
     return outputs
 
 
-def load_prediction_array(path: Path, model: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_prediction_array(
+    path: Path, model: str, expected_split_id: str | None = None,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
         if model.startswith("descriptor:"):
+            expected_fields = {
+                "schema_version", "split_id", "model_names",
+                "val_indices", "val_targets", "val_predictions",
+                "test_indices", "test_targets", "test_predictions",
+            }
+            if set(archive.files) != expected_fields:
+                raise ValueError(f"descriptor prediction fields are incomplete: {path}")
+            if str(archive["schema_version"].item()) != "prm_descriptor_predictions_v1":
+                raise ValueError(f"unsupported descriptor prediction schema: {path}")
             family = model.split(":", 1)[1]
             names = [str(name) for name in archive["model_names"].tolist()]
+            if family not in names:
+                raise ValueError(f"descriptor family {family} is absent: {path}")
             position = names.index(family)
-            indices = np.asarray(archive["test_indices"], dtype=np.int64)
+            raw_indices = np.asarray(archive["test_indices"])
             targets = np.asarray(archive["test_targets"])
             predictions = np.asarray(archive["test_predictions"][position], dtype=float)
         else:
-            indices = np.asarray(archive["indices"], dtype=np.int64)
+            expected_fields = {
+                "schema_version", "split_id", "split", "indices", "preds", "targets",
+            }
+            if set(archive.files) != expected_fields:
+                raise ValueError(f"neural prediction fields are incomplete: {path}")
+            if str(archive["schema_version"].item()) != "prm_predictions_v1":
+                raise ValueError(f"unsupported neural prediction schema: {path}")
+            if str(archive["split"].item()) != "test":
+                raise ValueError(f"neural prediction partition mismatch: {path}")
+            raw_indices = np.asarray(archive["indices"])
             targets = np.asarray(archive["targets"])
             predictions = np.asarray(archive["preds"], dtype=float)
+        split_id = str(archive["split_id"].item())
+    if expected_split_id is not None and split_id != expected_split_id:
+        raise ValueError(f"prediction split mismatch for {path}")
+    if raw_indices.ndim != 1 or not np.issubdtype(raw_indices.dtype, np.integer):
+        raise ValueError(f"prediction indices are invalid: {path}")
+    indices = raw_indices.astype(np.int64, copy=False)
+    if (
+        targets.ndim != 1
+        or predictions.ndim != 1
+        or len(indices) == 0
+        or len(indices) != len(targets)
+        or len(indices) != len(predictions)
+        or len(np.unique(indices)) != len(indices)
+    ):
+        raise ValueError(f"prediction vectors are not uniquely aligned: {path}")
+    if not np.isfinite(targets).all() or not np.isfinite(predictions).all():
+        raise ValueError(f"prediction vectors contain non-finite values: {path}")
     order = np.argsort(indices)
     return indices[order], targets[order], predictions[order]
 
@@ -348,7 +424,9 @@ def seed_averaged_prediction(
     reference_targets = None
     predictions = []
     for member in members:
-        indices, targets, values = load_prediction_array(Path(member["prediction_path"]), model)
+        indices, targets, values = load_prediction_array(
+            Path(member["prediction_path"]), model, expected_split_id=split_id,
+        )
         if reference_indices is None:
             reference_indices, reference_targets = indices, targets
         elif not np.array_equal(indices, reference_indices) or not np.allclose(
@@ -397,21 +475,37 @@ def read_sample_metadata(path: Path) -> Dict[int, Dict[str, Any]]:
 def regression_metrics(
     targets: np.ndarray, predictions: np.ndarray,
     hosts: Sequence[str] | None = None, dopants: Sequence[str] | None = None,
-) -> Dict[str, float]:
-    residual = np.asarray(predictions) - np.asarray(targets)
+) -> Dict[str, Any]:
+    targets = np.asarray(targets, dtype=float)
+    predictions = np.asarray(predictions, dtype=float)
+    if (
+        targets.shape != predictions.shape
+        or targets.ndim != 1
+        or len(targets) < 2
+        or not np.isfinite(targets).all()
+        or not np.isfinite(predictions).all()
+    ):
+        raise ValueError("pooled metrics require finite aligned vectors")
+    residual = predictions - targets
     denominator = np.sum((targets - np.mean(targets)) ** 2)
+    if denominator <= 0.0:
+        raise ValueError("pooled metrics require non-constant targets")
+    spearman = (
+        None if len(np.unique(predictions)) < 2
+        else finite_spearman(targets, predictions, context="pooled Spearman correlation")
+    )
     output = {
         "mae": float(np.mean(np.abs(residual))),
         "rmse": float(np.sqrt(np.mean(residual ** 2))),
         "bias": float(np.mean(residual)),
-        "spearman": float(spearmanr(targets, predictions).statistic),
+        "spearman": spearman,
         "r2": float(1.0 - np.sum(residual ** 2) / denominator),
     }
     favorable = np.asarray(targets) <= 0.0
     output["favorable_n"] = int(np.sum(favorable))
-    output["favorable_mae"] = (
-        float(np.mean(np.abs(residual[favorable]))) if np.any(favorable) else float("nan")
-    )
+    if not np.any(favorable):
+        raise ValueError("pooled evaluation has no non-positive formation energies")
+    output["favorable_mae"] = float(np.mean(np.abs(residual[favorable])))
     low = low_energy_metrics(targets, predictions, fraction=0.1)
     low_order = np.argsort(np.asarray(targets), kind="stable")[: int(low["k"])]
     output.update(
@@ -442,6 +536,20 @@ def paired_sample_comparison(
     seed: int, draws: int = 10_000,
     groups: Sequence[str] | None = None,
 ) -> Dict[str, float]:
+    targets = np.asarray(targets, dtype=float)
+    reference = np.asarray(reference, dtype=float)
+    comparator = np.asarray(comparator, dtype=float)
+    if (
+        targets.shape != reference.shape
+        or targets.shape != comparator.shape
+        or targets.ndim != 1
+        or len(targets) == 0
+        or not np.isfinite(targets).all()
+        or not np.isfinite(reference).all()
+        or not np.isfinite(comparator).all()
+        or draws < 1
+    ):
+        raise ValueError("paired bootstrap requires finite aligned vectors and draws")
     differences = np.abs(comparator - targets) - np.abs(reference - targets)
     if groups is None:
         cluster_sums = differences
@@ -656,6 +764,8 @@ def main() -> None:
             )
 
     collector_git = git_snapshot()
+    if not collector_git["commit"] or collector_git["dirty"]:
+        raise ValueError("comparison collection requires a clean Git commit")
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     archived_runs = []

@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from scripts.prm_collect_results import (
+    bootstrap_ci,
     comparison_archive_manifests,
     file_sha256,
     load_prediction_array,
@@ -85,6 +86,24 @@ def test_pooled_metrics_include_group_and_low_energy_diagnostics():
     assert metrics["dopant_macro_mae"] == 0.1
 
 
+def test_constant_mean_baseline_has_explicitly_undefined_rank_metric():
+    targets = np.asarray([-1.0, 0.0, 2.0])
+    predictions = np.full(3, 0.5)
+
+    metrics = regression_metrics(targets, predictions)
+
+    assert metrics["spearman"] is None
+
+
+def test_single_fold_interval_is_explicitly_not_estimable():
+    summary = bootstrap_ci([0.5], seed=1)
+
+    assert summary["mean"] == 0.5
+    assert summary["ci_low"] is None
+    assert summary["ci_high"] is None
+    assert summary["interval_status"] == "not_estimable_single_fold"
+
+
 def test_descriptor_root_requires_observed_data_and_artifact_hashes(tmp_path):
     protocol_dir = tmp_path / "protocol"
     split_dir = protocol_dir / "splits"
@@ -107,7 +126,11 @@ def test_descriptor_root_requires_observed_data_and_artifact_hashes(tmp_path):
         "data_sha256": "data-sha",
         "data_file_sha256": "data-sha",
         "protocol_manifest_sha256": file_sha256(protocol_path),
-        "git": {"dirty": False},
+        "git": {"dirty": False, "commit": "training"},
+        "metric_encoding": {
+            "schema_version": "prm_nullable_correlations_v1",
+            "normalizer_git": {"dirty": False, "commit": "normalizer"},
+        },
         "splits": ["id_cv5_f0"],
         "split_artifacts": {
             "id_cv5_f0": {
@@ -140,6 +163,9 @@ def test_neural_prediction_loader_preserves_target_storage_precision(tmp_path):
     protocol_targets = {1: -3.210987654321, 2: 12.3456789012345}
     np.savez(
         path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        split_id=np.asarray("id_cv5_f0"),
+        split=np.asarray("test"),
         indices=np.asarray([2, 1]),
         targets=np.asarray(
             [protocol_targets[2], protocol_targets[1]], dtype=np.float32

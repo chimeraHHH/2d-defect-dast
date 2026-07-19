@@ -1,7 +1,7 @@
 """Paper-facing metrics with deterministic uncertainty summaries."""
 from __future__ import annotations
 
-from typing import Dict, Iterable, Sequence
+from typing import Any, Dict, Iterable, Sequence
 
 import numpy as np
 from scipy.stats import spearmanr
@@ -27,15 +27,25 @@ def finite_spearman(
 
 def regression_metrics(
     targets: Sequence[float], predictions: Sequence[float]
-) -> Dict[str, float]:
+) -> Dict[str, Any]:
     y = np.asarray(targets, dtype=float)
     pred = np.asarray(predictions, dtype=float)
     if y.shape != pred.shape or y.ndim != 1 or len(y) == 0:
         raise ValueError("targets and predictions must be non-empty aligned vectors")
+    if not np.isfinite(y).all() or not np.isfinite(pred).all():
+        raise ValueError("targets and predictions must contain only finite values")
     error = pred - y
     target_ss = float(np.sum((y - y.mean()) ** 2))
-    pearson = float(np.corrcoef(y, pred)[0, 1]) if y.std() > 0 and pred.std() > 0 else float("nan")
-    spearman = float(spearmanr(y, pred).statistic) if len(y) > 1 else float("nan")
+    correlation_defined = (
+        len(y) > 1 and len(np.unique(y)) > 1 and len(np.unique(pred)) > 1
+    )
+    pearson = float(np.corrcoef(y, pred)[0, 1]) if correlation_defined else None
+    if pearson is not None and not np.isfinite(pearson):
+        raise ValueError("Pearson correlation is non-finite")
+    spearman = (
+        finite_spearman(y, pred, context="regression Spearman correlation")
+        if correlation_defined else None
+    )
     return {
         "n": int(len(y)),
         "mae": float(np.mean(np.abs(error))),
@@ -43,7 +53,7 @@ def regression_metrics(
         "bias": float(np.mean(error)),
         "pearson": pearson,
         "spearman": spearman,
-        "r2": float(1.0 - np.sum(error**2) / target_ss) if target_ss > 0 else float("nan"),
+        "r2": float(1.0 - np.sum(error**2) / target_ss) if target_ss > 0 else None,
     }
 
 
