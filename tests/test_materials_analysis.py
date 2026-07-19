@@ -42,6 +42,25 @@ def test_preference_and_screening_regret_are_computed_by_host_dopant_pair():
     )
     assert adsorbate["exact_site_correct"] == 0
     assert adsorbate["screening_regret_eV"] == 1.0
+    assert adsorbate["top2_eligible"] == 0
+    assert adsorbate["true_best_in_predicted_top2"] is None
+    assert all(item["host"] != "H2" for item in sites)
+
+
+def test_site_selection_accepts_tied_true_minimum_and_requires_three_for_top2():
+    samples = [
+        row(0, "H1", "C", "adsorbate", "ads0", 0.0, 2.0),
+        row(1, "H1", "C", "adsorbate", "ads1", 5e-9, 0.0),
+        row(2, "H1", "C", "adsorbate", "ads2", 1.0, 1.0),
+    ]
+
+    _, sites = analyse_preferences(samples)
+
+    assert len(sites) == 1
+    assert sites[0]["n_tied_true_best_sites"] == 2
+    assert sites[0]["exact_site_correct"] == 1
+    assert sites[0]["top2_eligible"] == 1
+    assert sites[0]["true_best_in_predicted_top2"] == 1
 
 
 def test_materials_bootstrap_is_chunked_and_requires_multiple_units():

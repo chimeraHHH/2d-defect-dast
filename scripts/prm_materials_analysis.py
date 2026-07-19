@@ -30,6 +30,7 @@ from src.prm_provenance import (
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
+ENERGY_TIE_TOLERANCE_EV = 1e-8
 
 
 def file_sha256(path: Path) -> str:
@@ -219,7 +220,7 @@ def analyse_preferences(
             for defect_type in ("adsorbate", "interstitial")
         }
         for defect_type, typed in by_type.items():
-            if not typed:
+            if len(typed) < 2:
                 continue
             true_order = sorted(typed, key=lambda row: (row["target_eV"], row["sample_index"]))
             predicted_order = sorted(
@@ -227,15 +228,27 @@ def analyse_preferences(
             )
             selected = predicted_order[0]
             true_best = true_order[0]
+            true_best_indices = {
+                row["sample_index"] for row in true_order
+                if row["target_eV"] <= true_best["target_eV"] + ENERGY_TIE_TOLERANCE_EV
+            }
             top_two = {row["sample_index"] for row in predicted_order[:2]}
+            top2_eligible = len(typed) >= 3
             site_rows.append(
                 {
                     "host": host, "dopant": dopant, "dopant_Z": atomic_numbers[dopant],
                     "dopant_period": dopant_period(dopant), "defecttype": defect_type,
                     "n_sites": len(typed), "true_best_site": true_best["site"],
+                    "n_tied_true_best_sites": len(true_best_indices),
                     "predicted_best_site": selected["site"],
-                    "exact_site_correct": int(selected["sample_index"] == true_best["sample_index"]),
-                    "true_best_in_predicted_top2": int(true_best["sample_index"] in top_two),
+                    "exact_site_correct": int(
+                        selected["sample_index"] in true_best_indices
+                    ),
+                    "top2_eligible": int(top2_eligible),
+                    "true_best_in_predicted_top2": (
+                        int(bool(true_best_indices & top_two))
+                        if top2_eligible else None
+                    ),
                     "screening_regret_eV": float(selected["target_eV"] - true_best["target_eV"]),
                 }
             )
@@ -257,6 +270,12 @@ def analyse_preferences(
         true_preference = "adsorbate" if true_margin >= 0 else "interstitial"
         predicted_preference = "adsorbate" if predicted_margin >= 0 else "interstitial"
         true_global = min(members, key=lambda row: (row["target_eV"], row["sample_index"]))
+        true_global_indices = {
+            row["sample_index"] for row in members
+            if row["target_eV"] <= (
+                true_global["target_eV"] + ENERGY_TIE_TOLERANCE_EV
+            )
+        }
         predicted_global = min(
             members, key=lambda row: (row["prediction_eV"], row["sample_index"])
         )
@@ -271,9 +290,10 @@ def analyse_preferences(
                 "predicted_margin_eV": float(predicted_margin),
                 "margin_absolute_error_eV": float(abs(predicted_margin - true_margin)),
                 "true_global_best": f"{true_global['defecttype']}:{true_global['site']}",
+                "n_tied_true_global_best_sites": len(true_global_indices),
                 "predicted_global_best": f"{predicted_global['defecttype']}:{predicted_global['site']}",
                 "global_site_correct": int(
-                    true_global["sample_index"] == predicted_global["sample_index"]
+                    predicted_global["sample_index"] in true_global_indices
                 ),
                 "global_screening_regret_eV": float(
                     predicted_global["target_eV"] - true_global["target_eV"]
@@ -353,6 +373,7 @@ def main() -> None:
     margin_errors = [row["margin_absolute_error_eV"] for row in pair_rows]
     global_regret = [row["global_screening_regret_eV"] for row in pair_rows]
     exact_site = [row["exact_site_correct"] for row in site_rows]
+    top2_site_rows = [row for row in site_rows if row["top2_eligible"]]
     site_regret = [row["screening_regret_eV"] for row in site_rows]
     residual = np.asarray([row["residual_eV"] for row in sample_rows])
     summary = {
@@ -389,9 +410,17 @@ def main() -> None:
             ),
         },
         "within_defect_type_site_selection": {
+            "eligibility": {
+                "exact_and_regret": "at least two candidate sites",
+                "top2": "at least three candidate sites",
+                "true_energy_tie_tolerance_eV": ENERGY_TIE_TOLERANCE_EV,
+                "n_exact_candidate_sets": len(site_rows),
+                "n_top2_candidate_sets": len(top2_site_rows),
+            },
             "exact_accuracy": bootstrap_mean(exact_site, seed=20263005),
             "top2_accuracy": bootstrap_mean(
-                [row["true_best_in_predicted_top2"] for row in site_rows], seed=20263006,
+                [row["true_best_in_predicted_top2"] for row in top2_site_rows],
+                seed=20263006,
             ),
             "screening_regret_eV": bootstrap_mean(site_regret, seed=20263007),
         },
