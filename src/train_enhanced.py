@@ -42,6 +42,7 @@ from src.dataset import CrystalGraphDataset, collate_fn, make_splits
 from src.splits import load_split
 from src.sampler import HostBalancedSampler
 from src.prm_assets import load_pretrained_initialization, verify_training_assets
+from src.prm_metrics import regression_metrics
 from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
 from src.models import (
@@ -448,7 +449,6 @@ def apply_stochastic_depth(model, drop_rate: float = 0.1):
 def evaluate(model, loader, normalizer, device, swa_model=None):
     eval_model = swa_model if swa_model is not None else model
     eval_model.eval()
-    abs_err, sq_err, n = 0.0, 0.0, 0
     preds_all, targets_all, indices_all = [], [], []
     with torch.no_grad():
         for batch in loader:
@@ -458,33 +458,14 @@ def evaluate(model, loader, normalizer, device, swa_model=None):
             # Handle uncertainty output: (pred, log_var) tuple
             preds_norm = model_out[0] if isinstance(model_out, tuple) else model_out
             preds = normalizer.denorm(preds_norm)
-            err = preds - target
-            abs_err += err.abs().sum().item()
-            sq_err += err.pow(2).sum().item()
-            n += target.numel()
             preds_all.append(preds.cpu())
             targets_all.append(target.cpu())
             indices_all.append(batch["sample_index"].detach().cpu())
-    mae = abs_err / max(n, 1)
-    rmse = math.sqrt(sq_err / max(n, 1))
     preds_np = torch.cat(preds_all).numpy() if preds_all else np.array([])
     targets_np = torch.cat(targets_all).numpy() if targets_all else np.array([])
     indices_np = torch.cat(indices_all).numpy() if indices_all else np.array([], dtype=int)
-    bias = float(np.mean(preds_np - targets_np)) if len(preds_np) else float("nan")
-    if len(preds_np) > 1 and np.std(preds_np) > 0 and np.std(targets_np) > 0:
-        pearson = float(np.corrcoef(preds_np, targets_np)[0, 1])
-        pred_rank = np.argsort(np.argsort(preds_np, kind="stable"), kind="stable")
-        target_rank = np.argsort(np.argsort(targets_np, kind="stable"), kind="stable")
-        spearman = float(np.corrcoef(pred_rank, target_rank)[0, 1])
-    else:
-        pearson = float("nan")
-        spearman = float("nan")
-    target_ss = float(np.sum((targets_np - np.mean(targets_np)) ** 2)) if len(targets_np) else 0.0
-    residual_ss = float(np.sum((preds_np - targets_np) ** 2)) if len(preds_np) else 0.0
-    r2 = 1.0 - residual_ss / target_ss if target_ss > 0 else float("nan")
     return {
-        "mae": mae, "rmse": rmse,
-        "bias": bias, "pearson": pearson, "spearman": spearman, "r2": r2,
+        **regression_metrics(targets_np, preds_np),
         "preds": preds_np, "targets": targets_np, "indices": indices_np,
     }
 

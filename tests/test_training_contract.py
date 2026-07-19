@@ -12,6 +12,7 @@ import yaml
 from src.train_schnet import build_scheduler
 from src.train_enhanced import (
     capture_rng_state,
+    evaluate as evaluate_dart,
     make_label_noise_generator,
     resolve_runtime_assets,
     restore_rng_state,
@@ -141,6 +142,27 @@ def test_label_noise_stream_is_independent_of_model_rng_consumption():
 
     assert torch.equal(observed, expected)
     assert not torch.equal(changed, expected)
+
+
+def test_dart_evaluation_uses_standard_tie_aware_spearman():
+    class Model(torch.nn.Module):
+        def forward(self, batch):
+            return batch["prediction"]
+
+    class IdentityNormalizer:
+        @staticmethod
+        def denorm(values):
+            return values
+
+    batch = {
+        "target": torch.tensor([0.0, 0.0, 1.0, 1.0]),
+        "prediction": torch.tensor([0.0, 1.0, 0.0, 1.0]),
+        "sample_index": torch.arange(4),
+    }
+    metrics = evaluate_dart(
+        Model(), [batch], IdentityNormalizer(), torch.device("cpu")
+    )
+    assert metrics["spearman"] == pytest.approx(0.0)
 
 
 def test_runtime_asset_resolution_does_not_mutate_controlled_config():
