@@ -1,0 +1,618 @@
+{
+  "batches": [
+    {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "evaluated_splits": [
+        "chemistry_block_g6x3d",
+        "dopant_cv5_f0",
+        "dopant_cv5_f1",
+        "dopant_cv5_f2",
+        "dopant_cv5_f3",
+        "dopant_cv5_f4",
+        "host_cv5_f0",
+        "host_cv5_f1",
+        "host_cv5_f2",
+        "host_cv5_f3",
+        "host_cv5_f4",
+        "id_cv5_f0",
+        "id_cv5_f1",
+        "id_cv5_f2",
+        "id_cv5_f3",
+        "id_cv5_f4",
+        "id_repeat_s42",
+        "id_repeat_s43",
+        "id_repeat_s44",
+        "id_repeat_s45",
+        "id_repeat_s46",
+        "pair_cv5_f0",
+        "pair_cv5_f1",
+        "pair_cv5_f2",
+        "pair_cv5_f3",
+        "pair_cv5_f4",
+        "uq_calibration_s62"
+      ],
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "requested_splits": [
+        "chemistry_block_g6x3d",
+        "dopant_cv5_f0",
+        "dopant_cv5_f1",
+        "dopant_cv5_f2",
+        "dopant_cv5_f3",
+        "dopant_cv5_f4",
+        "host_cv5_f0",
+        "host_cv5_f1",
+        "host_cv5_f2",
+        "host_cv5_f3",
+        "host_cv5_f4",
+        "id_cv5_f0",
+        "id_cv5_f1",
+        "id_cv5_f2",
+        "id_cv5_f3",
+        "id_cv5_f4",
+        "id_repeat_s42",
+        "id_repeat_s43",
+        "id_repeat_s44",
+        "id_repeat_s45",
+        "id_repeat_s46",
+        "pair_cv5_f0",
+        "pair_cv5_f1",
+        "pair_cv5_f2",
+        "pair_cv5_f3",
+        "pair_cv5_f4",
+        "uq_calibration_s62"
+      ],
+      "reused_splits": [],
+      "started_at": "2026-07-19T14:27:29.697159+00:00",
+      "upgraded_splits": [],
+      "wall_seconds": 1070.362654209137
+    },
+    {
+      "completed_at": "2026-07-19T14:45:40.247111+00:00",
+      "evaluated_splits": [],
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "requested_splits": [
+        "chemistry_block_g6x3d",
+        "dopant_cv5_f0",
+        "dopant_cv5_f1",
+        "dopant_cv5_f2",
+        "dopant_cv5_f3",
+        "dopant_cv5_f4",
+        "host_cv5_f0",
+        "host_cv5_f1",
+        "host_cv5_f2",
+        "host_cv5_f3",
+        "host_cv5_f4",
+        "id_cv5_f0",
+        "id_cv5_f1",
+        "id_cv5_f2",
+        "id_cv5_f3",
+        "id_cv5_f4",
+        "id_repeat_s42",
+        "id_repeat_s43",
+        "id_repeat_s44",
+        "id_repeat_s45",
+        "id_repeat_s46",
+        "pair_cv5_f0",
+        "pair_cv5_f1",
+        "pair_cv5_f2",
+        "pair_cv5_f3",
+        "pair_cv5_f4",
+        "uq_calibration_s62"
+      ],
+      "reused_splits": [
+        "chemistry_block_g6x3d",
+        "dopant_cv5_f0",
+        "dopant_cv5_f1",
+        "dopant_cv5_f2",
+        "dopant_cv5_f3",
+        "dopant_cv5_f4",
+        "host_cv5_f0",
+        "host_cv5_f1",
+        "host_cv5_f2",
+        "host_cv5_f3",
+        "host_cv5_f4",
+        "id_cv5_f0",
+        "id_cv5_f1",
+        "id_cv5_f2",
+        "id_cv5_f3",
+        "id_cv5_f4",
+        "id_repeat_s42",
+        "id_repeat_s43",
+        "id_repeat_s44",
+        "id_repeat_s45",
+        "id_repeat_s46",
+        "pair_cv5_f0",
+        "pair_cv5_f1",
+        "pair_cv5_f2",
+        "pair_cv5_f3",
+        "pair_cv5_f4",
+        "uq_calibration_s62"
+      ],
+      "started_at": "2026-07-19T14:45:38.086136+00:00",
+      "upgraded_splits": [],
+      "wall_seconds": 2.1610167026519775
+    }
+  ],
+  "completed_at": "2026-07-19T14:45:40.247111+00:00",
+  "data_file_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "data_path": "/Users/yiminghua/2026Spring/changsheng/project/data/processed/cleaned_dataset.pkl",
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "environment": {
+    "hostname": "YimingHuas-MacBook-Air.local",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.13 (main, Mar  3 2026, 15:35:03) [Clang 21.1.4 ]"
+  },
+  "evaluated_splits": [],
+  "feature_matrix_scope": "canonical retained rows only, hashed with sample indices",
+  "feature_matrix_sha256": "5ddb29c86c2cd3d7d5222310d5cb1d968675074d939fb7e644717070540cb014",
+  "formal_split_coverage": {
+    "all_complete": true,
+    "complete": 27,
+    "total": 27
+  },
+  "git": {
+    "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "n_features": 80,
+  "n_featurized_samples": 10224,
+  "n_samples": 10641,
+  "protocol_manifest_sha256": "7deff479a52c9c5095a94fbcd2f4d6bbc65d8800cc30fe28ba06b73c83b01dbb",
+  "requested_splits": [
+    "chemistry_block_g6x3d",
+    "dopant_cv5_f0",
+    "dopant_cv5_f1",
+    "dopant_cv5_f2",
+    "dopant_cv5_f3",
+    "dopant_cv5_f4",
+    "host_cv5_f0",
+    "host_cv5_f1",
+    "host_cv5_f2",
+    "host_cv5_f3",
+    "host_cv5_f4",
+    "id_cv5_f0",
+    "id_cv5_f1",
+    "id_cv5_f2",
+    "id_cv5_f3",
+    "id_cv5_f4",
+    "id_repeat_s42",
+    "id_repeat_s43",
+    "id_repeat_s44",
+    "id_repeat_s45",
+    "id_repeat_s46",
+    "pair_cv5_f0",
+    "pair_cv5_f1",
+    "pair_cv5_f2",
+    "pair_cv5_f3",
+    "pair_cv5_f4",
+    "uq_calibration_s62"
+  ],
+  "reused_splits": [
+    "chemistry_block_g6x3d",
+    "dopant_cv5_f0",
+    "dopant_cv5_f1",
+    "dopant_cv5_f2",
+    "dopant_cv5_f3",
+    "dopant_cv5_f4",
+    "host_cv5_f0",
+    "host_cv5_f1",
+    "host_cv5_f2",
+    "host_cv5_f3",
+    "host_cv5_f4",
+    "id_cv5_f0",
+    "id_cv5_f1",
+    "id_cv5_f2",
+    "id_cv5_f3",
+    "id_cv5_f4",
+    "id_repeat_s42",
+    "id_repeat_s43",
+    "id_repeat_s44",
+    "id_repeat_s45",
+    "id_repeat_s46",
+    "pair_cv5_f0",
+    "pair_cv5_f1",
+    "pair_cv5_f2",
+    "pair_cv5_f3",
+    "pair_cv5_f4",
+    "uq_calibration_s62"
+  ],
+  "schema_version": "prm_descriptor_manifest_v2",
+  "selection_data": "validation only",
+  "split_artifacts": {
+    "chemistry_block_g6x3d": {
+      "metrics_sha256": "a987e580be9da99ac7aeb63095b72f391811f38441433268461e577b4b8ae89a",
+      "predictions_sha256": "3501fc342a76c18bfd1d1e5be0920e750baf9903b49d8002633344c6df740120"
+    },
+    "dopant_cv5_f0": {
+      "metrics_sha256": "9abf585cefb8213913f6a1c58ca209f2f1774ef8fa4bed23306df1cbd5930cfb",
+      "predictions_sha256": "98ed1d091addf5dbde20f12f26a3d03f017a03dd02ce94a25cdaaf6003f91622"
+    },
+    "dopant_cv5_f1": {
+      "metrics_sha256": "17d9b000812e96e4c61fb849976c939cf7155f3fdbce3e110b10086555977d1e",
+      "predictions_sha256": "acfe7bfcbb1cc3578f8e7ad6aef9606e27281d0f84c81a44466691c65041772d"
+    },
+    "dopant_cv5_f2": {
+      "metrics_sha256": "cd35dd5694dab7550259fa38790445c0ad27f2af9eae80550b1fcd1c6130cf29",
+      "predictions_sha256": "504e033c9f9836c2b8f9cc4e82c37ee4c8e3fb74e9c47facb9a6d90291dccb77"
+    },
+    "dopant_cv5_f3": {
+      "metrics_sha256": "e3b40d873713cf60a1cc0f59871c01d18e71d49d3f93de327e048c4949f193ac",
+      "predictions_sha256": "bf5facd24f083b73748cf53cb4d3c52127d6e29ef2996af3daf4b4079155de4d"
+    },
+    "dopant_cv5_f4": {
+      "metrics_sha256": "c7e2b4b885ba5864022d1c1e2cf07f371d6452fc3bd74458d6878fea3f52dd9e",
+      "predictions_sha256": "644fe06cf8cf82103491b5132c3ed4eb2c2d173086359f4941cbbb0a2f37a950"
+    },
+    "host_cv5_f0": {
+      "metrics_sha256": "13a6f5e52072c44a36bb855ea70cfbe2198036da029cc653a5aaff7bb85afec7",
+      "predictions_sha256": "4f2e3967b9dcaab28ed8f3c87f33a6821747c98ef27b077546af082fc728a103"
+    },
+    "host_cv5_f1": {
+      "metrics_sha256": "893b46200ffd8f0dda9a0fa3de840450c05fd1fdaa28c240697b382a42c81b14",
+      "predictions_sha256": "63f373dadcbf9fef193017233c840ace09ebd1910d7184e577bdca91ca94ae00"
+    },
+    "host_cv5_f2": {
+      "metrics_sha256": "9e4bb0268d19d90d7b7c844cb525e5e661a9585c692b2236b7fa41edcffe3535",
+      "predictions_sha256": "e2d94f04fa528f0756594b4530c762f7f3f5798f51c30fea8e68ba82ae91aa58"
+    },
+    "host_cv5_f3": {
+      "metrics_sha256": "e7bb2492a4d75cade676fccad36b173a60165cbc59c8dd2fb7673eadd531dada",
+      "predictions_sha256": "fb592327de5b97e32f0ee410b0f3bb9a945a847b074cd8f9faa90a28ed76b3dc"
+    },
+    "host_cv5_f4": {
+      "metrics_sha256": "0d7c89e0b1b8a9e04b2a919b516f54cbf17388982d5296ec6ee5a35be79751f6",
+      "predictions_sha256": "2691677e81adbc4b7fbb6e8966d6fab40ea27dba62b28b8aabdc3ca2dafda98a"
+    },
+    "id_cv5_f0": {
+      "metrics_sha256": "3736eb4518289213f2aa7622949b85f194c92422c28660824576c823d708f73d",
+      "predictions_sha256": "0f5de0efe65de214b38f53ee87da3b60de2b5b5494132728f52eb3402e24673c"
+    },
+    "id_cv5_f1": {
+      "metrics_sha256": "b1c41f46cc4255232069663352eb3c4d229733bda964a8f14243f108549b4a4c",
+      "predictions_sha256": "3da1fd6165ee4bdbe3fbae117f381f7bae3835dc10cfd3f56f1a01d4c674e0bb"
+    },
+    "id_cv5_f2": {
+      "metrics_sha256": "786032ed085c851de894c59864ff81ee8012185954a643e57d1977cd6cab4613",
+      "predictions_sha256": "a2a5eca3c6ab69dd3b51ae3b63cf941c8a0de44d8b990f1a37a37d8476d759b3"
+    },
+    "id_cv5_f3": {
+      "metrics_sha256": "9510242148f634a24306ab5cbeece5b5a06cd3ebc2b5fdcc438cca7630b82eb1",
+      "predictions_sha256": "b3519702e2316caffcd62a2c4e8a616eec953e6192f2ed13d23f247a65152f68"
+    },
+    "id_cv5_f4": {
+      "metrics_sha256": "235cbc93a5236b2e29385f11a384c05d11495c46b8e25fb2797dffdecd53516e",
+      "predictions_sha256": "5d4926b347fa453fbd1c7dc0da2d97997fc60efaab990c7c96ff3ed81a65eb7b"
+    },
+    "id_repeat_s42": {
+      "metrics_sha256": "58fc0cc7af8fd0317d11b052ce7eaff0dd87c87adb04b01494c9e663974ad831",
+      "predictions_sha256": "8c27e342530df89d12f25d278efff632f06ff727182e77af2ebf98ef1255eb7c"
+    },
+    "id_repeat_s43": {
+      "metrics_sha256": "191b7a197503302319fdc4da37ff6641078abee0dff9d48d90ff83041dc84a5a",
+      "predictions_sha256": "614b8ee994ca78a74d5a23763a21c4b98f11b9ef27f3e83ef182ae9058a304eb"
+    },
+    "id_repeat_s44": {
+      "metrics_sha256": "a8d90eb75327bc76285154ce8d39bc938238e951aaea19506fcce786bd50160e",
+      "predictions_sha256": "cf41c7b41d2811ffe839fefec5720765d664dacadb3109a289e705e9f40a5d2b"
+    },
+    "id_repeat_s45": {
+      "metrics_sha256": "f3d2f093254e1f1fb7d72aa4ad5ec5f8754a3dd7bf8ee12f883878105825b28b",
+      "predictions_sha256": "912e23ff4ff07d8a6e73a02fb2e2d7918cfe6cfa1523340c3edc26a14fd060c8"
+    },
+    "id_repeat_s46": {
+      "metrics_sha256": "626e97e8087de1904b142a6083c25808844ead77a400fa91086bddc9bcaca972",
+      "predictions_sha256": "99dbdff24e1db6731862e0807876cfc95f406969f3fac8274d6ca5615814539a"
+    },
+    "pair_cv5_f0": {
+      "metrics_sha256": "aed4e0044a143d98dbf0ffb1978b8256c0e64da8bd0febce12d9226096dbc401",
+      "predictions_sha256": "af626018bb9809f0ca7e24664ed586d342447c653d315aeaead26885325f2161"
+    },
+    "pair_cv5_f1": {
+      "metrics_sha256": "48bfd67ed93a94b67ee6e6050e1ed527a0c745fed2d82c8a21fa19972e41a18a",
+      "predictions_sha256": "5dea06efe2c2aea2a45168d014ea347179be3a214a19ca176aa8b25772970462"
+    },
+    "pair_cv5_f2": {
+      "metrics_sha256": "7333136b5a4fb0016de428a0bf9fae09280d7b3e0b9ef79a5d2a97eb69ded653",
+      "predictions_sha256": "5f5157968ef5f6d737ee67cf707f057fd120c0480c721dc076773087b4618d3e"
+    },
+    "pair_cv5_f3": {
+      "metrics_sha256": "5d423a51d7ec0e06ba58edef4c9a3b314e0bf3d60bd38daefd490d3a0e8baaa0",
+      "predictions_sha256": "508203f696139ad0b9ac2d8086fc1e5af682480c3d57cfb13522e302a7373a74"
+    },
+    "pair_cv5_f4": {
+      "metrics_sha256": "6f847252464b47e34488a51a5ba7d9208d8e99f02091e5a23cf6eb697dd3211a",
+      "predictions_sha256": "6e38bc1fff9752ea3f9ec5244c2a8bc2d4f5dd02112d355b8bf783c79c32aed9"
+    },
+    "uq_calibration_s62": {
+      "metrics_sha256": "62ad5cf730b1257cea8b557b7326e2a3c6dd4cc5b54e222812c182856f75e3d0",
+      "predictions_sha256": "53e4bca85ed649106dd3c1552886dcc6fc404830f8cc7e47fdb6500c286795ae"
+    }
+  },
+  "split_provenance": {
+    "chemistry_block_g6x3d": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "dopant_cv5_f0": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "dopant_cv5_f1": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "dopant_cv5_f2": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "dopant_cv5_f3": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "dopant_cv5_f4": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "host_cv5_f0": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "host_cv5_f1": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "host_cv5_f2": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "host_cv5_f3": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "host_cv5_f4": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_cv5_f0": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_cv5_f1": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_cv5_f2": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_cv5_f3": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_cv5_f4": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_repeat_s42": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_repeat_s43": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_repeat_s44": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_repeat_s45": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "id_repeat_s46": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "pair_cv5_f0": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "pair_cv5_f1": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "pair_cv5_f2": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "pair_cv5_f3": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "pair_cv5_f4": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    },
+    "uq_calibration_s62": {
+      "completed_at": "2026-07-19T14:45:20.059731+00:00",
+      "git": {
+        "commit": "91013dfa0b119709704570a09bb91a8ab9b3fa71",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "started_at": "2026-07-19T14:27:29.697159+00:00"
+    }
+  },
+  "splits": [
+    "chemistry_block_g6x3d",
+    "dopant_cv5_f0",
+    "dopant_cv5_f1",
+    "dopant_cv5_f2",
+    "dopant_cv5_f3",
+    "dopant_cv5_f4",
+    "host_cv5_f0",
+    "host_cv5_f1",
+    "host_cv5_f2",
+    "host_cv5_f3",
+    "host_cv5_f4",
+    "id_cv5_f0",
+    "id_cv5_f1",
+    "id_cv5_f2",
+    "id_cv5_f3",
+    "id_cv5_f4",
+    "id_repeat_s42",
+    "id_repeat_s43",
+    "id_repeat_s44",
+    "id_repeat_s45",
+    "id_repeat_s46",
+    "pair_cv5_f0",
+    "pair_cv5_f1",
+    "pair_cv5_f2",
+    "pair_cv5_f3",
+    "pair_cv5_f4",
+    "uq_calibration_s62"
+  ],
+  "started_at": "2026-07-19T14:45:38.086136+00:00",
+  "status": "complete",
+  "upgraded_splits": [],
+  "wall_seconds": 2.1610167026519775
+}
