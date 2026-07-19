@@ -22,6 +22,7 @@ import socket
 import subprocess
 import sys
 import time
+from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
@@ -63,6 +64,24 @@ MODEL_REGISTRY = {
 def resolve_path(value: str | Path, root: Path = ROOT) -> Path:
     path = Path(value).expanduser()
     return path if path.is_absolute() else root / path
+
+
+def resolve_runtime_assets(
+    controlled_config: Dict[str, Any],
+    ct_uae_override: str | None = None,
+    pretrained_override: str | None = None,
+) -> Dict[str, Any]:
+    runtime = deepcopy(controlled_config)
+    ct_uae_path = runtime.get("model_kwargs", {}).get("ct_uae_path")
+    if ct_uae_override:
+        runtime.setdefault("model_kwargs", {})["ct_uae_path"] = ct_uae_override
+    elif ct_uae_path:
+        runtime["model_kwargs"]["ct_uae_path"] = str(resolve_path(ct_uae_path))
+    if pretrained_override:
+        runtime["pretrained_embed"] = pretrained_override
+    elif runtime.get("pretrained_embed"):
+        runtime["pretrained_embed"] = str(resolve_path(runtime["pretrained_embed"]))
+    return runtime
 
 
 def git_snapshot() -> Dict[str, Any]:
@@ -143,6 +162,25 @@ def set_seed(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def capture_rng_state() -> Dict[str, Any]:
+    state: Dict[str, Any] = {
+        "python": random.getstate(),
+        "numpy": np.random.get_state(),
+        "torch": torch.get_rng_state(),
+    }
+    if torch.cuda.is_available():
+        state["cuda"] = torch.cuda.get_rng_state_all()
+    return state
+
+
+def restore_rng_state(state: Dict[str, Any]) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.set_rng_state(state["torch"])
+    if torch.cuda.is_available() and "cuda" in state:
+        torch.cuda.set_rng_state_all(state["cuda"])
 
 
 def move_batch(batch, device):
@@ -453,19 +491,6 @@ def main() -> None:
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Resolve large, machine-specific assets without committing them to Git.
-    # The resolved paths remain part of the saved config and run manifest.
-    if os.environ.get("PRM_CT_UAE_PATH"):
-        cfg.setdefault("model_kwargs", {})["ct_uae_path"] = os.environ["PRM_CT_UAE_PATH"]
-    elif cfg.get("model_kwargs", {}).get("ct_uae_path"):
-        cfg["model_kwargs"]["ct_uae_path"] = str(
-            resolve_path(cfg["model_kwargs"]["ct_uae_path"])
-        )
-    if os.environ.get("PRM_PRETRAINED_EMBED"):
-        cfg["pretrained_embed"] = os.environ["PRM_PRETRAINED_EMBED"]
-    elif cfg.get("pretrained_embed"):
-        cfg["pretrained_embed"] = str(resolve_path(cfg["pretrained_embed"]))
-
     if args.seed is not None:
         cfg["seed"] = args.seed
         cfg["output_dir"] = cfg["output_dir"] + f"_s{args.seed}"
@@ -476,6 +501,15 @@ def main() -> None:
         cfg["split_path"] = args.split_path
     if args.output_dir is not None:
         cfg["output_dir"] = args.output_dir
+
+    # Preserve the controlled experiment config before resolving machine-local
+    # asset paths. Collectors compare this copy with the versioned YAML.
+    controlled_cfg = deepcopy(cfg)
+    cfg = resolve_runtime_assets(
+        controlled_cfg,
+        ct_uae_override=os.environ.get("PRM_CT_UAE_PATH"),
+        pretrained_override=os.environ.get("PRM_PRETRAINED_EMBED"),
+    )
 
     split_seed = cfg.get("split_seed", 42)
 
@@ -560,8 +594,10 @@ def main() -> None:
         "started_at": datetime.now(timezone.utc).isoformat(),
         "command": [sys.executable, *sys.argv],
         "git": git_snapshot(),
-        "config": cfg,
-        "config_sha256": config_sha256(cfg),
+        "config": controlled_cfg,
+        "config_sha256": config_sha256(controlled_cfg),
+        "runtime_config": cfg,
+        "runtime_config_sha256": config_sha256(cfg),
         "data": {
             "path": str(data_path),
             "size_bytes": data_path.stat().st_size,
@@ -606,6 +642,7 @@ def main() -> None:
 
     # P0-2: Host-balanced sampling
     use_balanced = cfg.get("host_balanced", False)
+    sampler = None
     if use_balanced:
         # Sampler always indexes into the full dataset by original indices
         sampler = HostBalancedSampler(
@@ -819,6 +856,7 @@ def main() -> None:
     history = []
     best_val_mae = float("inf")
     start_epoch = 1
+    global_step = 0
 
     # ── Resume from checkpoint ──────────────────────────────────────────
     if args.resume:
@@ -827,15 +865,15 @@ def main() -> None:
             print(f"Loading resume checkpoint from {latest_path} ...")
             resume_ckpt = torch.load(latest_path, map_location=device,
                                      weights_only=False)
+            if config_sha256(resume_ckpt.get("config", {})) != config_sha256(cfg):
+                raise ValueError("resume checkpoint configuration does not match this run")
             model.load_state_dict(resume_ckpt["model"])
             optimizer.load_state_dict(resume_ckpt["optimizer"])
-            try:
-                scheduler.load_state_dict(resume_ckpt["scheduler"])
-            except Exception as e:
-                print(f"WARNING: Could not restore scheduler state: {e}")
+            scheduler.load_state_dict(resume_ckpt["scheduler"])
             best_val_mae = resume_ckpt.get("best_val_mae", float("inf"))
             history = resume_ckpt.get("history", [])
             start_epoch = resume_ckpt["epoch"] + 1
+            global_step = int(resume_ckpt.get("global_step", 0))
             if ema is not None and "ema_shadow" in resume_ckpt:
                 ema.shadow = resume_ckpt["ema_shadow"]
                 ema.backup = resume_ckpt["ema_backup"]
@@ -843,6 +881,9 @@ def main() -> None:
                 aux_defect_head.load_state_dict(resume_ckpt["aux_defect_head"])
             if use_swa and "swa_model" in resume_ckpt:
                 swa_model.load_state_dict(resume_ckpt["swa_model"])
+            if "rng_state" not in resume_ckpt:
+                raise ValueError("resume checkpoint lacks reproducible RNG state")
+            restore_rng_state(resume_ckpt["rng_state"])
             print(f"▶ Resumed from epoch {resume_ckpt['epoch']} "
                   f"(best_val_mae={best_val_mae:.4f}, "
                   f"remaining={epochs - resume_ckpt['epoch']} epochs)")
@@ -871,10 +912,11 @@ def main() -> None:
         logf.write(msg)
         logf.flush()
 
-        global_step = 0
         for epoch in range(start_epoch, epochs + 1):
             t0 = time.time()
             model.train()
+            if sampler is not None:
+                sampler.set_epoch(epoch - 1)
             if aux_defect_head is not None:
                 aux_defect_head.train()
             train_loss, train_abs, n_seen = 0.0, 0.0, 0
@@ -1079,6 +1121,7 @@ def main() -> None:
                 "global_step": global_step,
                 "normalizer": normalizer.state_dict(),
                 "config": cfg,
+                "rng_state": capture_rng_state(),
             }
             if ema is not None:
                 _resume_state["ema_shadow"] = ema.shadow

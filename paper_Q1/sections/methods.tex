@@ -137,16 +137,18 @@ standardized using training-partition statistics for optimization and
 transformed back to eV for all reported errors.  The fixed DART regularization
 recipe is limited to 0.1 dropout and additive Gaussian target noise with
 standard deviation 0.03~eV; no coordinate or strain augmentation is applied.
-A host-balanced sampler draws 200 structures per host per epoch.  The input
-projection and compatible local-layer weights are initialized from the same
-frozen pretraining checkpoint for every factorial variant.
+A host-balanced sampler draws 200 structures per host per epoch; its sequence
+is deterministically indexed by model seed and epoch so paired variants see
+the same batches.  The input projection and compatible local-layer weights are
+initialized from the same frozen pretraining checkpoint for every factorial
+variant.
 
 The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved
 configuration, command, Python/PyTorch/CUDA environment, data and split
 hashes, seed, partition indices, epoch history, checkpoint, and validation and
 test predictions.  Interrupted jobs resume from complete optimizer,
-scheduler, and model state.
+scheduler, model, and random-number-generator state.
 
 %----------------------------------------------------------------------
 \subsection{Baselines}

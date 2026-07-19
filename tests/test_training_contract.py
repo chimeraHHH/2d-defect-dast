@@ -1,13 +1,21 @@
 from __future__ import annotations
 
 import json
+import random
 from pathlib import Path
 
+import numpy as np
 import pytest
 import torch
 import yaml
 
 from src.train_schnet import build_scheduler
+from src.train_enhanced import (
+    capture_rng_state,
+    resolve_runtime_assets,
+    restore_rng_state,
+    set_seed,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -99,3 +107,30 @@ def test_schnet_scheduler_rejects_invalid_warmup(warmup_epochs):
             warmup_epochs=warmup_epochs,
             eta_min=1e-6,
         )
+
+
+def test_rng_state_round_trip_reproduces_all_training_generators():
+    set_seed(91)
+    state = capture_rng_state()
+    expected = (random.random(), np.random.random(), torch.rand(3))
+    restore_rng_state(state)
+    observed = (random.random(), np.random.random(), torch.rand(3))
+    assert observed[0] == expected[0]
+    assert observed[1] == expected[1]
+    assert torch.equal(observed[2], expected[2])
+
+
+def test_runtime_asset_resolution_does_not_mutate_controlled_config():
+    controlled = {
+        "model_kwargs": {"ct_uae_path": "data/ct_uae.pt"},
+        "pretrained_embed": "results/pretrained.pt",
+    }
+    runtime = resolve_runtime_assets(
+        controlled,
+        ct_uae_override="/runtime/ct_uae.pt",
+        pretrained_override="/runtime/pretrained.pt",
+    )
+    assert controlled["model_kwargs"]["ct_uae_path"] == "data/ct_uae.pt"
+    assert controlled["pretrained_embed"] == "results/pretrained.pt"
+    assert runtime["model_kwargs"]["ct_uae_path"] == "/runtime/ct_uae.pt"
+    assert runtime["pretrained_embed"] == "/runtime/pretrained.pt"

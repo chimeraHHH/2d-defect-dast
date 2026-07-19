@@ -33,9 +33,11 @@ from src.sampler import HostBalancedSampler
 from src.splits import load_split
 from src.train_enhanced import (
     Normalizer,
+    capture_rng_state,
     file_sha256,
     move_batch,
     resolve_path,
+    restore_rng_state,
     set_seed,
 )
 
@@ -145,6 +147,7 @@ def main() -> None:
         },
     )
     n_workers = int(cfg.get("num_workers", 4))
+    train_sampler = None
     augmentation = None
     if cfg.get("online_aug", False):
         aug_cfg = cfg.get("online_aug_cfg", {})
@@ -235,22 +238,30 @@ def main() -> None:
     start_epoch = 1
     history = []
     best_val = float("inf")
+    global_steps = 0
     checkpoint_path = output_dir / "best.pt"
     latest_path = output_dir / "latest.pt"
     if args.resume and latest_path.exists():
         checkpoint = torch.load(latest_path, map_location=device, weights_only=False)
+        if config_sha256(checkpoint.get("config", {})) != config_sha256(cfg):
+            raise ValueError("resume checkpoint configuration does not match this run")
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         scheduler.load_state_dict(checkpoint["scheduler"])
         history = checkpoint["history"]
         best_val = checkpoint["best_val_mae"]
         start_epoch = checkpoint["epoch"] + 1
+        global_steps = int(checkpoint.get("global_steps", 0))
+        if "rng_state" not in checkpoint:
+            raise ValueError("resume checkpoint lacks reproducible RNG state")
+        restore_rng_state(checkpoint["rng_state"])
 
-    global_steps = 0
     with (output_dir / "train.log").open("a" if start_epoch > 1 else "w") as log:
         for epoch in range(start_epoch, epochs + 1):
             epoch_start = time.time()
             model.train()
+            if train_sampler is not None:
+                train_sampler.set_epoch(epoch - 1)
             train_error = 0.0
             n_seen = 0
             for batch in loaders["train"]:
@@ -303,6 +314,9 @@ def main() -> None:
                     "epoch": epoch, "model": model.state_dict(),
                     "optimizer": optimizer.state_dict(), "scheduler": scheduler.state_dict(),
                     "history": history, "best_val_mae": best_val,
+                    "global_steps": global_steps,
+                    "rng_state": capture_rng_state(),
+                    "config": cfg,
                 },
                 latest_path,
             )
