@@ -1,4 +1,4 @@
-\documentclass[twocolumn,superscriptaddress,prb,floatfix]{revtex4-2}
+\documentclass[aps,prmaterials,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -15,9 +15,6 @@
 \setcounter{topnumber}{4}
 \setcounter{bottomnumber}{3}
 \setcounter{totalnumber}{8}
-\usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, shapes.geometric, fit,
-                 decorations.pathreplacing, calc}
 \usepackage[colorlinks=true,
             linkcolor=blue!60!black,
             citecolor=green!50!black,
@@ -31,8 +28,8 @@
 
 \begin{document}
 
-\title{DART: Defect-Aware Radial Transformer with Physically Informed
-       Innovations for Formation Energy Prediction in Two-Dimensional Materials}
+\title{Defect-aware graph learning of impurity incorporation energetics and
+chemical transferability in two-dimensional materials}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
@@ -41,32 +38,23 @@
 \date{\today}
 
 \begin{abstract}
-Point defects govern the electronic, optical, and catalytic properties of
-two-dimensional (2D) materials, yet first-principles formation-energy
-calculations remain prohibitively expensive for exhaustive host--dopant
-screening.  Here we present \dart{} (Defect-Aware Radial Transformer), a
-compact graph transformer that combines local bond-angle message passing,
-global periodic self-attention, and three targeted architectural
-innovations---defect-aware gated attention pooling, local environment
-enrichment, and pre-norm residual connections---to predict defect formation
-energies on the IMP2D benchmark with substantially fewer parameters than
-existing approaches.  A small ensemble of physically diverse models further
-improves accuracy beyond a much larger prior ensemble.
-
-We systematically evaluate twelve physically motivated innovations spanning
-architecture, loss functions, and training strategies, using bootstrap
-hypothesis testing with rigorous statistical controls.  Notably, all
-auxiliary-loss and reweighting strategies significantly \emph{worsen}
-performance, while targeted architectural changes provide consistent gains---a
-finding that challenges the common practice of importing imbalanced-learning
-techniques from computer vision into data-limited materials science.
-
-A graduated three-tier out-of-distribution protocol quantifies deployment
-boundaries from interpolation through intra-family transfer to compositional
-extrapolation, revealing graceful degradation.  Temperature-scaled ensemble
-uncertainty provides well-calibrated confidence estimates.  Together, these
-results establish \dart{} as an efficient and rigorously validated surrogate
-for accelerating defect engineering in 2D materials.
+Machine-learned formation energies can accelerate impurity screening in
+two-dimensional materials, but random-split accuracy alone does not establish
+chemical transferability or a reliable deployment domain.  We develop a
+defect-aware graph transformer and evaluate it on a provenance-audited,
+leakage-controlled subset of the IMP2D database.  A paired $2^3$ factorial
+separates the contributions of gated graph readout, defect-environment
+features, and a pre-normalized, distance-gated local interaction block.  The
+architecture is selected using validation data only and is then tested under
+random, host-held-out, impurity-held-out, host--impurity-pair-held-out, and
+predefined compositional-block protocols against periodic SchNet and tuned
+descriptor baselines.  A separate calibration partition supports ensemble
+uncertainty and split-conformal intervals, while out-of-fold predictions
+quantify defect-type preference and site-screening regret.  This protocol is
+designed to distinguish interpolation accuracy from chemically meaningful
+transfer and to state the applicability limits of the learned surrogate
+without invoking unmatched first-principles calculations as external
+validation.
 \end{abstract}
 
 \maketitle
@@ -82,7 +70,7 @@ for accelerating defect engineering in 2D materials.
 \input{sections/methods}
 
 %----------------------------------------------------------------------
-\section{Experimental Setup}\label{sec:setup}
+\section{Evaluation Protocol}\label{sec:setup}
 %----------------------------------------------------------------------
 \input{sections/setup}
 
@@ -100,6 +88,14 @@ for accelerating defect engineering in 2D materials.
 \section{Conclusion}\label{sec:conclusion}
 %----------------------------------------------------------------------
 \input{sections/conclusion}
+
+\section*{Data and code availability}
+The source IMP2D data are available through the repository associated with
+Ref.~\cite{imp2d2023}.  The exact sample audit, immutable split definitions,
+resolved experiment configurations, analysis scripts, and machine-readable
+result bundles for this study are available at
+\url{https://github.com/chimeraHHH/2d-defect-dast}.  A release-specific commit
+and archival identifier will be added before publication.
 
 \begin{acknowledgments}
 This work was supported by the National College Students Innovation and

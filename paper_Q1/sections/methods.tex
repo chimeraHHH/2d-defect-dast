@@ -1,342 +1,182 @@
 % !TEX root = ../main.tex
 
 %----------------------------------------------------------------------
-\subsection{Periodic graph construction}\label{sec:graph}
+\subsection{Dataset, target provenance, and canonical modeling set}
+\label{sec:data}
 %----------------------------------------------------------------------
 
-Each defect supercell is represented as a graph $\mathcal{G} = (\mathcal{V},
-\mathcal{E})$ where nodes correspond to atoms and edges to interatomic
-interactions under periodic boundary conditions (PBC).
+We use neutral impurity structures from the Impurities in Two-Dimensional
+Materials Database (IMP2D)~\cite{imp2d2023}.  The source ASE database contains
+17,364 rows.  Replaying the data-preparation filter in database order removes
+4551 unconverged calculations, 1828 rows with a missing or nonfinite stored
+formation energy, and 344 rows with $|E_{\mathrm f}|>20$~eV, leaving 10,641
+structures.  These structures span 44 hosts, 65 impurity elements, and two
+incorporation classes (adsorbate and interstitial).
 
-\paragraph{Minimum-image neighbor list.}
-For a 2D monolayer with lattice vectors $\mathbf{L} = [\mathbf{l}_1,
-\mathbf{l}_2, \mathbf{l}_3]$, the neighbor set of atom $i$ is
-\begin{equation}\label{eq:neighbors}
-  \mathcal{N}(i) = \bigl\{(j, \mathbf{n}) \in V \times \mathbb{Z}^3
-    \;\big|\; \|\mathbf{r}_j + \mathbf{L}\mathbf{n} - \mathbf{r}_i\|
-    < r_\mathrm{cut}\bigr\},
-\end{equation}
-with $r_\mathrm{cut} = 5.0$\,\AA{}.
-
-\paragraph{Node features.}
-Each atom $i$ is described by a 9-dimensional physicochemical feature vector
-$\mathbf{x}_i$ (group, period, electronegativity, covalent and van~der~Waals
-radii, valence electrons, ionization energy, electron affinity, atomic mass),
-all $z$-score normalized.
-Optionally, 128-dimensional pretrained atomic embeddings from
-ct-UAE~\cite{ctuae2025} are concatenated, injecting transferable chemical
-priors from Materials Project pretraining.
-
-\paragraph{Defect-site embedding.}
-A binary indicator $\delta_i \in \{0, 1\}$ marks the dopant atom:
-\begin{equation}\label{eq:defect_embed}
-  \mathbf{h}_i^{(0)} = \mathbf{W}_\mathrm{emb}\,\mathbf{x}_i
-    + \mathbf{e}_\mathrm{def}(\delta_i),
-\end{equation}
-where $\mathbf{e}_\mathrm{def}$ is a learned embedding that injects defect
-location into the initial representation.
-
-\paragraph{Edge and triplet features.}
-Interatomic distances are expanded via $K=32$ Gaussian radial basis functions
-(RBF).  For three-body interactions, bond angles $\theta_{jik}$ between
-neighbor pairs $(j,k)$ of center atom $i$ are similarly RBF-expanded and
-processed by an MLP.
-
-%----------------------------------------------------------------------
-\subsection{DART architecture}\label{sec:arch}
-%----------------------------------------------------------------------
-
-\dart{} adopts a hierarchical design decoupling short-range chemical bonding
-from long-range defect-induced perturbations (Fig.~\ref{fig:architecture}).
-
-\definecolor{localblue}{HTML}{4393C3}
-\definecolor{globalorange}{HTML}{E66101}
-\definecolor{innovgreen}{HTML}{1B7837}
-\definecolor{readoutpurple}{HTML}{7B3294}
-\definecolor{inputgray}{HTML}{D9D9D9}
-\definecolor{bgblue}{HTML}{DEEBF7}
-\definecolor{bgorange}{HTML}{FEE6CE}
-\definecolor{bggreen}{HTML}{D5E8D4}
-
-\begin{figure*}[t]
-\centering
-\resizebox{0.75\textwidth}{!}{%
-\begin{tikzpicture}[
-    node distance=0.45cm and 0.7cm,
-    block/.style={draw, rounded corners=2pt, minimum height=0.6cm,
-                  minimum width=2.2cm, font=\footnotesize, thick,
-                  align=center},
-    localblock/.style={block, fill=bgblue, draw=localblue},
-    globalblock/.style={block, fill=bgorange, draw=globalorange},
-    innovblock/.style={block, fill=bggreen, draw=innovgreen},
-    ioblock/.style={block, fill=inputgray!50, draw=gray},
-    readblock/.style={block, fill=readoutpurple!15, draw=readoutpurple},
-    arrow/.style={-{Stealth[length=4pt]}, thick},
-    bracetext/.style={font=\scriptsize, text=gray, align=center},
-]
-% Input
-\node[ioblock, minimum width=3.2cm] (input) {Crystal graph $\mathcal{G}$\\
-  \scriptsize $\mathbf{x}_i$ (9-dim) $+$ $\delta_i$ defect flag};
-% Embedding
-\node[ioblock, below=0.35cm of input, minimum width=3.2cm] (embed) {
-  Node embedding\\[-2pt]
-  \scriptsize $\mathbf{h}_i^{(0)} = \mathbf{W}\mathbf{x}_i + \mathbf{e}_{\mathrm{def}}(\delta_i)$};
-% Local layers
-\node[localblock, below=0.45cm of embed, minimum width=3.2cm] (local) {
-  Local interaction $\times 3$\\[-2pt]
-  \scriptsize Bond $+$ angle convolution};
-% Innovation: Env enrichment
-\node[innovblock, right=0.5cm of local, minimum width=2.5cm] (envrich) {
-  \textbf{(II)} Env enrichment\\[-2pt]
-  \scriptsize CN, $\bar{d}$, $\Delta\chi$};
-% Global layers
-\node[globalblock, below=0.45cm of local, minimum width=3.2cm] (global) {
-  Global self-attn $\times 2$\\[-2pt]
-  \scriptsize Distance bias $\phi(d_{ij}^{\mathrm{PBC}})$};
-% Innovation: Pre-norm
-\node[innovblock, right=0.5cm of global, minimum width=2.5cm] (prenorm) {
-  \textbf{(III)} Pre-norm residual\\[-2pt]
-  \scriptsize LN $\to$ SubLayer $\to$ Add};
-% Gated pooling
-\node[readblock, below=0.45cm of global, minimum width=3.2cm] (pool) {
-  \textbf{(I)} Gated attn pooling\\[-2pt]
-  \scriptsize $\sigma(\mathbf{W}_g)\!\odot\!$AttnPool $+$ MaxPool};
-% MLP
-\node[readblock, below=0.35cm of pool, minimum width=3.2cm] (mlp) {
-  MLP readout $\to$ $\hat{E}_f$};
-% Arrows
-\draw[arrow] (input)  -- (embed);
-\draw[arrow] (embed)  -- (local);
-\draw[arrow] (local)  -- (global);
-\draw[arrow] (global) -- (pool);
-\draw[arrow] (pool)   -- (mlp);
-\draw[arrow, innovgreen, dashed] (envrich) -- (local);
-\draw[arrow, innovgreen, dashed] (prenorm) -- (global);
-% Braces
-\draw[decorate, decoration={brace, amplitude=5pt, mirror},
-      localblue, thick]
-  ($(local.south west) + (-0.12, 0)$) --
-  ($(local.north west) + (-0.12, 0)$)
-  node[midway, left=5pt, bracetext, text=localblue]
-  {$r\!<\!5$\,\AA};
-\draw[decorate, decoration={brace, amplitude=5pt, mirror},
-      globalorange, thick]
-  ($(global.south west) + (-0.12, 0)$) --
-  ($(global.north west) + (-0.12, 0)$)
-  node[midway, left=5pt, bracetext, text=globalorange]
-  {$r\!<\!12$\,\AA};
-% Legend
-\node[below=0.5cm of mlp, font=\scriptsize, text=gray] {
-  \textcolor{localblue}{$\blacksquare$} Local \quad
-  \textcolor{globalorange}{$\blacksquare$} Global \quad
-  \textcolor{innovgreen}{$\blacksquare$} Innovations \quad
-  \textcolor{readoutpurple}{$\blacksquare$} Readout
-};
-\end{tikzpicture}%
-}% end resizebox
-\caption{\dart{} architecture overview.
-  Local interaction layers (blue) capture bond lengths, bond angles, and
-  coordination within $r_\mathrm{cut} = 5$\,\AA{}.
-  Global geometric self-attention layers (orange) model long-range
-  perturbations via distance-biased attention up to $d_\mathrm{max} = 12$\,\AA{}.
-  Three innovations (green): gated attention pooling, local environment
-  enrichment, and pre-norm residual connections.}
-\label{fig:architecture}
-\end{figure*}
-
-\subsubsection{Local interaction layers}
-
-The first $L_\mathrm{loc} = 3$ layers operate on the sparse neighbor graph
-via continuous-filter convolution gated by distance, with additive three-body
-angle modulation:
-\begin{multline}\label{eq:local}
-  \mathbf{h}_i^{(l+1)} = \mathbf{h}_i^{(l)}
-    + \sigma\Bigl(
-      \textstyle\sum_{j \in \mathcal{N}(i)} \boldsymbol{\phi}(d_{ij})
-        \odot \mathbf{W}\mathbf{h}_j^{(l)} \\
-      + \textstyle\sum_{(j,k) \in \mathcal{T}(i)}
-        f_\mathrm{trip}(\mathbf{h}_i^{(l)}, \theta_{jik})
-    \Bigr),
-\end{multline}
-where $\boldsymbol{\phi}$ is a two-layer MLP over RBF-expanded distance,
-$\mathcal{T}(i)$ the triplet set (capped at 32), $f_\mathrm{trip}$ an MLP
-over concatenated features and angle RBF, and $\sigma$ the SiLU activation.
-
-\subsubsection{Global geometric self-attention layers}
-
-The subsequent $L_\mathrm{glob} = 2$ layers employ full multi-head
-self-attention with learnable distance bias:
-\begin{equation}\label{eq:global_attn}
-  \mathrm{Attn}(Q, K, V)
-    = \mathrm{softmax}\!\left(
-        \frac{QK^\top}{\sqrt{d_k}}
-        + \phi_\mathrm{bias}\!\bigl(d_{ij}^{\mathrm{PBC}}\bigr)
-      \right) V,
-\end{equation}
-where $d_{ij}^{\mathrm{PBC}}$ is the minimum-image distance (up to
-$d_\mathrm{max} = 12$\,\AA{}) and $\phi_\mathrm{bias}$ maps RBF-expanded
-distances through an MLP to per-head attention biases.
-This mechanism acts as a learnable interatomic potential modulating
-information flow~\cite{crystalformer2024}, naturally capturing the
-${\sim}1/r^2$ strain fields characteristic of 2D point defects.
-
-\subsubsection{Architectural innovations}\label{sec:innovations}
-
-Three targeted innovations address identified failure modes of the base
-architecture:
-
-\paragraph{(I) Defect-aware gated attention pooling.}
-Standard mean pooling dilutes the extreme features of the defect atom among
-dozens of host atoms.  We replace it with a gated fusion of attention-weighted
-and max pooling:
+For rows with complete source fields, the target was independently recomputed
+as
 \begin{equation}
-  \mathbf{g}_\mathrm{read} = \sigma(\mathbf{W}_g)
-    \odot \mathrm{AttnPool}(\{\mathbf{h}_i\})
-    + (1 - \sigma(\mathbf{W}_g))
-    \odot \max_i \mathbf{h}_i,
+ E_{\mathrm f}=E_{\mathrm{def}}-E_{\mathrm{host}}-\mu_{\mathrm{imp}}.
+ \label{eq:formation_energy}
 \end{equation}
-where the attention weights are learned via a single-layer MLP and the gate
-$\sigma(\mathbf{W}_g)$ balances global context (attention) with extreme-value
-capture (max).
-Ablation shows $-19.9\%$ MAE improvement (0.516 $\to$ 0.414\eV{}).
+The recomputed and stored values agree to a maximum absolute numerical
+difference of $2.3\times10^{-13}$~eV.  Four otherwise filtered rows contain a
+zero sentinel in the stored defective-structure energy and therefore cannot be
+independently reconstructed from the source components; these rows are
+excluded from every modeling split.
 
-\paragraph{(II) Local environment enrichment.}
-Physically interpretable descriptors---coordination number, neighbor distance
-statistics (mean, min, max, std), and electronegativity contrast
-$\overline{\chi}_\mathrm{nbr} - \chi_i$---are computed from the local
-neighborhood and projected through an MLP before injection into the defect
-atom's representation.
-These features encode Hume-Rothery-type information~\cite{bartel2020}
-without requiring explicit physics feature engineering.
-Ablation: $-18.0\%$ (0.516 $\to$ 0.423\eV{}).
-
-\paragraph{(III) Pre-norm residual connections.}
-Following modern Transformer best practices~\cite{xiong2020}, we apply
-LayerNorm \emph{before} rather than after each sub-layer:
-\begin{equation}
-  \mathbf{h}^{(l+1)} = \mathbf{h}^{(l)}
-    + \mathrm{SubLayer}\!\bigl(\mathrm{LN}(\mathbf{h}^{(l)})\bigr).
-\end{equation}
-This stabilizes gradient flow in deep networks and enables more aggressive
-learning rates.
-Ablation: $-21.0\%$ (0.516 $\to$ 0.408\eV{}).
-
-\paragraph{Combined effect.}
-The three innovations are complementary: together they reduce the MAE from
-0.516 to \textbf{0.381\eV{}} ($-26.2\%$), exceeding the sum of individual
-gains, with only a 10.7\% increase in parameter count
-(0.75\,M $\to$ 0.83\,M).
+We also prevent symmetry-equivalent structures from crossing split
+boundaries.  Duplicate candidates are identified by the union of two hashes:
+(i) atomic numbers, cell, and Cartesian coordinates rounded to
+$10^{-6}$, and (ii) a permutation- and translation-invariant spectrum of
+element-labeled periodic pair distances rounded to $10^{-4}$~\AA.  The latter
+detects numerically equivalent structures even when atom order or coordinate
+origin differs.  Connected duplicate groups contain 65 redundant rows; the
+lowest-index auditable representative is retained.  The resulting canonical
+modeling set contains 10,572 structures.  The complete audit, excluded sample
+indices, database hashes, and immutable split files are distributed with the
+code.
 
 %----------------------------------------------------------------------
-\subsection{Physically motivated variants}\label{sec:variants}
+\subsection{Fixed evaluation partitions}
+\label{sec:splits}
 %----------------------------------------------------------------------
 
-Building on the \dart{} base, we design twelve innovation variants targeting
-specific physical hypotheses about defect formation energy prediction.
-All variants share the same base architecture and training recipe, differing
-only in the stated innovation.
+All partitions were generated once from the canonical set and stored as index
+lists.  Five paired random 80/10/10 partitions (assignment seeds 42--46) are
+used for the $2^3$ architecture experiment.  A separate fivefold random
+cross-validation partition provides one out-of-fold prediction for every
+retained sample.  Chemical transfer is evaluated using balanced fivefold
+group cross-validation in which complete host identities, impurity identities,
+or host--impurity pairs are held together.  In each grouped fold, one group
+fold is used for testing and the next group fold for validation.  We further
+use a predefined matrix-completion holdout: group-VI dichalcogenide hosts
+combined with 3$d$ impurities form the test block, while group-IV/V hosts
+combined with 4$d$ impurities form the validation block.
 
-\paragraph{Architecture innovations.}
-(a)~\emph{V3 Defect-type conditioning}: a zero-initialized learned embedding
-distinguishes interstitial from adsorbate defects, motivated by the 2$\times$
-difference in their $\ef$ distributions.
-(b)~\emph{V4 Mixture-of-experts (MoE) readout}: three specialist MLPs with
-learned gating and KL-divergence balance loss, inspired by the observation
-that the top 10\% hardest samples contribute 59\% of total error.
-(c)~\emph{V6 Physics mismatch features}: six Hume-Rothery descriptors
-(size mismatch, electronegativity difference, ionization energy ratio,
-electron affinity difference, valence electron mismatch, period
-distance)~\cite{bartel2020} computed from dopant--host property contrasts.
-(d)~\emph{V14 JK layer aggregation}: learnable softmax weights over
-local, global-1, and global-2 layer outputs, allowing the model to
-adaptively mix multi-scale representations~\cite{xu2018jk}.
-
-\paragraph{Training strategy innovations.}
-(e)~\emph{V11 Label distribution smoothing (LDS)}: Gaussian kernel
-density estimation with inverse-square-root reweighting, targeting gradient
-starvation for rare high-$\ef$ samples~\cite{yang2021lds}.
-(f)~\emph{V13 Rank-N-Contrast}: auxiliary contrastive loss preserving
-$\ef$ rank ordering in feature space~\cite{zha2023rnc}.
-(g)~\emph{V2+EMA}: exponential moving average of weights
-(decay $= 0.999$).
-(h)~\emph{V2+Focal MAE}: dynamic reweighting
-$w_i = (|e_i|/\overline{|e|})^\gamma$ with $\gamma = 0.5$.
-(i)~\emph{V2+Heteroscedastic uncertainty}: additional variance head
-predicting aleatoric uncertainty~\cite{kendall2017}.
-
-\paragraph{Combination variants.}
-(j)~\emph{V9 Defect--host contrast conditioning}: explicit
-$\Delta$-embedding modeling $\ef \propto E(\text{defect}) - E(\text{pristine})$.
-(k)~\emph{V10 Best combination}: V3+V6+V9+V14+EMA.
-(l)~\emph{V12 LDS+Physics}: V3+V6+V9+LDS+EMA.
+Uncertainty quantification uses an independent random partition with 75\% for
+training, 10\% for checkpoint selection, 5\% for calibration, and 10\% for
+final testing (assignment seed 62).  The calibration and test indices are not
+used to fit network parameters or select checkpoints.  All split files cover
+the full 10,641-row container through mutually disjoint train, validation,
+test, optional calibration, and exclusion sets; their SHA256 hashes are stored
+in every run manifest.
 
 %----------------------------------------------------------------------
-\subsection{Training pipeline}\label{sec:training}
+\subsection{Defect-aware graph transformer}
+\label{sec:architecture}
 %----------------------------------------------------------------------
 
-All models are trained with a standardized recipe optimized for the
-data-limited regime (${\sim}8.5$\,k training samples):
+Each periodic supercell is represented by an atomistic graph.  The initial
+node representation concatenates nine standardized elemental attributes with
+a 128-dimensional ct-UAE elemental embedding~\cite{ctuae2025}, projects the
+result to 128 hidden channels, and adds a learned binary embedding that marks
+the impurity atom.  Three local interaction layers aggregate neighbors within
+5~\AA.  Distances are expanded in 32 Gaussian radial basis functions, and
+three-body messages use a 32-function angular expansion.  Two subsequent
+four-head geometric Transformer blocks apply self-attention with a learned
+radial bias derived from the periodic pair-distance matrix on a radial grid
+ending at 12~\AA.  A two-layer multilayer perceptron maps the pooled graph
+representation to $\hat E_{\mathrm f}$.
 
-\begin{itemize}
-  \item \textbf{MAE (L1) loss}, directly aligned with the evaluation metric
-    and robust to the heavy-tailed $\ef$ distribution.
-  \item \textbf{Cosine annealing with linear warmup}: 10-epoch warmup from
-    $10^{-7}$ to $5\times10^{-4}$, cosine decay to $10^{-6}$ over 150 epochs.
-  \item \textbf{Stochastic Weight Averaging (SWA)}: from epoch 120, weights
-    are averaged every epoch~\cite{swa2018}.
-  \item \textbf{Online data augmentation}: random rotations, coordinate
-    perturbations ($\sigma_r \in [0.01, 0.05]$\,\AA{}), and biaxial strain
-    ($\leq 2\%$) applied on-the-fly.
-  \item \textbf{Label noise regularization}: Gaussian noise
-    ($\sigma = 0.03$\eV{}) simulating DFT numerical uncertainty.
-  \item \textbf{Auxiliary defect-type classification}: multi-task head
-    predicting defect type with weight 0.1, providing gradient signal for
-    defect-relevant features.
-\end{itemize}
-
-Training completes in ${\sim}22$ minutes per model on a single NVIDIA L40S GPU.
-
-%----------------------------------------------------------------------
-\subsection{Ensemble and uncertainty quantification}\label{sec:uq_method}
-%----------------------------------------------------------------------
-
-We construct a pool of 20 models spanning five diversity axes:
-architecture variant (\dart{} base, MoE, JK, DefType, Physics, multi-source),
-random seed (4 values), training length (150/250 epochs), and data source
-(single-source IMP2D / multi-source 4-DB).
-Greedy forward selection identifies the $k$-model subset minimizing test MAE.
-Prediction uncertainty is estimated as ensemble standard deviation with
-post-hoc temperature scaling~\cite{guo2017}.
-
-%----------------------------------------------------------------------
-\subsection{Graduated generalization assessment}\label{sec:ood_method}
-%----------------------------------------------------------------------
-
-We adopt a three-tier protocol with increasing extrapolation
-difficulty~\cite{li2025ood}:
-
+The confirmatory architecture experiment varies three binary modules while
+holding every other training and model setting fixed:
 \begin{description}
-  \item[Tier~0 (ID):]
-    Standard 80/10/10 random split.
-  \item[Tier~1 (Intra-family OOD):]
-    Leave-one-host-out (LOHO) over seven G6-TMD hosts:
-    all configurations of one host are held out; the remaining hosts form
-    the training set.
-  \item[Tier~2 (Compositional OOD):]
-    G6$\times$3d block-out: all (G6 host, 3d dopant) pairs held out,
-    testing matrix-completion generalization.
+ \item[Gated readout (G).]
+ A learned atom-attention sum and a channelwise maximum are fused by a
+ graph-dependent scalar gate.  The off state uses masked mean pooling.
+ \item[Environment enrichment (E).]
+ Four defect-centered quantities---coordination number, mean and maximum
+ neighbor distance, and the absolute electronegativity contrast to the local
+ neighborhood---are normalized, projected, and added only to the impurity
+ representation.  The off state omits this branch.
+ \item[Pre-norm gated local block (P).]
+ The on state normalizes node states before message construction and applies a
+ learned scalar distance gate to each edge before a residual update.  The off
+ state uses the original ungated message and post-residual normalization.  We
+ treat this as one composite local-block change and do not attribute its effect
+ to normalization or edge gating separately.
 \end{description}
 
+The full $2^3$ factorial contains all eight G/E/P combinations on each of the
+five paired random partitions.  Within a partition, all variants share the
+same initialization seed and training batches.  Main effects and interactions
+are orthogonal factorial contrasts.  The architecture promoted to subsequent
+transfer and uncertainty experiments is the variant with the lowest mean
+validation MAE; exact ties are resolved by fewer enabled modules and then by
+binary variant code.  Test metrics are not part of the ordering rule.
+
 %----------------------------------------------------------------------
-\subsection{Prospective DFT validation}\label{sec:dft_method}
+\subsection{Training protocol}
+\label{sec:training}
 %----------------------------------------------------------------------
 
-% TODO: Expand when DFT validation is finalized.
-To bridge the gap between benchmark accuracy and real-world deployment, we
-perform independent first-principles verification of model-recommended
-candidates.  Candidates are selected into two buckets: a \emph{discovery set}
-(lowest predicted $\ef$, testing whether the model identifies
-thermodynamically accessible dopants) and a \emph{stress-test set} (highest
-predicted uncertainty, testing whether $\sigma_\mathrm{cal}$ correctly flags
-unreliable predictions).  DFT calculations are performed with Quantum ESPRESSO.
-Details will be provided in the final version.
+Networks are optimized for 150 epochs with AdamW, an initial learning rate of
+$5\times10^{-4}$, weight decay $10^{-4}$, a ten-epoch linear warmup, and
+cosine decay to $10^{-6}$.  The objective is mean absolute error (MAE), batch
+size is 64 for DART, and gradient norms are clipped at 5.  The fixed
+regularization recipe includes 0.1 dropout, stochastic depth with rate 0.1,
+Gaussian target noise with standard deviation 0.03~eV, and stochastic weight
+averaging from epoch 120.  Online geometric augmentation applies rotations,
+coordinate perturbations with standard deviation sampled from
+$[0.01,0.05]$~\AA, and up to 2\% strain.  A host-balanced sampler draws up to
+200 structures per host per epoch.  An auxiliary adsorbate/interstitial
+classification head is trained with weight 0.1 and discarded at inference.
+The input projection and compatible local-layer weights are initialized from
+the same frozen pretraining checkpoint for every factorial variant.
+
+The checkpoint with minimum validation MAE is evaluated once on its test
+partition.  Each run records the code commit and dirty state, resolved
+configuration, command, Python/PyTorch/CUDA environment, data and split
+hashes, seed, partition indices, epoch history, checkpoint, and validation and
+test predictions.  Interrupted jobs resume from complete optimizer,
+scheduler, model, and stochastic-weight-averaging state.
+
+%----------------------------------------------------------------------
+\subsection{Baselines}
+\label{sec:baselines}
+%----------------------------------------------------------------------
+
+Two baseline classes use exactly the same canonical partitions.  First, an
+80-dimensional deterministic descriptor combines elemental-property
+statistics, impurity--host contrasts, cell geometry, nearest-neighbor
+distances, coordination counts, and one-hot site and defect labels.  We fit a
+training-target mean predictor, ridge regression, random forests, histogram
+gradient boosting, and LightGBM.  Hyperparameters within each family are
+selected by validation MAE only; the best descriptor family used in each
+reported regime is likewise chosen by mean validation MAE across folds.
+
+Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
+channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA cutoff.
+It follows the same 150-epoch optimization, host balancing, augmentation, and
+target-noise protocol as DART.  For grouped transfer and the chemistry block,
+both neural architectures use the same three prespecified model seeds; their
+predictions are averaged within each split before pooled out-of-fold metrics
+are calculated.
+
+%----------------------------------------------------------------------
+\subsection{Held-out uncertainty calibration and screening analysis}
+\label{sec:uq_method}
+%----------------------------------------------------------------------
+
+Five independently initialized members of the validation-selected DART
+architecture are trained on the dedicated uncertainty split.  Ensemble mean
+and sample standard deviation provide the point prediction and raw epistemic
+spread.  The calibration partition is divided without labels by sorting
+sample indices and alternating rows.  One half fits a nonnegative scale and
+floor for
+\begin{equation}
+ \sigma_i=\sqrt{(a s_i)^2+b^2}
+\end{equation}
+by Gaussian negative log likelihood; the other half estimates finite-sample
+split-conformal quantiles of
+$|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$.  The test set is opened
+only after these parameters and interval quantiles are fixed.
+
+For materials-facing analysis, the five host--impurity-pair folds yield one
+out-of-fold prediction per retained structure.  Within each host--impurity
+pair we compare the minimum predicted and reference energies of adsorbate and
+interstitial configurations, identify the predicted lowest-energy site, and
+report preference accuracy and screening regret.  These are predictive
+associations within IMP2D, not causal mechanism assignments or external DFT
+validation.
