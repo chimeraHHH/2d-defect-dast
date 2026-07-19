@@ -211,6 +211,9 @@ def validate_runs(
             {
                 "manifest": str(path), "manifest_sha256": file_sha256(path),
                 "git": manifest["git"], "seed": int(manifest["seed"]),
+                "data_sha256": manifest["data"]["data_sha256"],
+                "split_id": manifest["split"]["split_id"],
+                "split_sha256": manifest["split"].get("sha256"),
             }
         )
     if len(seeds) != expected_members:
@@ -309,6 +312,8 @@ def main() -> None:
             "selected_variant": variant,
             "selection_data": selection["selection_data"],
         },
+        "data_sha256": sources[0]["data_sha256"],
+        "split_sha256": sources[0]["split_sha256"],
         "calibration_contract": {
             "split_id": "uq_calibration_s62",
             "dedicated_calibration_partition": len(cal_indices),

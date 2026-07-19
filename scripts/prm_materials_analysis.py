@@ -67,7 +67,7 @@ def dopant_period(symbol: str) -> int:
 
 def load_oof_predictions(
     run_dirs: Sequence[Path], selection: Mapping[str, Any],
-    protocol_dir: Path,
+    protocol_dir: Path, expected_data_sha256: str | None = None,
 ) -> Tuple[Dict[int, float], List[Dict[str, Any]]]:
     expected_variant = selection["selected_variant"]
     expected_bits = [digit == "1" for digit in expected_variant[1:]]
@@ -81,6 +81,9 @@ def load_oof_predictions(
             raise ValueError(f"incomplete pair-OOF run: {manifest_path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty pair-OOF run: {manifest_path}")
+        data_sha256 = manifest["data"]["data_sha256"]
+        if expected_data_sha256 is not None and data_sha256 != expected_data_sha256:
+            raise ValueError(f"dataset hash mismatch: {manifest_path}")
         bits = [bool(manifest["config"]["model_kwargs"][name]) for name in COMPONENTS]
         if bits != expected_bits:
             raise ValueError(f"run does not use selected architecture: {manifest_path}")
@@ -106,6 +109,8 @@ def load_oof_predictions(
                 "prediction_sha256": file_sha256(prediction_path),
                 "git": manifest["git"], "seed": int(manifest["seed"]),
                 "split_id": split_id,
+                "data_sha256": data_sha256,
+                "split_sha256": manifest["split"].get("sha256"),
             }
         )
     expected_splits = {f"pair_cv5_f{fold}" for fold in range(5)}
@@ -259,6 +264,7 @@ def main() -> None:
     if selection.get("selection_data") != "validation only":
         raise ValueError("materials analysis requires validation-selected architecture")
     variant = selection["selected_variant"]
+    protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
     run_dirs = sorted(
         path for path in args.result_root.resolve().glob(
             f"selected/{variant}/transfer/pair_cv5_f*/seed242"
@@ -267,6 +273,7 @@ def main() -> None:
     )
     predictions, sources = load_oof_predictions(
         run_dirs, selection, args.protocol_dir.resolve(),
+        protocol_manifest["data_sha256"],
     )
     sample_table = read_sample_table(args.protocol_dir / "samples.csv")
     sample_rows = []
@@ -292,6 +299,7 @@ def main() -> None:
             "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
             "selected_variant": variant, "selection_data": selection["selection_data"],
         },
+        "data_sha256": protocol_manifest["data_sha256"],
         "sources": sources,
         "sample_oof": {
             "n": len(sample_rows), "mae_eV": float(np.mean(np.abs(residual))),
