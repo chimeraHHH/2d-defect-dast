@@ -1,0 +1,188 @@
+{
+  "chemistry_block": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 0.6298162072805723,
+        "n": 1
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 0.6660305014375592,
+        "n": 1
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 0.7902055695770619,
+        "n": 1
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 1.4878634065051957,
+        "n": 1
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.0443961592451765,
+        "n": 1
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  },
+  "dopant_cv": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 1.2005975418562005,
+        "n": 5
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 1.221314831963419,
+        "n": 5
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 1.2516086155888637,
+        "n": 5
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 1.8271042648951532,
+        "n": 5
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.299330037052742,
+        "n": 5
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  },
+  "host_cv": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 1.2299816492125712,
+        "n": 5
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 1.230664654479473,
+        "n": 5
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 1.2396829199032768,
+        "n": 5
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 2.150991217585733,
+        "n": 5
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.311882291797398,
+        "n": 5
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  },
+  "id_cv": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 0.6332638545183336,
+        "n": 5
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 0.6451499088975521,
+        "n": 5
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 0.7516457885965038,
+        "n": 5
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 1.73806467281412,
+        "n": 5
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.296922193859364,
+        "n": 5
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  },
+  "id_repeat": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 0.5635007532988381,
+        "n": 5
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 0.5766808950638638,
+        "n": 5
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 0.6697800890394837,
+        "n": 5
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 1.7398281926809254,
+        "n": 5
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.3095689263942902,
+        "n": 5
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  },
+  "pair_cv": {
+    "candidates": [
+      {
+        "family": "lightgbm",
+        "mean_validation_mae_eV": 0.7006076604107004,
+        "n": 5
+      },
+      {
+        "family": "hist_gradient_boosting",
+        "mean_validation_mae_eV": 0.7120295855578959,
+        "n": 5
+      },
+      {
+        "family": "random_forest",
+        "mean_validation_mae_eV": 0.8305855627753932,
+        "n": 5
+      },
+      {
+        "family": "ridge",
+        "mean_validation_mae_eV": 1.7477625288429213,
+        "n": 5
+      },
+      {
+        "family": "mean",
+        "mean_validation_mae_eV": 2.2976196487230434,
+        "n": 5
+      }
+    ],
+    "selected_family": "lightgbm",
+    "selection_data": "validation only"
+  }
+}

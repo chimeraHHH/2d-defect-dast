@@ -64,6 +64,7 @@ uncertainty identifies a useful selective-prediction domain.
 
 The final 10,572-structure protocol, test suite, remote smoke test, periodic
 SchNet implementation, result collectors, and manuscript protocol sections are
-complete. Descriptor baselines are running on CPU. The paired 2^3 factorial is
-queued behind currently occupied GPUs; validation-only promotion, transfer,
-SchNet, ensemble-UQ, and paper result generation follow automatically.
+complete. Descriptor baselines are frozen for all 27 formal splits, with
+LightGBM selected by validation MAE in every paper regime. The paired 2^3
+factorial is queued behind currently occupied GPUs; validation-only promotion,
+transfer, SchNet, ensemble-UQ, and paper result generation follow automatically.
