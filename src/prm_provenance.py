@@ -93,6 +93,10 @@ def validate_training_completion(
     metrics = manifest.get("metrics")
     if not isinstance(config, Mapping) or not isinstance(metrics, Mapping):
         raise ValueError(f"training config or metrics are missing: {manifest_path}")
+    if float(config.get("label_noise_std", 0.0)) > 0 and (
+        execution.get("label_noise_stream") != "model_seed_and_epoch_v1"
+    ):
+        raise ValueError(f"label-noise stream is not reproducible: {manifest_path}")
     epochs = int(config.get("epochs", 0))
     history = metrics.get("history")
     if epochs <= 0 or not isinstance(history, list) or len(history) != epochs:

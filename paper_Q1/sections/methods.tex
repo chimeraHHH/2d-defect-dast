@@ -138,8 +138,9 @@ transformed back to eV for all reported errors.  The fixed DART regularization
 recipe is limited to 0.1 dropout and additive Gaussian target noise with
 standard deviation 0.03~eV; no coordinate or strain augmentation is applied.
 A host-balanced sampler draws 200 structures per host per epoch; its sequence
-is deterministically indexed by model seed and epoch so paired variants see
-the same batches.  Every factorial variant uses the same fixed pretraining
+and the independent target-noise stream are deterministically indexed by model
+seed and epoch so paired variants see the same batches and noise realizations.
+Every factorial variant uses the same fixed pretraining
 checkpoint.  Its nine-feature input-projection block and bias, together with
 all 51 shape-matched V1 local-message tensors, initialize the corresponding
 DART parameters.  The 128 input-projection columns associated with the fixed

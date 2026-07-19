@@ -99,3 +99,13 @@ def test_truncated_training_cannot_be_admitted():
     manifest["execution"]["max_steps"] = 1
     with pytest.raises(ValueError, match="truncated"):
         validate_training_completion(manifest, Path("run_manifest.json"))
+
+
+def test_noisy_training_requires_the_independent_rng_stream():
+    manifest = _complete_manifest()
+    manifest["config"]["label_noise_std"] = 0.03
+    with pytest.raises(ValueError, match="label-noise stream"):
+        validate_training_completion(manifest, Path("run_manifest.json"))
+
+    manifest["execution"]["label_noise_stream"] = "model_seed_and_epoch_v1"
+    validate_training_completion(manifest, Path("run_manifest.json"))

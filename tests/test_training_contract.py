@@ -12,6 +12,7 @@ import yaml
 from src.train_schnet import build_scheduler
 from src.train_enhanced import (
     capture_rng_state,
+    make_label_noise_generator,
     resolve_runtime_assets,
     restore_rng_state,
     set_seed,
@@ -124,6 +125,22 @@ def test_rng_state_round_trip_reproduces_all_training_generators():
     assert observed[0] == expected[0]
     assert observed[1] == expected[1]
     assert torch.equal(observed[2], expected[2])
+
+
+def test_label_noise_stream_is_independent_of_model_rng_consumption():
+    device = torch.device("cpu")
+    first = make_label_noise_generator(device, seed=142, epoch=7)
+    expected = torch.randn((4,), generator=first)
+
+    torch.manual_seed(999)
+    _ = torch.randn(10_000)
+    repeated = make_label_noise_generator(device, seed=142, epoch=7)
+    observed = torch.randn((4,), generator=repeated)
+    next_epoch = make_label_noise_generator(device, seed=142, epoch=8)
+    changed = torch.randn((4,), generator=next_epoch)
+
+    assert torch.equal(observed, expected)
+    assert not torch.equal(changed, expected)
 
 
 def test_runtime_asset_resolution_does_not_mutate_controlled_config():

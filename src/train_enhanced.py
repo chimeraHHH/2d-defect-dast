@@ -165,6 +165,19 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def make_label_noise_generator(
+    device: torch.device,
+    *,
+    seed: int,
+    epoch: int,
+) -> torch.Generator:
+    """Create a model-independent target-noise stream for one epoch."""
+    stream_seed = (int(seed) * 1_000_003 + int(epoch) * 97_409 + 17) % (2**63 - 1)
+    generator = torch.Generator(device=device)
+    generator.manual_seed(stream_seed)
+    return generator
+
+
 def capture_rng_state() -> Dict[str, Any]:
     state: Dict[str, Any] = {
         "python": random.getstate(),
@@ -603,6 +616,7 @@ def main() -> None:
         "execution": {
             "max_steps": int(args.max_steps),
             "resume_requested": bool(args.resume),
+            "label_noise_stream": "model_seed_and_epoch_v1",
         },
         "assets": asset_records,
         "data": {
@@ -916,6 +930,9 @@ def main() -> None:
         for epoch in range(start_epoch, epochs + 1):
             t0 = time.time()
             model.train()
+            label_noise_generator = make_label_noise_generator(
+                device, seed=int(cfg.get("seed", 42)), epoch=epoch
+            )
             if sampler is not None:
                 sampler.set_epoch(epoch - 1)
             if aux_defect_head is not None:
@@ -936,7 +953,12 @@ def main() -> None:
 
                 # P1-3: Label noise
                 if label_noise_std > 0:
-                    noise = torch.randn_like(target) * label_noise_std
+                    noise = torch.randn(
+                        target.shape,
+                        dtype=target.dtype,
+                        device=target.device,
+                        generator=label_noise_generator,
+                    ) * label_noise_std
                     target_noisy = target + noise
                 else:
                     target_noisy = target

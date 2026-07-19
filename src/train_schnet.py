@@ -36,6 +36,7 @@ from src.train_enhanced import (
     capture_rng_state,
     file_sha256,
     move_batch,
+    make_label_noise_generator,
     resolve_path,
     restore_rng_state,
     set_seed,
@@ -219,6 +220,7 @@ def main() -> None:
         "execution": {
             "max_steps": int(args.max_steps),
             "resume_requested": bool(args.resume),
+            "label_noise_stream": "model_seed_and_epoch_v1",
         },
         "data": {
             "path": str(data_path), "size_bytes": data_path.stat().st_size,
@@ -264,6 +266,9 @@ def main() -> None:
         for epoch in range(start_epoch, epochs + 1):
             epoch_start = time.time()
             model.train()
+            label_noise_generator = make_label_noise_generator(
+                device, seed=int(cfg["seed"]), epoch=epoch
+            )
             if train_sampler is not None:
                 train_sampler.set_epoch(epoch - 1)
             train_error = 0.0
@@ -273,7 +278,13 @@ def main() -> None:
                 label_noise = float(cfg.get("label_noise_std", 0.0))
                 noisy_target = batch["target"]
                 if label_noise > 0:
-                    noisy_target = noisy_target + torch.randn_like(noisy_target) * label_noise
+                    noise = torch.randn(
+                        noisy_target.shape,
+                        dtype=noisy_target.dtype,
+                        device=noisy_target.device,
+                        generator=label_noise_generator,
+                    )
+                    noisy_target = noisy_target + noise * label_noise
                 target_norm = normalizer.norm(noisy_target)
                 prediction_norm = model(batch)
                 loss = torch.mean(torch.abs(prediction_norm - target_norm))
