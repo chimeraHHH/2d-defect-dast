@@ -12,6 +12,7 @@ from src.splits import (
     random_split_indices,
     random_split_subset,
     random_cv_splits,
+    random_split_with_calibration,
     validate_split,
     write_split,
 )
@@ -61,6 +62,20 @@ def test_random_cv_tests_every_sample_once():
     assert len(tested) == len(set(tested))
     for split in splits:
         validate_split(split, len(indices))
+
+
+def test_calibration_partition_is_disjoint_and_fully_covered():
+    indices = list(range(100))
+    train, val, calibration, test = random_split_with_calibration(indices, seed=62)
+    split = {
+        "train": train, "val": val, "calibration": calibration,
+        "test": test,
+    }
+    counts = validate_split(split, len(indices))
+    assert counts == {
+        "train": 75, "val": 10, "test": 10, "calibration": 5,
+        "excluded": 0,
+    }
 
 
 def test_split_round_trip_checks_dataset_identity(tmp_path):

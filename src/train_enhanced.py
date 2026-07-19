@@ -85,6 +85,14 @@ def config_sha256(config: Dict[str, Any]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def environment_snapshot(device: torch.device) -> Dict[str, Any]:
     cuda_name = None
     if device.type == "cuda" and torch.cuda.is_available():
@@ -528,6 +536,10 @@ def main() -> None:
         train_set = Subset(dataset, split_payload["train"])
         val_set = Subset(dataset, split_payload["val"])
         test_set = Subset(dataset, split_payload["test"])
+        calibration_set = (
+            Subset(dataset, split_payload["calibration"])
+            if "calibration" in split_payload else None
+        )
         split_id = split_payload["split_id"]
     else:
         split_path = None
@@ -537,7 +549,14 @@ def main() -> None:
             val_ratio=cfg.get("val_ratio", 0.1),
             seed=split_seed,
         )
+        calibration_set = None
         split_id = f"legacy_random_s{split_seed}"
+
+    split_counts = {
+        "train": len(train_set), "val": len(val_set), "test": len(test_set),
+    }
+    if calibration_set is not None:
+        split_counts["calibration"] = len(calibration_set)
 
     run_manifest = {
         "schema_version": "prm_run_manifest_v1",
@@ -555,21 +574,24 @@ def main() -> None:
         "split": {
             "split_id": split_id,
             "path": str(split_path) if split_path else None,
-            "counts": {
-                "train": len(train_set), "val": len(val_set), "test": len(test_set)
-            },
+            "sha256": file_sha256(split_path) if split_path else None,
+            "counts": split_counts,
         },
         "seed": cfg.get("seed", 42),
         "environment": environment_snapshot(device),
     }
     write_json(out_dir / "run_manifest.json", run_manifest)
-    np.savez(
-        out_dir / "split_indices.npz",
-        train=np.asarray(train_set.indices, dtype=np.int64),
-        val=np.asarray(val_set.indices, dtype=np.int64),
-        test=np.asarray(test_set.indices, dtype=np.int64),
-        split_id=np.asarray(split_id),
-    )
+    split_arrays = {
+        "train": np.asarray(train_set.indices, dtype=np.int64),
+        "val": np.asarray(val_set.indices, dtype=np.int64),
+        "test": np.asarray(test_set.indices, dtype=np.int64),
+        "split_id": np.asarray(split_id),
+    }
+    if calibration_set is not None:
+        split_arrays["calibration"] = np.asarray(
+            calibration_set.indices, dtype=np.int64,
+        )
+    np.savez(out_dir / "split_indices.npz", **split_arrays)
 
     set_seed(cfg.get("seed", 42))
 
@@ -620,6 +642,14 @@ def main() -> None:
                              shuffle=False, collate_fn=collate_fn,
                              num_workers=n_workers, pin_memory=True,
                              persistent_workers=(n_workers > 0))
+    calibration_loader = (
+        DataLoader(
+            calibration_set, batch_size=cfg.get("batch_size", 64),
+            shuffle=False, collate_fn=collate_fn, num_workers=n_workers,
+            pin_memory=True, persistent_workers=(n_workers > 0),
+        )
+        if calibration_set is not None else None
+    )
 
     # Normalizer
     targets = torch.tensor(
@@ -1071,6 +1101,10 @@ def main() -> None:
         model.load_state_dict(ckpt["model"])
         test_metrics = evaluate(model, test_loader, normalizer, device)
         val_final = evaluate(model, val_loader, normalizer, device)
+        calibration_metrics = (
+            evaluate(model, calibration_loader, normalizer, device)
+            if calibration_loader is not None else None
+        )
         final_line = f"\n[Final] Test MAE {test_metrics['mae']:.4f} | RMSE {test_metrics['rmse']:.4f}\n"
         print(final_line)
         logf.write(final_line)
@@ -1087,6 +1121,11 @@ def main() -> None:
         },
         "test_mae": test_metrics["mae"], "test_rmse": test_metrics["rmse"],
     }
+    if calibration_metrics is not None:
+        summary["calibration"] = {
+            key: calibration_metrics[key]
+            for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+        }
     # Save model internals for interpretability analysis
     if hasattr(model, 'jk_weights'):
         import torch.nn.functional as _F
@@ -1113,16 +1152,30 @@ def main() -> None:
              split_id=np.asarray(split_id), split=np.asarray("val"),
              indices=val_final["indices"],
              preds=val_final["preds"], targets=val_final["targets"])
+    if calibration_metrics is not None:
+        np.savez(
+            out_dir / "calibration_predictions.npz",
+            schema_version=np.asarray("prm_predictions_v1"),
+            split_id=np.asarray(split_id), split=np.asarray("calibration"),
+            indices=calibration_metrics["indices"],
+            preds=calibration_metrics["preds"],
+            targets=calibration_metrics["targets"],
+        )
+    output_paths = {
+        "metrics": str(metrics_path),
+        "checkpoint": str(ckpt_path),
+        "validation_predictions": str(out_dir / "val_predictions.npz"),
+        "test_predictions": str(out_dir / "test_predictions.npz"),
+    }
+    if calibration_metrics is not None:
+        output_paths["calibration_predictions"] = str(
+            out_dir / "calibration_predictions.npz"
+        )
     run_manifest.update(
         {
             "status": "complete",
             "completed_at": datetime.now(timezone.utc).isoformat(),
-            "outputs": {
-                "metrics": str(metrics_path),
-                "checkpoint": str(ckpt_path),
-                "validation_predictions": str(out_dir / "val_predictions.npz"),
-                "test_predictions": str(out_dir / "test_predictions.npz"),
-            },
+            "outputs": output_paths,
             "metrics": summary,
         }
     )

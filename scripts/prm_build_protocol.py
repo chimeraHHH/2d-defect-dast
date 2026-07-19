@@ -22,6 +22,7 @@ from src.splits import (
     random_cv_splits,
     random_split_indices,
     random_split_subset,
+    random_split_with_calibration,
     write_split,
 )
 
@@ -64,6 +65,60 @@ def coordinate_fingerprint(sample: Dict[str, Any]) -> str:
             array = array.astype(dtype)
         digest.update(array.tobytes(order="C"))
     return digest.hexdigest()
+
+
+def invariant_distance_fingerprint(
+    sample: Dict[str, Any], decimals: int = 4,
+) -> str:
+    """Hash composition and element-labelled pair distances invariantly."""
+    numbers = np.asarray(sample["numbers"], dtype=np.int16)
+    distances = np.asarray(sample["dist_matrix"], dtype=float)
+    left, right = np.triu_indices(len(numbers), k=1)
+    low_z = np.minimum(numbers[left], numbers[right])
+    high_z = np.maximum(numbers[left], numbers[right])
+    rounded_distance = np.round(distances[left, right], decimals=decimals)
+    order = np.lexsort((rounded_distance, high_z, low_z))
+    elements, counts = np.unique(numbers, return_counts=True)
+    digest = hashlib.sha256()
+    digest.update(elements.astype("<i2").tobytes())
+    digest.update(counts.astype("<i2").tobytes())
+    digest.update(low_z[order].astype("<i2").tobytes())
+    digest.update(high_z[order].astype("<i2").tobytes())
+    digest.update(rounded_distance[order].astype("<f8").tobytes())
+    return digest.hexdigest()
+
+
+def merged_duplicate_groups(
+    fingerprint_sets: Sequence[Sequence[str]],
+) -> List[List[int]]:
+    """Return connected components induced by multiple duplicate fingerprints."""
+    n_samples = len(fingerprint_sets[0])
+    if any(len(values) != n_samples for values in fingerprint_sets):
+        raise ValueError("fingerprint collections have different lengths")
+    parent = list(range(n_samples))
+
+    def find(index: int) -> int:
+        while parent[index] != index:
+            parent[index] = parent[parent[index]]
+            index = parent[index]
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root, right_root = find(left), find(right)
+        if left_root != right_root:
+            parent[max(left_root, right_root)] = min(left_root, right_root)
+
+    for fingerprints in fingerprint_sets:
+        first_by_fingerprint: Dict[str, int] = {}
+        for index, fingerprint in enumerate(fingerprints):
+            if fingerprint in first_by_fingerprint:
+                union(index, first_by_fingerprint[fingerprint])
+            else:
+                first_by_fingerprint[fingerprint] = index
+    components: Dict[int, List[int]] = defaultdict(list)
+    for index in range(n_samples):
+        components[find(index)].append(index)
+    return sorted(components.values(), key=lambda group: group[0])
 
 
 def duplicate_summary(values: Iterable[Any]) -> Dict[str, int]:
@@ -260,11 +315,31 @@ def build_splits(
                     "status": "development" if split_seed == 42 else "confirmatory_repeat",
                     "warning": "seed 42 was inspected in historical development"
                     if split_seed == 42 else "predefined before PRM reruns",
-                    "deduplication": "one representative per rounded-coordinate fingerprint",
+                    "deduplication": "one representative per merged coordinate/distance fingerprint group",
                 },
                 excluded=excluded_indices,
             )
         )
+
+    uq_train, uq_val, uq_calibration, uq_test = random_split_with_calibration(
+        retained_indices, seed=62,
+    )
+    records.append(
+        write_split(
+            split_dir / "uq_calibration_s62.json", "uq_calibration_s62",
+            uq_train, uq_val, uq_test, n_samples, data_sha256,
+            "random_75_10_5_10_deduplicated_with_heldout_calibration",
+            {
+                "assignment_seed": 62,
+                "selection_data": "validation partition only",
+                "calibration_data": "dedicated calibration partition only",
+                "test_data": "evaluation only",
+                "deduplication": "one representative per merged coordinate/distance fingerprint group",
+            },
+            excluded=excluded_indices,
+            calibration=uq_calibration,
+        )
+    )
 
     for split in random_cv_splits(retained_indices, n_folds=5, seed=52):
         fold = int(split["fold"])
@@ -278,7 +353,7 @@ def build_splits(
                     "fold": fold,
                     "assignment_seed": 52,
                     "purpose": "out-of-fold predictions for paper analysis",
-                    "deduplication": "one representative per rounded-coordinate fingerprint",
+                    "deduplication": "one representative per merged coordinate/distance fingerprint group",
                 },
                 excluded=excluded_indices,
             )
@@ -302,7 +377,7 @@ def build_splits(
                     n_samples, data_sha256, f"{axis}_grouped_cv5",
                     {
                         "fold": fold, "groups": split["groups"], "assignment_seed": 42,
-                        "deduplication": "one representative per rounded-coordinate fingerprint",
+                        "deduplication": "one representative per merged coordinate/distance fingerprint group",
                     },
                     excluded=excluded_indices,
                 )
@@ -330,7 +405,7 @@ def build_splits(
                 "test_dopant_group": sorted(DOPANTS_3D),
                 "validation_host_group": sorted(G45_HOSTS),
                 "validation_dopant_group": sorted(DOPANTS_4D),
-                "deduplication": "one representative per rounded-coordinate fingerprint",
+                "deduplication": "one representative per merged coordinate/distance fingerprint group",
             },
             excluded=excluded_indices,
         )
@@ -363,15 +438,17 @@ def main() -> None:
         )
         for meta in metadata
     ]
-    fingerprints = [coordinate_fingerprint(sample) for sample in samples]
-    fingerprint_groups: Dict[str, List[int]] = defaultdict(list)
-    for index, fingerprint in enumerate(fingerprints):
-        fingerprint_groups[fingerprint].append(index)
-    retained_indices = [min(group) for group in fingerprint_groups.values()]
-    retained_indices.sort()
+    coordinate_fingerprints = [coordinate_fingerprint(sample) for sample in samples]
+    distance_fingerprints = [
+        invariant_distance_fingerprint(sample) for sample in samples
+    ]
+    all_groups = merged_duplicate_groups(
+        [coordinate_fingerprints, distance_fingerprints]
+    )
+    retained_indices = [min(group) for group in all_groups]
     retained_set = set(retained_indices)
     excluded_indices = [i for i in range(len(samples)) if i not in retained_set]
-    repeated_groups = [group for group in fingerprint_groups.values() if len(group) > 1]
+    repeated_groups = [group for group in all_groups if len(group) > 1]
     duplicate_target_deltas = [
         max(float(samples[i]["target"]) for i in group)
         - min(float(samples[i]["target"]) for i in group)
@@ -429,10 +506,16 @@ def main() -> None:
             "id": duplicate_summary(ids),
             "unique_id": duplicate_summary(unique_ids),
             "host_dopant_defecttype_site": duplicate_summary(semantic_keys),
-            "rounded_coordinate_fingerprint": duplicate_summary(fingerprints),
+            "rounded_coordinate_fingerprint": duplicate_summary(coordinate_fingerprints),
+            "invariant_element_pair_distance_fingerprint": duplicate_summary(
+                distance_fingerprints
+            ),
             "semantic_groups_with_target_conflicts": conflicting_semantic_groups,
             "canonical_deduplication": {
-                "strategy": "retain the lowest sample index per rounded-coordinate fingerprint",
+                "strategy": (
+                    "retain the lowest sample index in each connected component "
+                    "of coordinate and invariant-distance duplicate groups"
+                ),
                 "n_retained": len(retained_indices),
                 "n_excluded": len(excluded_indices),
                 "excluded_indices": excluded_indices,
@@ -440,7 +523,11 @@ def main() -> None:
                     max(duplicate_target_deltas, default=0.0)
                 ),
             },
-            "fingerprint_note": "Atom order, numbers, cell and positions rounded to 1e-6; not invariant to translation or permutation.",
+            "fingerprint_note": (
+                "Union of (i) atom-order/cell/Cartesian-coordinate hashes rounded "
+                "to 1e-6 and (ii) permutation/translation-invariant, "
+                "element-labelled periodic pair-distance spectra rounded to 1e-4 Angstrom."
+            ),
         },
         "formation_energy_provenance": {
             "auditable_from_clean_pickle": False,

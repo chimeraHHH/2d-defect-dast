@@ -46,6 +46,31 @@ def random_split_subset(
     )
 
 
+def random_split_with_calibration(
+    indices: Sequence[int],
+    train_ratio: float = 0.75,
+    val_ratio: float = 0.10,
+    calibration_ratio: float = 0.05,
+    seed: int = 62,
+) -> Tuple[List[int], List[int], List[int], List[int]]:
+    """Split a canonical subset into train, validation, calibration and test."""
+    if min(train_ratio, val_ratio, calibration_ratio) <= 0:
+        raise ValueError("train, validation and calibration ratios must be positive")
+    if train_ratio + val_ratio + calibration_ratio >= 1.0:
+        raise ValueError("ratios must leave a nonempty test fraction")
+    shuffled = [int(i) for i in indices]
+    random.Random(seed).shuffle(shuffled)
+    n_train = int(train_ratio * len(shuffled))
+    n_val = int(val_ratio * len(shuffled))
+    n_calibration = int(calibration_ratio * len(shuffled))
+    return (
+        shuffled[:n_train],
+        shuffled[n_train:n_train + n_val],
+        shuffled[n_train + n_val:n_train + n_val + n_calibration],
+        shuffled[n_train + n_val + n_calibration:],
+    )
+
+
 def balanced_group_folds(
     labels: Sequence[str], n_folds: int = 5, seed: int = 42
 ) -> Tuple[List[List[int]], List[List[str]]]:
@@ -138,28 +163,27 @@ def validate_split(
     if missing:
         raise ValueError(f"split is missing keys: {missing}")
 
-    sets = {name: set(int(i) for i in split[name]) for name in required}
+    partitions = required + (("calibration",) if "calibration" in split else ())
+    sets = {name: set(int(i) for i in split[name]) for name in partitions}
     excluded_values = split.get("excluded", [])
     sets["excluded"] = set(int(i) for i in excluded_values)
-    for name in (*required, "excluded"):
-        source = split[name] if name in required else excluded_values
+    for name in (*partitions, "excluded"):
+        source = split[name] if name in partitions else excluded_values
         if len(sets[name]) != len(source):
             raise ValueError(f"duplicate indices in {name}")
         invalid = [i for i in sets[name] if i < 0 or i >= n_samples]
         if invalid:
             raise ValueError(f"out-of-range indices in {name}: {invalid[:5]}")
-    pairs = (
-        ("train", "val"), ("train", "test"), ("val", "test"),
-        ("train", "excluded"), ("val", "excluded"), ("test", "excluded"),
-    )
-    for left, right in pairs:
-        overlap = sets[left].intersection(sets[right])
-        if overlap:
-            raise ValueError(f"{left}/{right} overlap: {sorted(overlap)[:5]}")
+    disjoint_names = (*partitions, "excluded")
+    for left_index, left in enumerate(disjoint_names):
+        for right in disjoint_names[left_index + 1:]:
+            overlap = sets[left].intersection(sets[right])
+            if overlap:
+                raise ValueError(f"{left}/{right} overlap: {sorted(overlap)[:5]}")
     covered = set().union(*sets.values())
     if require_full_coverage and len(covered) != n_samples:
         raise ValueError(f"split covers {len(covered)} of {n_samples} samples")
-    return {name: len(sets[name]) for name in (*required, "excluded")}
+    return {name: len(sets[name]) for name in (*partitions, "excluded")}
 
 
 def write_split(
@@ -173,6 +197,7 @@ def write_split(
     protocol: str,
     metadata: Mapping[str, Any] | None = None,
     excluded: Iterable[int] | None = None,
+    calibration: Iterable[int] | None = None,
 ) -> Dict[str, Any]:
     """Validate and write one canonical split JSON."""
     payload: Dict[str, Any] = {
@@ -187,6 +212,8 @@ def write_split(
         "excluded": sorted(int(i) for i in (excluded or [])),
         "metadata": dict(metadata or {}),
     }
+    if calibration is not None:
+        payload["calibration"] = sorted(int(i) for i in calibration)
     payload["counts"] = validate_split(payload, n_samples)
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
