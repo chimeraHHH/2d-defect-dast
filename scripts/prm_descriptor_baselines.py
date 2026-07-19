@@ -522,6 +522,11 @@ def main() -> None:
         [index for index in range(len(samples)) if index not in excluded_set],
         dtype=np.int64,
     )
+    print(
+        f"Featurizing {len(retained_indices)} canonical rows "
+        f"({len(excluded_indices)} excluded) ...",
+        flush=True,
+    )
     retained_features = np.stack([featurize(samples[index]) for index in retained_indices])
     features = np.zeros(
         (len(samples), retained_features.shape[1]), dtype=retained_features.dtype,
@@ -560,13 +565,16 @@ def main() -> None:
     for path in split_paths:
         complete = result_is_complete(result_root, path.stem, path)
         if complete and reuse_compatible and not args.force:
+            print(f"[{path.stem}] validating reusable result", flush=True)
             if ensure_mean_baseline(path, samples, targets, result_root):
                 upgraded.append(path.stem)
             reused.append(path.stem)
             continue
+        print(f"[{path.stem}] fitting descriptor candidates", flush=True)
         evaluate_split(
             path, samples, features, targets, result_root, args.seed, args.n_jobs,
         )
+        print(f"[{path.stem}] complete", flush=True)
         evaluated.append(path.stem)
 
     git = git_snapshot()
