@@ -1,6 +1,10 @@
 import pytest
 
-from scripts.prm_collect_descriptor_results import validate_descriptor_manifest
+from scripts.prm_collect_descriptor_results import (
+    archive_descriptor_artifacts,
+    validate_descriptor_manifest,
+)
+from scripts.prm_collect_results import file_sha256
 
 
 DATA_SHA = "data-sha"
@@ -57,3 +61,41 @@ def test_dirty_descriptor_batch_is_rejected():
         validate_descriptor_manifest(
             manifest, {"data_sha256": DATA_SHA}, PROTOCOL_SHA,
         )
+
+
+def test_descriptor_artifacts_are_archived_with_verified_hashes(tmp_path):
+    descriptor_root = tmp_path / "source"
+    out_dir = tmp_path / "results"
+    split_id = "id_cv5_f0"
+    split_dir = descriptor_root / split_id
+    split_dir.mkdir(parents=True)
+    (descriptor_root / "manifest.json").write_text('{"status": "complete"}\n')
+    (split_dir / "metrics.json").write_text('{"mae": 0.5}\n')
+    (split_dir / "predictions.npz").write_bytes(b"predictions")
+    manifest = {
+        "splits": [split_id],
+        "split_artifacts": {
+            split_id: {
+                "metrics_sha256": file_sha256(split_dir / "metrics.json"),
+                "predictions_sha256": file_sha256(split_dir / "predictions.npz"),
+            },
+        },
+    }
+    stale_dir = out_dir / "runs" / "stale"
+    stale_dir.mkdir(parents=True)
+    (stale_dir / "partial.txt").write_text("stale")
+
+    archive = archive_descriptor_artifacts(descriptor_root, out_dir, manifest)
+
+    archived_dir = out_dir / "runs" / split_id
+    assert (archived_dir / "metrics.json").read_bytes() == (
+        split_dir / "metrics.json"
+    ).read_bytes()
+    assert (archived_dir / "predictions.npz").read_bytes() == b"predictions"
+    assert not stale_dir.exists()
+    assert archive["manifest"]["sha256"] == file_sha256(
+        out_dir / "runs" / "manifest.json"
+    )
+    assert archive["runs"][0]["metrics_sha256"] == manifest[
+        "split_artifacts"
+    ][split_id]["metrics_sha256"]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -78,6 +79,57 @@ def repository_path(path: Path) -> str:
         return str(resolved)
 
 
+def archive_descriptor_artifacts(
+    descriptor_root: Path,
+    out_dir: Path,
+    descriptor_manifest: Mapping[str, Any],
+) -> Dict[str, Any]:
+    archive_root = out_dir / "runs"
+    staging_root = out_dir / ".runs.tmp"
+    if staging_root.exists():
+        shutil.rmtree(staging_root)
+    staging_root.mkdir(parents=True)
+
+    source_manifest = descriptor_root / "manifest.json"
+    shutil.copyfile(source_manifest, staging_root / "manifest.json")
+    archived_runs = []
+    for split_id in sorted(descriptor_manifest["splits"]):
+        source_dir = descriptor_root / split_id
+        target_dir = staging_root / split_id
+        target_dir.mkdir()
+        record = descriptor_manifest["split_artifacts"][split_id]
+        archived = {"split_id": split_id}
+        for name, hash_key in (
+            ("metrics.json", "metrics_sha256"),
+            ("predictions.npz", "predictions_sha256"),
+        ):
+            source = source_dir / name
+            expected_sha = record[hash_key]
+            if file_sha256(source) != expected_sha:
+                raise ValueError(f"descriptor {name} hash mismatch: {split_id}")
+            target = target_dir / name
+            shutil.copyfile(source, target)
+            if file_sha256(target) != expected_sha:
+                raise OSError(f"archived descriptor {name} hash mismatch: {split_id}")
+            key = "metrics" if name == "metrics.json" else "predictions"
+            archived[f"{key}_path"] = repository_path(
+                archive_root / split_id / name
+            )
+            archived[f"{key}_sha256"] = expected_sha
+        archived_runs.append(archived)
+
+    if archive_root.exists():
+        shutil.rmtree(archive_root)
+    staging_root.replace(archive_root)
+    return {
+        "manifest": {
+            "path": repository_path(archive_root / "manifest.json"),
+            "sha256": file_sha256(archive_root / "manifest.json"),
+        },
+        "runs": archived_runs,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--descriptor-root", type=Path, required=True)
@@ -131,26 +183,15 @@ def main() -> None:
         json.dumps(selection, indent=2, sort_keys=True) + "\n"
     )
 
-    sources = []
-    for path in sorted(descriptor_root.glob("*/metrics.json")):
-        split_id = path.parent.name
-        if split_id == "uq_calibration_s62":
-            continue
-        sources.append(
-            {
-                "split_id": split_id,
-                "path": str(path.relative_to(descriptor_root.parent.parent)),
-                "sha256": file_sha256(path),
-                "predictions_path": str(
-                    (path.parent / "predictions.npz").relative_to(
-                        descriptor_root.parent.parent
-                    )
-                ),
-                "predictions_sha256": file_sha256(path.parent / "predictions.npz"),
-            }
-        )
+    archive = archive_descriptor_artifacts(
+        descriptor_root, out_dir, descriptor_manifest,
+    )
+    sources = [
+        record for record in archive["runs"]
+        if record["split_id"] != "uq_calibration_s62"
+    ]
     bundle = {
-        "schema_version": "prm_descriptor_bundle_v1",
+        "schema_version": "prm_descriptor_bundle_v2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "collector_git": collector_git,
         "data_sha256": protocol["data_sha256"],
@@ -158,16 +199,17 @@ def main() -> None:
             "path": repository_path(protocol_path), "sha256": file_sha256(protocol_path),
         },
         "descriptor_manifest": {
-            "path": str(descriptor_manifest_path.relative_to(descriptor_root.parent.parent)),
-            "sha256": file_sha256(descriptor_manifest_path),
+            **archive["manifest"],
             "training_git": descriptor_manifest["git"],
         },
         "selection_data": "validation only",
         "expected_split_counts": EXPECTED_PAPER_SPLITS,
         "n_metric_rows": len(rows),
         "n_sources": len(sources),
+        "n_archived_runs": len(archive["runs"]),
         "selection": selection,
         "sources": sources,
+        "archived_runs": archive["runs"],
     }
     (out_dir / "manifest.json").write_text(
         json.dumps(bundle, indent=2, sort_keys=True) + "\n"
