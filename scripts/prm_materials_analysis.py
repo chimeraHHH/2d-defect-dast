@@ -156,9 +156,16 @@ def bootstrap_mean(
     values: Sequence[float], seed: int, draws: int = 20_000,
 ) -> Dict[str, float]:
     array = np.asarray(values, dtype=float)
+    if len(array) < 2:
+        raise ValueError("bootstrap mean requires at least two decision units")
     rng = np.random.default_rng(seed)
-    sampled = rng.choice(array, size=(draws, len(array)), replace=True).mean(axis=1)
-    low, high = np.quantile(sampled, [0.025, 0.975])
+    chunks = []
+    for start in range(0, draws, 256):
+        size = min(256, draws - start)
+        indices = rng.integers(0, len(array), size=(size, len(array)))
+        chunks.append(array[indices].mean(axis=1))
+    means = np.concatenate(chunks)
+    low, high = np.quantile(means, [0.025, 0.975])
     return {
         "mean": float(array.mean()), "std": float(array.std(ddof=1)),
         "ci_low": float(low), "ci_high": float(high), "n": len(array),

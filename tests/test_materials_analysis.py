@@ -1,4 +1,6 @@
-from scripts.prm_materials_analysis import analyse_preferences
+import pytest
+
+from scripts.prm_materials_analysis import analyse_preferences, bootstrap_mean
 
 
 def row(index, host, dopant, defecttype, site, target, prediction):
@@ -35,3 +37,14 @@ def test_preference_and_screening_regret_are_computed_by_host_dopant_pair():
     )
     assert adsorbate["exact_site_correct"] == 0
     assert adsorbate["screening_regret_eV"] == 1.0
+
+
+def test_materials_bootstrap_is_chunked_and_requires_multiple_units():
+    result = bootstrap_mean([0.0, 1.0, 2.0, 3.0], seed=1, draws=513)
+
+    assert result["mean"] == 1.5
+    assert result["n"] == 4
+    assert result["ci_low"] <= result["mean"] <= result["ci_high"]
+
+    with pytest.raises(ValueError, match="at least two decision units"):
+        bootstrap_mean([1.0], seed=1, draws=10)
