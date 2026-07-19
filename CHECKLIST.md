@@ -13,11 +13,14 @@
 - [x] Add run manifest and canonical prediction schema.
 - [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
       the exact copied versus seeded parameter sets in every DART run.
-- [x] Pass unit tests and one bounded remote smoke run.
+- [x] Pass 99 remote unit tests and one bounded protocol-v2 CPU smoke run
+      from clean commit `af6eeec`.
 
 ## Experiments
 
-- [ ] Run 2^3 architecture factorial for seeds 42-46.
+- [ ] Run 2^3 architecture factorial for seeds 42-46. (The clean
+      `factorial-v2` queue is active on the remote result store and waits for
+      GPUs to satisfy the declared idle thresholds.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs
