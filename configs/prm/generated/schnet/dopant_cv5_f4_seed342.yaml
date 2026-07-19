@@ -1,7 +1,7 @@
 model: pbc_schnet
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: baselines/schnet/dopant_cv5_f4/seed342
-split_path: artifacts/prm_protocol_v1/splits/dopant_cv5_f4.json
+split_path: artifacts/prm_protocol_v2/splits/dopant_cv5_f4.json
 seed: 342
 batch_size: 32
 num_workers: 4

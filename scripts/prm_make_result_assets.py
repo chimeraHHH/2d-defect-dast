@@ -140,11 +140,15 @@ def validate_contract(
         raise ValueError("factorial bundle must contain all 40 paired runs")
     if int(uq.get("n_members", -1)) != 5:
         raise ValueError("UQ bundle must contain five ensemble members")
-    if int(uq.get("calibration_contract", {}).get("dedicated_calibration_partition", -1)) != 528:
-        raise ValueError("UQ bundle does not use the frozen 528-row calibration partition")
-    if int(uq.get("test", {}).get("n", -1)) != 1058:
+    expected_uq = protocol.get("uq_split_counts", {})
+    expected_calibration = int(expected_uq.get("calibration", -1))
+    expected_test = int(expected_uq.get("test", -1))
+    expected_modeling = int(protocol.get("n_modeling_samples", -1))
+    if int(uq.get("calibration_contract", {}).get("dedicated_calibration_partition", -1)) != expected_calibration:
+        raise ValueError("UQ bundle does not use the frozen calibration partition")
+    if int(uq.get("test", {}).get("n", -1)) != expected_test:
         raise ValueError("UQ test set does not match the frozen split")
-    if int(materials.get("sample_oof", {}).get("n", -1)) != 10572:
+    if int(materials.get("sample_oof", {}).get("n", -1)) != expected_modeling:
         raise ValueError("materials OOF predictions do not cover the canonical set")
 
     pooled_keys = {(row["regime"], row["model"]) for row in pooled_rows}
@@ -541,7 +545,7 @@ def render_uq_table(uq: Mapping[str, Any]) -> str:
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table}}[t]
-\caption{{Held-out split-conformal interval performance on 1058 test
+\caption{{Held-out split-conformal interval performance on the frozen test
 structures. Coverage is in percent and mean width is in eV.}}
 \label{{tab:uq}}
 \centering
@@ -976,7 +980,7 @@ def main() -> None:
         "--result-root", type=Path, default=ROOT / "artifacts/prm_results",
     )
     parser.add_argument(
-        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
     parser.add_argument("--paper-dir", type=Path, default=ROOT / "paper_Q1")
     args = parser.parse_args()

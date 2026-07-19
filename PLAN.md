@@ -17,8 +17,9 @@ uncertainty identifies a useful selective-prediction domain.
 ## Evidence contract
 
 - Dataset: 10,641 source-filtered IMP2D rows in `cleaned_dataset.pkl`, reduced
-  to a canonical 10,572-structure modeling set after excluding 65 redundant
-  structures and four rows with non-reconstructable raw energy components.
+  to a canonical 10,224-structure modeling set after excluding four rows with
+  non-reconstructable raw energy components, 349 rows without a
+  permutation-invariant impurity identity, and 64 redundant structures.
 - Development benchmark: the historical seed-42 80/10/10 split, retained only
   for comparison with archived runs and labelled as previously inspected.
 - Confirmatory evidence: paired random repeats, random out-of-fold prediction,
@@ -62,13 +63,13 @@ uncertainty identifies a useful selective-prediction domain.
 
 ## Current route
 
-The final 10,572-structure protocol, periodic SchNet implementation, result
-collectors, and manuscript protocol sections are complete. Descriptor
-baseline values exist for all 27 formal splits, with LightGBM selected by
-validation MAE in every paper regime, but their batch must pass the new v2
-actual-file and artifact-hash audit before reuse. The two DART initialization
+The final 10,224-structure protocol v2, periodic SchNet implementation, result
+collectors, and manuscript protocol sections are complete. Descriptor values
+from protocol v1 are superseded because their sample set and site encoding no
+longer match protocol v2; all 27 formal descriptor splits must be rerun. The
+two DART initialization
 assets are pinned by SHA-256, and formal runs must record a fail-closed
 parameter-load report. When the remote host is reachable, descriptor
-provenance is upgraded first and the paired 2^3 factorial is restarted from
+baselines are regenerated first and the paired 2^3 factorial is restarted from
 the latest clean commit, followed by validation-only promotion, transfer,
 SchNet, ensemble UQ, and paper result generation.

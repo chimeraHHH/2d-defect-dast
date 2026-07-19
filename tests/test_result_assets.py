@@ -109,7 +109,10 @@ def test_manuscript_uses_only_macros_emitted_by_result_generator():
 def contract_inputs():
     regimes = ("id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block")
     clean = {"commit": "abc", "dirty": False}
-    protocol = {"data_sha256": "data"}
+    protocol = {
+        "data_sha256": "data", "n_modeling_samples": 10224,
+        "uq_split_counts": {"calibration": 511, "test": 1023},
+    }
     factorial = {
         "schema_version": "prm_factorial_bundle_v1", "collector_git": clean,
         "data_sha256": "data", "n_runs": 40,
@@ -130,14 +133,14 @@ def contract_inputs():
         "schema_version": "prm_uq_results_v1", "collector_git": clean,
         "data_sha256": "data", "n_members": 5,
         "selection": {"selected_variant": "g111"},
-        "calibration_contract": {"dedicated_calibration_partition": 528},
-        "test": {"n": 1058},
+        "calibration_contract": {"dedicated_calibration_partition": 511},
+        "test": {"n": 1023},
     }
     materials = {
         "schema_version": "prm_materials_analysis_v1", "collector_git": clean,
         "data_sha256": "data",
         "selection": {"selected_variant": "g111"},
-        "sample_oof": {"n": 10572},
+        "sample_oof": {"n": 10224},
     }
     pooled = []
     paired = []

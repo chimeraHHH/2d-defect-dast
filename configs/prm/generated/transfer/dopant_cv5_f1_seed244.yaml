@@ -1,7 +1,7 @@
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: transfer/dopant_cv5_f1/seed244
-split_path: artifacts/prm_protocol_v1/splits/dopant_cv5_f1.json
+split_path: artifacts/prm_protocol_v2/splits/dopant_cv5_f1.json
 seed: 244
 batch_size: 64
 epochs: 150

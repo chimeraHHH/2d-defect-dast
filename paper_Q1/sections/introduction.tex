@@ -48,8 +48,10 @@ screening regret?
 To answer these questions, we construct a fully auditable protocol around the
 IMP2D source database.  We replay the source filter and formation-energy
 formula, remove rows whose raw energy components cannot be reconstructed,
+exclude same-element structures for which the relaxed database cannot assign
+a permutation-invariant impurity node,
 merge duplicate structures with both coordinate and invariant-distance
-fingerprints, and publish immutable split definitions.  The resulting 10,572
+fingerprints, and publish immutable split definitions.  The resulting 10,224
 structure modeling set is evaluated through a paired $2^3$ architecture
 experiment, random and chemistry-grouped cross-validation, and a predefined
 host--impurity matrix holdout.  Architecture and descriptor choices use

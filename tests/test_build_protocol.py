@@ -1,9 +1,15 @@
 import numpy as np
 
 from scripts.prm_build_protocol import (
+    audit_defect_identity,
     coordinate_fingerprint,
     invariant_distance_fingerprint,
     merged_duplicate_groups,
+)
+from src.defect_identity import (
+    dopant_candidate_indices,
+    permutation_safe_defect_mask,
+    unique_defect_index,
 )
 
 
@@ -35,3 +41,30 @@ def test_duplicate_groups_merge_transitive_fingerprint_matches():
         ]
     )
     assert groups == [[0, 1, 2], [3]]
+
+
+def test_impurity_identity_requires_one_composition_match():
+    unique = {
+        "id": 1,
+        "numbers": np.asarray([6, 8]),
+        "metadata": {"host": "C", "dopant": "O"},
+    }
+    ambiguous = {
+        "id": 2,
+        "numbers": np.asarray([6, 8, 8]),
+        "metadata": {
+            "host": "CO", "dopant": "O", "defecttype": "interstitial",
+            "site": "int0",
+        },
+    }
+    assert dopant_candidate_indices(unique).tolist() == [1]
+    assert unique_defect_index(unique) == 1
+    assert permutation_safe_defect_mask(unique).tolist() == [0, 1]
+    assert permutation_safe_defect_mask(ambiguous).tolist() == [0, 0, 0]
+    with np.testing.assert_raises_regex(ValueError, "unique impurity identity"):
+        unique_defect_index(ambiguous)
+
+    audit = audit_defect_identity([unique, ambiguous])
+    assert audit["n_unique"] == 1
+    assert audit["n_ambiguous"] == 1
+    assert audit["ambiguous_indices"] == [1]

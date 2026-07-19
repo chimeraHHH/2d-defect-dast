@@ -7,7 +7,8 @@
 - [x] Generate and validate immutable development, host, dopant and block splits.
 - [x] Recompute targets from raw components and exclude four source sentinels.
 - [x] Exclude coordinate- or invariant-distance-equivalent duplicate rows.
-- [x] Freeze the canonical 10,572-structure modeling set and dedicated UQ split.
+- [x] Freeze protocol v2 with 10,224 uniquely labeled structures and a
+      dedicated UQ split.
 - [x] Add split-file support and sample-index preservation to the trainer.
 - [x] Add run manifest and canonical prediction schema.
 - [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
@@ -17,10 +18,10 @@
 ## Experiments
 
 - [ ] Run 2^3 architecture factorial for seeds 42-46.
-- [x] Run descriptor baselines with validation-only tuning (27/27 formal splits;
-      numerical outputs completed from a clean worktree).
-- [ ] Upgrade the descriptor batch to provenance v2 by hashing the actual input
-      file and all 27 metrics/prediction pairs on the remote result store.
+- [ ] Rerun descriptor baselines on protocol v2 with validation-only tuning
+      (27 formal splits; protocol-v1 outputs are superseded).
+- [ ] Hash the actual descriptor input file and all 27 metrics/prediction pairs
+      on the result store.
 - [ ] Run SchNet comparator under the same split contract. (Implementation and
       configurations complete; runs await GPU capacity.)
 - [ ] Select the final DART configuration from validation/CV evidence only.

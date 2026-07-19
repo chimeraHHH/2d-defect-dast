@@ -272,7 +272,7 @@ def main() -> None:
         default=ROOT / "artifacts/prm_results/factorial/selection.json",
     )
     parser.add_argument(
-        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/materials",

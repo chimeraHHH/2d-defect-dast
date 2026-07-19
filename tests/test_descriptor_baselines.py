@@ -1,8 +1,11 @@
 import json
 
 import numpy as np
+import pytest
 
 from scripts.prm_descriptor_baselines import (
+    SITE_NAMES,
+    defect_index,
     file_sha256,
     mean_baseline,
     prior_split_provenance,
@@ -102,3 +105,19 @@ def test_mean_baseline_uses_training_targets_only():
     assert result["training_target_mean"] == 2.0
     assert val_pred.tolist() == [2.0]
     assert test_pred.tolist() == [2.0]
+
+
+def test_descriptor_site_basis_matches_observed_imp2d_labels():
+    assert SITE_NAMES == tuple(
+        [f"ads{i}" for i in range(6)] + [f"int{i}" for i in range(6)]
+    )
+
+
+def test_descriptor_rejects_order_based_identity_for_same_element_rows():
+    sample = {
+        "id": 11,
+        "numbers": np.asarray([42, 52, 52]),
+        "metadata": {"dopant": "Te"},
+    }
+    with pytest.raises(ValueError, match="unique impurity identity"):
+        defect_index(sample)

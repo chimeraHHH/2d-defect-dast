@@ -25,15 +25,25 @@ zero sentinel in the stored defective-structure energy and therefore cannot be
 independently reconstructed from the source components; these rows are
 excluded from every modeling split.
 
+The released relaxed structures do not retain a persistent identity field for
+the atom initially inserted by the structure generator.  In 349 rows, the
+impurity element is also a constituent of the host, so multiple identical
+nuclei match the impurity label.  Assigning one of them by array order would
+break permutation invariance and would make the defect-centered features
+depend on a nonphysical convention.  We therefore require exactly one atom to
+match the impurity element and exclude all 349 non-unique rows from the formal
+protocol.
+
 We also prevent symmetry-equivalent structures from crossing split
 boundaries.  Duplicate candidates are identified by the union of two hashes:
 (i) atomic numbers, cell, and Cartesian coordinates rounded to
 $10^{-6}$, and (ii) a permutation- and translation-invariant spectrum of
 element-labeled periodic pair distances rounded to $10^{-4}$~\AA.  The latter
 detects numerically equivalent structures even when atom order or coordinate
-origin differs.  Connected duplicate groups contain 65 redundant rows; the
-lowest-index auditable representative is retained.  The resulting canonical
-modeling set contains 10,572 structures.  The complete audit, excluded sample
+origin differs.  Among the remaining eligible structures, connected duplicate
+groups contain 64 redundant rows; the lowest-index auditable representative is
+retained.  The resulting canonical modeling set contains 10,224 structures.
+The complete audit, excluded sample
 indices, database hashes, and immutable split files are distributed with the
 code.
 
@@ -68,15 +78,16 @@ chemical coverage, target distribution, and fixed partition geometry.
  \centering
  \includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
  \caption{Data provenance and frozen evaluation protocol. (a) Sequential
- source filtering, raw-energy reconstruction audit, and structure
- canonicalization. The final set excludes four rows with zero sentinels in a
- raw energy component and 65 redundant structures. (b) Formation-energy
+ source filtering, raw-energy reconstruction audit, impurity-identity audit,
+ and structure canonicalization. The final set excludes four rows with zero
+ sentinels in a raw energy component, 349 rows without a unique impurity atom,
+ and 64 redundant structures. (b) Formation-energy
  distributions for the two incorporation classes in the canonical set.
  (c) Number of structures for each of 44 hosts and 65 impurity elements;
  white cells are unobserved combinations. (d) Train, validation, calibration,
  and test fractions for each evaluation regime. Bars for fivefold protocols
- show fold averages. All regimes cover the same 10,572 retained structures;
- the common 69-row exclusion set is omitted from the bars.}
+ show fold averages. All regimes cover the same 10,224 retained structures;
+ the common 417-row exclusion set is omitted from the bars.}
  \label{fig:protocol}
 \end{figure*}
 
@@ -96,6 +107,9 @@ four-head geometric Transformer blocks apply self-attention with a learned
 radial bias derived from the periodic pair-distance matrix on a radial grid
 ending at 12~\AA.  A two-layer multilayer perceptron maps the pooled graph
 representation to $\hat E_{\mathrm f}$.
+Because every formal row passes the identity audit, the binary impurity
+embedding always marks exactly one compositionally unique atom; no array-order
+heuristic is used.
 
 The confirmatory architecture experiment varies three binary modules while
 holding every other training and model setting fixed:

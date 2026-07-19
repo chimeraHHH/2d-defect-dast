@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, Subset
 
+from src.defect_identity import permutation_safe_defect_mask
 from src.features import get_atom_feature_table
 
 # Defect type → integer encoding (used for defect-type conditioning)
@@ -94,34 +95,14 @@ class CrystalGraphDataset(Dataset):
 
     # ------------------------------------------------------------------ helpers
     def _compute_defect_mask(self, sample: Dict[str, Any]) -> np.ndarray:
-        """Heuristic: mark the defect atom in IMP2D supercells.
+        """Mark an impurity only when its element occurs exactly once.
 
-        IMP2D defects are constructed by ASE's ``DefectBuilder`` which appends
-        the dopant atom at the end of the positions list. We mark the LAST
-        atom whose element matches the dopant tag in metadata; if the dopant
-        is unique to the host (e.g. SnS2:Cl) this picks the only candidate.
-        For self-substitution / anti-site defects (e.g. MoTe2:Te) the heuristic
-        still localises to one atom, biased toward the inserted one.
+        The released IMP2D rows contain relaxed structures without persistent
+        per-atom identity tags. Array order is not a physical label for
+        identical nuclei, so same-element self-interstitials receive no
+        arbitrary mask and are excluded by the formal PRM protocol.
         """
-        natoms = len(sample["numbers"])
-        mask = np.zeros(natoms, dtype=np.int64)
-        dopant = sample["metadata"].get("dopant", "")
-        if not dopant:
-            return mask
-        try:
-            from ase.data import atomic_numbers as _AZ
-
-            z = _AZ.get(dopant, None)
-        except Exception:  # pragma: no cover - defensive
-            z = None
-        if z is None:
-            return mask
-        candidates = np.flatnonzero(sample["numbers"] == z)
-        if candidates.size == 0:
-            return mask
-        # mark the last candidate (DefectBuilder convention)
-        mask[candidates[-1]] = 1
-        return mask
+        return permutation_safe_defect_mask(sample)
 
     # ------------------------------------------------------------------ pytorch
     def __len__(self) -> int:

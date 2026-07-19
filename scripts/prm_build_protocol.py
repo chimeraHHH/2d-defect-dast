@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.defect_identity import dopant_candidate_indices
 from src.splits import (
     grouped_cv_splits,
     random_cv_splits,
@@ -34,6 +35,10 @@ G45_HOSTS = {
 }
 DOPANTS_3D = {"Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"}
 DOPANTS_4D = {"Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd"}
+CANONICALIZATION = (
+    "merged duplicate groups; rows with missing raw energy components or "
+    "non-unique impurity identity excluded"
+)
 
 
 def file_sha256(path: Path, chunk_size: int = 8 * 1024 * 1024) -> str:
@@ -132,10 +137,16 @@ def duplicate_summary(values: Iterable[Any]) -> Dict[str, int]:
     }
 
 
-def write_sample_table(path: Path, samples: Sequence[Dict[str, Any]]) -> None:
+def write_sample_table(
+    path: Path,
+    samples: Sequence[Dict[str, Any]],
+    retained_indices: set[int],
+    exclusion_reasons: Dict[int, Sequence[str]],
+) -> None:
     fields = [
         "sample_index", "id", "unique_id", "host", "dopant", "defecttype",
         "site", "target_eV", "natoms", "spacegroup", "supercell",
+        "dopant_candidate_count", "canonical_retained", "exclusion_reasons",
     ]
     with path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -155,8 +166,60 @@ def write_sample_table(path: Path, samples: Sequence[Dict[str, Any]]) -> None:
                     "natoms": int(meta.get("natoms", len(sample["numbers"]))),
                     "spacegroup": meta.get("spacegroup", ""),
                     "supercell": meta.get("supercell", ""),
+                    "dopant_candidate_count": len(dopant_candidate_indices(sample)),
+                    "canonical_retained": index in retained_indices,
+                    "exclusion_reasons": ";".join(exclusion_reasons.get(index, ())),
                 }
             )
+
+
+def audit_defect_identity(samples: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """Identify rows where a relaxed structure cannot label one impurity atom."""
+    candidate_counts = [len(dopant_candidate_indices(sample)) for sample in samples]
+    missing_indices = [
+        index for index, count in enumerate(candidate_counts) if count == 0
+    ]
+    if missing_indices:
+        raise ValueError(
+            "dopant element is absent from final structures at sample indices "
+            f"{missing_indices[:10]}"
+        )
+    ambiguous_indices = [
+        index for index, count in enumerate(candidate_counts) if count > 1
+    ]
+    rows = []
+    for index in ambiguous_indices:
+        sample = samples[index]
+        meta = sample.get("metadata", {})
+        rows.append(
+            {
+                "sample_index": index,
+                "row_id": int(sample["id"]),
+                "host": str(meta.get("host", "")),
+                "dopant": str(meta.get("dopant", "")),
+                "defecttype": str(meta.get("defecttype", "")),
+                "site": str(meta.get("site", "")),
+                "n_matching_atoms": candidate_counts[index],
+            }
+        )
+    return {
+        "policy": "require exactly one atom matching the dopant element",
+        "rationale": (
+            "The released relaxed structures contain no persistent atom-identity "
+            "tag. Identical same-element nuclei are permutation equivalent, so an "
+            "array-order heuristic cannot define a physical impurity node."
+        ),
+        "n_unique": len(samples) - len(ambiguous_indices),
+        "n_missing": len(missing_indices),
+        "n_ambiguous": len(ambiguous_indices),
+        "ambiguous_indices": ambiguous_indices,
+        "ambiguous_row_ids": [row["row_id"] for row in rows],
+        "ambiguous_counts": {
+            key: dict(sorted(Counter(row[key] for row in rows).items()))
+            for key in ("host", "dopant", "defecttype", "site")
+        },
+        "ambiguous_rows": rows,
+    }
 
 
 def audit_raw_database(
@@ -315,7 +378,7 @@ def build_splits(
                     "status": "development" if split_seed == 42 else "confirmatory_repeat",
                     "warning": "seed 42 was inspected in historical development"
                     if split_seed == 42 else "predefined before PRM reruns",
-                    "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
+                    "canonicalization": CANONICALIZATION,
                 },
                 excluded=excluded_indices,
             )
@@ -334,7 +397,7 @@ def build_splits(
                 "selection_data": "validation partition only",
                 "calibration_data": "dedicated calibration partition only",
                 "test_data": "evaluation only",
-                "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
+                "canonicalization": CANONICALIZATION,
             },
             excluded=excluded_indices,
             calibration=uq_calibration,
@@ -353,7 +416,7 @@ def build_splits(
                     "fold": fold,
                     "assignment_seed": 52,
                     "purpose": "out-of-fold predictions for paper analysis",
-                    "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
+                    "canonicalization": CANONICALIZATION,
                 },
                 excluded=excluded_indices,
             )
@@ -377,7 +440,7 @@ def build_splits(
                     n_samples, data_sha256, f"{axis}_grouped_cv5",
                     {
                         "fold": fold, "groups": split["groups"], "assignment_seed": 42,
-                        "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
+                        "canonicalization": CANONICALIZATION,
                     },
                     excluded=excluded_indices,
                 )
@@ -405,7 +468,7 @@ def build_splits(
                 "test_dopant_group": sorted(DOPANTS_3D),
                 "validation_host_group": sorted(G45_HOSTS),
                 "validation_dopant_group": sorted(DOPANTS_4D),
-                "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
+                "canonicalization": CANONICALIZATION,
             },
             excluded=excluded_indices,
         )
@@ -417,7 +480,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
     parser.add_argument("--raw-db", type=Path, required=True)
-    parser.add_argument("--out-dir", type=Path, default=Path("artifacts/prm_protocol_v1"))
+    parser.add_argument("--out-dir", type=Path, default=Path("artifacts/prm_protocol_v2"))
     args = parser.parse_args()
 
     data_path = args.data.expanduser().resolve()
@@ -440,6 +503,10 @@ def main() -> None:
         if int(sample["id"]) in component_exception_ids
     )
     provenance_excluded_set = set(provenance_excluded_indices)
+    defect_identity = audit_defect_identity(samples)
+    identity_excluded_indices = list(defect_identity["ambiguous_indices"])
+    identity_excluded_set = set(identity_excluded_indices)
+    eligibility_excluded_set = provenance_excluded_set.union(identity_excluded_set)
 
     ids = [str(sample.get("id", "")) for sample in samples]
     unique_ids = [str(sample.get("unique_id", "")) for sample in samples]
@@ -460,7 +527,7 @@ def main() -> None:
     retained_indices = []
     duplicate_excluded_indices = []
     for group in all_groups:
-        eligible = [index for index in group if index not in provenance_excluded_set]
+        eligible = [index for index in group if index not in eligibility_excluded_set]
         if not eligible:
             continue
         retained = min(eligible)
@@ -487,8 +554,18 @@ def main() -> None:
 
     quantile_levels = [0.0, 0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99, 1.0]
     quantiles = np.quantile(targets, quantile_levels)
+    exclusion_reasons: Dict[int, List[str]] = defaultdict(list)
+    for index in provenance_excluded_indices:
+        exclusion_reasons[index].append("raw_energy_component_missing")
+    for index in identity_excluded_indices:
+        exclusion_reasons[index].append("non_unique_impurity_identity")
+    for index in duplicate_excluded_indices:
+        exclusion_reasons[index].append("duplicate_structure")
+    if set(exclusion_reasons) != set(excluded_indices):
+        raise ValueError("canonical exclusion reasons do not cover every excluded row")
+
     audit = {
-        "schema_version": "prm_data_audit_v1",
+        "schema_version": "prm_data_audit_v2",
         "dataset": {
             "path_recorded": str(data_path),
             "file_name": data_path.name,
@@ -539,7 +616,11 @@ def main() -> None:
                 "n_excluded": len(excluded_indices),
                 "n_duplicate_excluded": len(duplicate_excluded_indices),
                 "n_raw_component_excluded": len(provenance_excluded_indices),
+                "n_ambiguous_identity_excluded": len(identity_excluded_indices),
+                "n_pre_dedup_eligibility_excluded": len(eligibility_excluded_set),
+                "n_pre_dedup_eligible": len(samples) - len(eligibility_excluded_set),
                 "raw_component_excluded_indices": provenance_excluded_indices,
+                "ambiguous_identity_excluded_indices": identity_excluded_indices,
                 "excluded_indices": excluded_indices,
                 "max_target_delta_eV_within_duplicate_group": float(
                     max(duplicate_target_deltas, default=0.0)
@@ -551,6 +632,10 @@ def main() -> None:
                 "element-labelled periodic pair-distance spectra rounded to 1e-4 Angstrom."
             ),
         },
+        "defect_identity": defect_identity,
+        "all_modeling_rows_have_unique_impurity_identity": not any(
+            index in identity_excluded_set for index in retained_indices
+        ),
         "formation_energy_provenance": {
             "auditable_from_clean_pickle": False,
             "raw_database_audit": raw_database_audit,
@@ -565,7 +650,9 @@ def main() -> None:
         },
     }
 
-    write_sample_table(out_dir / "samples.csv", samples)
+    write_sample_table(
+        out_dir / "samples.csv", samples, retained_set, exclusion_reasons,
+    )
     splits = build_splits(
         samples, retained_indices, excluded_indices, out_dir, sha256
     )
@@ -581,9 +668,20 @@ def main() -> None:
         json.dumps(audit, indent=2, sort_keys=True) + "\n"
     )
     manifest = {
-        "schema_version": "prm_protocol_manifest_v1",
+        "schema_version": "prm_protocol_manifest_v2",
+        "supersedes": "artifacts/prm_protocol_v1",
+        "supersession_reason": (
+            "remove relaxed same-element structures whose impurity atom cannot "
+            "be identified without an order-dependent label"
+        ),
         "data_sha256": sha256,
         "n_samples": len(samples),
+        "n_modeling_samples": len(retained_indices),
+        "n_excluded_samples": len(excluded_indices),
+        "uq_split_counts": next(
+            split["counts"] for split in splits
+            if split["split_id"] == "uq_calibration_s62"
+        ),
         "data_audit": "data_audit.json",
         "sample_table": "samples.csv",
         "splits": [f"splits/{split['split_id']}.json" for split in splits],

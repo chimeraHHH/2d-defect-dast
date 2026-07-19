@@ -1,7 +1,7 @@
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: transfer/chemistry_block_g6x3d/seed243
-split_path: artifacts/prm_protocol_v1/splits/chemistry_block_g6x3d.json
+split_path: artifacts/prm_protocol_v2/splits/chemistry_block_g6x3d.json
 seed: 243
 batch_size: 64
 epochs: 150

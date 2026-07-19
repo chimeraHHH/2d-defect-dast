@@ -65,7 +65,7 @@ def main() -> None:
         "--base", type=Path, default=ROOT / "configs/prm/base_factorial.yaml",
     )
     parser.add_argument(
-        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "configs/prm/promoted",

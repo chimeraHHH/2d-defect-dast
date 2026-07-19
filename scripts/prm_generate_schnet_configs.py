@@ -1,6 +1,8 @@
 """Generate SchNet comparator configs for every formal PRM split."""
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -11,10 +13,21 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def main() -> None:
-    base = yaml.safe_load((ROOT / "configs/prm/base_schnet.yaml").read_text())
-    protocol = json.loads((ROOT / "artifacts/prm_protocol_v1/manifest.json").read_text())
-    out_dir = ROOT / "configs/prm/generated/schnet"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base", type=Path, default=ROOT / "configs/prm/base_schnet.yaml")
+    parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2")
+    parser.add_argument("--out-dir", type=Path, default=ROOT / "configs/prm/generated/schnet")
+    args = parser.parse_args()
+
+    base = yaml.safe_load(args.base.read_text())
+    protocol_path = args.protocol_dir / "manifest.json"
+    protocol = json.loads(protocol_path.read_text())
+    out_dir = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     split_ids = [
         *(f"id_repeat_s{i}" for i in range(42, 47)),
@@ -36,14 +49,18 @@ def main() -> None:
             cfg = deepcopy(base)
             cfg["seed"] = seed
             cfg["data_sha256"] = protocol["data_sha256"]
-            cfg["split_path"] = f"artifacts/prm_protocol_v1/splits/{split_id}.json"
+            cfg["split_path"] = str(
+                (args.protocol_dir / "splits" / f"{split_id}.json").relative_to(ROOT)
+            )
             cfg["output_dir"] = f"baselines/schnet/{split_id}/seed{seed}"
             path = out_dir / f"{split_id}_seed{seed}.yaml"
             path.write_text(yaml.safe_dump(cfg, sort_keys=False))
             records.append(str(path.relative_to(ROOT)))
     manifest = {
-        "schema_version": "prm_schnet_config_manifest_v1",
+        "schema_version": "prm_schnet_config_manifest_v2",
         "data_sha256": protocol["data_sha256"],
+        "protocol_manifest_sha256": file_sha256(protocol_path),
+        "protocol_dir": str(args.protocol_dir.relative_to(ROOT)),
         "n_configs": len(records),
         "configs": records,
     }

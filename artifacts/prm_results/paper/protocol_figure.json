@@ -1,100 +1,101 @@
 {
   "counts": {
-    "canonical_rows": 10572,
+    "ambiguous_identity_exclusions": 349,
+    "canonical_rows": 10224,
     "defect_types": {
-      "adsorbate": 6958,
-      "interstitial": 3614
+      "adsorbate": 6925,
+      "interstitial": 3299
     },
     "dopants": 65,
-    "duplicate_exclusions": 65,
-    "host_dopant_cells": 2608,
+    "duplicate_exclusions": 64,
+    "host_dopant_cells": 2526,
     "hosts": 44,
     "raw_component_exclusions": 4,
     "raw_rows": 17364,
     "source_filtered_rows": 10641
   },
-  "created_at": "2026-07-19T08:51:42.902770+00:00",
+  "created_at": "2026-07-19T14:25:36.127716+00:00",
   "inputs": {
     "data_audit": {
-      "path": "artifacts/prm_protocol_v1/data_audit.json",
-      "sha256": "ae99b976eb388c06eac0149d0e077e4819e7335d96037e145939e25eaeed8e8a"
+      "path": "artifacts/prm_protocol_v2/data_audit.json",
+      "sha256": "d2d537e93bd363252b60cd76ee13b73967450e9fd8d53bd20b215fb40f110bc0"
     },
     "protocol_manifest": {
-      "path": "artifacts/prm_protocol_v1/manifest.json",
-      "sha256": "8d65dfdc17b45335f4722ff09264335fd95cc966710dcc1995cda728f9a37d0c"
+      "path": "artifacts/prm_protocol_v2/manifest.json",
+      "sha256": "7deff479a52c9c5095a94fbcd2f4d6bbc65d8800cc30fe28ba06b73c83b01dbb"
     },
     "sample_table": {
-      "path": "artifacts/prm_protocol_v1/samples.csv",
-      "sha256": "95db146de552aab5c5170e025aa65b8a7d5880171c331f295fb8e9b68ee52c89"
+      "path": "artifacts/prm_protocol_v2/samples.csv",
+      "sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168"
     }
   },
   "outputs": {
     "pdf": {
       "path": "paper_Q1/figures/fig_protocol_overview.pdf",
-      "sha256": "6f03ff6a5e94700c0276da8ed6c3b8df6422bdaa90c835138dd7d6e485485788"
+      "sha256": "f8a2334511dd02481f7c0105f0432d56f5285a3490c4d8c41ef8a1d2a80fef34"
     },
     "png": {
       "path": "paper_Q1/figures/fig_protocol_overview.png",
-      "sha256": "e1ae61836d8a17ebd31545606653ccc8a15c622f7149079a1bb43be5a54a8cfb"
+      "sha256": "b3d7b5ddebca4fdf741d5dd7486f9ce18ef9eb614526ed037624bf9356f673a9"
     }
   },
   "partition_profiles": [
     {
       "calibration": 0.0,
       "label": "Paired ID",
-      "test": 1058.0,
-      "total": 10572.0,
-      "train": 8457.0,
-      "val": 1057.0
+      "test": 1023.0,
+      "total": 10224.0,
+      "train": 8179.0,
+      "val": 1022.0
     },
     {
       "calibration": 0.0,
       "label": "Random OOF",
-      "test": 2114.4,
-      "total": 10572.0,
-      "train": 6343.2,
-      "val": 2114.4
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
     },
     {
       "calibration": 0.0,
       "label": "Host OOF",
-      "test": 2114.4,
-      "total": 10572.0,
-      "train": 6343.2,
-      "val": 2114.4
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
     },
     {
       "calibration": 0.0,
       "label": "Impurity OOF",
-      "test": 2114.4,
-      "total": 10572.0,
-      "train": 6343.2,
-      "val": 2114.4
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
     },
     {
       "calibration": 0.0,
       "label": "Pair OOF",
-      "test": 2114.4,
-      "total": 10572.0,
-      "train": 6343.2,
-      "val": 2114.4
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
     },
     {
       "calibration": 0,
       "label": "Chem. block",
       "test": 365,
-      "total": 10572.0,
-      "train": 9815,
-      "val": 392
+      "total": 10224.0,
+      "train": 9487,
+      "val": 372
     },
     {
-      "calibration": 528,
+      "calibration": 511,
       "label": "UQ holdout",
-      "test": 1058,
-      "total": 10572.0,
-      "train": 7929,
-      "val": 1057
+      "test": 1023,
+      "total": 10224.0,
+      "train": 7668,
+      "val": 1022
     }
   ],
-  "schema_version": "prm_protocol_figure_v1"
+  "schema_version": "prm_protocol_figure_v2"
 }

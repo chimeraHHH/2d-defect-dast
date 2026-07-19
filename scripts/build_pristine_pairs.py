@@ -8,11 +8,9 @@ the supercell positions yields the host pristine supercell at the host's
 relaxed coordinates (modulo small local relaxation perturbations from the
 defect, which we accept as the cost of the unrelaxed approximation).
 
-The dopant atom is identified by the same heuristic used in
-``CrystalGraphDataset._compute_defect_mask``: the LAST atom in
-``numbers`` whose atomic number matches ``metadata["dopant"]``. For
-IMP2D defect types (adsorbate / interstitial), that last-matching index
-is consistently the inserted atom.
+The dopant atom is removed only when its element occurs exactly once in the
+released relaxed structure. Same-element self-interstitials are skipped
+because identical nuclei have no persistent physical identity in the database.
 
 Output: ``data/processed/cleaned_dataset_with_pristine.pkl`` containing a
 ``data`` list where each entry has the original defect fields plus a
@@ -35,26 +33,16 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.defect_identity import unique_defect_index  # noqa: E402
 from src.graph import build_graph  # noqa: E402
 
 
 def find_defect_index(sample) -> int | None:
-    """Index of the dopant atom in sample['numbers'], or None if undetermined.
-
-    Mirrors ``CrystalGraphDataset._compute_defect_mask`` so the pristine we
-    construct is exactly the host structure that the existing defect_mask
-    flags.
-    """
-    dopant = sample["metadata"].get("dopant", "")
-    if not dopant:
+    """Index of a compositionally unique impurity, or None if ambiguous."""
+    try:
+        return unique_defect_index(sample)
+    except ValueError:
         return None
-    z = _AZ.get(dopant, None)
-    if z is None:
-        return None
-    candidates = np.flatnonzero(sample["numbers"] == z)
-    if candidates.size == 0:
-        return None
-    return int(candidates[-1])
 
 
 def build_pristine_pair(sample) -> dict | None:

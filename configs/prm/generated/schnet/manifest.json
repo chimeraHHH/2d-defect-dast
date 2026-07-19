@@ -1,6 +1,8 @@
 {
-  "schema_version": "prm_schnet_config_manifest_v1",
+  "schema_version": "prm_schnet_config_manifest_v2",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "protocol_manifest_sha256": "7deff479a52c9c5095a94fbcd2f4d6bbc65d8800cc30fe28ba06b73c83b01dbb",
+  "protocol_dir": "artifacts/prm_protocol_v2",
   "n_configs": 48,
   "configs": [
     "configs/prm/generated/schnet/id_repeat_s42_seed342.yaml",

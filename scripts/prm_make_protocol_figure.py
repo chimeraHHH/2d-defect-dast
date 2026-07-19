@@ -200,11 +200,17 @@ def draw_provenance(axis: plt.Axes, audit: Mapping[str, Any]) -> None:
         ("ASE source", int(raw["raw_rows"]), ""),
         (
             "Source filter", int(raw["valid_after_filter"]),
-            f"-{raw['not_converged']} unconverged\n-{raw['missing_or_nonfinite_eform']} missing target\n-{raw['outside_abs_20_eV']} outside |Ef| <= 20 eV",
+            f"-{raw['not_converged']} unconverged; "
+            f"-{raw['missing_or_nonfinite_eform']} missing; "
+            f"-{raw['outside_abs_20_eV']} outside range",
         ),
         (
             "Raw-energy audit", int(raw["valid_after_filter"]) - int(canonical["n_raw_component_excluded"]),
             f"-{canonical['n_raw_component_excluded']} zero-sentinel rows",
+        ),
+        (
+            "Impurity-identity audit", int(canonical["n_pre_dedup_eligible"]),
+            f"-{canonical['n_ambiguous_identity_excluded']} non-unique atom labels",
         ),
         (
             "Canonical set", int(canonical["n_retained"]),
@@ -214,30 +220,30 @@ def draw_provenance(axis: plt.Axes, audit: Mapping[str, Any]) -> None:
     axis.set_xlim(0, 1)
     axis.set_ylim(0, 1)
     axis.axis("off")
-    y_positions = np.linspace(0.86, 0.14, len(steps))
+    y_positions = np.linspace(0.91, 0.09, len(steps))
     for index, ((title, count, note), y) in enumerate(zip(steps, y_positions)):
         face = "#F3F3F3" if index < len(steps) - 1 else "#E7F0F4"
         edge = COLORS["grid"] if index < len(steps) - 1 else COLORS["validation"]
         box = FancyBboxPatch(
-            (0.08, y - 0.075), 0.84, 0.15,
+            (0.08, y - 0.058), 0.84, 0.116,
             boxstyle="round,pad=0.008,rounding_size=0.015",
             linewidth=0.7, edgecolor=edge, facecolor=face,
         )
         axis.add_patch(box)
-        axis.text(0.12, y + 0.025, title, ha="left", va="center", fontsize=6.7)
+        axis.text(0.12, y + 0.018, title, ha="left", va="center", fontsize=6.2)
         axis.text(
-            0.88, y + 0.025, f"{count:,}", ha="right", va="center",
-            fontsize=7.5, fontweight="bold", color=COLORS["ink"],
+            0.88, y + 0.018, f"{count:,}", ha="right", va="center",
+            fontsize=7.0, fontweight="bold", color=COLORS["ink"],
         )
         if note:
             axis.text(
-                0.12, y - 0.035, note, ha="left", va="center",
-                fontsize=5.2, color=COLORS["muted"], linespacing=1.05,
+                0.12, y - 0.025, note, ha="left", va="center",
+                fontsize=4.8, color=COLORS["muted"], linespacing=1.05,
             )
         if index < len(steps) - 1:
             next_y = y_positions[index + 1]
             axis.annotate(
-                "", xy=(0.5, next_y + 0.083), xytext=(0.5, y - 0.083),
+                "", xy=(0.5, next_y + 0.064), xytext=(0.5, y - 0.064),
                 arrowprops={"arrowstyle": "-|>", "lw": 0.7, "color": COLORS["muted"]},
             )
     panel_label(axis, "(a)")
@@ -326,15 +332,15 @@ def draw_partition_profiles(axis: plt.Axes, profiles: Sequence[Mapping[str, Any]
     axis.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ["0", "25", "50", "75", "100"])
     axis.set_xlabel("Partition fraction (%)")
     axis.legend(
-        frameon=False, loc="lower center", bbox_to_anchor=(0.5, 1.01),
-        ncol=4, columnspacing=0.9, handlelength=1.2,
+        frameon=False, loc="lower right", bbox_to_anchor=(1.0, 1.01),
+        ncol=4, columnspacing=0.7, handlelength=1.0,
     )
     axis.grid(axis="x", color=COLORS["grid"], lw=0.45, zorder=0)
     axis.set_axisbelow(True)
     axis.spines[["top", "right", "left"]].set_visible(False)
     axis.tick_params(axis="y", length=0)
     panel_label(axis, "(d)")
-    axis.set_title("Frozen evaluation partitions", loc="left", pad=12)
+    axis.set_title("Frozen evaluation partitions", loc="left", pad=12, fontsize=7.2)
 
 
 def build_summary(
@@ -351,7 +357,7 @@ def build_summary(
     canonical = audit["duplicates"]["canonical_deduplication"]
     defect_counts = Counter(str(row["defecttype"]) for row in retained)
     summary = {
-        "schema_version": "prm_protocol_figure_v1",
+        "schema_version": "prm_protocol_figure_v2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "inputs": {
             "protocol_manifest": {
@@ -368,6 +374,7 @@ def build_summary(
             "raw_rows": audit["formation_energy_provenance"]["raw_database_audit"]["filter_replay"]["raw_rows"],
             "source_filtered_rows": audit["dataset"]["n_samples"],
             "raw_component_exclusions": canonical["n_raw_component_excluded"],
+            "ambiguous_identity_exclusions": canonical["n_ambiguous_identity_excluded"],
             "duplicate_exclusions": canonical["n_duplicate_excluded"],
             "canonical_rows": canonical["n_retained"],
             "hosts": len(hosts),
@@ -427,7 +434,7 @@ def make_figure(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
     parser.add_argument(
         "--output-pdf", type=Path,

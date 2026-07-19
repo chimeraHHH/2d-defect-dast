@@ -32,10 +32,14 @@ def component_code(bits: Iterable[int]) -> str:
     return "".join(str(int(bit)) for bit in bits)
 
 
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", type=Path, default=ROOT / "configs/prm/base_factorial.yaml")
-    parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1")
+    parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2")
     parser.add_argument("--out-dir", type=Path, default=ROOT / "configs/prm/generated")
     args = parser.parse_args()
 
@@ -95,8 +99,10 @@ def main() -> None:
             )
 
     manifest = {
-        "schema_version": "prm_config_manifest_v1",
+        "schema_version": "prm_config_manifest_v2",
         "data_sha256": data_sha256,
+        "protocol_manifest_sha256": file_sha256(args.protocol_dir / "manifest.json"),
+        "protocol_dir": str(args.protocol_dir.relative_to(ROOT)),
         "base_config": str(args.base.resolve().relative_to(ROOT)),
         "n_configs": len(generated),
         "configs": generated,

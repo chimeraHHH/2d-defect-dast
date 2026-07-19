@@ -268,7 +268,7 @@ def main() -> None:
     parser.add_argument("--result-root", type=Path, required=True)
     parser.add_argument(
         "--protocol-manifest", type=Path,
-        default=ROOT / "artifacts/prm_protocol_v1/manifest.json",
+        default=ROOT / "artifacts/prm_protocol_v2/manifest.json",
     )
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/factorial",

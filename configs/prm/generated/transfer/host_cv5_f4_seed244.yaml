@@ -1,7 +1,7 @@
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: transfer/host_cv5_f4/seed244
-split_path: artifacts/prm_protocol_v1/splits/host_cv5_f4.json
+split_path: artifacts/prm_protocol_v2/splits/host_cv5_f4.json
 seed: 244
 batch_size: 64
 epochs: 150

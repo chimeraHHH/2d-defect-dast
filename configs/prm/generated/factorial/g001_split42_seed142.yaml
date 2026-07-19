@@ -1,7 +1,7 @@
 model: v2
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: factorial/g001/split42_seed142
-split_path: artifacts/prm_protocol_v1/splits/id_repeat_s42.json
+split_path: artifacts/prm_protocol_v2/splits/id_repeat_s42.json
 seed: 142
 batch_size: 64
 epochs: 150

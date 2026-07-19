@@ -6,24 +6,25 @@ from scripts.prm_make_protocol_figure import build_summary, latex_formula
 
 
 ROOT = Path(__file__).resolve().parent.parent
-PROTOCOL = ROOT / "artifacts/prm_protocol_v1"
+PROTOCOL = ROOT / "artifacts/prm_protocol_v2"
 
 
 def test_protocol_figure_summary_matches_canonical_audit():
     summary, retained, (hosts, dopants, matrix) = build_summary(PROTOCOL)
 
-    assert summary["schema_version"] == "prm_protocol_figure_v1"
+    assert summary["schema_version"] == "prm_protocol_figure_v2"
     assert summary["counts"]["raw_rows"] == 17_364
     assert summary["counts"]["source_filtered_rows"] == 10_641
     assert summary["counts"]["raw_component_exclusions"] == 4
-    assert summary["counts"]["duplicate_exclusions"] == 65
-    assert summary["counts"]["canonical_rows"] == 10_572
-    assert len(retained) == 10_572
+    assert summary["counts"]["ambiguous_identity_exclusions"] == 349
+    assert summary["counts"]["duplicate_exclusions"] == 64
+    assert summary["counts"]["canonical_rows"] == 10_224
+    assert len(retained) == 10_224
     assert len(hosts) == 44
     assert len(dopants) == 65
-    assert int(np.sum(matrix)) == 10_572
+    assert int(np.sum(matrix)) == 10_224
     assert summary["inputs"]["data_audit"]["path"] == (
-        "artifacts/prm_protocol_v1/data_audit.json"
+        "artifacts/prm_protocol_v2/data_audit.json"
     )
 
 
@@ -32,11 +33,11 @@ def test_partition_profiles_cover_every_retained_sample():
 
     assert len(summary["partition_profiles"]) == 7
     assert all(
-        np.isclose(profile["total"], 10_572)
+        np.isclose(profile["total"], 10_224)
         for profile in summary["partition_profiles"]
     )
     uq = next(profile for profile in summary["partition_profiles"] if profile["label"] == "UQ holdout")
-    assert uq["calibration"] == 528
+    assert uq["calibration"] == 511
 
 
 def test_formula_labels_use_subscripts_only_for_valid_formulas():

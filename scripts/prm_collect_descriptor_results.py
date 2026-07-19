@@ -82,7 +82,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--descriptor-root", type=Path, required=True)
     parser.add_argument(
-        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/descriptors",

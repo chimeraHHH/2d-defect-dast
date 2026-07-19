@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 import numpy as np
-from ase.data import atomic_masses, atomic_numbers, covalent_radii
+from ase.data import atomic_masses, covalent_radii
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import Ridge
 from sklearn.pipeline import make_pipeline
@@ -28,6 +28,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.prm_metrics import low_energy_metrics, macro_group_mae, regression_metrics
+from src.defect_identity import unique_defect_index
 from src.splits import load_split
 
 
@@ -44,7 +45,7 @@ ELECTRONEGATIVITY = {
     75: 1.90, 76: 2.20, 77: 2.20, 78: 2.28, 79: 2.54, 80: 2.00,
     81: 1.62, 82: 2.33, 83: 2.02,
 }
-SITE_NAMES = tuple([f"ads{i}" for i in range(7)] + [f"int{i}" for i in range(5)])
+SITE_NAMES = tuple([f"ads{i}" for i in range(6)] + [f"int{i}" for i in range(6)])
 DEFECT_TYPES = ("adsorbate", "interstitial")
 
 
@@ -69,11 +70,7 @@ def git_snapshot() -> Dict[str, Any]:
 
 
 def defect_index(sample: Dict[str, Any]) -> int:
-    numbers = np.asarray(sample["numbers"], dtype=int)
-    dopant = sample.get("metadata", {}).get("dopant", "")
-    z = atomic_numbers.get(str(dopant))
-    matches = np.flatnonzero(numbers == z) if z is not None else np.array([], dtype=int)
-    return int(matches[-1]) if len(matches) else len(numbers) - 1
+    return unique_defect_index(sample)
 
 
 def property_values(numbers: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -479,7 +476,7 @@ def prior_split_provenance(manifest: Dict[str, Any]) -> Dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, required=True)
-    parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1")
+    parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2")
     parser.add_argument("--result-root", type=Path, required=True)
     parser.add_argument(
         "--split-glob", action="append", dest="split_globs",
@@ -513,14 +510,37 @@ def main() -> None:
         blob = pickle.load(handle)
     samples = blob["data"] if isinstance(blob, dict) and "data" in blob else blob
     targets = np.asarray([float(sample["target"]) for sample in samples], dtype=float)
-    features = np.stack([featurize(sample) for sample in samples])
-    feature_hash = hashlib.sha256(features.tobytes()).hexdigest()
+
+    audit_path = args.protocol_dir / protocol_manifest["data_audit"]
+    audit = json.loads(audit_path.read_text())
+    excluded_indices = np.asarray(
+        audit["duplicates"]["canonical_deduplication"]["excluded_indices"],
+        dtype=np.int64,
+    )
+    excluded_set = set(excluded_indices.tolist())
+    retained_indices = np.asarray(
+        [index for index in range(len(samples)) if index not in excluded_set],
+        dtype=np.int64,
+    )
+    retained_features = np.stack([featurize(samples[index]) for index in retained_indices])
+    features = np.zeros(
+        (len(samples), retained_features.shape[1]), dtype=retained_features.dtype,
+    )
+    features[retained_indices] = retained_features
+    feature_digest = hashlib.sha256()
+    feature_digest.update(retained_indices.tobytes())
+    feature_digest.update(retained_features.tobytes())
+    feature_hash = feature_digest.hexdigest()
 
     data_sha256 = observed_data_sha256
     formal_paths = [
         path for path in sorted((args.protocol_dir / "splits").glob("*.json"))
         if path.stem not in ("id_historical_s42", "smoke_protocol")
     ]
+    for path in formal_paths:
+        split = json.loads(path.read_text())
+        if set(split.get("excluded", ())) != excluded_set:
+            raise ValueError(f"formal split exclusions differ from protocol audit: {path.stem}")
     selected = {
         path.resolve()
         for pattern in (args.split_globs or ["*.json"])
@@ -615,6 +635,8 @@ def main() -> None:
         "data_file_sha256": observed_data_sha256,
         "protocol_manifest_sha256": file_sha256(args.protocol_dir / "manifest.json"),
         "feature_matrix_sha256": feature_hash,
+        "feature_matrix_scope": "canonical retained rows only, hashed with sample indices",
+        "n_featurized_samples": len(retained_indices),
         "n_samples": len(samples),
         "n_features": int(features.shape[1]),
         "selection_data": "validation only",

@@ -1,7 +1,7 @@
 model: pbc_schnet
 data_path: data/processed/cleaned_dataset.pkl
 output_dir: baselines/schnet/chemistry_block_g6x3d/seed342
-split_path: artifacts/prm_protocol_v1/splits/chemistry_block_g6x3d.json
+split_path: artifacts/prm_protocol_v2/splits/chemistry_block_g6x3d.json
 seed: 342
 batch_size: 32
 num_workers: 4
