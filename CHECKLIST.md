@@ -18,7 +18,9 @@
 
 - [ ] Run 2^3 architecture factorial for seeds 42-46.
 - [x] Run descriptor baselines with validation-only tuning (27/27 formal splits;
-      canonical descriptor bundle frozen from a clean worktree).
+      numerical outputs completed from a clean worktree).
+- [ ] Upgrade the descriptor batch to provenance v2 by hashing the actual input
+      file and all 27 metrics/prediction pairs on the remote result store.
 - [ ] Run SchNet comparator under the same split contract. (Implementation and
       configurations complete; runs await GPU capacity.)
 - [ ] Select the final DART configuration from validation/CV evidence only.

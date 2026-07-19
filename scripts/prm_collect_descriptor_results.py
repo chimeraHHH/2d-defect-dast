@@ -48,7 +48,7 @@ def validate_descriptor_manifest(
     manifest: Mapping[str, Any], protocol: Mapping[str, Any],
     protocol_manifest_sha256: str,
 ) -> None:
-    if manifest.get("schema_version") != "prm_descriptor_manifest_v1":
+    if manifest.get("schema_version") != "prm_descriptor_manifest_v2":
         raise ValueError("unsupported descriptor manifest schema")
     if manifest.get("status") != "complete":
         raise ValueError("descriptor baseline batch is incomplete")
@@ -59,10 +59,15 @@ def validate_descriptor_manifest(
         raise ValueError("descriptor hyperparameters were not selected on validation data")
     if manifest.get("data_sha256") != protocol.get("data_sha256"):
         raise ValueError("descriptor dataset hash does not match the frozen protocol")
+    if manifest.get("data_file_sha256") != protocol.get("data_sha256"):
+        raise ValueError("descriptor input file hash was not independently verified")
     if manifest.get("protocol_manifest_sha256") != protocol_manifest_sha256:
         raise ValueError("descriptor protocol manifest hash mismatch")
     if manifest.get("git", {}).get("dirty"):
         raise ValueError("final descriptor batch was produced from a dirty worktree")
+    artifacts = manifest.get("split_artifacts", {})
+    if set(artifacts) != set(manifest.get("splits", [])) or len(artifacts) != 27:
+        raise ValueError("descriptor split artifact hashes are incomplete")
 
 
 def repository_path(path: Path) -> str:

@@ -64,10 +64,11 @@ uncertainty identifies a useful selective-prediction domain.
 
 The final 10,572-structure protocol, periodic SchNet implementation, result
 collectors, and manuscript protocol sections are complete. Descriptor
-baselines are frozen for all 27 formal splits, with LightGBM selected by
-validation MAE in every paper regime. The two DART initialization assets are
-now pinned by SHA-256, and formal runs must record a fail-closed parameter-load
-report. The paired 2^3 factorial remains the next compute stage; it will be
-restarted from the latest clean commit when the remote GPU host is reachable,
-followed by validation-only promotion, transfer, SchNet, ensemble UQ, and paper
-result generation.
+baseline values exist for all 27 formal splits, with LightGBM selected by
+validation MAE in every paper regime, but their batch must pass the new v2
+actual-file and artifact-hash audit before reuse. The two DART initialization
+assets are pinned by SHA-256, and formal runs must record a fail-closed
+parameter-load report. When the remote host is reachable, descriptor
+provenance is upgraded first and the paired 2^3 factorial is restarted from
+the latest clean commit, followed by validation-only promotion, transfer,
+SchNet, ensemble UQ, and paper result generation.

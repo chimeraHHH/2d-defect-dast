@@ -79,6 +79,44 @@ def expected_split_hash(protocol_dir: Path, split_id: str) -> str:
     return file_sha256(protocol_dir / "splits" / f"{split_id}.json")
 
 
+def validate_descriptor_root(descriptor_root: Path, protocol_dir: Path) -> None:
+    manifest_path = descriptor_root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    protocol_path = protocol_dir / "manifest.json"
+    protocol = json.loads(protocol_path.read_text())
+    if manifest.get("schema_version") != "prm_descriptor_manifest_v2":
+        raise ValueError("descriptor results lack independently verified data provenance")
+    if manifest.get("status") != "complete":
+        raise ValueError("descriptor baseline batch is incomplete")
+    if manifest.get("selection_data") != "validation only":
+        raise ValueError("descriptor baseline selection used non-validation data")
+    if manifest.get("data_sha256") != protocol.get("data_sha256"):
+        raise ValueError("descriptor dataset/protocol hash mismatch")
+    if manifest.get("data_file_sha256") != protocol.get("data_sha256"):
+        raise ValueError("descriptor input file hash was not independently verified")
+    if manifest.get("protocol_manifest_sha256") != file_sha256(protocol_path):
+        raise ValueError("descriptor protocol manifest hash mismatch")
+    if manifest.get("git", {}).get("dirty"):
+        raise ValueError("descriptor baseline batch came from a dirty worktree")
+
+    expected_splits = {
+        path.stem for path in (protocol_dir / "splits").glob("*.json")
+        if path.stem not in {"id_historical_s42", "smoke_protocol"}
+    }
+    if set(manifest.get("splits", [])) != expected_splits:
+        raise ValueError("descriptor split coverage differs from the frozen protocol")
+    artifacts = manifest.get("split_artifacts")
+    if not isinstance(artifacts, Mapping) or set(artifacts) != expected_splits:
+        raise ValueError("descriptor split artifact hashes are incomplete")
+    for split_id, record in artifacts.items():
+        metrics_path = descriptor_root / split_id / "metrics.json"
+        predictions_path = descriptor_root / split_id / "predictions.npz"
+        if record.get("metrics_sha256") != file_sha256(metrics_path):
+            raise ValueError(f"descriptor metrics hash mismatch: {split_id}")
+        if record.get("predictions_sha256") != file_sha256(predictions_path):
+            raise ValueError(f"descriptor predictions hash mismatch: {split_id}")
+
+
 def load_neural_runs(
     manifest_paths: Sequence[Path], model: str, protocol_dir: Path,
     expected_data_sha256: str,
@@ -412,7 +450,9 @@ def main() -> None:
         schnet_paths, "schnet", protocol_dir, protocol["data_sha256"],
         schnet_expected_configs,
     )
-    rows += load_descriptor_runs(result_root / "baselines" / "descriptors", protocol_dir)
+    descriptor_root = result_root / "baselines" / "descriptors"
+    validate_descriptor_root(descriptor_root, protocol_dir)
+    rows += load_descriptor_runs(descriptor_root, protocol_dir)
 
     if not args.allow_incomplete:
         for model, regimes in EXPECTED_RUNS.items():

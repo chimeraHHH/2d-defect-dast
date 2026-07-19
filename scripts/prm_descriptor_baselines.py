@@ -405,6 +405,15 @@ def main() -> None:
     except (OSError, json.JSONDecodeError):
         previous_manifest = {}
 
+    protocol_manifest_path = args.protocol_dir / "manifest.json"
+    protocol_manifest = json.loads(protocol_manifest_path.read_text())
+    expected_data_sha256 = protocol_manifest["data_sha256"]
+    observed_data_sha256 = file_sha256(args.data)
+    if observed_data_sha256 != expected_data_sha256:
+        raise ValueError(
+            "descriptor input dataset does not match the frozen protocol: "
+            f"expected {expected_data_sha256}, observed {observed_data_sha256}"
+        )
     with args.data.open("rb") as handle:
         blob = pickle.load(handle)
     samples = blob["data"] if isinstance(blob, dict) and "data" in blob else blob
@@ -412,8 +421,7 @@ def main() -> None:
     features = np.stack([featurize(sample) for sample in samples])
     feature_hash = hashlib.sha256(features.tobytes()).hexdigest()
 
-    protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
-    data_sha256 = protocol_manifest["data_sha256"]
+    data_sha256 = observed_data_sha256
     formal_paths = [
         path for path in sorted((args.protocol_dir / "splits").glob("*.json"))
         if path.stem not in ("id_historical_s42", "smoke_protocol")
@@ -483,11 +491,22 @@ def main() -> None:
         path.stem for path in formal_paths
         if result_is_complete(result_root, path.stem, path)
     ]
+    split_artifacts = {
+        split_id: {
+            "metrics_sha256": file_sha256(
+                output_dir / split_id / "metrics.json"
+            ),
+            "predictions_sha256": file_sha256(
+                output_dir / split_id / "predictions.npz"
+            ),
+        }
+        for split_id in complete_splits
+    }
     requested_complete = all(
         result_is_complete(result_root, path.stem, path) for path in split_paths
     )
     manifest = {
-        "schema_version": "prm_descriptor_manifest_v1",
+        "schema_version": "prm_descriptor_manifest_v2",
         "status": "complete" if requested_complete else "incomplete",
         "started_at": batch["started_at"],
         "completed_at": completed_at,
@@ -498,6 +517,7 @@ def main() -> None:
         },
         "data_path": str(args.data.resolve()),
         "data_sha256": data_sha256,
+        "data_file_sha256": observed_data_sha256,
         "protocol_manifest_sha256": file_sha256(args.protocol_dir / "manifest.json"),
         "feature_matrix_sha256": feature_hash,
         "n_samples": len(samples),
@@ -514,6 +534,7 @@ def main() -> None:
             "all_complete": len(complete_splits) == len(formal_paths),
         },
         "split_provenance": split_provenance,
+        "split_artifacts": split_artifacts,
         "batches": batches,
         "wall_seconds": batch["wall_seconds"],
     }

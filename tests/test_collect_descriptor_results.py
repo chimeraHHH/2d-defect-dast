@@ -8,16 +8,20 @@ PROTOCOL_SHA = "protocol-sha"
 
 
 def valid_manifest():
+    splits = [f"split_{index}" for index in range(27)]
     return {
-        "schema_version": "prm_descriptor_manifest_v1",
+        "schema_version": "prm_descriptor_manifest_v2",
         "status": "complete",
         "formal_split_coverage": {
             "complete": 27, "total": 27, "all_complete": True,
         },
         "selection_data": "validation only",
         "data_sha256": DATA_SHA,
+        "data_file_sha256": DATA_SHA,
         "protocol_manifest_sha256": PROTOCOL_SHA,
         "git": {"dirty": False, "commit": "abc"},
+        "splits": splits,
+        "split_artifacts": {split: {} for split in splits},
     }
 
 
@@ -33,6 +37,7 @@ def test_complete_descriptor_manifest_matches_frozen_protocol():
         ("status", "incomplete"),
         ("selection_data", "test"),
         ("data_sha256", "stale"),
+        ("data_file_sha256", "stale"),
         ("protocol_manifest_sha256", "stale"),
     ],
 )
