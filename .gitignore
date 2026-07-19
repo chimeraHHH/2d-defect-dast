@@ -76,3 +76,10 @@ results/logs/*.txt
 .vscode/
 .idea/
 self-check/
+
+# LaTeX build intermediates (compiled manuscript PDFs remain tracked)
+*.aux
+*.bbl
+*.blg
+*.out
+*Notes.bib
