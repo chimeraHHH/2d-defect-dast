@@ -490,8 +490,8 @@ def render_benchmark_table(claims: Mapping[str, Any]) -> str:
 \caption{{Pooled out-of-fold or single-block test MAE (eV). The descriptor
 column uses the family selected separately within each regime by validation
 MAE ({latex_escape(descriptor_note)} in the resulting selections). $\Delta$
-is comparator minus DART absolute error with a paired 95\% sample-bootstrap
-interval; positive values favor DART.}}
+is comparator minus DART absolute error with a paired 95\% bootstrap interval
+using the regime-matched resampling unit; positive values favor DART.}}
 \label{{tab:benchmark}}
 \centering
 \begin{{tabular}}{{lccc cc}}
@@ -768,7 +768,7 @@ def plot_transfer(
     axes[1].set_yticks(y, [REGIME_LABELS[regime] for regime in REGIME_ORDER])
     axes[1].invert_yaxis()
     axes[1].set_xlabel(r"Paired $\Delta$MAE (comparator - DART, eV)")
-    axes[1].set_title("Aligned sample-bootstrap contrasts", loc="left", pad=5)
+    axes[1].set_title("Paired regime-matched contrasts", loc="left", pad=5)
     axes[1].legend(frameon=False, loc="best")
     axes[1].grid(axis="x", color=COLORS["grid"], lw=0.45)
     axes[1].spines[["top", "right", "left"]].set_visible(False)
