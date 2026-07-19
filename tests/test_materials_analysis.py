@@ -4,6 +4,7 @@ import pytest
 from scripts.prm_materials_analysis import (
     analyse_preferences,
     bootstrap_mean,
+    cluster_bootstrap_mean,
     load_prediction_array,
 )
 
@@ -86,6 +87,23 @@ def test_materials_bootstrap_is_chunked_and_requires_multiple_units():
 
     with pytest.raises(ValueError, match="at least two decision units"):
         bootstrap_mean([1.0], seed=1, draws=10)
+
+
+def test_site_bootstrap_keeps_rows_from_each_pair_in_one_cluster():
+    rows = [
+        {"host": "H1", "dopant": "C", "score": 0.0},
+        {"host": "H1", "dopant": "C", "score": 0.0},
+        {"host": "H2", "dopant": "N", "score": 1.0},
+    ]
+
+    result = cluster_bootstrap_mean(rows, "score", seed=7, draws=5000)
+
+    assert result["mean"] == pytest.approx(1.0 / 3.0)
+    assert result["n"] == 3
+    assert result["n_clusters"] == 2
+    assert result["resampling_unit"] == "host_dopant_pair"
+    assert result["ci_low"] == 0.0
+    assert result["ci_high"] == 1.0
 
 
 def test_materials_prediction_loader_preserves_target_storage_precision(tmp_path):

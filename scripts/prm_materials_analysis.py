@@ -194,6 +194,42 @@ def bootstrap_mean(
     }
 
 
+def cluster_bootstrap_mean(
+    rows: Sequence[Mapping[str, Any]], value_key: str, seed: int,
+    draws: int = 20_000,
+) -> Dict[str, Any]:
+    """Bootstrap a row-weighted mean while retaining whole chemical pairs."""
+    if draws < 1:
+        raise ValueError("cluster bootstrap requires at least one draw")
+    grouped: Dict[Tuple[str, ...], List[float]] = defaultdict(list)
+    for row in rows:
+        cluster = (str(row["host"]), str(row["dopant"]))
+        grouped[cluster].append(float(row[value_key]))
+    if len(grouped) < 2:
+        raise ValueError("cluster bootstrap requires at least two chemical units")
+    values = np.asarray(
+        [value for cluster in grouped.values() for value in cluster], dtype=float
+    )
+    if not np.isfinite(values).all():
+        raise ValueError("cluster bootstrap requires finite values")
+    totals = np.asarray([sum(cluster) for cluster in grouped.values()], dtype=float)
+    counts = np.asarray([len(cluster) for cluster in grouped.values()], dtype=float)
+    rng = np.random.default_rng(seed)
+    chunks = []
+    for start in range(0, draws, 256):
+        size = min(256, draws - start)
+        indices = rng.integers(0, len(grouped), size=(size, len(grouped)))
+        chunks.append(totals[indices].sum(axis=1) / counts[indices].sum(axis=1))
+    means = np.concatenate(chunks)
+    low, high = np.quantile(means, [0.025, 0.975])
+    return {
+        "mean": float(values.mean()), "std": float(values.std(ddof=1)),
+        "ci_low": float(low), "ci_high": float(high), "n": len(values),
+        "n_clusters": len(grouped),
+        "resampling_unit": "host_dopant_pair",
+    }
+
+
 def group_error_rows(
     samples: Sequence[Mapping[str, Any]], key: str,
 ) -> List[Dict[str, Any]]:
@@ -387,12 +423,7 @@ def main() -> None:
 
     pair_rows, site_rows = analyse_preferences(sample_rows)
     preference_rows = [row for row in pair_rows if row["preference_eligible"]]
-    preference_correct = [row["preference_correct"] for row in preference_rows]
-    margin_errors = [row["margin_absolute_error_eV"] for row in pair_rows]
-    global_regret = [row["global_screening_regret_eV"] for row in pair_rows]
-    exact_site = [row["exact_site_correct"] for row in site_rows]
     top2_site_rows = [row for row in site_rows if row["top2_eligible"]]
-    site_regret = [row["screening_regret_eV"] for row in site_rows]
     residual = np.asarray([row["residual_eV"] for row in sample_rows])
     summary = {
         "schema_version": "prm_materials_analysis_v1",
@@ -420,16 +451,22 @@ def main() -> None:
                 "n_pairs_with_both_defect_types": len(pair_rows),
                 "n_binary_eligible_pairs": len(preference_rows),
             },
-            "accuracy": bootstrap_mean(preference_correct, seed=20263001),
-            "margin_mae_eV": bootstrap_mean(margin_errors, seed=20263002),
+            "accuracy": cluster_bootstrap_mean(
+                preference_rows, "preference_correct", seed=20263001,
+            ),
+            "margin_mae_eV": cluster_bootstrap_mean(
+                pair_rows, "margin_absolute_error_eV", seed=20263002,
+            ),
             "margin_spearman": finite_spearman(
                 [row["true_margin_eV"] for row in pair_rows],
                 [row["predicted_margin_eV"] for row in pair_rows],
                 context="adsorbate-interstitial margin Spearman correlation",
             ),
-            "global_screening_regret_eV": bootstrap_mean(global_regret, seed=20263003),
-            "global_exact_site_accuracy": bootstrap_mean(
-                [row["global_site_correct"] for row in pair_rows], seed=20263004,
+            "global_screening_regret_eV": cluster_bootstrap_mean(
+                pair_rows, "global_screening_regret_eV", seed=20263003,
+            ),
+            "global_exact_site_accuracy": cluster_bootstrap_mean(
+                pair_rows, "global_site_correct", seed=20263004,
             ),
         },
         "within_defect_type_site_selection": {
@@ -440,12 +477,15 @@ def main() -> None:
                 "n_exact_candidate_sets": len(site_rows),
                 "n_top2_candidate_sets": len(top2_site_rows),
             },
-            "exact_accuracy": bootstrap_mean(exact_site, seed=20263005),
-            "top2_accuracy": bootstrap_mean(
-                [row["true_best_in_predicted_top2"] for row in top2_site_rows],
-                seed=20263006,
+            "exact_accuracy": cluster_bootstrap_mean(
+                site_rows, "exact_site_correct", seed=20263005,
             ),
-            "screening_regret_eV": bootstrap_mean(site_regret, seed=20263007),
+            "top2_accuracy": cluster_bootstrap_mean(
+                top2_site_rows, "true_best_in_predicted_top2", seed=20263006,
+            ),
+            "screening_regret_eV": cluster_bootstrap_mean(
+                site_rows, "screening_regret_eV", seed=20263007,
+            ),
         },
         "interpretation_boundary": (
             "Out-of-fold associations and screening regret are descriptive; "

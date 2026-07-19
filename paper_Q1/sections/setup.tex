@@ -25,6 +25,9 @@ structures for random cross-validation, complete hosts for host-held-out
 evaluation, complete impurities for impurity-held-out evaluation, and
 host--impurity pairs for pair-held-out and compositional-block evaluation.
 Within each resampled chemical unit all associated structures remain together.
+Screening intervals use 20,000 host--impurity-pair cluster-bootstrap
+resamples.  Adsorbate and interstitial site decisions from the same pair remain
+together, while point estimates average all eligible decision sets.
 An interval excluding zero is treated as evidence for a directional difference;
 otherwise the result is reported as inconclusive rather than equivalent.
 

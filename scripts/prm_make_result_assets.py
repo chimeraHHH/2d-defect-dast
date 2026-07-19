@@ -639,8 +639,9 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
 \caption{{Out-of-fold screening metrics from host--impurity-pair folds.
-Intervals are 95\% nonparametric bootstrap intervals over the corresponding
-pairs or within-class site-selection groups.}}
+Intervals are 95\% nonparametric cluster-bootstrap intervals over
+host--impurity pairs; multiple within-class decisions from one pair remain
+together in every resample.}}
 \label{{tab:screening}}
 \centering
 \begin{{tabular}}{{lccc}}
