@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import pickle
 import platform
@@ -13,7 +14,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 import numpy as np
 from ase.data import atomic_masses, atomic_numbers, covalent_radii
@@ -301,27 +302,121 @@ def evaluate_split(
     return payload
 
 
+def _metric_blocks_match(
+    recorded: Mapping[str, Any], recomputed: Mapping[str, Any],
+) -> bool:
+    for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2"):
+        if key not in recorded or key not in recomputed:
+            return False
+        if key == "n":
+            if int(recorded[key]) != int(recomputed[key]):
+                return False
+            continue
+        left, right = float(recorded[key]), float(recomputed[key])
+        if math.isnan(left) and math.isnan(right):
+            continue
+        if not math.isclose(left, right, rel_tol=1e-7, abs_tol=1e-8):
+            return False
+    return True
+
+
+def validate_descriptor_result(
+    result_root: Path, split_id: str, split_path: Path,
+) -> None:
+    output_dir = result_root / "baselines" / "descriptors" / split_id
+    metrics = json.loads((output_dir / "metrics.json").read_text())
+    split = json.loads(split_path.read_text())
+    if metrics.get("schema_version") != "prm_descriptor_results_v1":
+        raise ValueError(f"unsupported descriptor metrics schema: {split_id}")
+    if metrics.get("split_id") != split_id or split.get("split_id") != split_id:
+        raise ValueError(f"descriptor split identity mismatch: {split_id}")
+    if metrics.get("split_sha256") != file_sha256(split_path):
+        raise ValueError(f"descriptor split hash mismatch: {split_id}")
+    if metrics.get("selection_data") != "validation only":
+        raise ValueError(f"descriptor selection used non-validation data: {split_id}")
+
+    with np.load(output_dir / "predictions.npz", allow_pickle=False) as archive:
+        expected_fields = {
+            "schema_version", "split_id", "model_names",
+            "val_indices", "val_targets", "val_predictions",
+            "test_indices", "test_targets", "test_predictions",
+        }
+        if set(archive.files) != expected_fields:
+            raise ValueError(f"descriptor prediction fields are incomplete: {split_id}")
+        if str(archive["schema_version"].item()) != "prm_descriptor_predictions_v1":
+            raise ValueError(f"unsupported descriptor prediction schema: {split_id}")
+        if str(archive["split_id"].item()) != split_id:
+            raise ValueError(f"descriptor prediction split mismatch: {split_id}")
+        model_names = [str(name) for name in archive["model_names"].tolist()]
+        val_indices = np.asarray(archive["val_indices"])
+        val_targets = np.asarray(archive["val_targets"], dtype=float)
+        val_predictions = np.asarray(archive["val_predictions"], dtype=float)
+        test_indices = np.asarray(archive["test_indices"])
+        test_targets = np.asarray(archive["test_targets"], dtype=float)
+        test_predictions = np.asarray(archive["test_predictions"], dtype=float)
+
+    if model_names != sorted(set(model_names)):
+        raise ValueError(f"descriptor model names are not unique and sorted: {split_id}")
+    if set(metrics.get("results", {})) != set(model_names):
+        raise ValueError(f"descriptor metrics/model names differ: {split_id}")
+    expected_val = np.asarray(split["val"], dtype=np.int64)
+    expected_test = np.asarray(split["test"], dtype=np.int64)
+    for name, observed, expected in (
+        ("validation", val_indices, expected_val),
+        ("test", test_indices, expected_test),
+    ):
+        if observed.ndim != 1 or not np.issubdtype(observed.dtype, np.integer):
+            raise ValueError(f"invalid descriptor {name} indices: {split_id}")
+        if not np.array_equal(observed.astype(np.int64, copy=False), expected):
+            raise ValueError(f"descriptor {name} indices differ from split: {split_id}")
+    if val_targets.shape != (len(expected_val),) or test_targets.shape != (len(expected_test),):
+        raise ValueError(f"descriptor target vectors are misaligned: {split_id}")
+    if val_predictions.shape != (len(model_names), len(expected_val)):
+        raise ValueError(f"descriptor validation prediction shape mismatch: {split_id}")
+    if test_predictions.shape != (len(model_names), len(expected_test)):
+        raise ValueError(f"descriptor test prediction shape mismatch: {split_id}")
+    if not all(
+        np.isfinite(array).all()
+        for array in (val_targets, test_targets, val_predictions, test_predictions)
+    ):
+        raise ValueError(f"descriptor predictions contain non-finite values: {split_id}")
+
+    for index, family in enumerate(model_names):
+        result = metrics["results"][family]
+        validation = regression_metrics(val_targets, val_predictions[index])
+        test = regression_metrics(test_targets, test_predictions[index])
+        if not _metric_blocks_match(result.get("validation", {}), validation):
+            raise ValueError(f"descriptor validation metrics mismatch: {split_id}/{family}")
+        if not _metric_blocks_match(result.get("test", {}), test):
+            raise ValueError(f"descriptor test metrics mismatch: {split_id}/{family}")
+        candidates = result.get("candidates", [])
+        if family == "mean":
+            if candidates or result.get("selected_by") != "fixed non-tuned baseline":
+                raise ValueError(f"mean descriptor baseline contract mismatch: {split_id}")
+            continue
+        if result.get("selected_by") != "minimum validation MAE" or not candidates:
+            raise ValueError(f"descriptor selection contract mismatch: {split_id}/{family}")
+        candidate_names = [str(row.get("candidate")) for row in candidates]
+        if len(candidate_names) != len(set(candidate_names)):
+            raise ValueError(f"duplicate descriptor candidates: {split_id}/{family}")
+        selected = min(
+            candidates,
+            key=lambda row: float(row.get("validation", {}).get("mae", float("inf"))),
+        )
+        if result.get("selected_candidate") != selected.get("candidate"):
+            raise ValueError(f"descriptor candidate selection mismatch: {split_id}/{family}")
+
+
 def result_is_complete(
     result_root: Path, split_id: str, split_path: Path | None = None,
 ) -> bool:
-    output_dir = result_root / "baselines" / "descriptors" / split_id
-    try:
-        metrics = json.loads((output_dir / "metrics.json").read_text())
-        with np.load(output_dir / "predictions.npz", allow_pickle=False) as predictions:
-            prediction_schema = str(predictions["schema_version"].item())
-            prediction_split = str(predictions["split_id"].item())
-    except (OSError, KeyError, ValueError, json.JSONDecodeError):
+    if split_path is None:
         return False
-    return (
-        metrics.get("schema_version") == "prm_descriptor_results_v1"
-        and metrics.get("split_id") == split_id
-        and (
-            split_path is None
-            or metrics.get("split_sha256") == file_sha256(split_path)
-        )
-        and prediction_schema == "prm_descriptor_predictions_v1"
-        and prediction_split == split_id
-    )
+    try:
+        validate_descriptor_result(result_root, split_id, split_path)
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+        return False
+    return True
 
 
 def ensure_mean_baseline(

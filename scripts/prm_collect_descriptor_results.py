@@ -98,6 +98,12 @@ def main() -> None:
     validate_descriptor_manifest(
         descriptor_manifest, protocol, file_sha256(protocol_path),
     )
+    for split_id, record in descriptor_manifest["split_artifacts"].items():
+        split_dir = descriptor_root / split_id
+        if record.get("metrics_sha256") != file_sha256(split_dir / "metrics.json"):
+            raise ValueError(f"descriptor metrics hash mismatch: {split_id}")
+        if record.get("predictions_sha256") != file_sha256(split_dir / "predictions.npz"):
+            raise ValueError(f"descriptor predictions hash mismatch: {split_id}")
 
     rows = load_descriptor_runs(descriptor_root, protocol_dir)
     observed = {
@@ -135,6 +141,12 @@ def main() -> None:
                 "split_id": split_id,
                 "path": str(path.relative_to(descriptor_root.parent.parent)),
                 "sha256": file_sha256(path),
+                "predictions_path": str(
+                    (path.parent / "predictions.npz").relative_to(
+                        descriptor_root.parent.parent
+                    )
+                ),
+                "predictions_sha256": file_sha256(path.parent / "predictions.npz"),
             }
         )
     bundle = {
