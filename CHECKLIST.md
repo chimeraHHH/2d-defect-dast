@@ -13,8 +13,12 @@
 - [x] Add run manifest and canonical prediction schema.
 - [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
       the exact copied versus seeded parameter sets in every DART run.
-- [x] Pass 99 remote unit tests and one bounded protocol-v2 CPU smoke run
-      from clean commit `af6eeec`.
+- [x] Pass 111 remote unit tests from clean GitHub commit `ed441fa` in an
+      isolated verification checkout.
+- [x] Complete bounded protocol-v2 DART and periodic-SchNet CPU smoke runs
+      from clean training commit `af6eeec`.
+- [x] Reconstruct all 9,871,460 stored graph-edge distances from positions,
+      periodic image shifts, and cells without topology or cutoff violations.
 
 ## Experiments
 
@@ -25,8 +29,9 @@
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs
       on the result store.
-- [ ] Run SchNet comparator under the same split contract. (Implementation and
-      configurations complete; runs await GPU capacity.)
+- [ ] Run SchNet comparator under the same split contract. (Implementation,
+      configurations, periodic-edge audit, and bounded smoke run complete;
+      formal runs await GPU capacity.)
 - [ ] Select the final DART configuration from validation/CV evidence only.
 - [ ] Run random out-of-fold and host--dopant-pair cross-validation.
 - [ ] Run host-group cross-validation.
@@ -46,6 +51,7 @@
       framing and state their exclusion from the evidence contract.
 - [ ] Generate all main figures and supplementary tables from canonical data.
 - [x] Add provisional Data and Code Availability statements.
-- [ ] Compile PDF and resolve LaTeX warnings that affect content.
+- [x] Compile and visually inspect the provisional result-gated PDF.
+- [ ] Compile the final populated PDF and resolve warnings that affect content.
 - [ ] Cross-check all numerical claims against result files.
 - [ ] Complete independent review and final revision.

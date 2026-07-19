@@ -70,10 +70,12 @@ validation plus artifact-hash collection. Validation selects LightGBM for the
 random, pair, and chemistry-block regimes and histogram gradient boosting for
 host- and dopant-held-out evaluation. The two DART initialization
 assets are pinned by SHA-256, and formal runs must record a fail-closed
-parameter-load report. On WHUServer-L40S, clean commit `af6eeec` passed all 99
-tests and a bounded protocol-v2 `g111` CPU smoke run. The stale protocol-v1
-queue was stopped before it launched any jobs. The systemd-managed
-`factorial-v2` queue now waits for the declared GPU idle thresholds, with all
-40 paired runs initially pending. After completion, the route is
-validation-only promotion, transfer, SchNet, ensemble UQ, and paper result
-generation.
+parameter-load report. On WHUServer-L40S, clean training commit `af6eeec`
+passed bounded protocol-v2 DART and SchNet CPU smoke runs. All 9,871,460 stored
+periodic graph edges were independently reconstructed without topology or
+cutoff violations. GitHub code commit `ed441fa` passes all 111 tests in
+an isolated remote checkout. The stale protocol-v1 queue was stopped before it
+launched any jobs. The systemd-managed `factorial-v2` queue now waits for the
+declared GPU idle thresholds, with all 40 paired runs pending and no failures.
+After completion, the route is validation-only promotion, transfer, SchNet,
+ensemble UQ, and paper result generation.
