@@ -97,6 +97,7 @@ def load_oof_predictions(
     predictions: Dict[int, float] = {}
     sources = []
     observed_splits = set()
+    commits = set()
     protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
     for run_dir in run_dirs:
         manifest_path = run_dir / "run_manifest.json"
@@ -107,6 +108,9 @@ def load_oof_predictions(
             raise ValueError(f"unsupported pair-OOF run manifest: {manifest_path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty pair-OOF run: {manifest_path}")
+        commit = manifest.get("git", {}).get("commit")
+        if not isinstance(commit, str) or not commit:
+            raise ValueError(f"pair-OOF run has no recorded code commit: {manifest_path}")
         expected_config = validate_manifest_config(
             manifest, expected_configs, manifest_path
         )
@@ -123,6 +127,7 @@ def load_oof_predictions(
         if manifest["split"].get("sha256") != file_sha256(split_path):
             raise ValueError(f"split hash mismatch: {manifest_path}")
         observed_splits.add(split_id)
+        commits.add(commit)
         prediction_path = run_dir / "test_predictions.npz"
         indices, values, targets = load_prediction_array(prediction_path)
         validate_protocol_targets(
@@ -149,6 +154,8 @@ def load_oof_predictions(
     expected_splits = {f"pair_cv5_f{fold}" for fold in range(5)}
     if observed_splits != expected_splits:
         raise ValueError(f"pair-OOF folds mismatch: {sorted(observed_splits)}")
+    if len(commits) != 1 or None in commits:
+        raise ValueError("pair-OOF runs do not share one recorded code commit")
     expected_indices = set()
     for split_id in expected_splits:
         split = json.loads((protocol_dir / "splits" / f"{split_id}.json").read_text())
@@ -360,6 +367,7 @@ def main() -> None:
             "factorial_collector_git": factorial_bundle["collector_git"],
         },
         "data_sha256": protocol_manifest["data_sha256"],
+        "training_commit": sources[0]["git"]["commit"],
         "sources": sources,
         "sample_oof": {
             "n": len(sample_rows), "mae_eV": float(np.mean(np.abs(residual))),
@@ -402,6 +410,15 @@ def main() -> None:
     write_csv(out_dir / "pair_preferences.csv", pair_rows)
     write_csv(out_dir / "site_selection.csv", site_rows)
     write_csv(out_dir / "group_errors.csv", group_rows)
+    summary["output_sha256"] = {
+        name: file_sha256(out_dir / filename)
+        for name, filename in {
+            "sample_predictions": "sample_predictions.csv",
+            "pair_preferences": "pair_preferences.csv",
+            "site_selection": "site_selection.csv",
+            "group_errors": "group_errors.csv",
+        }.items()
+    }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     print(json.dumps(summary, indent=2, sort_keys=True))
 

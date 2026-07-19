@@ -12,6 +12,7 @@ from scripts.prm_collect_results import (
     regime_for_split,
     select_descriptor_families,
     validate_descriptor_root,
+    validate_neural_campaign_commits,
     write_csv,
 )
 from src.prm_provenance import validate_protocol_targets
@@ -171,3 +172,24 @@ def test_comparison_archive_excludes_already_archived_factorial_runs(tmp_path):
     selected = comparison_archive_manifests(rows, result_root)
 
     assert selected == sorted([transfer.resolve(), schnet.resolve()])
+
+
+def test_neural_campaigns_require_one_bound_commit_each():
+    rows = [
+        {"model": "dart", "regime": "id_repeat", "git_commit": "factorial"},
+        {"model": "dart", "regime": "host_cv", "git_commit": "transfer"},
+        {"model": "schnet", "regime": "host_cv", "git_commit": "schnet"},
+    ]
+    selection = {"training_commits": ["factorial"]}
+
+    assert validate_neural_campaign_commits(rows, selection) == {
+        "dart_factorial": "factorial",
+        "dart_transfer": "transfer",
+        "schnet": "schnet",
+    }
+
+    rows.append(
+        {"model": "schnet", "regime": "dopant_cv", "git_commit": "other"}
+    )
+    with pytest.raises(ValueError, match="schnet results do not share one"):
+        validate_neural_campaign_commits(rows, selection)

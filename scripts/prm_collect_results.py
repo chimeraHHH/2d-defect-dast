@@ -208,6 +208,43 @@ def comparison_archive_manifests(
     return unique
 
 
+def validate_neural_campaign_commits(
+    rows: Sequence[Mapping[str, Any]], selection: Mapping[str, Any],
+    *, require_all: bool = True,
+) -> Dict[str, str]:
+    campaigns = {
+        "dart_factorial": {
+            str(row.get("git_commit")) for row in rows
+            if row.get("model") == "dart" and row.get("regime") == "id_repeat"
+        },
+        "dart_transfer": {
+            str(row.get("git_commit")) for row in rows
+            if row.get("model") == "dart" and row.get("regime") != "id_repeat"
+        },
+        "schnet": {
+            str(row.get("git_commit")) for row in rows
+            if row.get("model") == "schnet"
+        },
+    }
+    observed = {}
+    for campaign, commits in campaigns.items():
+        if not commits and not require_all:
+            continue
+        if len(commits) != 1 or "None" in commits or "" in commits:
+            raise ValueError(
+                f"{campaign} results do not share one recorded code commit: "
+                f"{sorted(commits)}"
+            )
+        observed[campaign] = next(iter(commits))
+    expected_factorial = selection.get("training_commits")
+    if (
+        "dart_factorial" in observed
+        and expected_factorial != [observed["dart_factorial"]]
+    ):
+        raise ValueError("selected DART repeats do not match the bound factorial commit")
+    return observed
+
+
 def select_descriptor_families(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     selected = {}
     regimes = sorted({row["regime"] for row in rows if str(row["model"]).startswith("descriptor:")})
@@ -515,6 +552,10 @@ def main() -> None:
                         f"expected {expected} {model}/{regime} runs, found {observed}"
                     )
 
+    campaign_commits = validate_neural_campaign_commits(
+        rows, selection, require_all=not args.allow_incomplete
+    )
+
     descriptor_selection = select_descriptor_families(rows)
     retained_rows = [
         row for row in rows
@@ -637,6 +678,7 @@ def main() -> None:
         },
         "data_sha256": protocol["data_sha256"],
         "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),
+        "neural_campaign_commits": campaign_commits,
         "archive_policy": {
             "scope": "43 selected-DART transfer runs and 48 SchNet runs; "
                      "selected factorial runs are bound through the factorial bundle",

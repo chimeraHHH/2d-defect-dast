@@ -206,6 +206,7 @@ def validate_runs(
     split_ids = set()
     split_hashes = set()
     data_hashes = set()
+    commits = set()
     for run_dir in run_dirs:
         path = run_dir / "run_manifest.json"
         manifest = json.loads(path.read_text())
@@ -215,6 +216,9 @@ def validate_runs(
             raise ValueError(f"unsupported UQ run manifest: {path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty UQ member is not admissible: {path}")
+        commit = manifest.get("git", {}).get("commit")
+        if not isinstance(commit, str) or not commit:
+            raise ValueError(f"UQ member has no recorded code commit: {path}")
         expected_config = validate_manifest_config(manifest, expected_configs, path)
         validate_training_completion(manifest, path)
         validate_dart_assets(manifest, path)
@@ -227,6 +231,7 @@ def validate_runs(
         split_ids.add(manifest["split"]["split_id"])
         split_hashes.add(manifest["split"].get("sha256"))
         data_hashes.add(manifest["data"]["data_sha256"])
+        commits.add(commit)
         if manifest["data"]["data_sha256"] != expected_data_sha256:
             raise ValueError(f"UQ dataset hash mismatch: {path}")
         if manifest["split"].get("sha256") != expected_split_sha256:
@@ -250,6 +255,8 @@ def validate_runs(
         raise ValueError("UQ members do not share a recorded split definition")
     if len(data_hashes) != 1:
         raise ValueError("UQ members use different datasets")
+    if len(commits) != 1 or None in commits:
+        raise ValueError("UQ members do not share one recorded code commit")
     return sources
 
 
@@ -390,6 +397,7 @@ def main() -> None:
             "variance_calibration": variance,
         },
         "n_members": len(run_dirs),
+        "training_commit": sources[0]["git"]["commit"],
         "member_sources": sources,
         "test": {
             "n": len(test_indices),
