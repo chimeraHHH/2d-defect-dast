@@ -143,10 +143,11 @@ binary variant code.  Test metrics are not part of the ordering rule.
 \label{sec:training}
 %----------------------------------------------------------------------
 
-Networks are optimized for 150 epochs with AdamW, an initial learning rate of
-$5\times10^{-4}$, weight decay $10^{-4}$, a ten-epoch linear warmup, and
-cosine decay to $10^{-6}$.  The objective is mean absolute error (MAE), batch
-size is 64 for DART, and gradient norms are clipped at 5.  Targets are
+Networks are optimized for 150 epochs with AdamW, a peak learning rate of
+$5\times10^{-4}$ reached after a ten-epoch linear warmup from
+$5\times10^{-5}$, weight decay $10^{-4}$, and cosine decay to $10^{-6}$.
+The objective is mean absolute error (MAE), batch size is 64 for DART, and
+gradient norms are clipped at 5.  Targets are
 standardized using training-partition statistics for optimization and
 transformed back to eV for all reported errors.  The fixed DART regularization
 recipe is limited to 0.1 dropout and additive Gaussian target noise with
