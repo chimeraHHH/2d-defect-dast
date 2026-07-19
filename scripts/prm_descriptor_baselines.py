@@ -258,17 +258,59 @@ def evaluate_split(
     return payload
 
 
+def result_is_complete(result_root: Path, split_id: str) -> bool:
+    output_dir = result_root / "baselines" / "descriptors" / split_id
+    try:
+        metrics = json.loads((output_dir / "metrics.json").read_text())
+        with np.load(output_dir / "predictions.npz", allow_pickle=False) as predictions:
+            prediction_schema = str(predictions["schema_version"].item())
+            prediction_split = str(predictions["split_id"].item())
+    except (OSError, KeyError, ValueError, json.JSONDecodeError):
+        return False
+    return (
+        metrics.get("schema_version") == "prm_descriptor_results_v1"
+        and metrics.get("split_id") == split_id
+        and prediction_schema == "prm_descriptor_predictions_v1"
+        and prediction_split == split_id
+    )
+
+
+def prior_split_provenance(manifest: Dict[str, Any]) -> Dict[str, Any]:
+    provenance = dict(manifest.get("split_provenance", {}))
+    if provenance or not manifest:
+        return provenance
+    batch = {
+        "git": manifest.get("git"),
+        "started_at": manifest.get("started_at"),
+        "completed_at": manifest.get("completed_at"),
+    }
+    return {split_id: batch for split_id in manifest.get("splits", [])}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1")
     parser.add_argument("--result-root", type=Path, required=True)
-    parser.add_argument("--split-glob", default="*.json")
+    parser.add_argument(
+        "--split-glob", action="append", dest="split_globs",
+        help="Repeat to select multiple split patterns; defaults to all splits.",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-jobs", type=int, default=8)
+    parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
     started = time.time()
+    result_root = args.result_root.resolve()
+    output_dir = result_root / "baselines" / "descriptors"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = output_dir / "manifest.json"
+    try:
+        previous_manifest = json.loads(manifest_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        previous_manifest = {}
+
     with args.data.open("rb") as handle:
         blob = pickle.load(handle)
     samples = blob["data"] if isinstance(blob, dict) and "data" in blob else blob
@@ -276,40 +318,104 @@ def main() -> None:
     features = np.stack([featurize(sample) for sample in samples])
     feature_hash = hashlib.sha256(features.tobytes()).hexdigest()
 
-    split_paths = sorted((args.protocol_dir / "splits").glob(args.split_glob))
-    split_paths = [
-        path for path in split_paths
+    protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
+    data_sha256 = protocol_manifest["data_sha256"]
+    formal_paths = [
+        path for path in sorted((args.protocol_dir / "splits").glob("*.json"))
         if path.stem not in ("id_historical_s42", "smoke_protocol")
     ]
-    outputs = [
+    selected = {
+        path.resolve()
+        for pattern in (args.split_globs or ["*.json"])
+        for path in (args.protocol_dir / "splits").glob(pattern)
+    }
+    split_paths = [path for path in formal_paths if path.resolve() in selected]
+    if not split_paths:
+        raise SystemExit("no formal protocol splits matched --split-glob")
+
+    reuse_compatible = (
+        previous_manifest.get("data_sha256") == data_sha256
+        and previous_manifest.get("feature_matrix_sha256") == feature_hash
+    )
+    evaluated = []
+    reused = []
+    for path in split_paths:
+        complete = result_is_complete(result_root, path.stem)
+        if complete and reuse_compatible and not args.force:
+            reused.append(path.stem)
+            continue
         evaluate_split(
-            path, samples, features, targets, args.result_root.resolve(),
-            args.seed, args.n_jobs,
+            path, samples, features, targets, result_root, args.seed, args.n_jobs,
         )
-        for path in split_paths
+        evaluated.append(path.stem)
+
+    git = git_snapshot()
+    completed_at = datetime.now(timezone.utc).isoformat()
+    batch = {
+        "started_at": datetime.fromtimestamp(started, timezone.utc).isoformat(),
+        "completed_at": completed_at,
+        "git": git,
+        "requested_splits": [path.stem for path in split_paths],
+        "evaluated_splits": evaluated,
+        "reused_splits": reused,
+        "wall_seconds": time.time() - started,
+    }
+    batches = list(previous_manifest.get("batches", []))
+    if previous_manifest and not batches:
+        batches.append(
+            {
+                "started_at": previous_manifest.get("started_at"),
+                "completed_at": previous_manifest.get("completed_at"),
+                "git": previous_manifest.get("git"),
+                "requested_splits": previous_manifest.get("splits", []),
+                "evaluated_splits": previous_manifest.get("splits", []),
+                "reused_splits": [],
+                "wall_seconds": previous_manifest.get("wall_seconds"),
+            }
+        )
+    batches.append(batch)
+    split_provenance = prior_split_provenance(previous_manifest)
+    for split_id in evaluated:
+        split_provenance[split_id] = {
+            "git": git, "started_at": batch["started_at"],
+            "completed_at": completed_at,
+        }
+    complete_splits = [
+        path.stem for path in formal_paths if result_is_complete(result_root, path.stem)
     ]
+    requested_complete = all(
+        result_is_complete(result_root, path.stem) for path in split_paths
+    )
     manifest = {
         "schema_version": "prm_descriptor_manifest_v1",
-        "status": "complete",
-        "started_at": datetime.fromtimestamp(started, timezone.utc).isoformat(),
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-        "git": git_snapshot(),
+        "status": "complete" if requested_complete else "incomplete",
+        "started_at": batch["started_at"],
+        "completed_at": completed_at,
+        "git": git,
         "environment": {
             "hostname": socket.gethostname(), "python": sys.version,
             "platform": platform.platform(),
         },
         "data_path": str(args.data.resolve()),
-        "data_sha256": json.loads((args.protocol_dir / "manifest.json").read_text())["data_sha256"],
+        "data_sha256": data_sha256,
         "feature_matrix_sha256": feature_hash,
         "n_samples": len(samples),
         "n_features": int(features.shape[1]),
         "selection_data": "validation only",
-        "splits": [output["split_id"] for output in outputs],
-        "wall_seconds": time.time() - started,
+        "splits": complete_splits,
+        "requested_splits": batch["requested_splits"],
+        "evaluated_splits": evaluated,
+        "reused_splits": reused,
+        "formal_split_coverage": {
+            "complete": len(complete_splits),
+            "total": len(formal_paths),
+            "all_complete": len(complete_splits) == len(formal_paths),
+        },
+        "split_provenance": split_provenance,
+        "batches": batches,
+        "wall_seconds": batch["wall_seconds"],
     }
-    output_dir = args.result_root.resolve() / "baselines" / "descriptors"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     print(json.dumps(manifest, indent=2))
 
 
