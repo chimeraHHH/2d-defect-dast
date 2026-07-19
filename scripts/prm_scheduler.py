@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import fcntl
+import hashlib
 import json
 import os
 import signal
@@ -29,6 +30,27 @@ def atomic_json(path: Path, payload: Dict[str, Any]) -> None:
     temporary.replace(path)
 
 
+def config_sha256(config: Dict[str, Any]) -> str:
+    payload = json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def git_snapshot() -> Dict[str, Any]:
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    ).stdout.strip()
+    return {
+        "commit": commit or None,
+        "dirty": bool(status),
+        "status_porcelain": status.splitlines(),
+    }
+
+
 def gpu_status() -> Dict[int, Dict[str, int]]:
     result = subprocess.run(
         [
@@ -47,14 +69,45 @@ def gpu_status() -> Dict[int, Dict[str, int]]:
     return status
 
 
-def is_complete(result_root: Path, config: Dict[str, Any]) -> bool:
+def existing_run_status(
+    result_root: Path,
+    config: Dict[str, Any],
+    current_commit: str | None,
+) -> str:
     manifest = result_root / config["output_dir"] / "run_manifest.json"
     if not manifest.exists():
-        return False
+        return "pending"
     try:
-        return json.loads(manifest.read_text()).get("status") == "complete"
-    except (OSError, json.JSONDecodeError):
-        return False
+        payload = json.loads(manifest.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"unreadable existing run manifest: {manifest}") from exc
+    if payload.get("schema_version") != "prm_run_manifest_v1":
+        raise ValueError(f"unsupported existing run manifest: {manifest}")
+    expected_hash = config_sha256(config)
+    if payload.get("config_sha256") != expected_hash:
+        raise ValueError(
+            f"stale run config at {manifest}; archive its output directory before restarting"
+        )
+    if config_sha256(payload.get("config", {})) != expected_hash:
+        raise ValueError(f"run manifest config/hash mismatch: {manifest}")
+    if payload.get("git", {}).get("dirty"):
+        raise ValueError(f"dirty existing run is inadmissible: {manifest}")
+    status = payload.get("status")
+    if status == "complete":
+        return "complete"
+    if status != "running":
+        raise ValueError(f"unsupported existing run status {status!r}: {manifest}")
+    run_commit = payload.get("git", {}).get("commit")
+    if current_commit is not None and run_commit != current_commit:
+        raise ValueError(
+            f"refusing to resume {manifest} from commit {run_commit}; "
+            f"current commit is {current_commit}"
+        )
+    return "pending"
+
+
+def is_complete(result_root: Path, config: Dict[str, Any]) -> bool:
+    return existing_run_status(result_root, config, current_commit=None) == "complete"
 
 
 def config_record(path: Path) -> Dict[str, Any]:
@@ -65,6 +118,7 @@ def config_record(path: Path) -> Dict[str, Any]:
         "output_dir": config["output_dir"],
         "split_path": config["split_path"],
         "seed": config["seed"],
+        "config_sha256": config_sha256(config),
         "attempts": 0,
         "status": "pending",
     }
@@ -90,6 +144,14 @@ def main() -> None:
     args = parser.parse_args()
 
     result_root = args.result_root.expanduser().resolve()
+    scheduler_git = git_snapshot()
+    if scheduler_git["commit"] is None:
+        raise SystemExit("scheduler must run from a Git worktree")
+    if scheduler_git["dirty"]:
+        raise SystemExit(
+            "scheduler requires a clean Git worktree: "
+            + ", ".join(scheduler_git["status_porcelain"])
+        )
     scheduler_dir = result_root / "_scheduler" / args.queue_id
     scheduler_dir.mkdir(parents=True, exist_ok=True)
     lock_handle = (scheduler_dir / "scheduler.lock").open("w")
@@ -107,8 +169,11 @@ def main() -> None:
         for record in records
     }
     for record in records:
-        if is_complete(result_root, config_by_path[record["config_path"]]):
-            record["status"] = "complete"
+        record["status"] = existing_run_status(
+            result_root,
+            config_by_path[record["config_path"]],
+            current_commit=scheduler_git["commit"],
+        )
 
     excluded = {int(value) for value in args.exclude_gpus.split(",") if value.strip()}
     state: Dict[str, Any] = {
@@ -117,6 +182,7 @@ def main() -> None:
         "started_at": utc_now(),
         "updated_at": utc_now(),
         "status": "running",
+        "scheduler_git": scheduler_git,
         "settings": {
             "glob": args.glob,
             "module": args.module,
