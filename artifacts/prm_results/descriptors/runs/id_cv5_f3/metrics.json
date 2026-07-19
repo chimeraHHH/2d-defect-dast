@@ -1,4 +1,5 @@
 {
+  "metric_encoding": "prm_nullable_correlations_v1",
   "results": {
     "hist_gradient_boosting": {
       "candidates": [
@@ -416,10 +417,10 @@
         "bias": -0.030349091567577244,
         "mae": 2.3673879784387903,
         "n": 2045,
-        "pearson": NaN,
+        "pearson": null,
         "r2": -8.39908434147052e-05,
         "rmse": 3.311676928008274,
-        "spearman": NaN
+        "spearman": null
       },
       "test_dopant_macro": {
         "macro_mae": 2.387590437063069,
@@ -554,10 +555,10 @@
         "bias": -0.12923078836787563,
         "mae": 2.316472546591567,
         "n": 2044,
-        "pearson": -1.371743394546829e-16,
+        "pearson": null,
         "r2": -0.0015748995635291863,
         "rmse": 3.258976872591016,
-        "spearman": NaN
+        "spearman": null
       }
     },
     "random_forest": {
