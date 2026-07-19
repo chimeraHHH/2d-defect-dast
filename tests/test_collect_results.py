@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from scripts.prm_collect_results import (
+    comparison_archive_manifests,
     file_sha256,
     load_prediction_array,
     paired_sample_comparison,
@@ -153,3 +154,20 @@ def test_neural_prediction_loader_preserves_target_storage_precision(tmp_path):
     assert targets.dtype == np.float32
     assert canonical.dtype == np.float64
     assert canonical.tolist() == [protocol_targets[1], protocol_targets[2]]
+
+
+def test_comparison_archive_excludes_already_archived_factorial_runs(tmp_path):
+    result_root = tmp_path / "results"
+    factorial = result_root / "factorial" / "g101" / "run" / "run_manifest.json"
+    transfer = result_root / "selected" / "g101" / "transfer" / "run_manifest.json"
+    schnet = result_root / "baselines" / "schnet" / "run_manifest.json"
+    rows = [
+        {"model": "dart", "manifest_path": str(factorial)},
+        {"model": "dart", "manifest_path": str(transfer)},
+        {"model": "schnet", "manifest_path": str(schnet)},
+        {"model": "descriptor:mean", "manifest_path": "descriptor.json"},
+    ]
+
+    selected = comparison_archive_manifests(rows, result_root)
+
+    assert selected == sorted([transfer.resolve(), schnet.resolve()])

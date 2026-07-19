@@ -18,6 +18,7 @@ from scipy.stats import spearmanr
 from src.prm_metrics import low_energy_metrics, macro_group_mae
 from src.prm_provenance import (
     ExpectedConfig,
+    archive_training_artifacts,
     load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
@@ -186,6 +187,25 @@ def load_descriptor_runs(
                     row[f"{partition}_{metric}"] = float(result[partition][metric])
             rows.append(row)
     return rows
+
+
+def comparison_archive_manifests(
+    rows: Sequence[Mapping[str, Any]], result_root: Path,
+) -> List[Path]:
+    """Return transfer/SchNet manifests; factorial evidence is archived once."""
+    factorial_root = (result_root / "factorial").resolve()
+    paths = []
+    for row in rows:
+        if row.get("model") not in {"dart", "schnet"}:
+            continue
+        path = Path(str(row["manifest_path"])).resolve()
+        if path.is_relative_to(factorial_root):
+            continue
+        paths.append(path)
+    unique = sorted(set(paths))
+    if len(unique) != len(paths):
+        raise ValueError("comparison archive contains duplicate neural manifests")
+    return unique
 
 
 def select_descriptor_families(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
@@ -583,6 +603,19 @@ def main() -> None:
     collector_git = git_snapshot()
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    archived_runs = []
+    if not args.allow_incomplete:
+        archive_manifests = comparison_archive_manifests(rows, result_root)
+        if len(archive_manifests) != 91:
+            raise ValueError(
+                "expected 43 selected-DART transfer and 48 SchNet runs for archival, "
+                f"found {len(archive_manifests)}"
+            )
+        archived_runs = archive_training_artifacts(
+            archive_manifests,
+            out_dir / "runs",
+            repository_root=ROOT,
+        )
     write_csv(out_dir / "run_metrics.csv", retained_rows)
     write_csv(out_dir / "fold_metrics.csv", fold_rows)
     write_csv(out_dir / "summary.csv", summary_rows)
@@ -604,6 +637,17 @@ def main() -> None:
         },
         "data_sha256": protocol["data_sha256"],
         "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),
+        "archive_policy": {
+            "scope": "43 selected-DART transfer runs and 48 SchNet runs; "
+                     "selected factorial runs are bound through the factorial bundle",
+            "included": [
+                "run_manifest.json", "metrics.json", "split_indices.npz",
+                "val_predictions.npz", "test_predictions.npz",
+            ],
+            "checkpoint": "SHA-256 recorded; binary retained outside Git",
+        },
+        "n_archived_runs": len(archived_runs),
+        "archived_runs": archived_runs,
         "descriptor_selection": descriptor_selection,
         "aggregation": {
             "fold_metrics": "mean over model seeds within each split",
