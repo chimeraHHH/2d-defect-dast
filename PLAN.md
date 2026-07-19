@@ -73,9 +73,12 @@ assets are pinned by SHA-256, and formal runs must record a fail-closed
 parameter-load report. On WHUServer-L40S, clean training commit `af6eeec`
 passed bounded protocol-v2 DART and SchNet CPU smoke runs. All 9,871,460 stored
 periodic graph edges were independently reconstructed without topology or
-cutoff violations. GitHub code commit `ed441fa` passes all 111 tests in
-an isolated remote checkout. The stale protocol-v1 queue was stopped before it
-launched any jobs. The systemd-managed `factorial-v2` queue now waits for the
-declared GPU idle thresholds, with all 40 paired runs pending and no failures.
-After completion, the route is validation-only promotion, transfer, SchNet,
-ensemble UQ, and paper result generation.
+cutoff violations. GitHub code commit `38f8a2b` passes all 126 tests in an
+isolated remote checkout. UQ and materials collectors now reject non-finite
+inputs, undefined rank statistics, non-standard JSON numbers, and trivial or
+tied decision sets where the corresponding accuracy is not defined. The stale
+protocol-v1 queue was stopped before it launched any jobs. The systemd-managed
+`factorial-v2` queue now waits for the declared GPU idle thresholds, with all 40
+paired runs pending and no failures. After completion, the route is
+validation-only promotion, transfer, SchNet, ensemble UQ, and paper result
+generation.

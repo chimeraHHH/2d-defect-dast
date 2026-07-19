@@ -13,7 +13,7 @@
 - [x] Add run manifest and canonical prediction schema.
 - [x] Pin ct-UAE and DFT-3D-lite initialization assets by SHA-256 and record
       the exact copied versus seeded parameter sets in every DART run.
-- [x] Pass 111 remote unit tests from clean GitHub commit `ed441fa` in an
+- [x] Pass 126 remote unit tests from clean GitHub commit `38f8a2b` in an
       isolated verification checkout.
 - [x] Complete bounded protocol-v2 DART and periodic-SchNet CPU smoke runs
       from clean training commit `af6eeec`.
@@ -37,8 +37,12 @@
 - [ ] Run host-group cross-validation.
 - [ ] Run dopant-group cross-validation.
 - [ ] Run predefined host-by-dopant chemistry block holdout.
-- [ ] Rebuild UQ with a distinct held-out calibration partition.
+- [ ] Rebuild UQ with a distinct held-out calibration partition. (The collector
+      is fail-closed for non-finite inputs, undefined rank statistics, and
+      non-standard JSON; formal members await GPU capacity.)
 - [ ] Complete mechanism-preference, error and applicability-domain analyses.
+      (Eligibility and energy-tie contracts are implemented and tested; formal
+      out-of-fold predictions await the selected architecture.)
 
 ## Paper
 
