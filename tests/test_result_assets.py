@@ -1,3 +1,4 @@
+import hashlib
 import re
 from pathlib import Path
 
@@ -10,6 +11,8 @@ from scripts.prm_make_result_assets import (
     invalidate_ready_marker,
     latex_escape,
     render_macros,
+    require_recorded_output_hashes,
+    strict_json,
     validate_contract,
     write_ready_marker,
 )
@@ -28,6 +31,28 @@ def test_latex_and_number_formatting_are_stable():
     assert latex_escape("host_pair%") == r"host\_pair\%"
     assert finite_format(-0.0001, digits=3, signed=True) == "+0.000"
     assert finite_format(float("nan")) == "--"
+    with pytest.raises(ValueError, match="Out of range float values"):
+        strict_json({"paper_metric": float("nan")})
+
+
+def test_recorded_output_hashes_are_recomputed_before_asset_generation(tmp_path):
+    first = tmp_path / "first.csv"
+    second = tmp_path / "second.csv"
+    first.write_text("value\n1\n")
+    second.write_text("value\n2\n")
+    payload = {
+        "output_sha256": {
+            "first": hashlib.sha256(first.read_bytes()).hexdigest(),
+            "second": hashlib.sha256(second.read_bytes()).hexdigest(),
+        }
+    }
+    paths = {"first_path": first, "second_path": second}
+    expected = {"first": "first_path", "second": "second_path"}
+    require_recorded_output_hashes(payload, "fixture", paths, expected)
+
+    second.write_text("value\n3\n")
+    with pytest.raises(ValueError, match="output hash mismatch for second"):
+        require_recorded_output_hashes(payload, "fixture", paths, expected)
 
 
 def minimal_claims():

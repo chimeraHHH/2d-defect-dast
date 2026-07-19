@@ -47,6 +47,27 @@ COLORS = {
     "ink": "#222222",
     "muted": "#666666",
 }
+RECORDED_OUTPUTS = {
+    "comparison": {
+        "run_metrics": "comparison_run_metrics",
+        "fold_metrics": "comparison_fold_metrics",
+        "summary": "comparison_summary",
+        "pooled_metrics": "pooled",
+        "paired_comparisons": "paired",
+        "descriptor_selection": "comparison_descriptor_selection",
+    },
+    "uq": {
+        "predictions": "uq_predictions",
+        "interval_calibration": "uq_intervals",
+        "risk_coverage": "uq_risk",
+    },
+    "materials": {
+        "sample_predictions": "sample_predictions",
+        "pair_preferences": "pair_preferences",
+        "site_selection": "site_selection",
+        "group_errors": "group_errors",
+    },
+}
 
 
 def file_sha256(path: Path) -> str:
@@ -55,6 +76,10 @@ def file_sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def strict_json(payload: Any) -> str:
+    return json.dumps(payload, indent=2, sort_keys=True, allow_nan=False)
 
 
 def git_snapshot() -> Dict[str, Any]:
@@ -98,6 +123,22 @@ def require_clean_collector(payload: Mapping[str, Any], name: str) -> None:
         raise ValueError(f"{name} has no collector commit")
     if snapshot.get("dirty"):
         raise ValueError(f"{name} was collected from a dirty worktree")
+
+
+def require_recorded_output_hashes(
+    payload: Mapping[str, Any], name: str, paths: Mapping[str, Path],
+    expected: Mapping[str, str],
+) -> None:
+    recorded = payload.get("output_sha256")
+    if not isinstance(recorded, Mapping) or set(recorded) != set(expected):
+        raise ValueError(f"{name} output hash contract is incomplete")
+    for output_name, path_key in expected.items():
+        observed = file_sha256(paths[path_key])
+        if recorded[output_name] != observed:
+            raise ValueError(
+                f"{name} output hash mismatch for {output_name}: "
+                f"recorded={recorded[output_name]}, observed={observed}"
+            )
 
 
 def validate_contract(
@@ -245,13 +286,20 @@ def input_paths(result_root: Path, protocol_dir: Path) -> Dict[str, Path]:
         "protocol": protocol_dir / "manifest.json",
         "factorial": result_root / "factorial/bundle.json",
         "comparison": result_root / "comparison/manifest.json",
+        "comparison_run_metrics": result_root / "comparison/run_metrics.csv",
+        "comparison_fold_metrics": result_root / "comparison/fold_metrics.csv",
+        "comparison_summary": result_root / "comparison/summary.csv",
         "pooled": result_root / "comparison/pooled_metrics.csv",
         "paired": result_root / "comparison/paired_comparisons.csv",
+        "comparison_descriptor_selection": (
+            result_root / "comparison/descriptor_selection.json"
+        ),
         "uq": result_root / "uq/metrics.json",
         "uq_intervals": result_root / "uq/interval_calibration.csv",
         "uq_risk": result_root / "uq/risk_coverage.csv",
         "uq_predictions": result_root / "uq/predictions.npz",
         "materials": result_root / "materials/summary.json",
+        "sample_predictions": result_root / "materials/sample_predictions.csv",
         "pair_preferences": result_root / "materials/pair_preferences.csv",
         "site_selection": result_root / "materials/site_selection.csv",
         "group_errors": result_root / "materials/group_errors.csv",
@@ -262,7 +310,7 @@ def load_inputs(paths: Mapping[str, Path]) -> Dict[str, Any]:
     missing = [str(path) for path in paths.values() if not path.is_file()]
     if missing:
         raise FileNotFoundError("canonical paper inputs are incomplete:\n" + "\n".join(missing))
-    return {
+    inputs = {
         "protocol": json.loads(paths["protocol"].read_text()),
         "factorial": json.loads(paths["factorial"].read_text()),
         "comparison": json.loads(paths["comparison"].read_text()),
@@ -276,6 +324,11 @@ def load_inputs(paths: Mapping[str, Path]) -> Dict[str, Any]:
         "site_selection": read_csv(paths["site_selection"]),
         "group_errors": read_csv(paths["group_errors"]),
     }
+    for name in ("protocol", "factorial", "comparison", "uq", "materials"):
+        strict_json(inputs[name])
+    for name, expected in RECORDED_OUTPUTS.items():
+        require_recorded_output_hashes(inputs[name], name, paths, expected)
+    return inputs
 
 
 def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, Any]:
@@ -916,7 +969,7 @@ def write_outputs(
 
     output_paths = []
     claims_path = generated_dir / "claims.json"
-    claims_path.write_text(json.dumps(claims, indent=2, sort_keys=True) + "\n")
+    claims_path.write_text(strict_json(claims) + "\n")
     output_paths.append(claims_path)
     text_outputs = {
         "results_macros.tex": render_macros(claims),
@@ -970,7 +1023,7 @@ def write_outputs(
     }
     manifest_path = result_root / "paper/result_assets.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    manifest_path.write_text(strict_json(manifest) + "\n")
     return manifest
 
 
@@ -995,13 +1048,14 @@ def main() -> None:
         inputs["uq"], inputs["materials"], inputs["pooled"], inputs["paired"],
     )
     claims = build_claims(inputs, selected)
+    strict_json(claims)
     collector_git = git_snapshot()
     if collector_git["dirty"]:
         raise ValueError("paper assets must be generated from a clean worktree")
     manifest = write_outputs(
         inputs, paths, claims, paper_dir, result_root, collector_git,
     )
-    print(json.dumps(manifest, indent=2, sort_keys=True))
+    print(strict_json(manifest))
 
 
 if __name__ == "__main__":

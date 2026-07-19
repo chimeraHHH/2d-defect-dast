@@ -676,9 +676,23 @@ def main() -> None:
     write_csv(out_dir / "summary.csv", summary_rows)
     write_csv(out_dir / "pooled_metrics.csv", pooled_rows)
     write_csv(out_dir / "paired_comparisons.csv", comparison_rows)
-    (out_dir / "descriptor_selection.json").write_text(
-        json.dumps(descriptor_selection, indent=2, sort_keys=True) + "\n"
+    descriptor_selection_path = out_dir / "descriptor_selection.json"
+    descriptor_selection_path.write_text(
+        json.dumps(
+            descriptor_selection, indent=2, sort_keys=True, allow_nan=False
+        ) + "\n"
     )
+    output_sha256 = {
+        name: file_sha256(out_dir / filename)
+        for name, filename in {
+            "run_metrics": "run_metrics.csv",
+            "fold_metrics": "fold_metrics.csv",
+            "summary": "summary.csv",
+            "pooled_metrics": "pooled_metrics.csv",
+            "paired_comparisons": "paired_comparisons.csv",
+            "descriptor_selection": "descriptor_selection.json",
+        }.items()
+    }
     manifest = {
         "schema_version": "prm_comparison_bundle_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -711,6 +725,7 @@ def main() -> None:
         "n_archived_runs": len(archived_runs),
         "archived_runs": archived_runs,
         "descriptor_selection": descriptor_selection,
+        "output_sha256": output_sha256,
         "aggregation": {
             "fold_metrics": "mean over model seeds within each split",
             "pooled_metrics": "mean prediction over model seeds, then concatenate disjoint test folds",
@@ -720,8 +735,11 @@ def main() -> None:
             ),
         },
     }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(manifest, indent=2, sort_keys=True))
+    encoded_manifest = json.dumps(
+        manifest, indent=2, sort_keys=True, allow_nan=False
+    )
+    (out_dir / "manifest.json").write_text(encoded_manifest + "\n")
+    print(encoded_manifest)
 
 
 if __name__ == "__main__":
