@@ -190,7 +190,8 @@ def summarize_factorial(
 
 
 def load_runs(
-    result_root: Path, expected_data_sha256: str, allow_dirty: bool = False,
+    result_root: Path, expected_data_sha256: str,
+    expected_split_hashes: Mapping[str, str], allow_dirty: bool = False,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     manifests = sorted((result_root / "factorial").glob("g*/split*_seed*/run_manifest.json"))
     rows: List[Dict[str, Any]] = []
@@ -214,6 +215,8 @@ def load_runs(
         if not split_id.startswith("id_repeat_s"):
             raise ValueError(f"unexpected factorial split: {split_id}")
         repeat = int(split_id.rsplit("s", 1)[1])
+        if payload["split"].get("sha256") != expected_split_hashes.get(split_id):
+            raise ValueError(f"split hash mismatch: {path}")
         contracts.add(contract_hash(config))
         row: Dict[str, Any] = {
             "variant": variant, "bits": bits, "repeat": repeat,
@@ -257,8 +260,16 @@ def main() -> None:
     args = parser.parse_args()
 
     protocol = json.loads(args.protocol_manifest.read_text())
+    protocol_dir = args.protocol_manifest.resolve().parent
+    expected_split_hashes = {
+        f"id_repeat_s{repeat}": file_sha256(
+            protocol_dir / "splits" / f"id_repeat_s{repeat}.json"
+        )
+        for repeat in range(42, 47)
+    }
     rows, sources = load_runs(
-        args.result_root.resolve(), protocol["data_sha256"], args.allow_dirty,
+        args.result_root.resolve(), protocol["data_sha256"],
+        expected_split_hashes, args.allow_dirty,
     )
     summary = summarize_factorial(rows, args.bootstrap_samples)
     out_dir = args.out_dir.resolve()
