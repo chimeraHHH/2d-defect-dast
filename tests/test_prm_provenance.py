@@ -80,6 +80,38 @@ def test_prediction_targets_must_match_protocol_sample_table(tmp_path):
         )
 
 
+def test_prediction_targets_accept_only_exact_float32_protocol_rounding(tmp_path):
+    sample_table = tmp_path / "samples.csv"
+    sample_table.write_text(
+        "sample_index,target_eV\n0,12.3456789012345\n1,-3.210987654321\n"
+    )
+    targets = load_protocol_targets(sample_table)
+    rounded = np.asarray([targets[0], targets[1]], dtype=np.float32)
+
+    validate_protocol_targets(
+        np.asarray([0, 1]), rounded, targets, context="neural predictions"
+    )
+
+    changed = rounded.copy()
+    changed[0] = np.nextafter(changed[0], np.float32(np.inf))
+    with pytest.raises(ValueError, match="target mismatch at sample 0"):
+        validate_protocol_targets(
+            np.asarray([0, 1]), changed, targets, context="neural predictions"
+        )
+
+
+def test_prediction_targets_reject_low_precision_storage(tmp_path):
+    sample_table = tmp_path / "samples.csv"
+    sample_table.write_text("sample_index,target_eV\n0,1.5\n")
+    targets = load_protocol_targets(sample_table)
+
+    with pytest.raises(ValueError, match="unsupported target dtype float16"):
+        validate_protocol_targets(
+            np.asarray([0]), np.asarray([1.5], dtype=np.float16), targets,
+            context="neural predictions",
+        )
+
+
 def _complete_manifest():
     config = {"epochs": 2, "seed": 142}
     return {

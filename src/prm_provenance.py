@@ -75,8 +75,17 @@ def validate_protocol_targets(
     *,
     context: str,
 ) -> None:
+    """Require exact target alignment at the artifact's stored precision.
+
+    Neural prediction archives store targets as float32 tensors, whereas the
+    protocol table is parsed as float64. Comparing those representations with
+    an arbitrary tolerance either rejects valid round-off or admits small label
+    changes. Rounding the protocol value to the artifact dtype makes the
+    admissible representation explicit and still rejects a one-ULP mutation.
+    """
     raw_indices = np.asarray(indices)
-    values = np.asarray(targets, dtype=float)
+    raw_values = np.asarray(targets)
+    values = np.asarray(raw_values, dtype=float)
     if (
         raw_indices.ndim != 1
         or not np.issubdtype(raw_indices.dtype, np.integer)
@@ -85,6 +94,11 @@ def validate_protocol_targets(
         or len(np.unique(raw_indices)) != len(raw_indices)
     ):
         raise ValueError(f"{context} target vectors are not uniquely aligned")
+    if (
+        not np.issubdtype(raw_values.dtype, np.floating)
+        or raw_values.dtype.itemsize < np.dtype(np.float32).itemsize
+    ):
+        raise ValueError(f"{context} has unsupported target dtype {raw_values.dtype}")
     if not np.isfinite(values).all():
         raise ValueError(f"{context} contains non-finite targets")
     normalized_indices = raw_indices.astype(np.int64, copy=False)
@@ -94,13 +108,15 @@ def validate_protocol_targets(
     expected = np.asarray(
         [protocol_targets[int(index)] for index in normalized_indices], dtype=float
     )
-    matches = np.isclose(values, expected, rtol=0.0, atol=1e-10)
+    expected_at_storage_precision = expected.astype(raw_values.dtype)
+    matches = raw_values == expected_at_storage_precision
     if not np.all(matches):
         position = int(np.flatnonzero(~matches)[0])
         index = int(normalized_indices[position])
         raise ValueError(
             f"{context} target mismatch at sample {index}: "
-            f"observed={values[position]:.16g}, protocol={expected[position]:.16g}"
+            f"observed={values[position]:.16g}, protocol={expected[position]:.16g}, "
+            f"storage_dtype={raw_values.dtype}"
         )
 
 
