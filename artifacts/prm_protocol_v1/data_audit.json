@@ -104,7 +104,69 @@
   },
   "formation_energy_provenance": {
     "auditable_from_clean_pickle": false,
-    "reason": "The cleaned samples contain the derived target but not pristine, defect and chemical-potential energy components."
+    "raw_database_audit": {
+      "filter_replay": {
+        "missing_or_nonfinite_eform": 1828,
+        "not_converged": 4551,
+        "outside_abs_20_eV": 344,
+        "raw_rows": 17364,
+        "valid_after_filter": 10641
+      },
+      "formula": "eform = en2 - hostenergy - dopant_chemical_potential",
+      "formula_component_exceptions": [
+        {
+          "defecttype": "interstitial",
+          "dopant": "Ti",
+          "eform_eV": 6.8851534949999165,
+          "en2": 0.0,
+          "host": "Nb4C3",
+          "reason": "en2_zero_sentinel",
+          "row_id": 4741,
+          "site": "int1"
+        },
+        {
+          "defecttype": "interstitial",
+          "dopant": "Ti",
+          "eform_eV": 8.982057374999814,
+          "en2": 0.0,
+          "host": "Nb4C3",
+          "reason": "en2_zero_sentinel",
+          "row_id": 5977,
+          "site": "int2"
+        },
+        {
+          "defecttype": "adsorbate",
+          "dopant": "Re",
+          "eform_eV": 7.08681764,
+          "en2": 0.0,
+          "host": "Nb2CO2",
+          "reason": "en2_zero_sentinel",
+          "row_id": 6351,
+          "site": "ads0"
+        },
+        {
+          "defecttype": "interstitial",
+          "dopant": "Y",
+          "eform_eV": 17.20439837000001,
+          "en2": 0.0,
+          "host": "TiO2",
+          "reason": "en2_zero_sentinel",
+          "row_id": 10736,
+          "site": "int0"
+        }
+      ],
+      "max_cleaned_target_abs_delta_eV": 0.0,
+      "max_formula_abs_delta_eV": 2.2737367544323206e-13,
+      "mean_formula_abs_delta_eV": 1.356631972234457e-15,
+      "metadata_mismatches": 0,
+      "n_formula_component_exceptions": 4,
+      "n_formula_verified": 10637,
+      "path_recorded": "/home/huayiming/Workspace/yiminghua/project/data/raw/imp2d.db",
+      "sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4",
+      "size_bytes": 71819264,
+      "valid_id_set_matches_cleaned": true
+    },
+    "status": "cleaned targets verified against the filtered ASE database; formula verified where raw components are present"
   },
   "metadata_cardinality": {
     "defecttype": 2,
@@ -308,6 +370,56 @@
     {
       "counts": {
         "excluded": 58,
+        "test": 2117,
+        "train": 6349,
+        "val": 2117
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2117,
+        "train": 6349,
+        "val": 2117
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2117,
+        "train": 6350,
+        "val": 2116
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2116,
+        "train": 6351,
+        "val": 2116
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2116,
+        "train": 6350,
+        "val": 2117
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 58,
         "test": 2096,
         "train": 6399,
         "val": 2088
@@ -404,6 +516,56 @@
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2117,
+        "train": 6349,
+        "val": 2117
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2117,
+        "train": 6349,
+        "val": 2117
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2117,
+        "train": 6350,
+        "val": 2116
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2116,
+        "train": 6351,
+        "val": 2116
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 58,
+        "test": 2116,
+        "train": 6350,
+        "val": 2117
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f4"
     },
     {
       "counts": {

@@ -68,12 +68,16 @@ def main() -> None:
     # These are provisional full-core transfer configs. They are promoted only
     # if the factorial does not select a different architecture.
     transfer_splits = [
+        *(f"id_cv5_f{i}" for i in range(5)),
+        *(f"pair_cv5_f{i}" for i in range(5)),
         *(f"host_cv5_f{i}" for i in range(5)),
         *(f"dopant_cv5_f{i}" for i in range(5)),
         "chemistry_block_g6x3d",
     ]
     for split_id in transfer_splits:
-        for model_seed in (242, 243, 244):
+        single_seed = split_id.startswith("id_cv5") or split_id.startswith("pair_cv5")
+        model_seeds = (242,) if single_seed else (242, 243, 244)
+        for model_seed in model_seeds:
             cfg = deepcopy(base)
             cfg["seed"] = model_seed
             cfg["split_path"] = str(

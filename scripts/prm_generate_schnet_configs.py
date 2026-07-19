@@ -18,13 +18,20 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     split_ids = [
         *(f"id_repeat_s{i}" for i in range(42, 47)),
+        *(f"id_cv5_f{i}" for i in range(5)),
+        *(f"pair_cv5_f{i}" for i in range(5)),
         *(f"host_cv5_f{i}" for i in range(5)),
         *(f"dopant_cv5_f{i}" for i in range(5)),
         "chemistry_block_g6x3d",
     ]
     records = []
     for split_id in split_ids:
-        seeds = (342, 343, 344) if not split_id.startswith("id_repeat") else (342,)
+        single_seed = (
+            split_id.startswith("id_repeat")
+            or split_id.startswith("id_cv5")
+            or split_id.startswith("pair_cv5")
+        )
+        seeds = (342,) if single_seed else (342, 343, 344)
         for seed in seeds:
             cfg = deepcopy(base)
             cfg["seed"] = seed

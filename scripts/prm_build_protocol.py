@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
 
 from src.splits import (
     grouped_cv_splits,
+    random_cv_splits,
     random_split_indices,
     random_split_subset,
     write_split,
@@ -103,6 +104,111 @@ def write_sample_table(path: Path, samples: Sequence[Dict[str, Any]]) -> None:
             )
 
 
+def audit_raw_database(
+    path: Path, samples: Sequence[Dict[str, Any]]
+) -> Dict[str, Any]:
+    from ase.db import connect
+
+    database = connect(str(path))
+    valid_ids = []
+    valid_rows = {}
+    formula_deltas = []
+    formula_component_exceptions = []
+    target_deltas = []
+    metadata_mismatches = 0
+    counts = {
+        "raw_rows": database.count(),
+        "not_converged": 0,
+        "missing_or_nonfinite_eform": 0,
+        "outside_abs_20_eV": 0,
+        "valid_after_filter": 0,
+    }
+    for row in database.select():
+        if not bool(row.get("converged")):
+            counts["not_converged"] += 1
+            continue
+        eform = row.get("eform")
+        if eform is None or not np.isfinite(float(eform)):
+            counts["missing_or_nonfinite_eform"] += 1
+            continue
+        if abs(float(eform)) > 20.0:
+            counts["outside_abs_20_eV"] += 1
+            continue
+        counts["valid_after_filter"] += 1
+        valid_ids.append(int(row.id))
+        valid_rows[int(row.id)] = row
+        components = (
+            row.get("en2"), row.get("hostenergy"),
+            row.get("dopant_chemical_potential"),
+        )
+        components_finite = all(
+            value is not None and np.isfinite(float(value)) for value in components
+        )
+        # Six raw rows use en2 == 0 as a missing-value sentinel. Four survive
+        # the published |eform| <= 20 eV filter and must not be interpreted as
+        # physically meaningful total energies.
+        if components_finite and float(components[0]) != 0.0:
+            calculated = float(components[0]) - float(components[1]) - float(components[2])
+            formula_deltas.append(abs(calculated - float(eform)))
+        else:
+            formula_component_exceptions.append(
+                {
+                    "row_id": int(row.id),
+                    "reason": "en2_zero_sentinel" if components_finite else "nonfinite_component",
+                    "en2": None if components[0] is None else float(components[0]),
+                    "host": str(row.get("host", "")),
+                    "dopant": str(row.get("dopant", "")),
+                    "site": str(row.get("site", "")),
+                    "defecttype": str(row.get("defecttype", "")),
+                    "eform_eV": float(eform),
+                }
+            )
+
+    sample_ids = [int(sample["id"]) for sample in samples]
+    valid_id_set_matches = set(valid_ids) == set(sample_ids)
+    if not valid_id_set_matches:
+        missing = sorted(set(sample_ids).difference(valid_ids))[:10]
+        extra = sorted(set(valid_ids).difference(sample_ids))[:10]
+        raise ValueError(
+            f"raw database and cleaned data IDs differ; missing={missing}, extra={extra}"
+        )
+    for sample in samples:
+        row = valid_rows[int(sample["id"])]
+        target_deltas.append(abs(float(sample["target"]) - float(row.get("eform"))))
+        meta = sample.get("metadata", {})
+        if any(
+            str(meta.get(key, "")) != str(row.get(key, ""))
+            for key in ("host", "dopant", "site", "defecttype")
+        ):
+            metadata_mismatches += 1
+
+    max_formula_delta = float(max(formula_deltas, default=float("nan")))
+    max_target_delta = float(max(target_deltas, default=float("nan")))
+    if max_formula_delta > 1e-8:
+        raise ValueError(f"formation-energy formula mismatch: {max_formula_delta:.6g} eV")
+    if max_target_delta > 1e-12 or metadata_mismatches:
+        raise ValueError(
+            "cleaned data do not exactly reproduce the filtered raw database: "
+            f"target_delta={max_target_delta:.6g}, metadata_mismatches={metadata_mismatches}"
+        )
+
+    return {
+        "path_recorded": str(path.resolve()),
+        "size_bytes": path.stat().st_size,
+        "sha256": file_sha256(path),
+        "filter_replay": counts,
+        "valid_id_set_matches_cleaned": valid_id_set_matches,
+        "n_formula_verified": len(formula_deltas),
+        "n_formula_component_exceptions": len(formula_component_exceptions),
+        "formula_component_exceptions": formula_component_exceptions,
+        "formula": "eform = en2 - hostenergy - dopant_chemical_potential",
+        "max_formula_abs_delta_eV": max_formula_delta,
+        "mean_formula_abs_delta_eV": float(np.mean(formula_deltas)) if formula_deltas else float("nan"),
+        "max_cleaned_target_abs_delta_eV": max_target_delta,
+        "metadata_mismatches": metadata_mismatches,
+    }
+
+
 def build_splits(
     samples: Sequence[Dict[str, Any]],
     retained_indices: Sequence[int],
@@ -160,9 +266,28 @@ def build_splits(
             )
         )
 
+    for split in random_cv_splits(retained_indices, n_folds=5, seed=52):
+        fold = int(split["fold"])
+        split_id = f"id_cv5_f{fold}"
+        records.append(
+            write_split(
+                split_dir / f"{split_id}.json", split_id,
+                split["train"], split["val"], split["test"],
+                n_samples, data_sha256, "random_cv5_oof",
+                {
+                    "fold": fold,
+                    "assignment_seed": 52,
+                    "purpose": "out-of-fold predictions for paper analysis",
+                    "deduplication": "one representative per rounded-coordinate fingerprint",
+                },
+                excluded=excluded_indices,
+            )
+        )
+
     hosts = [str(s.get("metadata", {}).get("host", "unknown")) for s in samples]
     dopants = [str(s.get("metadata", {}).get("dopant", "unknown")) for s in samples]
-    for axis, labels in (("host", hosts), ("dopant", dopants)):
+    pairs = [f"{host}|{dopant}" for host, dopant in zip(hosts, dopants)]
+    for axis, labels in (("host", hosts), ("dopant", dopants), ("pair", pairs)):
         retained_labels = [labels[i] for i in retained_indices]
         for split in grouped_cv_splits(retained_labels, n_folds=5, seed=42):
             fold = int(split["fold"])
@@ -216,6 +341,7 @@ def build_splits(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
+    parser.add_argument("--raw-db", type=Path, default=None)
     parser.add_argument("--out-dir", type=Path, default=Path("artifacts/prm_protocol_v1"))
     args = parser.parse_args()
 
@@ -262,6 +388,10 @@ def main() -> None:
 
     quantile_levels = [0.0, 0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99, 1.0]
     quantiles = np.quantile(targets, quantile_levels)
+    raw_database_audit = None
+    if args.raw_db is not None:
+        raw_database_audit = audit_raw_database(args.raw_db.expanduser().resolve(), samples)
+
     audit = {
         "schema_version": "prm_data_audit_v1",
         "dataset": {
@@ -314,7 +444,12 @@ def main() -> None:
         },
         "formation_energy_provenance": {
             "auditable_from_clean_pickle": False,
-            "reason": "The cleaned samples contain the derived target but not pristine, defect and chemical-potential energy components.",
+            "raw_database_audit": raw_database_audit,
+            "status": (
+                "cleaned targets verified against the filtered ASE database; "
+                "formula verified where raw components are present"
+                if raw_database_audit else "raw database not supplied"
+            ),
         },
     }
 

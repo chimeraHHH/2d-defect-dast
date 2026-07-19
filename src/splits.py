@@ -107,6 +107,26 @@ def grouped_cv_splits(
     return outputs
 
 
+def random_cv_splits(
+    indices: Sequence[int], n_folds: int = 5, seed: int = 52
+) -> List[Dict[str, Any]]:
+    """Create random CV folds so every retained sample is tested exactly once."""
+    if n_folds < 3:
+        raise ValueError("n_folds must be at least 3")
+    shuffled = [int(i) for i in indices]
+    random.Random(seed).shuffle(shuffled)
+    folds = [shuffled[offset::n_folds] for offset in range(n_folds)]
+    all_indices = set(shuffled)
+    outputs = []
+    for test_fold in range(n_folds):
+        val_fold = (test_fold + 1) % n_folds
+        test = sorted(folds[test_fold])
+        val = sorted(folds[val_fold])
+        train = sorted(all_indices.difference(test).difference(val))
+        outputs.append({"train": train, "val": val, "test": test, "fold": test_fold})
+    return outputs
+
+
 def validate_split(
     split: Mapping[str, Sequence[int]],
     n_samples: int,

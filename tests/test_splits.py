@@ -11,6 +11,7 @@ from src.splits import (
     load_split,
     random_split_indices,
     random_split_subset,
+    random_cv_splits,
     validate_split,
     write_split,
 )
@@ -50,6 +51,16 @@ def test_grouped_cv_has_disjoint_group_sets():
         assert group_sets["train"].isdisjoint(group_sets["val"])
         assert group_sets["train"].isdisjoint(group_sets["test"])
         assert group_sets["val"].isdisjoint(group_sets["test"])
+
+
+def test_random_cv_tests_every_sample_once():
+    indices = list(range(103))
+    splits = random_cv_splits(indices, n_folds=5, seed=52)
+    tested = [index for split in splits for index in split["test"]]
+    assert sorted(tested) == indices
+    assert len(tested) == len(set(tested))
+    for split in splits:
+        validate_split(split, len(indices))
 
 
 def test_split_round_trip_checks_dataset_identity(tmp_path):
