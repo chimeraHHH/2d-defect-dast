@@ -9,7 +9,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping
 
+import numpy as np
 import yaml
+
+from src.prm_metrics import regression_metrics
 
 
 DART_ASSET_KEYS = ("ct_uae", "pretrained_embed")
@@ -204,6 +207,100 @@ def validate_output_artifacts(
         raise ValueError(f"unreadable metrics artifact: {resolved['metrics']}") from exc
     if recorded_metrics != manifest.get("metrics"):
         raise ValueError(f"metrics file/manifest mismatch: {manifest_path}")
+    validate_prediction_artifacts(manifest, manifest_path, resolved)
+
+
+def validate_prediction_artifacts(
+    manifest: Mapping[str, Any],
+    manifest_path: Path,
+    resolved_outputs: Mapping[str, Path],
+) -> None:
+    """Recompute partition metrics from the frozen prediction artifacts."""
+    split_id = manifest.get("split", {}).get("split_id")
+    split_counts = manifest.get("split", {}).get("counts", {})
+    partition_names = ["train", "val", "test"]
+    if "calibration_predictions" in resolved_outputs:
+        partition_names.append("calibration")
+
+    with np.load(resolved_outputs["split_indices"], allow_pickle=False) as archive:
+        expected_keys = {"schema_version", "split_id", *partition_names}
+        if set(archive.files) != expected_keys:
+            raise ValueError(f"split-index partitions are incomplete: {manifest_path}")
+        if str(archive["schema_version"].item()) != "prm_split_indices_v1":
+            raise ValueError(f"unsupported split-index schema: {manifest_path}")
+        if str(archive["split_id"].item()) != split_id:
+            raise ValueError(f"split-index identity mismatch: {manifest_path}")
+        partitions = {}
+        for name in partition_names:
+            raw = np.asarray(archive[name])
+            if raw.ndim != 1 or not np.issubdtype(raw.dtype, np.integer):
+                raise ValueError(f"invalid {name} split indices: {manifest_path}")
+            indices = raw.astype(np.int64, copy=False)
+            if np.any(indices < 0) or len(np.unique(indices)) != len(indices):
+                raise ValueError(f"non-unique {name} split indices: {manifest_path}")
+            if len(indices) != int(split_counts.get(name, -1)):
+                raise ValueError(f"{name} split count mismatch: {manifest_path}")
+            partitions[name] = indices
+    for left_index, left_name in enumerate(partition_names):
+        for right_name in partition_names[left_index + 1:]:
+            if np.intersect1d(partitions[left_name], partitions[right_name]).size:
+                raise ValueError(
+                    f"overlapping {left_name}/{right_name} split indices: {manifest_path}"
+                )
+
+    prediction_contracts = [
+        ("validation", "validation_predictions", "val"),
+        ("test", "test_predictions", "test"),
+    ]
+    if "calibration_predictions" in resolved_outputs:
+        prediction_contracts.append(
+            ("calibration", "calibration_predictions", "calibration")
+        )
+    metric_keys = ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+    for metric_partition, output_key, split_name in prediction_contracts:
+        path = resolved_outputs[output_key]
+        with np.load(path, allow_pickle=False) as archive:
+            expected_keys = {
+                "schema_version", "split_id", "split", "indices", "preds", "targets",
+            }
+            if set(archive.files) != expected_keys:
+                raise ValueError(f"prediction artifact fields are incomplete: {path}")
+            if str(archive["schema_version"].item()) != "prm_predictions_v1":
+                raise ValueError(f"unsupported prediction schema: {path}")
+            if str(archive["split_id"].item()) != split_id:
+                raise ValueError(f"prediction split identity mismatch: {path}")
+            if str(archive["split"].item()) != split_name:
+                raise ValueError(f"prediction partition mismatch: {path}")
+            raw_indices = np.asarray(archive["indices"])
+            predictions = np.asarray(archive["preds"], dtype=float)
+            targets = np.asarray(archive["targets"], dtype=float)
+        if raw_indices.ndim != 1 or not np.issubdtype(raw_indices.dtype, np.integer):
+            raise ValueError(f"invalid prediction indices: {path}")
+        indices = raw_indices.astype(np.int64, copy=False)
+        if (
+            predictions.ndim != 1
+            or targets.ndim != 1
+            or len(indices) != len(predictions)
+            or len(indices) != len(targets)
+            or len(np.unique(indices)) != len(indices)
+        ):
+            raise ValueError(f"unaligned prediction vectors: {path}")
+        if not np.array_equal(np.sort(indices), np.sort(partitions[split_name])):
+            raise ValueError(f"prediction indices do not match frozen split: {path}")
+        if not np.isfinite(predictions).all() or not np.isfinite(targets).all():
+            raise ValueError(f"non-finite prediction values: {path}")
+        recomputed = regression_metrics(targets, predictions)
+        recorded = manifest.get("metrics", {}).get(metric_partition, {})
+        if int(recorded.get("n", -1)) != recomputed["n"]:
+            raise ValueError(f"recorded prediction count mismatch: {path}")
+        for key in metric_keys:
+            if not math.isclose(
+                float(recorded.get(key, float("nan"))),
+                float(recomputed[key]),
+                rel_tol=1e-7,
+                abs_tol=1e-8,
+            ):
+                raise ValueError(f"recorded {metric_partition} {key} mismatch: {path}")
 
 
 def validate_dart_assets(

@@ -154,8 +154,10 @@ partition.  Each run records the code commit and dirty state, resolved
 configuration, command, Python/PyTorch/CUDA environment, data and split
 hashes, seed, partition indices, epoch history, checkpoint, and validation and
 test predictions.  SHA-256 digests bind the metrics, checkpoint, split-index,
-and prediction files to that manifest.  Interrupted jobs resume from complete optimizer,
-scheduler, model, and random-number-generator state.
+and prediction files to that manifest.  Before aggregation, collectors verify
+partition membership and independently recompute all reported regression
+metrics from the stored targets and predictions.  Interrupted jobs resume from
+complete optimizer, scheduler, model, and random-number-generator state.
 
 %----------------------------------------------------------------------
 \subsection{Baselines}

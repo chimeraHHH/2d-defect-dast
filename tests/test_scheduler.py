@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pytest
 import yaml
 
 from scripts import prm_scheduler
+from src.prm_metrics import regression_metrics
 from src.prm_provenance import file_sha256
 
 
@@ -36,19 +38,25 @@ def test_config_record_reads_output_contract(tmp_path, monkeypatch):
 def _write_run_manifest(result_root, config, *, status="complete", dirty=False, commit="abc"):
     run_dir = result_root / config["output_dir"]
     run_dir.mkdir(parents=True)
+    split_id = "id_repeat_s42"
+    split_indices = {
+        "train": np.asarray([0, 1], dtype=np.int64),
+        "val": np.asarray([2, 3], dtype=np.int64),
+        "test": np.asarray([4, 5], dtype=np.int64),
+    }
+    validation_targets = np.asarray([0.0, 1.0])
+    validation_predictions = np.asarray([0.2, 0.8])
+    test_targets = np.asarray([0.0, 2.0])
+    test_predictions = np.asarray([0.5, 1.5])
+    validation_metrics = regression_metrics(validation_targets, validation_predictions)
+    test_metrics = regression_metrics(test_targets, test_predictions)
     metrics = {
-        "split_id": "id_repeat_s42",
+        "split_id": split_id,
         "n_params": 100,
-        "best_val_mae": 0.4,
-        "history": [{"epoch": 1, "val_mae": 0.4}],
-        "validation": {
-            "mae": 0.4, "rmse": 0.5, "bias": 0.0,
-            "spearman": 0.7, "r2": 0.6,
-        },
-        "test": {
-            "mae": 0.45, "rmse": 0.55, "bias": 0.01,
-            "spearman": 0.65, "r2": 0.5,
-        },
+        "best_val_mae": validation_metrics["mae"],
+        "history": [{"epoch": 1, "val_mae": validation_metrics["mae"]}],
+        "validation": validation_metrics,
+        "test": test_metrics,
     }
     outputs = {
         "metrics": "metrics.json",
@@ -57,12 +65,27 @@ def _write_run_manifest(result_root, config, *, status="complete", dirty=False, 
         "validation_predictions": "val_predictions.npz",
         "test_predictions": "test_predictions.npz",
     }
-    for key, name in outputs.items():
-        path = run_dir / name
-        if key == "metrics":
-            path.write_text(json.dumps(metrics, sort_keys=True))
-        else:
-            path.write_bytes(key.encode())
+    (run_dir / "metrics.json").write_text(json.dumps(metrics, sort_keys=True))
+    (run_dir / "best.pt").write_bytes(b"checkpoint")
+    np.savez_compressed(
+        run_dir / "split_indices.npz",
+        schema_version=np.asarray("prm_split_indices_v1"),
+        split_id=np.asarray(split_id),
+        **split_indices,
+    )
+    for name, indices, targets, predictions, split_name in (
+        ("val_predictions.npz", split_indices["val"], validation_targets, validation_predictions, "val"),
+        ("test_predictions.npz", split_indices["test"], test_targets, test_predictions, "test"),
+    ):
+        np.savez_compressed(
+            run_dir / name,
+            schema_version=np.asarray("prm_predictions_v1"),
+            split_id=np.asarray(split_id),
+            split=np.asarray(split_name),
+            indices=indices,
+            preds=predictions,
+            targets=targets,
+        )
     manifest = {
         "schema_version": "prm_run_manifest_v1",
         "status": status,
@@ -72,8 +95,8 @@ def _write_run_manifest(result_root, config, *, status="complete", dirty=False, 
         "execution": {"max_steps": 0, "resume_requested": False},
         "seed": config["seed"],
         "split": {
-            "split_id": "id_repeat_s42",
-            "counts": {"train": 8, "val": 1, "test": 1},
+            "split_id": split_id,
+            "counts": {key: len(value) for key, value in split_indices.items()},
         },
         "metrics": metrics,
         "outputs": outputs,

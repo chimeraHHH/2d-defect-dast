@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+from src.prm_metrics import regression_metrics
 from src.prm_provenance import (
     config_sha256,
     file_sha256,
@@ -125,7 +127,23 @@ def test_noisy_training_requires_the_independent_rng_stream():
 
 def test_complete_training_verifies_every_output_digest(tmp_path):
     manifest = _complete_manifest()
-    manifest["split"]["counts"] = {"train": 8, "val": 1, "test": 1}
+    split_id = manifest["split"]["split_id"]
+    split_indices = {
+        "train": np.asarray([0, 1], dtype=np.int64),
+        "val": np.asarray([2, 3], dtype=np.int64),
+        "test": np.asarray([4, 5], dtype=np.int64),
+    }
+    validation_targets = np.asarray([0.0, 1.0])
+    validation_predictions = np.asarray([0.2, 0.8])
+    test_targets = np.asarray([0.0, 2.0])
+    test_predictions = np.asarray([0.5, 1.5])
+    manifest["split"]["counts"] = {key: len(value) for key, value in split_indices.items()}
+    manifest["metrics"]["validation"] = regression_metrics(
+        validation_targets, validation_predictions
+    )
+    manifest["metrics"]["test"] = regression_metrics(test_targets, test_predictions)
+    manifest["metrics"]["best_val_mae"] = manifest["metrics"]["validation"]["mae"]
+    manifest["metrics"]["history"][-1]["val_mae"] = manifest["metrics"]["best_val_mae"]
     outputs = {
         "metrics": "metrics.json",
         "checkpoint": "best.pt",
@@ -133,12 +151,27 @@ def test_complete_training_verifies_every_output_digest(tmp_path):
         "validation_predictions": "val_predictions.npz",
         "test_predictions": "test_predictions.npz",
     }
-    for key, name in outputs.items():
-        path = tmp_path / name
-        if key == "metrics":
-            path.write_text(json.dumps(manifest["metrics"], sort_keys=True))
-        else:
-            path.write_bytes(f"{key}-content".encode())
+    (tmp_path / "metrics.json").write_text(json.dumps(manifest["metrics"], sort_keys=True))
+    (tmp_path / "best.pt").write_bytes(b"checkpoint-content")
+    np.savez_compressed(
+        tmp_path / "split_indices.npz",
+        schema_version=np.asarray("prm_split_indices_v1"),
+        split_id=np.asarray(split_id),
+        **split_indices,
+    )
+    for name, indices, targets, predictions, split_name in (
+        ("val_predictions.npz", split_indices["val"], validation_targets, validation_predictions, "val"),
+        ("test_predictions.npz", split_indices["test"], test_targets, test_predictions, "test"),
+    ):
+        np.savez_compressed(
+            tmp_path / name,
+            schema_version=np.asarray("prm_predictions_v1"),
+            split_id=np.asarray(split_id),
+            split=np.asarray(split_name),
+            indices=indices,
+            preds=predictions,
+            targets=targets,
+        )
     manifest["outputs"] = outputs
     manifest["output_sha256"] = {
         key: file_sha256(tmp_path / name) for key, name in outputs.items()
@@ -149,4 +182,19 @@ def test_complete_training_verifies_every_output_digest(tmp_path):
 
     (tmp_path / "test_predictions.npz").write_bytes(b"modified")
     with pytest.raises(ValueError, match="output hash mismatch"):
+        validate_training_completion(manifest, manifest_path)
+
+    np.savez_compressed(
+        tmp_path / "test_predictions.npz",
+        schema_version=np.asarray("prm_predictions_v1"),
+        split_id=np.asarray(split_id),
+        split=np.asarray("test"),
+        indices=split_indices["test"],
+        preds=np.asarray([0.0, 2.0]),
+        targets=test_targets,
+    )
+    manifest["output_sha256"]["test_predictions"] = file_sha256(
+        tmp_path / "test_predictions.npz"
+    )
+    with pytest.raises(ValueError, match="recorded test mae mismatch"):
         validate_training_completion(manifest, manifest_path)

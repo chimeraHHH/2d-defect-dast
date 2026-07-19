@@ -141,6 +141,7 @@ def main() -> None:
     }
     np.savez_compressed(
         output_dir / "split_indices.npz",
+        schema_version=np.asarray("prm_split_indices_v1"),
         split_id=np.asarray(split["split_id"]),
         **{
             name: np.asarray(values.indices, dtype=np.int64)

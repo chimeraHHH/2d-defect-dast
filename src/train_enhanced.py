@@ -616,6 +616,7 @@ def main() -> None:
     }
     write_json(out_dir / "run_manifest.json", run_manifest)
     split_arrays = {
+        "schema_version": np.asarray("prm_split_indices_v1"),
         "train": np.asarray(train_set.indices, dtype=np.int64),
         "val": np.asarray(val_set.indices, dtype=np.int64),
         "test": np.asarray(test_set.indices, dtype=np.int64),
@@ -1157,17 +1158,19 @@ def main() -> None:
         "best_val_mae": best_val_mae,
         "split_id": split_id,
         "validation": {
-            key: val_final[key] for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+            key: val_final[key]
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
         },
         "test": {
-            key: test_metrics[key] for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+            key: test_metrics[key]
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
         },
         "test_mae": test_metrics["mae"], "test_rmse": test_metrics["rmse"],
     }
     if calibration_metrics is not None:
         summary["calibration"] = {
             key: calibration_metrics[key]
-            for key in ("mae", "rmse", "bias", "pearson", "spearman", "r2")
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
         }
     # Save model internals for interpretability analysis
     if hasattr(model, 'jk_weights'):
