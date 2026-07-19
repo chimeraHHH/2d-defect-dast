@@ -135,7 +135,8 @@ cosine decay to $10^{-6}$.  The objective is mean absolute error (MAE), batch
 size is 64 for DART, and gradient norms are clipped at 5.  The fixed
 regularization recipe includes 0.1 dropout, stochastic depth with rate 0.1,
 Gaussian target noise with standard deviation 0.03~eV, and stochastic weight
-averaging from epoch 120.  Online geometric augmentation applies rotations,
+averaging from epoch 120~\cite{swa2018}.  Online geometric augmentation applies
+rotations,
 coordinate perturbations with standard deviation sampled from
 $[0.01,0.05]$~\AA, and up to 2\% strain.  A host-balanced sampler draws up to
 200 structures per host per epoch.  An auxiliary adsorbate/interstitial
@@ -160,7 +161,9 @@ Two baseline classes use exactly the same canonical partitions.  First, an
 statistics, impurity--host contrasts, cell geometry, nearest-neighbor
 distances, coordination counts, and one-hot site and defect labels.  We fit a
 training-target mean predictor, ridge regression, random forests, histogram
-gradient boosting, and LightGBM.  Hyperparameters within each family are
+gradient boosting, and LightGBM~\cite{ke2017lightgbm}.  These model families
+also permit direct comparison with earlier IMP2D descriptor
+studies~\cite{kesorn2024,elalouani2026}.  Hyperparameters within each family are
 selected by validation MAE only; the best descriptor family used in each
 reported regime is likewise chosen by mean validation MAE across folds.
 
@@ -178,18 +181,22 @@ are calculated.
 %----------------------------------------------------------------------
 
 Five independently initialized members of the validation-selected DART
-architecture are trained on the dedicated uncertainty split.  Ensemble mean
-and sample standard deviation provide the point prediction and raw epistemic
-spread.  The calibration partition is divided without labels by sorting
-sample indices and alternating rows.  One half fits a nonnegative scale and
-floor for
+architecture are trained on the dedicated uncertainty split, following the
+deep-ensemble construction~\cite{lakshminarayanan2017}.  Ensemble mean and
+sample standard deviation provide the point prediction and a raw
+model-disagreement proxy.  The calibration partition is divided without labels
+by sorting sample indices and alternating rows.  One half fits a nonnegative
+scale and floor for
 \begin{equation}
  \sigma_i=\sqrt{(a s_i)^2+b^2}
 \end{equation}
 by Gaussian negative log likelihood; the other half estimates finite-sample
 split-conformal quantiles of
-$|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$.  The test set is opened
-only after these parameters and interval quantiles are fixed.
+$|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$~\cite{angelopoulos2023}.
+Under exchangeability, the resulting intervals have
+finite-sample marginal coverage at each prespecified level; this guarantee does
+not imply conditional coverage for every host or impurity group.  The test set
+is opened only after these parameters and interval quantiles are fixed.
 
 For materials-facing analysis, the five host--impurity-pair folds yield one
 out-of-fold prediction per retained structure.  Within each host--impurity

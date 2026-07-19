@@ -16,11 +16,13 @@ models because they operate directly on periodic atomic structures.  ALIGNN
 demonstrated the value of joint bond and angle representations for crystalline
 properties~\cite{alignn2021}, while SchNet established continuous-filter
 message passing from interatomic distances~\cite{schutt2018}.  Defect-focused
-models and engineered structural descriptors have subsequently improved
-prediction in several bulk and 2D settings~\cite{elalouani2024,definet2025,
-fang2025,kiyohara2025}.  These developments motivate architectures that expose
-the impurity site while retaining both local coordination and longer-range
-periodic context.
+models and engineered structural descriptors have subsequently expanded this
+direction in both bulk and 2D settings~\cite{kesorn2024,elalouani2026,
+definet2025,fang2025,kiyohara2025}.  In particular, recent descriptor studies
+on IMP2D show that data representation and model selection materially affect
+the reported error~\cite{kesorn2024,elalouani2026}.  These developments motivate
+architectures that expose the impurity site while retaining both local
+coordination and longer-range periodic context.
 
 Benchmark accuracy, however, does not by itself define a useful materials
 model.  A random structure split can place closely related host--impurity
