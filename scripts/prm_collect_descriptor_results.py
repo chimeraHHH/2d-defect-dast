@@ -109,6 +109,7 @@ def main() -> None:
         if row["model"] == "descriptor:mean"
         or row["model"] == f"descriptor:{selection[row['regime']]['selected_family']}"
     ]
+    collector_git = git_snapshot()
 
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -134,7 +135,7 @@ def main() -> None:
     bundle = {
         "schema_version": "prm_descriptor_bundle_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "collector_git": git_snapshot(),
+        "collector_git": collector_git,
         "data_sha256": protocol["data_sha256"],
         "protocol_manifest": {
             "path": repository_path(protocol_path), "sha256": file_sha256(protocol_path),

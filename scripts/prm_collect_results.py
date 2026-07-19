@@ -451,6 +451,7 @@ def main() -> None:
                 }
             )
 
+    collector_git = git_snapshot()
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     write_csv(out_dir / "run_metrics.csv", retained_rows)
@@ -464,7 +465,7 @@ def main() -> None:
     manifest = {
         "schema_version": "prm_comparison_bundle_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "collector_git": git_snapshot(),
+        "collector_git": collector_git,
         "selection": {
             "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
             "selected_variant": variant, "selection_data": selection["selection_data"],

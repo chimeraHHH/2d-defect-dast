@@ -272,6 +272,7 @@ def main() -> None:
         expected_split_hashes, args.allow_dirty,
     )
     summary = summarize_factorial(rows, args.bootstrap_samples)
+    collector_git = git_snapshot()
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -309,7 +310,7 @@ def main() -> None:
     bundle = {
         "schema_version": "prm_factorial_bundle_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "collector_git": git_snapshot(),
+        "collector_git": collector_git,
         "protocol_manifest": str(args.protocol_manifest.resolve()),
         "data_sha256": protocol["data_sha256"],
         "bootstrap": {
