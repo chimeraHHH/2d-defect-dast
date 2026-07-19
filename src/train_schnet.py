@@ -30,7 +30,14 @@ from src.prm_metrics import regression_metrics
 from src.augment_online import OnlineAugDataset, OnlineAugTransform
 from src.sampler import HostBalancedSampler
 from src.splits import load_split
-from src.train_enhanced import Normalizer, move_batch, resolve_path, set_seed
+from src.train_enhanced import (
+    Normalizer,
+    config_sha256,
+    file_sha256,
+    move_batch,
+    resolve_path,
+    set_seed,
+)
 
 
 def git_snapshot() -> Dict[str, Any]:
@@ -101,6 +108,14 @@ def main() -> None:
     sets = {
         name: Subset(dataset, split[name]) for name in ("train", "val", "test")
     }
+    np.savez_compressed(
+        output_dir / "split_indices.npz",
+        split_id=np.asarray(split["split_id"]),
+        **{
+            name: np.asarray(values.indices, dtype=np.int64)
+            for name, values in sets.items()
+        },
+    )
     n_workers = int(cfg.get("num_workers", 4))
     augmentation = None
     if cfg.get("online_aug", False):
@@ -166,8 +181,15 @@ def main() -> None:
         "command": [sys.executable, *sys.argv],
         "git": git_snapshot(),
         "config": cfg,
-        "data": {"path": str(data_path), "data_sha256": split["data_sha256"]},
-        "split": {"split_id": split["split_id"], "path": str(split_path), "counts": split["counts"]},
+        "config_sha256": config_sha256(cfg),
+        "data": {
+            "path": str(data_path), "size_bytes": data_path.stat().st_size,
+            "data_sha256": split["data_sha256"],
+        },
+        "split": {
+            "split_id": split["split_id"], "path": str(split_path),
+            "sha256": file_sha256(split_path), "counts": split["counts"],
+        },
         "seed": cfg["seed"],
         "environment": {
             "hostname": socket.gethostname(), "platform": platform.platform(),
@@ -277,6 +299,12 @@ def main() -> None:
         {
             "status": "complete", "completed_at": datetime.now(timezone.utc).isoformat(),
             "metrics": metrics,
+            "outputs": {
+                "metrics": str(output_dir / "metrics.json"),
+                "checkpoint": str(checkpoint_path),
+                "validation_predictions": str(output_dir / "val_predictions.npz"),
+                "test_predictions": str(output_dir / "test_predictions.npz"),
+            },
         }
     )
     (output_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
