@@ -78,11 +78,10 @@ def bootstrap_mean_ci(
     values: Sequence[float], samples: int = 50_000, seed: int = 20260719,
 ) -> Dict[str, float]:
     array = np.asarray(values, dtype=float)
-    if len(array) < 2:
-        return {
-            "mean": float(array.mean()), "std": 0.0,
-            "ci_low": float("nan"), "ci_high": float("nan"),
-        }
+    if array.ndim != 1 or len(array) < 2 or not np.isfinite(array).all():
+        raise ValueError("factorial bootstrap requires at least two finite values")
+    if samples < 1:
+        raise ValueError("factorial bootstrap requires at least one sample")
     rng = np.random.default_rng(seed)
     draws = rng.choice(array, size=(samples, len(array)), replace=True).mean(axis=1)
     low, high = np.quantile(draws, [0.025, 0.975])
@@ -128,20 +127,15 @@ def summarize_factorial(
             [row["validation_mae"] for row in subset], bootstrap_samples,
             seed=20260719 + int(variant[1:], 2),
         )
-        test = bootstrap_mean_ci(
-            [row["test_mae"] for row in subset], bootstrap_samples,
-            seed=20260819 + int(variant[1:], 2),
-        )
         variant_summary.append(
             {
                 "variant": variant,
                 "enabled_components": int(sum(subset[0]["bits"])),
                 "validation_mae": validation,
-                "test_mae": test,
             }
         )
 
-    # Test metrics are deliberately absent from the ordering key.
+    # Freeze the architecture before any test summary is constructed.
     ranked = sorted(
         variant_summary,
         key=lambda item: (
@@ -151,6 +145,12 @@ def summarize_factorial(
     )
     selected = ranked[0]
     selected_rows = [row for row in rows if row["variant"] == selected["variant"]]
+    for item in variant_summary:
+        subset = [row for row in rows if row["variant"] == item["variant"]]
+        item["test_mae"] = bootstrap_mean_ci(
+            [row["test_mae"] for row in subset], bootstrap_samples,
+            seed=20260819 + int(item["variant"][1:], 2),
+        )
 
     effects = []
     for split_name in ("validation", "test"):
@@ -219,7 +219,12 @@ def load_runs(
             raise ValueError(f"unsupported manifest schema: {path}")
         if payload["data"]["data_sha256"] != expected_data_sha256:
             raise ValueError(f"dataset hash mismatch: {path}")
-        if payload.get("git", {}).get("dirty") and not allow_dirty:
+        git = payload.get("git")
+        if not isinstance(git, Mapping) or not isinstance(git.get("commit"), str):
+            raise ValueError(f"training run has no recorded code commit: {path}")
+        if not git["commit"]:
+            raise ValueError(f"training run has no recorded code commit: {path}")
+        if git.get("dirty") and not allow_dirty:
             raise ValueError(f"dirty training run is not admissible: {path}")
         config = payload["config"]
         expected_config = validate_manifest_config(payload, expected_configs, path)
@@ -235,11 +240,11 @@ def load_runs(
         if payload["split"].get("sha256") != expected_split_hashes.get(split_id):
             raise ValueError(f"split hash mismatch: {path}")
         contracts.add(contract_hash(config))
-        commits.add(payload["git"]["commit"])
+        commits.add(git["commit"])
         row: Dict[str, Any] = {
             "variant": variant, "bits": bits, "repeat": repeat,
             "seed": int(payload["seed"]), "n_params": int(payload["metrics"]["n_params"]),
-            "manifest_path": str(path), "git_commit": payload["git"]["commit"],
+            "manifest_path": str(path), "git_commit": git["commit"],
         }
         for split_name in ("validation", "test"):
             for metric in METRICS:
@@ -248,13 +253,13 @@ def load_runs(
         sources.append(
             {
                 "path": str(path), "sha256": file_sha256(path),
-                "git": payload["git"], "config_sha256": payload["config_sha256"],
+                "git": git, "config_sha256": payload["config_sha256"],
                 "expected_config": str(expected_config.path),
             }
         )
-    if len(contracts) > 1:
+    if len(contracts) != 1:
         raise ValueError("factorial training settings differ beyond component flags, split and seed")
-    if len(commits) > 1:
+    if len(commits) != 1:
         raise ValueError("factorial runs were produced by more than one code commit")
     return rows, sources
 
@@ -306,6 +311,8 @@ def main() -> None:
     )
     summary = summarize_factorial(rows, args.bootstrap_samples)
     collector_git = git_snapshot()
+    if not collector_git["commit"] or collector_git["dirty"]:
+        raise ValueError("factorial collection requires a clean Git commit")
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     archived_runs = archive_training_artifacts(
@@ -314,6 +321,8 @@ def main() -> None:
         repository_root=ROOT,
         strip_output_prefix="factorial",
     )
+    if len(archived_runs) != 40:
+        raise ValueError("factorial evidence archive does not contain all 40 runs")
 
     run_fields = [
         "variant", "repeat", "seed", "n_params", "git_commit",
@@ -368,7 +377,9 @@ def main() -> None:
         **summary,
     }
     bundle_path = out_dir / "bundle.json"
-    bundle_path.write_text(json.dumps(bundle, indent=2, sort_keys=True) + "\n")
+    bundle_path.write_text(
+        json.dumps(bundle, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    )
     selection_document = {
         "schema_version": "prm_factorial_selection_v1",
         **summary["selection"],
@@ -380,9 +391,11 @@ def main() -> None:
         "collector_git": collector_git,
     }
     (out_dir / "selection.json").write_text(
-        json.dumps(selection_document, indent=2, sort_keys=True) + "\n"
+        json.dumps(
+            selection_document, indent=2, sort_keys=True, allow_nan=False
+        ) + "\n"
     )
-    print(json.dumps(selection_document, indent=2, sort_keys=True))
+    print(json.dumps(selection_document, indent=2, sort_keys=True, allow_nan=False))
 
 
 if __name__ == "__main__":

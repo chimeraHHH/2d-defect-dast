@@ -1,6 +1,11 @@
+import numpy as np
 import pytest
 
-from scripts.prm_collect_factorial import contract_hash, summarize_factorial
+from scripts.prm_collect_factorial import (
+    bootstrap_mean_ci,
+    contract_hash,
+    summarize_factorial,
+)
 
 
 def synthetic_rows():
@@ -36,6 +41,15 @@ def test_selection_uses_validation_even_when_test_ranking_disagrees():
         and effect["term"] == "G"
     )
     assert gated_mae["mean"] < 0.0
+
+
+def test_factorial_bootstrap_rejects_nonfinite_or_degenerate_inputs():
+    with pytest.raises(ValueError, match="at least two finite"):
+        bootstrap_mean_ci([1.0], samples=10)
+    with pytest.raises(ValueError, match="at least two finite"):
+        bootstrap_mean_ci([1.0, np.nan], samples=10)
+    with pytest.raises(ValueError, match="at least one sample"):
+        bootstrap_mean_ci([1.0, 2.0], samples=0)
 
 
 def test_contract_hash_ignores_pairing_fields_and_component_flags():
