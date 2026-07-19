@@ -1,8 +1,8 @@
 {
   "counts": {
-    "excluded": 65,
+    "excluded": 69,
     "test": 365,
-    "train": 9819,
+    "train": 9815,
     "val": 392
   },
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
@@ -71,10 +71,14 @@
     2633,
     2647,
     2659,
-    2676
+    2676,
+    2986,
+    3431,
+    3565,
+    6114
   ],
   "metadata": {
-    "deduplication": "one representative per merged coordinate/distance fingerprint group",
+    "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
     "test_dopant_group": [
       "Co",
       "Cr",
@@ -3020,7 +3024,6 @@
     2983,
     2984,
     2985,
-    2986,
     2987,
     2988,
     2989,
@@ -3465,7 +3468,6 @@
     3428,
     3429,
     3430,
-    3431,
     3432,
     3433,
     3434,
@@ -3599,7 +3601,6 @@
     3562,
     3563,
     3564,
-    3565,
     3566,
     3567,
     3568,
@@ -6050,7 +6051,6 @@
     6111,
     6112,
     6113,
-    6114,
     6115,
     6116,
     6117,

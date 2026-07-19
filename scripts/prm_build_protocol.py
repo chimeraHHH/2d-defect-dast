@@ -315,7 +315,7 @@ def build_splits(
                     "status": "development" if split_seed == 42 else "confirmatory_repeat",
                     "warning": "seed 42 was inspected in historical development"
                     if split_seed == 42 else "predefined before PRM reruns",
-                    "deduplication": "one representative per merged coordinate/distance fingerprint group",
+                    "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
                 },
                 excluded=excluded_indices,
             )
@@ -334,7 +334,7 @@ def build_splits(
                 "selection_data": "validation partition only",
                 "calibration_data": "dedicated calibration partition only",
                 "test_data": "evaluation only",
-                "deduplication": "one representative per merged coordinate/distance fingerprint group",
+                "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
             },
             excluded=excluded_indices,
             calibration=uq_calibration,
@@ -353,7 +353,7 @@ def build_splits(
                     "fold": fold,
                     "assignment_seed": 52,
                     "purpose": "out-of-fold predictions for paper analysis",
-                    "deduplication": "one representative per merged coordinate/distance fingerprint group",
+                    "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
                 },
                 excluded=excluded_indices,
             )
@@ -377,7 +377,7 @@ def build_splits(
                     n_samples, data_sha256, f"{axis}_grouped_cv5",
                     {
                         "fold": fold, "groups": split["groups"], "assignment_seed": 42,
-                        "deduplication": "one representative per merged coordinate/distance fingerprint group",
+                        "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
                     },
                     excluded=excluded_indices,
                 )
@@ -405,7 +405,7 @@ def build_splits(
                 "test_dopant_group": sorted(DOPANTS_3D),
                 "validation_host_group": sorted(G45_HOSTS),
                 "validation_dopant_group": sorted(DOPANTS_4D),
-                "deduplication": "one representative per merged coordinate/distance fingerprint group",
+                "canonicalization": "merged duplicate groups; rows with missing raw energy components excluded",
             },
             excluded=excluded_indices,
         )
@@ -416,7 +416,7 @@ def build_splits(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
-    parser.add_argument("--raw-db", type=Path, default=None)
+    parser.add_argument("--raw-db", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, default=Path("artifacts/prm_protocol_v1"))
     args = parser.parse_args()
 
@@ -428,6 +428,18 @@ def main() -> None:
     samples, embedded_meta = load_samples(data_path)
     targets = np.asarray([float(sample["target"]) for sample in samples])
     metadata = [sample.get("metadata", {}) for sample in samples]
+    raw_database_audit = audit_raw_database(
+        args.raw_db.expanduser().resolve(), samples,
+    )
+    component_exception_ids = {
+        int(row["row_id"])
+        for row in raw_database_audit["formula_component_exceptions"]
+    }
+    provenance_excluded_indices = sorted(
+        index for index, sample in enumerate(samples)
+        if int(sample["id"]) in component_exception_ids
+    )
+    provenance_excluded_set = set(provenance_excluded_indices)
 
     ids = [str(sample.get("id", "")) for sample in samples]
     unique_ids = [str(sample.get("unique_id", "")) for sample in samples]
@@ -445,7 +457,17 @@ def main() -> None:
     all_groups = merged_duplicate_groups(
         [coordinate_fingerprints, distance_fingerprints]
     )
-    retained_indices = [min(group) for group in all_groups]
+    retained_indices = []
+    duplicate_excluded_indices = []
+    for group in all_groups:
+        eligible = [index for index in group if index not in provenance_excluded_set]
+        if not eligible:
+            continue
+        retained = min(eligible)
+        retained_indices.append(retained)
+        duplicate_excluded_indices.extend(
+            index for index in eligible if index != retained
+        )
     retained_set = set(retained_indices)
     excluded_indices = [i for i in range(len(samples)) if i not in retained_set]
     repeated_groups = [group for group in all_groups if len(group) > 1]
@@ -465,10 +487,6 @@ def main() -> None:
 
     quantile_levels = [0.0, 0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99, 1.0]
     quantiles = np.quantile(targets, quantile_levels)
-    raw_database_audit = None
-    if args.raw_db is not None:
-        raw_database_audit = audit_raw_database(args.raw_db.expanduser().resolve(), samples)
-
     audit = {
         "schema_version": "prm_data_audit_v1",
         "dataset": {
@@ -477,6 +495,7 @@ def main() -> None:
             "size_bytes": data_path.stat().st_size,
             "sha256": sha256,
             "n_samples": len(samples),
+            "n_modeling_samples": len(retained_indices),
             "container_type": "dict[data]" if embedded_meta is not None else "list",
             "embedded_meta": embedded_meta,
         },
@@ -518,6 +537,9 @@ def main() -> None:
                 ),
                 "n_retained": len(retained_indices),
                 "n_excluded": len(excluded_indices),
+                "n_duplicate_excluded": len(duplicate_excluded_indices),
+                "n_raw_component_excluded": len(provenance_excluded_indices),
+                "raw_component_excluded_indices": provenance_excluded_indices,
                 "excluded_indices": excluded_indices,
                 "max_target_delta_eV_within_duplicate_group": float(
                     max(duplicate_target_deltas, default=0.0)
@@ -532,10 +554,13 @@ def main() -> None:
         "formation_energy_provenance": {
             "auditable_from_clean_pickle": False,
             "raw_database_audit": raw_database_audit,
+            "all_modeling_rows_formula_verified": not any(
+                index in provenance_excluded_set for index in retained_indices
+            ),
             "status": (
                 "cleaned targets verified against the filtered ASE database; "
-                "formula verified where raw components are present"
-                if raw_database_audit else "raw database not supplied"
+                "all rows lacking auditable raw energy components are excluded "
+                "from modeling splits"
             ),
         },
     }

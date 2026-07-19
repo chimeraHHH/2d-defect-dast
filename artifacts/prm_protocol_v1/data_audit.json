@@ -3,6 +3,7 @@
     "container_type": "list",
     "embedded_meta": null,
     "file_name": "cleaned_dataset.pkl",
+    "n_modeling_samples": 10572,
     "n_samples": 10641,
     "path_recorded": "/storage/ssd/metaiot_guest/yiminghua/project/data/processed/cleaned_dataset.pkl",
     "sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
@@ -75,11 +76,23 @@
         2633,
         2647,
         2659,
-        2676
+        2676,
+        2986,
+        3431,
+        3565,
+        6114
       ],
       "max_target_delta_eV_within_duplicate_group": 0.03752713000000085,
-      "n_excluded": 65,
-      "n_retained": 10576,
+      "n_duplicate_excluded": 65,
+      "n_excluded": 69,
+      "n_raw_component_excluded": 4,
+      "n_retained": 10572,
+      "raw_component_excluded_indices": [
+        2986,
+        3431,
+        3565,
+        6114
+      ],
       "strategy": "retain the lowest sample index in each connected component of coordinate and invariant-distance duplicate groups"
     },
     "fingerprint_note": "Union of (i) atom-order/cell/Cartesian-coordinate hashes rounded to 1e-6 and (ii) permutation/translation-invariant, element-labelled periodic pair-distance spectra rounded to 1e-4 Angstrom.",
@@ -116,6 +129,7 @@
     }
   },
   "formation_energy_provenance": {
+    "all_modeling_rows_formula_verified": true,
     "auditable_from_clean_pickle": false,
     "raw_database_audit": {
       "filter_replay": {
@@ -179,7 +193,7 @@
       "size_bytes": 71819264,
       "valid_id_set_matches_cleaned": true
     },
-    "status": "cleaned targets verified against the filtered ASE database; formula verified where raw components are present"
+    "status": "cleaned targets verified against the filtered ASE database; all rows lacking auditable raw energy components are excluded from modeling splits"
   },
   "metadata_cardinality": {
     "defecttype": 2,
@@ -332,9 +346,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 1059,
-        "train": 8460,
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
         "val": 1057
       },
       "protocol": "random_80_10_10",
@@ -342,9 +356,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 1059,
-        "train": 8460,
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
         "val": 1057
       },
       "protocol": "random_80_10_10",
@@ -352,9 +366,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 1059,
-        "train": 8460,
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
         "val": 1057
       },
       "protocol": "random_80_10_10",
@@ -362,9 +376,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 1059,
-        "train": 8460,
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
         "val": 1057
       },
       "protocol": "random_80_10_10",
@@ -372,9 +386,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 1059,
-        "train": 8460,
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
         "val": 1057
       },
       "protocol": "random_80_10_10",
@@ -383,9 +397,9 @@
     {
       "counts": {
         "calibration": 528,
-        "excluded": 65,
-        "test": 1059,
-        "train": 7932,
+        "excluded": 69,
+        "test": 1058,
+        "train": 7929,
         "val": 1057
       },
       "protocol": "random_75_10_5_10_deduplicated_with_heldout_calibration",
@@ -393,9 +407,9 @@
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2116,
-        "train": 6345,
+        "excluded": 69,
+        "test": 2115,
+        "train": 6342,
         "val": 2115
       },
       "protocol": "random_cv5_oof",
@@ -403,49 +417,49 @@
     },
     {
       "counts": {
-        "excluded": 65,
+        "excluded": 69,
         "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "train": 6343,
+        "val": 2114
       },
       "protocol": "random_cv5_oof",
       "split_id": "id_cv5_f1"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
       },
       "protocol": "random_cv5_oof",
       "split_id": "id_cv5_f2"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
       },
       "protocol": "random_cv5_oof",
       "split_id": "id_cv5_f3"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6345,
-        "val": 2116
+        "excluded": 69,
+        "test": 2114,
+        "train": 6343,
+        "val": 2115
       },
       "protocol": "random_cv5_oof",
       "split_id": "id_cv5_f4"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2096,
-        "train": 6392,
+        "excluded": 69,
+        "test": 2095,
+        "train": 6389,
         "val": 2088
       },
       "protocol": "host_grouped_cv5",
@@ -453,29 +467,29 @@
     },
     {
       "counts": {
-        "excluded": 65,
+        "excluded": 69,
         "test": 2088,
-        "train": 6362,
-        "val": 2126
+        "train": 6349,
+        "val": 2135
       },
       "protocol": "host_grouped_cv5",
       "split_id": "host_cv5_f1"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2126,
-        "train": 6313,
-        "val": 2137
+        "excluded": 69,
+        "test": 2135,
+        "train": 6312,
+        "val": 2125
       },
       "protocol": "host_grouped_cv5",
       "split_id": "host_cv5_f2"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2137,
-        "train": 6310,
+        "excluded": 69,
+        "test": 2125,
+        "train": 6318,
         "val": 2129
       },
       "protocol": "host_grouped_cv5",
@@ -483,69 +497,69 @@
     },
     {
       "counts": {
-        "excluded": 65,
+        "excluded": 69,
         "test": 2129,
-        "train": 6351,
-        "val": 2096
+        "train": 6348,
+        "val": 2095
       },
       "protocol": "host_grouped_cv5",
       "split_id": "host_cv5_f4"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2086,
-        "train": 6407,
-        "val": 2083
+        "excluded": 69,
+        "test": 2110,
+        "train": 6377,
+        "val": 2085
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f0"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2083,
-        "train": 6368,
-        "val": 2125
+        "excluded": 69,
+        "test": 2085,
+        "train": 6405,
+        "val": 2082
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f1"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2125,
-        "train": 6279,
-        "val": 2172
+        "excluded": 69,
+        "test": 2082,
+        "train": 6366,
+        "val": 2124
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f2"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2172,
-        "train": 6294,
-        "val": 2110
+        "excluded": 69,
+        "test": 2124,
+        "train": 6277,
+        "val": 2171
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f3"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2110,
-        "train": 6380,
-        "val": 2086
+        "excluded": 69,
+        "test": 2171,
+        "train": 6291,
+        "val": 2110
       },
       "protocol": "dopant_grouped_cv5",
       "split_id": "dopant_cv5_f4"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2116,
-        "train": 6345,
+        "excluded": 69,
+        "test": 2115,
+        "train": 6342,
         "val": 2115
       },
       "protocol": "pair_grouped_cv5",
@@ -553,49 +567,49 @@
     },
     {
       "counts": {
-        "excluded": 65,
+        "excluded": 69,
         "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "train": 6343,
+        "val": 2114
       },
       "protocol": "pair_grouped_cv5",
       "split_id": "pair_cv5_f1"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
       },
       "protocol": "pair_grouped_cv5",
       "split_id": "pair_cv5_f2"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6346,
-        "val": 2115
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
       },
       "protocol": "pair_grouped_cv5",
       "split_id": "pair_cv5_f3"
     },
     {
       "counts": {
-        "excluded": 65,
-        "test": 2115,
-        "train": 6345,
-        "val": 2116
+        "excluded": 69,
+        "test": 2114,
+        "train": 6343,
+        "val": 2115
       },
       "protocol": "pair_grouped_cv5",
       "split_id": "pair_cv5_f4"
     },
     {
       "counts": {
-        "excluded": 65,
+        "excluded": 69,
         "test": 365,
-        "train": 9819,
+        "train": 9815,
         "val": 392
       },
       "protocol": "matrix_completion_block",
