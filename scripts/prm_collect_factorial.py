@@ -336,9 +336,6 @@ def main() -> None:
         out_dir / "effects.csv", effect_rows,
         list(effect_rows[0]) if effect_rows else [],
     )
-    (out_dir / "selection.json").write_text(
-        json.dumps(summary["selection"], indent=2, sort_keys=True) + "\n"
-    )
     bundle = {
         "schema_version": "prm_factorial_bundle_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -354,8 +351,22 @@ def main() -> None:
         "sources": sources,
         **summary,
     }
-    (out_dir / "bundle.json").write_text(json.dumps(bundle, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(summary["selection"], indent=2, sort_keys=True))
+    bundle_path = out_dir / "bundle.json"
+    bundle_path.write_text(json.dumps(bundle, indent=2, sort_keys=True) + "\n")
+    selection_document = {
+        "schema_version": "prm_factorial_selection_v1",
+        **summary["selection"],
+        "factorial_bundle": bundle_path.name,
+        "factorial_bundle_sha256": file_sha256(bundle_path),
+        "data_sha256": protocol["data_sha256"],
+        "n_runs": len(rows),
+        "training_commits": sorted({str(row["git_commit"]) for row in rows}),
+        "collector_git": collector_git,
+    }
+    (out_dir / "selection.json").write_text(
+        json.dumps(selection_document, indent=2, sort_keys=True) + "\n"
+    )
+    print(json.dumps(selection_document, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

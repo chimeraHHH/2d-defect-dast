@@ -10,6 +10,8 @@ from typing import Any, Dict, Iterable, List
 
 import yaml
 
+from src.prm_provenance import load_verified_factorial_selection
+
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
@@ -61,6 +63,7 @@ def main() -> None:
         "--selection", type=Path,
         default=ROOT / "artifacts/prm_results/factorial/selection.json",
     )
+    parser.add_argument("--factorial-bundle", type=Path, default=None)
     parser.add_argument(
         "--base", type=Path, default=ROOT / "configs/prm/base_factorial.yaml",
     )
@@ -72,12 +75,16 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    selection = json.loads(args.selection.read_text())
+    selection, factorial_bundle = load_verified_factorial_selection(
+        args.selection, args.factorial_bundle
+    )
     bits = selected_bits(selection)
     variant = selection["selected_variant"]
     base = yaml.safe_load(args.base.read_text())
     protocol = json.loads((args.protocol_dir / "manifest.json").read_text())
     data_sha256 = protocol["data_sha256"]
+    if selection["data_sha256"] != data_sha256:
+        raise ValueError("factorial selection does not match the frozen protocol dataset")
     variant_dir = args.out_dir / variant
     records = []
 
@@ -125,6 +132,13 @@ def main() -> None:
         "schema_version": "prm_promoted_config_manifest_v1",
         "selection_path": str(args.selection.resolve()),
         "selection_sha256": sha256(args.selection),
+        "factorial_bundle": str(
+            (args.factorial_bundle or args.selection.parent / selection["factorial_bundle"])
+            .resolve()
+        ),
+        "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
+        "factorial_training_commit": selection["training_commits"][0],
+        "factorial_collector_git": factorial_bundle["collector_git"],
         "selection_data": selection["selection_data"],
         "selected_variant": variant,
         "component_flags": dict(zip(COMPONENTS, bits)),

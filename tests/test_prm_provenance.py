@@ -12,6 +12,7 @@ from src.prm_provenance import (
     file_sha256,
     load_expected_configs,
     load_protocol_targets,
+    load_verified_factorial_selection,
     validate_manifest_config,
     validate_protocol_targets,
     validate_training_completion,
@@ -110,6 +111,81 @@ def test_prediction_targets_reject_low_precision_storage(tmp_path):
             np.asarray([0]), np.asarray([1.5], dtype=np.float16), targets,
             context="neural predictions",
         )
+
+
+def _write_verified_factorial_selection(tmp_path):
+    selection_core = {
+        "rule": "minimum mean validation MAE",
+        "selection_data": "validation only",
+        "selected_variant": "g101",
+        "validation_mae": {"mean": 0.4},
+        "locked_test": {"mae": {"mean": 0.5}},
+    }
+    collector_git = {
+        "commit": "collector-commit", "dirty": False, "status_porcelain": []
+    }
+    bundle = {
+        "schema_version": "prm_factorial_bundle_v1",
+        "collector_git": collector_git,
+        "data_sha256": "data-sha",
+        "n_runs": 40,
+        "repeats": list(range(42, 47)),
+        "selection": selection_core,
+        "sources": [
+            {"git": {"commit": "training-commit", "dirty": False}}
+            for _ in range(40)
+        ],
+    }
+    bundle_path = tmp_path / "bundle.json"
+    bundle_path.write_text(json.dumps(bundle, sort_keys=True))
+    selection = {
+        "schema_version": "prm_factorial_selection_v1",
+        **selection_core,
+        "factorial_bundle": "bundle.json",
+        "factorial_bundle_sha256": file_sha256(bundle_path),
+        "data_sha256": "data-sha",
+        "n_runs": 40,
+        "training_commits": ["training-commit"],
+        "collector_git": collector_git,
+    }
+    selection_path = tmp_path / "selection.json"
+    selection_path.write_text(json.dumps(selection, sort_keys=True))
+    return selection_path, bundle_path, selection, bundle
+
+
+def test_factorial_selection_is_bound_to_complete_clean_bundle(tmp_path):
+    selection_path, _, expected_selection, expected_bundle = (
+        _write_verified_factorial_selection(tmp_path)
+    )
+
+    selection, bundle = load_verified_factorial_selection(selection_path)
+
+    assert selection == expected_selection
+    assert bundle == expected_bundle
+
+
+def test_factorial_selection_rejects_bundle_mutation(tmp_path):
+    selection_path, bundle_path, _, bundle = _write_verified_factorial_selection(
+        tmp_path
+    )
+    bundle["selection"]["selected_variant"] = "g111"
+    bundle_path.write_text(json.dumps(bundle, sort_keys=True))
+
+    with pytest.raises(ValueError, match="bundle hash mismatch"):
+        load_verified_factorial_selection(selection_path)
+
+
+def test_factorial_selection_rejects_dirty_training_source(tmp_path):
+    selection_path, bundle_path, selection, bundle = (
+        _write_verified_factorial_selection(tmp_path)
+    )
+    bundle["sources"][0]["git"]["dirty"] = True
+    bundle_path.write_text(json.dumps(bundle, sort_keys=True))
+    selection["factorial_bundle_sha256"] = file_sha256(bundle_path)
+    selection_path.write_text(json.dumps(selection, sort_keys=True))
+
+    with pytest.raises(ValueError, match="inadmissible training sources"):
+        load_verified_factorial_selection(selection_path)
 
 
 def _complete_manifest():

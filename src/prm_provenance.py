@@ -8,7 +8,7 @@ import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Sequence
+from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
 
 import numpy as np
 import yaml
@@ -119,6 +119,89 @@ def validate_protocol_targets(
             f"storage_dtype={raw_values.dtype}"
         )
     return expected
+
+
+def load_verified_factorial_selection(
+    selection_path: Path,
+    bundle_path: Path | None = None,
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Load an architecture selection bound to a complete factorial bundle."""
+    resolved_selection = selection_path.resolve()
+    try:
+        selection = json.loads(resolved_selection.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"unreadable factorial selection: {resolved_selection}") from exc
+    if selection.get("schema_version") != "prm_factorial_selection_v1":
+        raise ValueError(f"unsupported factorial selection schema: {resolved_selection}")
+
+    bundle_reference = selection.get("factorial_bundle")
+    if not isinstance(bundle_reference, str) or not bundle_reference:
+        raise ValueError(f"factorial selection has no bundle reference: {resolved_selection}")
+    resolved_bundle = (
+        bundle_path.resolve()
+        if bundle_path is not None
+        else (resolved_selection.parent / bundle_reference).resolve()
+    )
+    expected_bundle_sha256 = selection.get("factorial_bundle_sha256")
+    if (
+        not isinstance(expected_bundle_sha256, str)
+        or _SHA256_PATTERN.fullmatch(expected_bundle_sha256) is None
+    ):
+        raise ValueError(f"factorial selection has an invalid bundle hash: {resolved_selection}")
+    if not resolved_bundle.is_file() or file_sha256(resolved_bundle) != expected_bundle_sha256:
+        raise ValueError(f"factorial bundle hash mismatch: {resolved_bundle}")
+
+    try:
+        bundle = json.loads(resolved_bundle.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"unreadable factorial bundle: {resolved_bundle}") from exc
+    if bundle.get("schema_version") != "prm_factorial_bundle_v1":
+        raise ValueError(f"unsupported factorial bundle schema: {resolved_bundle}")
+    sources = bundle.get("sources")
+    if (
+        bundle.get("n_runs") != 40
+        or selection.get("n_runs") != 40
+        or not isinstance(sources, list)
+        or len(sources) != 40
+        or bundle.get("repeats") != list(range(42, 47))
+    ):
+        raise ValueError(f"factorial selection is not backed by all 40 runs: {resolved_bundle}")
+    collector_git = bundle.get("collector_git")
+    if (
+        not isinstance(collector_git, Mapping)
+        or not collector_git.get("commit")
+        or collector_git.get("dirty")
+        or selection.get("collector_git") != collector_git
+    ):
+        raise ValueError(f"factorial selection lacks a clean collector commit: {resolved_bundle}")
+    if selection.get("data_sha256") != bundle.get("data_sha256"):
+        raise ValueError(f"factorial selection dataset hash mismatch: {resolved_bundle}")
+
+    bundle_selection = bundle.get("selection")
+    if not isinstance(bundle_selection, Mapping):
+        raise ValueError(f"factorial bundle has no architecture selection: {resolved_bundle}")
+    if any(selection.get(key) != value for key, value in bundle_selection.items()):
+        raise ValueError(f"factorial selection content differs from its bundle: {resolved_bundle}")
+    if selection.get("selection_data") != "validation only" or re.fullmatch(
+        r"g[01]{3}", str(selection.get("selected_variant", ""))
+    ) is None:
+        raise ValueError(f"factorial selection rule is invalid: {resolved_selection}")
+
+    source_git_records = []
+    for source in sources:
+        git = source.get("git") if isinstance(source, Mapping) else None
+        if not isinstance(git, Mapping) or not git.get("commit") or git.get("dirty"):
+            raise ValueError(
+                f"factorial selection has inadmissible training sources: {resolved_bundle}"
+            )
+        source_git_records.append(git)
+    training_commits = sorted({str(git["commit"]) for git in source_git_records})
+    if (
+        len(training_commits) != 1
+        or selection.get("training_commits") != training_commits
+    ):
+        raise ValueError(f"factorial selection has inconsistent training commits: {resolved_bundle}")
+    return selection, bundle
 
 
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:

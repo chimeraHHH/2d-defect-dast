@@ -18,6 +18,7 @@ from scipy.stats import spearmanr
 from src.prm_metrics import low_energy_metrics, macro_group_mae
 from src.prm_provenance import (
     ExpectedConfig,
+    load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
@@ -437,6 +438,7 @@ def main() -> None:
         "--selection", type=Path,
         default=ROOT / "artifacts/prm_results/factorial/selection.json",
     )
+    parser.add_argument("--factorial-bundle", type=Path, default=None)
     parser.add_argument(
         "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
@@ -451,9 +453,11 @@ def main() -> None:
     protocol = json.loads((protocol_dir / "manifest.json").read_text())
     sample_metadata = read_sample_metadata(protocol_dir / "samples.csv")
     protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
-    selection = json.loads(args.selection.read_text())
-    if selection.get("selection_data") != "validation only":
-        raise ValueError("DART architecture was not selected on validation data")
+    selection, factorial_bundle = load_verified_factorial_selection(
+        args.selection, args.factorial_bundle
+    )
+    if selection["data_sha256"] != protocol["data_sha256"]:
+        raise ValueError("factorial selection does not match the frozen protocol dataset")
     variant = selection["selected_variant"]
     dart_paths = sorted((result_root / "factorial" / variant).glob("split*_seed*/run_manifest.json"))
     dart_paths += sorted(
@@ -594,6 +598,9 @@ def main() -> None:
         "selection": {
             "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
             "selected_variant": variant, "selection_data": selection["selection_data"],
+            "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
+            "factorial_training_commit": selection["training_commits"][0],
+            "factorial_collector_git": factorial_bundle["collector_git"],
         },
         "data_sha256": protocol["data_sha256"],
         "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),

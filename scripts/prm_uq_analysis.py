@@ -18,6 +18,7 @@ from scipy.stats import spearmanr
 
 from src.prm_provenance import (
     ExpectedConfig,
+    load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
@@ -269,6 +270,7 @@ def main() -> None:
         "--selection", type=Path,
         default=ROOT / "artifacts/prm_results/factorial/selection.json",
     )
+    parser.add_argument("--factorial-bundle", type=Path, default=None)
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/uq",
     )
@@ -282,12 +284,14 @@ def main() -> None:
     parser.add_argument("--expected-members", type=int, default=5)
     args = parser.parse_args()
 
-    selection = json.loads(args.selection.read_text())
-    if selection.get("selection_data") != "validation only":
-        raise ValueError("UQ architecture must be selected without test data")
+    selection, factorial_bundle = load_verified_factorial_selection(
+        args.selection, args.factorial_bundle
+    )
     variant = selection["selected_variant"]
     protocol_dir = args.protocol_dir.resolve()
     protocol = json.loads((protocol_dir / "manifest.json").read_text())
+    if selection["data_sha256"] != protocol["data_sha256"]:
+        raise ValueError("factorial selection does not match the frozen protocol dataset")
     expected_split_sha256 = file_sha256(
         protocol_dir / "splits/uq_calibration_s62.json"
     )
@@ -368,6 +372,9 @@ def main() -> None:
             "sha256": file_sha256(args.selection),
             "selected_variant": variant,
             "selection_data": selection["selection_data"],
+            "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
+            "factorial_training_commit": selection["training_commits"][0],
+            "factorial_collector_git": factorial_bundle["collector_git"],
         },
         "data_sha256": sources[0]["data_sha256"],
         "split_sha256": sources[0]["split_sha256"],

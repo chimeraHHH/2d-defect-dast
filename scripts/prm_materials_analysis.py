@@ -18,6 +18,7 @@ from scipy.stats import spearmanr
 
 from src.prm_provenance import (
     ExpectedConfig,
+    load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
     validate_dart_assets,
@@ -293,6 +294,7 @@ def main() -> None:
         "--selection", type=Path,
         default=ROOT / "artifacts/prm_results/factorial/selection.json",
     )
+    parser.add_argument("--factorial-bundle", type=Path, default=None)
     parser.add_argument(
         "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v2",
     )
@@ -305,11 +307,13 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    selection = json.loads(args.selection.read_text())
-    if selection.get("selection_data") != "validation only":
-        raise ValueError("materials analysis requires validation-selected architecture")
+    selection, factorial_bundle = load_verified_factorial_selection(
+        args.selection, args.factorial_bundle
+    )
     variant = selection["selected_variant"]
     protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
+    if selection["data_sha256"] != protocol_manifest["data_sha256"]:
+        raise ValueError("factorial selection does not match the frozen protocol dataset")
     expected_configs = load_expected_configs(
         sorted(
             (args.promoted_config_root.resolve() / variant / "transfer").glob(
@@ -351,6 +355,9 @@ def main() -> None:
         "selection": {
             "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
             "selected_variant": variant, "selection_data": selection["selection_data"],
+            "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
+            "factorial_training_commit": selection["training_commits"][0],
+            "factorial_collector_git": factorial_bundle["collector_git"],
         },
         "data_sha256": protocol_manifest["data_sha256"],
         "sources": sources,
