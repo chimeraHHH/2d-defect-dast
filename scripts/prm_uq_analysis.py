@@ -18,6 +18,7 @@ from scipy.stats import spearmanr
 
 from src.prm_provenance import (
     ExpectedConfig,
+    archive_training_artifacts,
     load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
@@ -283,6 +284,8 @@ def main() -> None:
     )
     parser.add_argument("--expected-members", type=int, default=5)
     args = parser.parse_args()
+    if args.expected_members != 5:
+        raise ValueError("the frozen UQ contract requires exactly five ensemble members")
 
     selection, factorial_bundle = load_verified_factorial_selection(
         args.selection, args.factorial_bundle
@@ -401,6 +404,27 @@ def main() -> None:
 
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    archived_runs = archive_training_artifacts(
+        [run_dir / "run_manifest.json" for run_dir in run_dirs],
+        out_dir / "runs",
+        repository_root=ROOT,
+    )
+    if len(archived_runs) != args.expected_members:
+        raise ValueError("UQ evidence archive does not contain every ensemble member")
+    metrics.update(
+        {
+            "archive_policy": {
+                "included": [
+                    "run_manifest.json", "metrics.json", "split_indices.npz",
+                    "val_predictions.npz", "calibration_predictions.npz",
+                    "test_predictions.npz",
+                ],
+                "checkpoint": "SHA-256 recorded; binary retained outside Git",
+            },
+            "n_archived_runs": len(archived_runs),
+            "archived_runs": archived_runs,
+        }
+    )
     np.savez_compressed(
         out_dir / "predictions.npz",
         schema_version=np.asarray("prm_uq_predictions_v1"),
@@ -421,6 +445,14 @@ def main() -> None:
     )
     write_csv(out_dir / "interval_calibration.csv", interval_rows)
     write_csv(out_dir / "risk_coverage.csv", risk_rows)
+    metrics["output_sha256"] = {
+        name: file_sha256(out_dir / filename)
+        for name, filename in {
+            "predictions": "predictions.npz",
+            "interval_calibration": "interval_calibration.csv",
+            "risk_coverage": "risk_coverage.csv",
+        }.items()
+    }
     (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n")
     print(json.dumps(metrics["test"], indent=2, sort_keys=True))
 
