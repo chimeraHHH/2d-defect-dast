@@ -53,3 +53,4 @@ def test_risk_coverage_recovers_oracle_when_uncertainty_orders_error():
     metrics, rows = risk_coverage(targets, predictions, uncertainty)
     assert metrics["excess_aurc_eV"] == 0.0
     assert rows[0]["mae_risk_eV"] == 0.1
+    assert rows[0]["oracle_mae_risk_eV"] == 0.1

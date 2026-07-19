@@ -159,8 +159,11 @@ def risk_coverage(
     aurc = float(np.mean(risk))
     oracle_aurc = float(np.mean(oracle_risk))
     rows = [
-        {"coverage": float(c), "mae_risk_eV": float(r)}
-        for c, r in zip(coverage, risk)
+        {
+            "coverage": float(c), "mae_risk_eV": float(r),
+            "oracle_mae_risk_eV": float(o),
+        }
+        for c, r, o in zip(coverage, risk, oracle_risk)
     ]
     at_coverage = {}
     for requested in (0.25, 0.50, 0.75, 0.90, 1.00):

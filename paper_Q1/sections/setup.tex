@@ -10,8 +10,10 @@ correlation, and $R^2$.  Host- and impurity-macro MAE give each chemical group
 equal weight, independent of its number of structures.  Cross-validation
 predictions are concatenated only when test folds are disjoint; model seeds
 are averaged within a fold before concatenation.  Low-energy behavior is
-assessed separately because screening decisions depend on the lower tail of
-the formation-energy distribution.
+assessed by MAE for $E_{\mathrm f}\leq 0$, MAE within the true lowest-energy
+decile of each pooled test regime, and recall of that decile by the predicted
+lowest-energy decile.  These strata are evaluation summaries and are not used
+for architecture or hyperparameter selection.
 
 For the architecture factorial, each effect is evaluated as the difference
 between the average metric at positive and negative levels of the associated

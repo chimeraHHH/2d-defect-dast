@@ -13,6 +13,9 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 import numpy as np
+from scipy.stats import spearmanr
+
+from src.prm_metrics import low_energy_metrics, macro_group_mae
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -264,15 +267,58 @@ def pooled_predictions(
     )
 
 
-def regression_metrics(targets: np.ndarray, predictions: np.ndarray) -> Dict[str, float]:
+def read_sample_metadata(path: Path) -> Dict[int, Dict[str, str]]:
+    with path.open(newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    return {
+        int(row["sample_index"]): {
+            "host": str(row["host"]), "dopant": str(row["dopant"]),
+        }
+        for row in rows
+    }
+
+
+def regression_metrics(
+    targets: np.ndarray, predictions: np.ndarray,
+    hosts: Sequence[str] | None = None, dopants: Sequence[str] | None = None,
+) -> Dict[str, float]:
     residual = np.asarray(predictions) - np.asarray(targets)
     denominator = np.sum((targets - np.mean(targets)) ** 2)
-    return {
+    output = {
         "mae": float(np.mean(np.abs(residual))),
         "rmse": float(np.sqrt(np.mean(residual ** 2))),
         "bias": float(np.mean(residual)),
+        "spearman": float(spearmanr(targets, predictions).statistic),
         "r2": float(1.0 - np.sum(residual ** 2) / denominator),
     }
+    favorable = np.asarray(targets) <= 0.0
+    output["favorable_n"] = int(np.sum(favorable))
+    output["favorable_mae"] = (
+        float(np.mean(np.abs(residual[favorable]))) if np.any(favorable) else float("nan")
+    )
+    low = low_energy_metrics(targets, predictions, fraction=0.1)
+    low_order = np.argsort(np.asarray(targets), kind="stable")[: int(low["k"])]
+    output.update(
+        {
+            "low_energy_k": int(low["k"]),
+            "low_energy_mae": float(np.mean(np.abs(residual[low_order]))),
+            "low_energy_recall": float(low["top_k_recall"]),
+            "predicted_low_energy_mean_target_eV": float(
+                low["mean_true_energy_in_predicted_top_k_eV"]
+            ),
+        }
+    )
+    if hosts is not None:
+        host_metrics = macro_group_mae(targets, predictions, hosts)
+        output["host_macro_mae"] = float(host_metrics["macro_mae"])
+        output["host_worst_group_mae"] = float(host_metrics["worst_group_mae"])
+        output["n_hosts"] = int(host_metrics["n_groups"])
+    if dopants is not None:
+        dopant_metrics = macro_group_mae(targets, predictions, dopants)
+        output["dopant_macro_mae"] = float(dopant_metrics["macro_mae"])
+        output["dopant_worst_group_mae"] = float(dopant_metrics["worst_group_mae"])
+        output["n_dopants"] = int(dopant_metrics["n_groups"])
+    return output
 
 
 def paired_sample_comparison(
@@ -322,6 +368,7 @@ def main() -> None:
     result_root = args.result_root.resolve()
     protocol_dir = args.protocol_dir.resolve()
     protocol = json.loads((protocol_dir / "manifest.json").read_text())
+    sample_metadata = read_sample_metadata(protocol_dir / "samples.csv")
     selection = json.loads(args.selection.read_text())
     if selection.get("selection_data") != "validation only":
         raise ValueError("DART architecture was not selected on validation data")
@@ -375,8 +422,13 @@ def main() -> None:
                     continue
                 raise
             pooled[model] = (indices, targets, predictions)
+            hosts = [sample_metadata[int(index)]["host"] for index in indices]
+            dopants = [sample_metadata[int(index)]["dopant"] for index in indices]
             pooled_rows.append(
-                {"model": model, "regime": regime, "n": len(indices), **regression_metrics(targets, predictions)}
+                {
+                    "model": model, "regime": regime, "n": len(indices),
+                    **regression_metrics(targets, predictions, hosts, dopants),
+                }
             )
         if "dart" not in pooled:
             continue

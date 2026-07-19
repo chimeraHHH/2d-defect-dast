@@ -2,6 +2,7 @@ import numpy as np
 
 from scripts.prm_collect_results import (
     paired_sample_comparison,
+    regression_metrics,
     regime_for_split,
     select_descriptor_families,
 )
@@ -38,3 +39,21 @@ def test_paired_bootstrap_difference_is_positive_for_worse_comparator():
     result = paired_sample_comparison(targets, dart, comparator, seed=1, draws=500)
     assert result["mae_difference_comparator_minus_dart_eV"] > 0.0
     assert result["ci_low_eV"] > 0.0
+
+
+def test_pooled_metrics_include_group_and_low_energy_diagnostics():
+    targets = np.arange(-5.0, 5.0)
+    predictions = targets.copy()
+    predictions[0] += 1.0
+    hosts = ["A"] * 5 + ["B"] * 5
+    dopants = ["X", "Y"] * 5
+
+    metrics = regression_metrics(targets, predictions, hosts, dopants)
+
+    assert metrics["spearman"] < 1.0
+    assert metrics["favorable_n"] == 6
+    assert metrics["low_energy_k"] == 1
+    assert metrics["low_energy_mae"] == 1.0
+    assert metrics["low_energy_recall"] == 1.0
+    assert metrics["host_macro_mae"] == 0.1
+    assert metrics["dopant_macro_mae"] == 0.1
