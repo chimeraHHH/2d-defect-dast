@@ -19,9 +19,13 @@ For the architecture factorial, each effect is evaluated as the difference
 between the average metric at positive and negative levels of the associated
 orthogonal contrast within each paired repeat.  Ninety-five-percent intervals
 are obtained by nonparametric bootstrap over the five repeat-level contrasts.
-For model comparisons on aligned out-of-fold predictions, we bootstrap the
-per-sample difference in absolute error using 10,000 paired resamples.  An
-interval excluding zero is treated as evidence for a directional difference;
+For model comparisons on aligned out-of-fold predictions, we use 10,000 paired
+bootstrap resamples.  The resampling unit matches the held-out unit: individual
+structures for random cross-validation, complete hosts for host-held-out
+evaluation, complete impurities for impurity-held-out evaluation, and
+host--impurity pairs for pair-held-out and compositional-block evaluation.
+Within each resampled chemical unit all associated structures remain together.
+An interval excluding zero is treated as evidence for a directional difference;
 otherwise the result is reported as inconclusive rather than equivalent.
 
 Uncertainty evaluation includes empirical interval coverage and mean width at

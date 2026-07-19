@@ -378,19 +378,38 @@ def regression_metrics(
 def paired_sample_comparison(
     targets: np.ndarray, reference: np.ndarray, comparator: np.ndarray,
     seed: int, draws: int = 10_000,
+    groups: Sequence[str] | None = None,
 ) -> Dict[str, float]:
     differences = np.abs(comparator - targets) - np.abs(reference - targets)
+    if groups is None:
+        cluster_sums = differences
+        cluster_counts = np.ones(len(differences), dtype=np.int64)
+    else:
+        labels = np.asarray(groups)
+        if len(labels) != len(differences):
+            raise ValueError("bootstrap group labels do not align with predictions")
+        _, inverse = np.unique(labels, return_inverse=True)
+        cluster_sums = np.bincount(inverse, weights=differences)
+        cluster_counts = np.bincount(inverse)
+    n_units = len(cluster_sums)
+    if n_units < 2:
+        raise ValueError("paired bootstrap requires at least two resampling units")
+
     rng = np.random.default_rng(seed)
     chunks = []
     for start in range(0, draws, 256):
         size = min(256, draws - start)
-        indices = rng.integers(0, len(differences), size=(size, len(differences)))
-        chunks.append(differences[indices].mean(axis=1))
+        indices = rng.integers(0, n_units, size=(size, n_units))
+        chunks.append(
+            cluster_sums[indices].sum(axis=1)
+            / cluster_counts[indices].sum(axis=1)
+        )
     means = np.concatenate(chunks)
     low, high = np.quantile(means, [0.025, 0.975])
     return {
         "mae_difference_comparator_minus_dart_eV": float(differences.mean()),
-        "ci_low_eV": float(low), "ci_high_eV": float(high), "n": len(differences),
+        "ci_low_eV": float(low), "ci_high_eV": float(high),
+        "n": len(differences), "n_resampling_units": n_units,
     }
 
 
@@ -506,6 +525,27 @@ def main() -> None:
         if "dart" not in pooled:
             continue
         reference_indices, reference_targets, reference_predictions = pooled["dart"]
+        reference_hosts = [
+            sample_metadata[int(index)]["host"] for index in reference_indices
+        ]
+        reference_dopants = [
+            sample_metadata[int(index)]["dopant"] for index in reference_indices
+        ]
+        if regime == "host_cv":
+            bootstrap_groups = reference_hosts
+            bootstrap_unit = "host"
+        elif regime == "dopant_cv":
+            bootstrap_groups = reference_dopants
+            bootstrap_unit = "dopant"
+        elif regime in ("pair_cv", "chemistry_block"):
+            bootstrap_groups = [
+                f"{host}::{dopant}"
+                for host, dopant in zip(reference_hosts, reference_dopants)
+            ]
+            bootstrap_unit = "host_dopant_pair"
+        else:
+            bootstrap_groups = None
+            bootstrap_unit = "sample"
         for comparator_index, comparator in enumerate(models[1:]):
             if comparator not in pooled:
                 continue
@@ -517,9 +557,11 @@ def main() -> None:
             comparison_rows.append(
                 {
                     "regime": regime, "reference": "dart", "comparator": comparator,
+                    "bootstrap_unit": bootstrap_unit,
                     **paired_sample_comparison(
                         targets, reference_predictions, predictions,
                         seed=20265000 + 10 * regime_index + comparator_index,
+                        groups=bootstrap_groups,
                     ),
                 }
             )
@@ -549,7 +591,10 @@ def main() -> None:
         "aggregation": {
             "fold_metrics": "mean over model seeds within each split",
             "pooled_metrics": "mean prediction over model seeds, then concatenate disjoint test folds",
-            "paired_ci": "nonparametric bootstrap over aligned test samples",
+            "paired_ci": (
+                "paired nonparametric bootstrap over aligned samples for random CV; "
+                "over held-out hosts, dopants, or host-dopant pairs for grouped regimes"
+            ),
         },
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

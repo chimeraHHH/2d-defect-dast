@@ -45,6 +45,22 @@ def test_paired_bootstrap_difference_is_positive_for_worse_comparator():
     result = paired_sample_comparison(targets, dart, comparator, seed=1, draws=500)
     assert result["mae_difference_comparator_minus_dart_eV"] > 0.0
     assert result["ci_low_eV"] > 0.0
+    assert result["n_resampling_units"] == 100
+
+
+def test_paired_bootstrap_resamples_declared_clusters():
+    targets = np.zeros(4)
+    dart = np.asarray([0.0, 0.0, 0.0, 1.0])
+    comparator = np.asarray([1.0, 1.0, 1.0, 0.0])
+
+    result = paired_sample_comparison(
+        targets, dart, comparator, seed=1, draws=500,
+        groups=["host-a", "host-a", "host-a", "host-b"],
+    )
+
+    assert result["mae_difference_comparator_minus_dart_eV"] == 0.5
+    assert result["n"] == 4
+    assert result["n_resampling_units"] == 2
 
 
 def test_pooled_metrics_include_group_and_low_energy_diagnostics():
