@@ -75,6 +75,7 @@ def main() -> None:
     parser.add_argument("--glob", default="configs/prm/generated/factorial/*.yaml")
     parser.add_argument("--queue-id", default="factorial")
     parser.add_argument("--python", type=Path, required=True)
+    parser.add_argument("--module", default="src.train_enhanced")
     parser.add_argument("--result-root", type=Path, required=True)
     parser.add_argument("--data-path", type=Path, required=True)
     parser.add_argument("--ct-uae-path", type=Path, required=True)
@@ -118,6 +119,7 @@ def main() -> None:
         "status": "running",
         "settings": {
             "glob": args.glob,
+            "module": args.module,
             "excluded_gpus": sorted(excluded),
             "max_parallel": args.max_parallel,
             "poll_seconds": args.poll_seconds,
@@ -217,7 +219,7 @@ def main() -> None:
             log_path = output_dir / "stdout.log"
             log_handle = log_path.open("a")
             command = [
-                str(args.python), "-u", "-m", "src.train_enhanced",
+                str(args.python), "-u", "-m", args.module,
                 "--config", record["config_path"],
             ]
             if (output_dir / "latest.pt").exists():

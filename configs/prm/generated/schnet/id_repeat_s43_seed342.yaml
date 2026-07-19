@@ -1,0 +1,32 @@
+model: pbc_schnet
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: baselines/schnet/id_repeat_s43/seed342
+split_path: artifacts/prm_protocol_v1/splits/id_repeat_s43.json
+seed: 342
+batch_size: 32
+num_workers: 4
+cpu_threads: 8
+epochs: 150
+online_aug: true
+online_aug_cfg:
+  sigma_range:
+  - 0.01
+  - 0.05
+  strain_range: 2.0
+  rotate_prob: 1.0
+  perturb_prob: 0.8
+  strain_prob: 0.3
+host_balanced: true
+samples_per_host: 200
+label_noise_std: 0.03
+lr: 0.0005
+weight_decay: 0.0001
+eta_min: 1.0e-06
+model_kwargs:
+  hidden_channels: 128
+  num_filters: 128
+  num_interactions: 6
+  num_gaussians: 50
+  cutoff: 5.0
+  readout: add
+data_sha256: 1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b

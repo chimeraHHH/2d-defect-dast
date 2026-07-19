@@ -1,0 +1,48 @@
+"""Generate SchNet comparator configs for every formal PRM split."""
+from __future__ import annotations
+
+import json
+from copy import deepcopy
+from pathlib import Path
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def main() -> None:
+    base = yaml.safe_load((ROOT / "configs/prm/base_schnet.yaml").read_text())
+    protocol = json.loads((ROOT / "artifacts/prm_protocol_v1/manifest.json").read_text())
+    out_dir = ROOT / "configs/prm/generated/schnet"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    split_ids = [
+        *(f"id_repeat_s{i}" for i in range(42, 47)),
+        *(f"host_cv5_f{i}" for i in range(5)),
+        *(f"dopant_cv5_f{i}" for i in range(5)),
+        "chemistry_block_g6x3d",
+    ]
+    records = []
+    for split_id in split_ids:
+        seeds = (342, 343, 344) if not split_id.startswith("id_repeat") else (342,)
+        for seed in seeds:
+            cfg = deepcopy(base)
+            cfg["seed"] = seed
+            cfg["data_sha256"] = protocol["data_sha256"]
+            cfg["split_path"] = f"artifacts/prm_protocol_v1/splits/{split_id}.json"
+            cfg["output_dir"] = f"baselines/schnet/{split_id}/seed{seed}"
+            path = out_dir / f"{split_id}_seed{seed}.yaml"
+            path.write_text(yaml.safe_dump(cfg, sort_keys=False))
+            records.append(str(path.relative_to(ROOT)))
+    manifest = {
+        "schema_version": "prm_schnet_config_manifest_v1",
+        "data_sha256": protocol["data_sha256"],
+        "n_configs": len(records),
+        "configs": records,
+    }
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    print(json.dumps(manifest, indent=2))
+
+
+if __name__ == "__main__":
+    main()
