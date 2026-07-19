@@ -39,6 +39,16 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def load_prediction_array(path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    with np.load(path, allow_pickle=False) as archive:
+        if str(archive["schema_version"].item()) != "prm_predictions_v1":
+            raise ValueError(f"unsupported prediction schema: {path}")
+        indices = np.asarray(archive["indices"], dtype=np.int64)
+        predictions = np.asarray(archive["preds"], dtype=float)
+        targets = np.asarray(archive["targets"])
+    return indices, predictions, targets
+
+
 def git_snapshot() -> Dict[str, Any]:
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
@@ -113,12 +123,7 @@ def load_oof_predictions(
             raise ValueError(f"split hash mismatch: {manifest_path}")
         observed_splits.add(split_id)
         prediction_path = run_dir / "test_predictions.npz"
-        with np.load(prediction_path, allow_pickle=False) as archive:
-            if str(archive["schema_version"].item()) != "prm_predictions_v1":
-                raise ValueError(f"unsupported prediction schema: {prediction_path}")
-            indices = np.asarray(archive["indices"], dtype=np.int64)
-            values = np.asarray(archive["preds"], dtype=float)
-            targets = np.asarray(archive["targets"], dtype=float)
+        indices, values, targets = load_prediction_array(prediction_path)
         validate_protocol_targets(
             indices, targets, protocol_targets,
             context=f"pair-OOF predictions in {prediction_path}",

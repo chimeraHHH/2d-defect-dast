@@ -269,11 +269,11 @@ def load_prediction_array(path: Path, model: str) -> Tuple[np.ndarray, np.ndarra
             names = [str(name) for name in archive["model_names"].tolist()]
             position = names.index(family)
             indices = np.asarray(archive["test_indices"], dtype=np.int64)
-            targets = np.asarray(archive["test_targets"], dtype=float)
+            targets = np.asarray(archive["test_targets"])
             predictions = np.asarray(archive["test_predictions"][position], dtype=float)
         else:
             indices = np.asarray(archive["indices"], dtype=np.int64)
-            targets = np.asarray(archive["targets"], dtype=float)
+            targets = np.asarray(archive["targets"])
             predictions = np.asarray(archive["preds"], dtype=float)
     order = np.argsort(indices)
     return indices[order], targets[order], predictions[order]
@@ -517,17 +517,19 @@ def main() -> None:
                 if args.allow_incomplete:
                     continue
                 raise
-            validate_protocol_targets(
+            canonical_targets = validate_protocol_targets(
                 indices, targets, protocol_targets,
                 context=f"{regime}/{model} pooled predictions",
             )
-            pooled[model] = (indices, targets, predictions)
+            pooled[model] = (indices, canonical_targets, predictions)
             hosts = [sample_metadata[int(index)]["host"] for index in indices]
             dopants = [sample_metadata[int(index)]["dopant"] for index in indices]
             pooled_rows.append(
                 {
                     "model": model, "regime": regime, "n": len(indices),
-                    **regression_metrics(targets, predictions, hosts, dopants),
+                    **regression_metrics(
+                        canonical_targets, predictions, hosts, dopants
+                    ),
                 }
             )
         if "dart" not in pooled:

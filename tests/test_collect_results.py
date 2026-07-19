@@ -5,6 +5,7 @@ import pytest
 
 from scripts.prm_collect_results import (
     file_sha256,
+    load_prediction_array,
     paired_sample_comparison,
     regression_metrics,
     regime_for_split,
@@ -12,6 +13,7 @@ from scripts.prm_collect_results import (
     validate_descriptor_root,
     write_csv,
 )
+from src.prm_provenance import validate_protocol_targets
 
 
 def test_regime_names_are_derived_from_frozen_split_ids():
@@ -129,3 +131,25 @@ def test_write_csv_uses_lf_line_endings(tmp_path):
     write_csv(output, [{"split": "id_cv5_f0", "mae": 0.5}])
 
     assert output.read_bytes() == b"split,mae\nid_cv5_f0,0.5\n"
+
+
+def test_neural_prediction_loader_preserves_target_storage_precision(tmp_path):
+    path = tmp_path / "test_predictions.npz"
+    protocol_targets = {1: -3.210987654321, 2: 12.3456789012345}
+    np.savez(
+        path,
+        indices=np.asarray([2, 1]),
+        targets=np.asarray(
+            [protocol_targets[2], protocol_targets[1]], dtype=np.float32
+        ),
+        preds=np.asarray([11.0, -2.0], dtype=np.float32),
+    )
+
+    indices, targets, _ = load_prediction_array(path, "dart")
+    canonical = validate_protocol_targets(
+        indices, targets, protocol_targets, context="DART predictions"
+    )
+
+    assert targets.dtype == np.float32
+    assert canonical.dtype == np.float64
+    assert canonical.tolist() == [protocol_targets[1], protocol_targets[2]]

@@ -1,6 +1,11 @@
+import numpy as np
 import pytest
 
-from scripts.prm_materials_analysis import analyse_preferences, bootstrap_mean
+from scripts.prm_materials_analysis import (
+    analyse_preferences,
+    bootstrap_mean,
+    load_prediction_array,
+)
 
 
 def row(index, host, dopant, defecttype, site, target, prediction):
@@ -48,3 +53,20 @@ def test_materials_bootstrap_is_chunked_and_requires_multiple_units():
 
     with pytest.raises(ValueError, match="at least two decision units"):
         bootstrap_mean([1.0], seed=1, draws=10)
+
+
+def test_materials_prediction_loader_preserves_target_storage_precision(tmp_path):
+    path = tmp_path / "test_predictions.npz"
+    np.savez(
+        path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        indices=np.asarray([1]),
+        preds=np.asarray([0.5], dtype=np.float32),
+        targets=np.asarray([1.234567890123], dtype=np.float32),
+    )
+
+    indices, predictions, targets = load_prediction_array(path)
+
+    assert indices.dtype == np.int64
+    assert predictions.dtype == np.float64
+    assert targets.dtype == np.float32

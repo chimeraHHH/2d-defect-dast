@@ -17,19 +17,22 @@ def test_prediction_members_align_by_sample_index(tmp_path):
         first / "test_predictions.npz",
         schema_version=np.asarray("prm_predictions_v1"),
         split=np.asarray("test"), split_id=np.asarray("uq_calibration_s62"),
-        indices=np.asarray([2, 1]), targets=np.asarray([20.0, 10.0]),
+        indices=np.asarray([2, 1]),
+        targets=np.asarray([20.0, 10.0], dtype=np.float32),
         preds=np.asarray([19.0, 9.0]),
     )
     np.savez(
         second / "test_predictions.npz",
         schema_version=np.asarray("prm_predictions_v1"),
         split=np.asarray("test"), split_id=np.asarray("uq_calibration_s62"),
-        indices=np.asarray([1, 2]), targets=np.asarray([10.0, 20.0]),
+        indices=np.asarray([1, 2]),
+        targets=np.asarray([10.0, 20.0], dtype=np.float32),
         preds=np.asarray([11.0, 21.0]),
     )
     indices, targets, members = load_aligned_predictions([first, second], "test")
     assert indices.tolist() == [1, 2]
     assert targets.tolist() == [10.0, 20.0]
+    assert targets.dtype == np.float32
     assert members.tolist() == [[9.0, 19.0], [11.0, 21.0]]
 
 

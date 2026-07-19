@@ -65,7 +65,7 @@ def load_aligned_predictions(
             if str(archive["split"].item()) != split_name:
                 raise ValueError(f"prediction split mismatch: {path}")
             indices = np.asarray(archive["indices"], dtype=np.int64)
-            targets = np.asarray(archive["targets"], dtype=float)
+            targets = np.asarray(archive["targets"])
             predictions = np.asarray(archive["preds"], dtype=float)
         order = np.argsort(indices)
         indices, targets, predictions = indices[order], targets[order], predictions[order]
@@ -311,11 +311,11 @@ def main() -> None:
     cal_indices, cal_targets, cal_members = load_aligned_predictions(run_dirs, "calibration")
     test_indices, test_targets, test_members = load_aligned_predictions(run_dirs, "test")
     protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
-    validate_protocol_targets(
+    cal_targets = validate_protocol_targets(
         cal_indices, cal_targets, protocol_targets,
         context="UQ calibration predictions",
     )
-    validate_protocol_targets(
+    test_targets = validate_protocol_targets(
         test_indices, test_targets, protocol_targets,
         context="UQ test predictions",
     )

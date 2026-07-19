@@ -74,7 +74,7 @@ def validate_protocol_targets(
     protocol_targets: Mapping[int, float],
     *,
     context: str,
-) -> None:
+) -> np.ndarray:
     """Require exact target alignment at the artifact's stored precision.
 
     Neural prediction archives store targets as float32 tensors, whereas the
@@ -118,6 +118,7 @@ def validate_protocol_targets(
             f"observed={values[position]:.16g}, protocol={expected[position]:.16g}, "
             f"storage_dtype={raw_values.dtype}"
         )
+    return expected
 
 
 def load_expected_configs(paths: Iterable[Path]) -> Dict[str, ExpectedConfig]:
