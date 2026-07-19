@@ -2,7 +2,11 @@ import json
 
 import numpy as np
 
-from scripts.prm_descriptor_baselines import prior_split_provenance, result_is_complete
+from scripts.prm_descriptor_baselines import (
+    mean_baseline,
+    prior_split_provenance,
+    result_is_complete,
+)
 
 
 def test_result_is_complete_requires_matching_schemas(tmp_path):
@@ -22,6 +26,9 @@ def test_result_is_complete_requires_matching_schemas(tmp_path):
         split_id=np.asarray("id_cv5_f0"),
     )
     assert result_is_complete(tmp_path, "id_cv5_f0")
+    split_path = tmp_path / "split.json"
+    split_path.write_text("{}")
+    assert not result_is_complete(tmp_path, "id_cv5_f0", split_path)
     assert not result_is_complete(tmp_path, "id_cv5_f1")
 
 
@@ -35,3 +42,22 @@ def test_prior_manifest_is_promoted_to_per_split_provenance():
     provenance = prior_split_provenance(manifest)
     assert set(provenance) == {"a", "b"}
     assert provenance["a"]["git"]["commit"] == "abc"
+
+
+def test_mean_baseline_uses_training_targets_only():
+    samples = [
+        {"metadata": {"host": "h1", "dopant": "d1"}},
+        {"metadata": {"host": "h2", "dopant": "d2"}},
+        {"metadata": {"host": "h3", "dopant": "d3"}},
+        {"metadata": {"host": "h4", "dopant": "d4"}},
+    ]
+    targets = np.asarray([1.0, 3.0, 100.0, -100.0])
+    indices = {
+        "train": np.asarray([0, 1]),
+        "val": np.asarray([2]),
+        "test": np.asarray([3]),
+    }
+    result, val_pred, test_pred = mean_baseline(samples, targets, indices)
+    assert result["training_target_mean"] == 2.0
+    assert val_pred.tolist() == [2.0]
+    assert test_pred.tolist() == [2.0]

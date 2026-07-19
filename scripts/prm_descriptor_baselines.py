@@ -47,6 +47,14 @@ SITE_NAMES = tuple([f"ads{i}" for i in range(7)] + [f"int{i}" for i in range(5)]
 DEFECT_TYPES = ("adsorbate", "interstitial")
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def git_snapshot() -> Dict[str, Any]:
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
@@ -174,6 +182,43 @@ def candidate_models(seed: int, n_jobs: int) -> Dict[str, List[Tuple[str, Any]]]
     return candidates
 
 
+def prediction_summary(
+    samples: Sequence[Dict[str, Any]], targets: np.ndarray,
+    indices: Dict[str, np.ndarray], val_pred: np.ndarray, test_pred: np.ndarray,
+) -> Dict[str, Any]:
+    test_meta = [samples[i].get("metadata", {}) for i in indices["test"]]
+    return {
+        "validation": regression_metrics(targets[indices["val"]], val_pred),
+        "test": regression_metrics(targets[indices["test"]], test_pred),
+        "test_host_macro": macro_group_mae(
+            targets[indices["test"]], test_pred,
+            [meta.get("host", "") for meta in test_meta],
+        ),
+        "test_dopant_macro": macro_group_mae(
+            targets[indices["test"]], test_pred,
+            [meta.get("dopant", "") for meta in test_meta],
+        ),
+        "test_low_energy": low_energy_metrics(targets[indices["test"]], test_pred),
+    }
+
+
+def mean_baseline(
+    samples: Sequence[Dict[str, Any]], targets: np.ndarray,
+    indices: Dict[str, np.ndarray],
+) -> Tuple[Dict[str, Any], np.ndarray, np.ndarray]:
+    train_mean = float(targets[indices["train"]].mean())
+    val_pred = np.full(len(indices["val"]), train_mean, dtype=float)
+    test_pred = np.full(len(indices["test"]), train_mean, dtype=float)
+    result = {
+        "selected_by": "fixed non-tuned baseline",
+        "selected_candidate": "training-target mean",
+        "training_target_mean": train_mean,
+        "candidates": [],
+        **prediction_summary(samples, targets, indices, val_pred, test_pred),
+    }
+    return result, val_pred, test_pred
+
+
 def evaluate_split(
     split_path: Path,
     samples: Sequence[Dict[str, Any]],
@@ -191,6 +236,10 @@ def evaluate_split(
     results: Dict[str, Any] = {}
     val_predictions: Dict[str, np.ndarray] = {}
     test_predictions: Dict[str, np.ndarray] = {}
+    mean_result, mean_val, mean_test = mean_baseline(samples, targets, indices)
+    results["mean"] = mean_result
+    val_predictions["mean"] = mean_val
+    test_predictions["mean"] = mean_test
 
     for family, candidates in candidate_models(seed, n_jobs).items():
         candidate_rows = []
@@ -218,20 +267,13 @@ def evaluate_split(
         test_pred = model.predict(features[indices["test"]])
         val_predictions[family] = selected_val_pred
         test_predictions[family] = test_pred
-        test_meta = [samples[i].get("metadata", {}) for i in indices["test"]]
         results[family] = {
             "selected_by": "minimum validation MAE",
             "selected_candidate": candidate_name,
             "candidates": candidate_rows,
-            "validation": regression_metrics(targets[indices["val"]], selected_val_pred),
-            "test": regression_metrics(targets[indices["test"]], test_pred),
-            "test_host_macro": macro_group_mae(
-                targets[indices["test"]], test_pred, [meta.get("host", "") for meta in test_meta]
+            **prediction_summary(
+                samples, targets, indices, selected_val_pred, test_pred,
             ),
-            "test_dopant_macro": macro_group_mae(
-                targets[indices["test"]], test_pred, [meta.get("dopant", "") for meta in test_meta]
-            ),
-            "test_low_energy": low_energy_metrics(targets[indices["test"]], test_pred),
         }
 
     model_names = sorted(results)
@@ -251,6 +293,7 @@ def evaluate_split(
         "schema_version": "prm_descriptor_results_v1",
         "split_id": split_id,
         "split_path": str(split_path),
+        "split_sha256": file_sha256(split_path),
         "selection_data": "validation only",
         "results": results,
     }
@@ -258,7 +301,9 @@ def evaluate_split(
     return payload
 
 
-def result_is_complete(result_root: Path, split_id: str) -> bool:
+def result_is_complete(
+    result_root: Path, split_id: str, split_path: Path | None = None,
+) -> bool:
     output_dir = result_root / "baselines" / "descriptors" / split_id
     try:
         metrics = json.loads((output_dir / "metrics.json").read_text())
@@ -270,9 +315,58 @@ def result_is_complete(result_root: Path, split_id: str) -> bool:
     return (
         metrics.get("schema_version") == "prm_descriptor_results_v1"
         and metrics.get("split_id") == split_id
+        and (
+            split_path is None
+            or metrics.get("split_sha256") == file_sha256(split_path)
+        )
         and prediction_schema == "prm_descriptor_predictions_v1"
         and prediction_split == split_id
     )
+
+
+def ensure_mean_baseline(
+    split_path: Path, samples: Sequence[Dict[str, Any]], targets: np.ndarray,
+    result_root: Path,
+) -> bool:
+    split = load_split(split_path, len(samples))
+    split_id = split["split_id"]
+    output_dir = result_root / "baselines" / "descriptors" / split_id
+    if not result_is_complete(result_root, split_id, split_path):
+        return False
+    metrics_path = output_dir / "metrics.json"
+    predictions_path = output_dir / "predictions.npz"
+    payload = json.loads(metrics_path.read_text())
+    with np.load(predictions_path, allow_pickle=False) as archive:
+        arrays = {name: archive[name].copy() for name in archive.files}
+    model_names = [str(name) for name in arrays["model_names"].tolist()]
+    if "mean" in payload.get("results", {}) and "mean" in model_names:
+        return False
+
+    indices = {name: np.asarray(split[name], dtype=int) for name in ("train", "val", "test")}
+    result, val_pred, test_pred = mean_baseline(samples, targets, indices)
+    val_by_model = {
+        name: arrays["val_predictions"][index]
+        for index, name in enumerate(model_names)
+    }
+    test_by_model = {
+        name: arrays["test_predictions"][index]
+        for index, name in enumerate(model_names)
+    }
+    val_by_model["mean"] = val_pred
+    test_by_model["mean"] = test_pred
+    payload.setdefault("results", {})["mean"] = result
+    sorted_names = sorted(val_by_model)
+    arrays["model_names"] = np.asarray(sorted_names)
+    arrays["val_predictions"] = np.stack([val_by_model[name] for name in sorted_names])
+    arrays["test_predictions"] = np.stack([test_by_model[name] for name in sorted_names])
+
+    temporary_predictions = predictions_path.with_suffix(".tmp.npz")
+    np.savez_compressed(temporary_predictions, **arrays)
+    temporary_predictions.replace(predictions_path)
+    temporary_metrics = metrics_path.with_suffix(".tmp.json")
+    temporary_metrics.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    temporary_metrics.replace(metrics_path)
+    return True
 
 
 def prior_split_provenance(manifest: Dict[str, Any]) -> Dict[str, Any]:
@@ -339,9 +433,12 @@ def main() -> None:
     )
     evaluated = []
     reused = []
+    upgraded = []
     for path in split_paths:
-        complete = result_is_complete(result_root, path.stem)
+        complete = result_is_complete(result_root, path.stem, path)
         if complete and reuse_compatible and not args.force:
+            if ensure_mean_baseline(path, samples, targets, result_root):
+                upgraded.append(path.stem)
             reused.append(path.stem)
             continue
         evaluate_split(
@@ -358,6 +455,7 @@ def main() -> None:
         "requested_splits": [path.stem for path in split_paths],
         "evaluated_splits": evaluated,
         "reused_splits": reused,
+        "upgraded_splits": upgraded,
         "wall_seconds": time.time() - started,
     }
     batches = list(previous_manifest.get("batches", []))
@@ -370,21 +468,23 @@ def main() -> None:
                 "requested_splits": previous_manifest.get("splits", []),
                 "evaluated_splits": previous_manifest.get("splits", []),
                 "reused_splits": [],
+                "upgraded_splits": [],
                 "wall_seconds": previous_manifest.get("wall_seconds"),
             }
         )
     batches.append(batch)
     split_provenance = prior_split_provenance(previous_manifest)
-    for split_id in evaluated:
+    for split_id in evaluated + upgraded:
         split_provenance[split_id] = {
             "git": git, "started_at": batch["started_at"],
             "completed_at": completed_at,
         }
     complete_splits = [
-        path.stem for path in formal_paths if result_is_complete(result_root, path.stem)
+        path.stem for path in formal_paths
+        if result_is_complete(result_root, path.stem, path)
     ]
     requested_complete = all(
-        result_is_complete(result_root, path.stem) for path in split_paths
+        result_is_complete(result_root, path.stem, path) for path in split_paths
     )
     manifest = {
         "schema_version": "prm_descriptor_manifest_v1",
@@ -398,6 +498,7 @@ def main() -> None:
         },
         "data_path": str(args.data.resolve()),
         "data_sha256": data_sha256,
+        "protocol_manifest_sha256": file_sha256(args.protocol_dir / "manifest.json"),
         "feature_matrix_sha256": feature_hash,
         "n_samples": len(samples),
         "n_features": int(features.shape[1]),
@@ -406,6 +507,7 @@ def main() -> None:
         "requested_splits": batch["requested_splits"],
         "evaluated_splits": evaluated,
         "reused_splits": reused,
+        "upgraded_splits": upgraded,
         "formal_split_coverage": {
             "complete": len(complete_splits),
             "total": len(formal_paths),
