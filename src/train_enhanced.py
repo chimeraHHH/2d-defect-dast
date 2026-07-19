@@ -40,6 +40,7 @@ if str(ROOT) not in sys.path:
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
 from src.splits import load_split
 from src.sampler import HostBalancedSampler
+from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
 from src.models import (
     CrystalTransformer,
@@ -78,11 +79,6 @@ def git_snapshot() -> Dict[str, Any]:
         "dirty": bool(status),
         "status_porcelain": status.splitlines(),
     }
-
-
-def config_sha256(config: Dict[str, Any]) -> str:
-    payload = json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
-    return hashlib.sha256(payload).hexdigest()
 
 
 def file_sha256(path: Path) -> str:

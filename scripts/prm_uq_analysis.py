@@ -16,6 +16,12 @@ from scipy.optimize import minimize
 from scipy.special import ndtr
 from scipy.stats import spearmanr
 
+from src.prm_provenance import (
+    ExpectedConfig,
+    load_expected_configs,
+    validate_manifest_config,
+)
+
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
@@ -181,6 +187,9 @@ def risk_coverage(
 
 def validate_runs(
     run_dirs: Sequence[Path], selection: Mapping[str, Any], expected_members: int,
+    expected_configs: Mapping[str, ExpectedConfig],
+    expected_data_sha256: str,
+    expected_split_sha256: str,
 ) -> List[Dict[str, Any]]:
     if len(run_dirs) != expected_members:
         raise ValueError(f"expected {expected_members} UQ members, found {len(run_dirs)}")
@@ -196,8 +205,11 @@ def validate_runs(
         manifest = json.loads(path.read_text())
         if manifest.get("status") != "complete":
             raise ValueError(f"incomplete UQ member: {path}")
+        if manifest.get("schema_version") != "prm_run_manifest_v1":
+            raise ValueError(f"unsupported UQ run manifest: {path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty UQ member is not admissible: {path}")
+        expected_config = validate_manifest_config(manifest, expected_configs, path)
         bits = [bool(manifest["config"]["model_kwargs"][name]) for name in COMPONENTS]
         if bits != expected_bits:
             raise ValueError(f"UQ member does not use selected architecture: {path}")
@@ -207,6 +219,10 @@ def validate_runs(
         split_ids.add(manifest["split"]["split_id"])
         split_hashes.add(manifest["split"].get("sha256"))
         data_hashes.add(manifest["data"]["data_sha256"])
+        if manifest["data"]["data_sha256"] != expected_data_sha256:
+            raise ValueError(f"UQ dataset hash mismatch: {path}")
+        if manifest["split"].get("sha256") != expected_split_sha256:
+            raise ValueError(f"UQ split hash mismatch: {path}")
         sources.append(
             {
                 "manifest": str(path), "manifest_sha256": file_sha256(path),
@@ -214,6 +230,8 @@ def validate_runs(
                 "data_sha256": manifest["data"]["data_sha256"],
                 "split_id": manifest["split"]["split_id"],
                 "split_sha256": manifest["split"].get("sha256"),
+                "config_sha256": manifest["config_sha256"],
+                "expected_config": str(expected_config.path),
             }
         )
     if len(seeds) != expected_members:
@@ -246,6 +264,13 @@ def main() -> None:
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/uq",
     )
+    parser.add_argument(
+        "--protocol-dir", type=Path, default=ROOT / "artifacts/prm_protocol_v1",
+    )
+    parser.add_argument(
+        "--promoted-config-root", type=Path,
+        default=ROOT / "configs/prm/promoted",
+    )
     parser.add_argument("--expected-members", type=int, default=5)
     args = parser.parse_args()
 
@@ -253,13 +278,28 @@ def main() -> None:
     if selection.get("selection_data") != "validation only":
         raise ValueError("UQ architecture must be selected without test data")
     variant = selection["selected_variant"]
+    protocol_dir = args.protocol_dir.resolve()
+    protocol = json.loads((protocol_dir / "manifest.json").read_text())
+    expected_split_sha256 = file_sha256(
+        protocol_dir / "splits/uq_calibration_s62.json"
+    )
+    expected_configs = load_expected_configs(
+        sorted((args.promoted_config_root.resolve() / variant / "uq").glob("*.yaml"))
+    )
     run_dirs = sorted(
         path for path in args.result_root.resolve().glob(
             f"selected/{variant}/uq/uq_calibration_s62/seed*"
         )
         if path.is_dir()
     )
-    sources = validate_runs(run_dirs, selection, args.expected_members)
+    sources = validate_runs(
+        run_dirs,
+        selection,
+        args.expected_members,
+        expected_configs,
+        protocol["data_sha256"],
+        expected_split_sha256,
+    )
     cal_indices, cal_targets, cal_members = load_aligned_predictions(run_dirs, "calibration")
     test_indices, test_targets, test_members = load_aligned_predictions(run_dirs, "test")
 

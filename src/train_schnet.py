@@ -27,12 +27,12 @@ if str(ROOT) not in sys.path:
 from src.dataset import CrystalGraphDataset, collate_fn
 from src.models.schnet_pbc import PBCSchNet
 from src.prm_metrics import regression_metrics
+from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugDataset, OnlineAugTransform
 from src.sampler import HostBalancedSampler
 from src.splits import load_split
 from src.train_enhanced import (
     Normalizer,
-    config_sha256,
     file_sha256,
     move_batch,
     resolve_path,

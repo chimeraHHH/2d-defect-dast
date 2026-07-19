@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import fcntl
-import hashlib
 import json
 import os
 import signal
@@ -15,6 +14,8 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import yaml
+
+from src.prm_provenance import config_sha256
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -28,11 +29,6 @@ def atomic_json(path: Path, payload: Dict[str, Any]) -> None:
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     temporary.replace(path)
-
-
-def config_sha256(config: Dict[str, Any]) -> str:
-    payload = json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
-    return hashlib.sha256(payload).hexdigest()
 
 
 def git_snapshot() -> Dict[str, Any]:

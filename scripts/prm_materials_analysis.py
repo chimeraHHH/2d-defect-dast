@@ -16,6 +16,12 @@ import numpy as np
 from ase.data import atomic_numbers
 from scipy.stats import spearmanr
 
+from src.prm_provenance import (
+    ExpectedConfig,
+    load_expected_configs,
+    validate_manifest_config,
+)
+
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
@@ -67,7 +73,9 @@ def dopant_period(symbol: str) -> int:
 
 def load_oof_predictions(
     run_dirs: Sequence[Path], selection: Mapping[str, Any],
-    protocol_dir: Path, expected_data_sha256: str | None = None,
+    protocol_dir: Path,
+    expected_configs: Mapping[str, ExpectedConfig],
+    expected_data_sha256: str | None = None,
 ) -> Tuple[Dict[int, float], List[Dict[str, Any]]]:
     expected_variant = selection["selected_variant"]
     expected_bits = [digit == "1" for digit in expected_variant[1:]]
@@ -79,8 +87,13 @@ def load_oof_predictions(
         manifest = json.loads(manifest_path.read_text())
         if manifest.get("status") != "complete":
             raise ValueError(f"incomplete pair-OOF run: {manifest_path}")
+        if manifest.get("schema_version") != "prm_run_manifest_v1":
+            raise ValueError(f"unsupported pair-OOF run manifest: {manifest_path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty pair-OOF run: {manifest_path}")
+        expected_config = validate_manifest_config(
+            manifest, expected_configs, manifest_path
+        )
         data_sha256 = manifest["data"]["data_sha256"]
         if expected_data_sha256 is not None and data_sha256 != expected_data_sha256:
             raise ValueError(f"dataset hash mismatch: {manifest_path}")
@@ -111,6 +124,8 @@ def load_oof_predictions(
                 "split_id": split_id,
                 "data_sha256": data_sha256,
                 "split_sha256": manifest["split"].get("sha256"),
+                "config_sha256": manifest["config_sha256"],
+                "expected_config": str(expected_config.path),
             }
         )
     expected_splits = {f"pair_cv5_f{fold}" for fold in range(5)}
@@ -258,6 +273,10 @@ def main() -> None:
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/materials",
     )
+    parser.add_argument(
+        "--promoted-config-root", type=Path,
+        default=ROOT / "configs/prm/promoted",
+    )
     args = parser.parse_args()
 
     selection = json.loads(args.selection.read_text())
@@ -265,6 +284,13 @@ def main() -> None:
         raise ValueError("materials analysis requires validation-selected architecture")
     variant = selection["selected_variant"]
     protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
+    expected_configs = load_expected_configs(
+        sorted(
+            (args.promoted_config_root.resolve() / variant / "transfer").glob(
+                "pair_cv5_*.yaml"
+            )
+        )
+    )
     run_dirs = sorted(
         path for path in args.result_root.resolve().glob(
             f"selected/{variant}/transfer/pair_cv5_f*/seed242"
@@ -273,6 +299,7 @@ def main() -> None:
     )
     predictions, sources = load_oof_predictions(
         run_dirs, selection, args.protocol_dir.resolve(),
+        expected_configs,
         protocol_manifest["data_sha256"],
     )
     sample_table = read_sample_table(args.protocol_dir / "samples.csv")

@@ -16,6 +16,11 @@ import numpy as np
 from scipy.stats import spearmanr
 
 from src.prm_metrics import low_energy_metrics, macro_group_mae
+from src.prm_provenance import (
+    ExpectedConfig,
+    load_expected_configs,
+    validate_manifest_config,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -75,14 +80,18 @@ def expected_split_hash(protocol_dir: Path, split_id: str) -> str:
 def load_neural_runs(
     manifest_paths: Sequence[Path], model: str, protocol_dir: Path,
     expected_data_sha256: str,
+    expected_configs: Mapping[str, ExpectedConfig],
 ) -> List[Dict[str, Any]]:
     rows = []
     for path in manifest_paths:
         manifest = json.loads(path.read_text())
         if manifest.get("status") != "complete":
             continue
+        if manifest.get("schema_version") != "prm_run_manifest_v1":
+            raise ValueError(f"unsupported run manifest: {path}")
         if manifest.get("git", {}).get("dirty"):
             raise ValueError(f"dirty run is inadmissible: {path}")
+        expected_config = validate_manifest_config(manifest, expected_configs, path)
         if manifest["data"]["data_sha256"] != expected_data_sha256:
             raise ValueError(f"dataset mismatch: {path}")
         split_id = manifest["split"]["split_id"]
@@ -95,6 +104,8 @@ def load_neural_runs(
             "manifest_path": str(path), "manifest_sha256": file_sha256(path),
             "prediction_path": str(path.parent / "test_predictions.npz"),
             "git_commit": manifest["git"]["commit"],
+            "config_sha256": manifest["config_sha256"],
+            "expected_config_path": str(expected_config.path),
         }
         for partition in ("validation", "test"):
             for metric in SCALAR_METRICS:
@@ -378,11 +389,23 @@ def main() -> None:
         (result_root / "selected" / variant / "transfer").glob("*/seed*/run_manifest.json")
     )
     schnet_paths = sorted((result_root / "baselines" / "schnet").glob("*/seed*/run_manifest.json"))
+    dart_config_paths = sorted(
+        (ROOT / "configs/prm/generated/factorial").glob(f"{variant}_*.yaml")
+    )
+    dart_config_paths += sorted(
+        (ROOT / "configs/prm/promoted" / variant / "transfer").glob("*.yaml")
+    )
+    dart_expected_configs = load_expected_configs(dart_config_paths)
+    schnet_expected_configs = load_expected_configs(
+        sorted((ROOT / "configs/prm/generated/schnet").glob("*.yaml"))
+    )
     rows = load_neural_runs(
         dart_paths, "dart", protocol_dir, protocol["data_sha256"],
+        dart_expected_configs,
     )
     rows += load_neural_runs(
         schnet_paths, "schnet", protocol_dir, protocol["data_sha256"],
+        schnet_expected_configs,
     )
     rows += load_descriptor_runs(result_root / "baselines" / "descriptors", protocol_dir)
 

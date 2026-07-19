@@ -13,6 +13,12 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 import numpy as np
 
+from src.prm_provenance import (
+    ExpectedConfig,
+    load_expected_configs,
+    validate_manifest_config,
+)
+
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = (
@@ -191,12 +197,15 @@ def summarize_factorial(
 
 def load_runs(
     result_root: Path, expected_data_sha256: str,
-    expected_split_hashes: Mapping[str, str], allow_dirty: bool = False,
+    expected_split_hashes: Mapping[str, str],
+    expected_configs: Mapping[str, ExpectedConfig],
+    allow_dirty: bool = False,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     manifests = sorted((result_root / "factorial").glob("g*/split*_seed*/run_manifest.json"))
     rows: List[Dict[str, Any]] = []
     sources = []
     contracts = set()
+    commits = set()
     for path in manifests:
         payload = json.loads(path.read_text())
         if payload.get("status") != "complete":
@@ -208,6 +217,7 @@ def load_runs(
         if payload.get("git", {}).get("dirty") and not allow_dirty:
             raise ValueError(f"dirty training run is not admissible: {path}")
         config = payload["config"]
+        expected_config = validate_manifest_config(payload, expected_configs, path)
         variant, bits = variant_from_config(config)
         if path.parent.parent.name != variant:
             raise ValueError(f"variant path/config mismatch: {path}")
@@ -218,6 +228,7 @@ def load_runs(
         if payload["split"].get("sha256") != expected_split_hashes.get(split_id):
             raise ValueError(f"split hash mismatch: {path}")
         contracts.add(contract_hash(config))
+        commits.add(payload["git"]["commit"])
         row: Dict[str, Any] = {
             "variant": variant, "bits": bits, "repeat": repeat,
             "seed": int(payload["seed"]), "n_params": int(payload["metrics"]["n_params"]),
@@ -231,10 +242,13 @@ def load_runs(
             {
                 "path": str(path), "sha256": file_sha256(path),
                 "git": payload["git"], "config_sha256": payload["config_sha256"],
+                "expected_config": str(expected_config.path),
             }
         )
     if len(contracts) > 1:
         raise ValueError("factorial training settings differ beyond component flags, split and seed")
+    if len(commits) > 1:
+        raise ValueError("factorial runs were produced by more than one code commit")
     return rows, sources
 
 
@@ -255,6 +269,10 @@ def main() -> None:
     parser.add_argument(
         "--out-dir", type=Path, default=ROOT / "artifacts/prm_results/factorial",
     )
+    parser.add_argument(
+        "--config-dir", type=Path,
+        default=ROOT / "configs/prm/generated/factorial",
+    )
     parser.add_argument("--bootstrap-samples", type=int, default=50_000)
     parser.add_argument("--allow-dirty", action="store_true")
     args = parser.parse_args()
@@ -267,9 +285,12 @@ def main() -> None:
         )
         for repeat in range(42, 47)
     }
+    expected_configs = load_expected_configs(
+        sorted(args.config_dir.resolve().glob("*.yaml"))
+    )
     rows, sources = load_runs(
         args.result_root.resolve(), protocol["data_sha256"],
-        expected_split_hashes, args.allow_dirty,
+        expected_split_hashes, expected_configs, args.allow_dirty,
     )
     summary = summarize_factorial(rows, args.bootstrap_samples)
     collector_git = git_snapshot()
