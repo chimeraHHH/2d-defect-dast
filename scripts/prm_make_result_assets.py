@@ -149,6 +149,95 @@ def require_recorded_output_hashes(
             )
 
 
+def validate_training_archive(
+    payload: Mapping[str, Any],
+    payload_path: Path,
+    *,
+    expected_count: int,
+    expected_artifacts: set[str],
+) -> None:
+    records = payload.get("archived_runs")
+    if (
+        int(payload.get("n_archived_runs", -1)) != expected_count
+        or not isinstance(records, list)
+        or len(records) != expected_count
+    ):
+        raise ValueError(
+            f"training archive count mismatch for {payload_path}: "
+            f"expected {expected_count}"
+        )
+
+    base = payload_path.resolve().parent
+    output_dirs = []
+    config_hashes = []
+    for record in records:
+        if not isinstance(record, Mapping):
+            raise ValueError(f"invalid training archive record in {payload_path}")
+        output_dir = record.get("output_dir")
+        config_sha256 = record.get("config_sha256")
+        git = record.get("git")
+        artifacts = record.get("artifacts")
+        omitted = record.get("omitted_outputs")
+        checkpoint = (
+            omitted.get("checkpoint") if isinstance(omitted, Mapping) else None
+        )
+        if (
+            not isinstance(output_dir, str)
+            or not output_dir
+            or Path(output_dir).is_absolute()
+            or ".." in Path(output_dir).parts
+            or not isinstance(config_sha256, str)
+            or len(config_sha256) != 64
+            or any(character not in "0123456789abcdef" for character in config_sha256)
+            or not isinstance(git, Mapping)
+            or not git.get("commit")
+            or git.get("dirty") is not False
+            or not isinstance(artifacts, Mapping)
+            or set(artifacts) != expected_artifacts
+            or not isinstance(checkpoint, Mapping)
+            or not isinstance(checkpoint.get("sha256"), str)
+            or len(checkpoint["sha256"]) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in checkpoint["sha256"]
+            )
+        ):
+            raise ValueError(f"incomplete training archive record in {payload_path}")
+        output_dirs.append(output_dir)
+        config_hashes.append(config_sha256)
+
+        for name, artifact in artifacts.items():
+            if not isinstance(artifact, Mapping):
+                raise ValueError(
+                    f"invalid archived {name} record in {payload_path}"
+                )
+            relative = Path(str(artifact.get("archive_relative_path", "")))
+            expected_sha256 = artifact.get("sha256")
+            path = (base / relative).resolve()
+            if (
+                not relative.parts
+                or relative.is_absolute()
+                or ".." in relative.parts
+                or not path.is_relative_to(base)
+                or not isinstance(expected_sha256, str)
+                or len(expected_sha256) != 64
+                or any(
+                    character not in "0123456789abcdef"
+                    for character in expected_sha256
+                )
+                or not path.is_file()
+                or file_sha256(path) != expected_sha256
+            ):
+                raise ValueError(
+                    f"archived {name} hash mismatch for {path}"
+                )
+    if (
+        len(set(output_dirs)) != expected_count
+        or len(set(config_hashes)) != expected_count
+    ):
+        raise ValueError(f"training archive records are not unique in {payload_path}")
+
+
 def validate_contract(
     protocol: Mapping[str, Any], factorial: Mapping[str, Any],
     comparison: Mapping[str, Any], uq: Mapping[str, Any],
@@ -187,6 +276,20 @@ def validate_contract(
         raise ValueError(f"selected architecture differs across bundles: {variants}")
     if int(factorial.get("n_runs", -1)) != 40:
         raise ValueError("factorial bundle must contain all 40 paired runs")
+    archive_counts = (
+        ("factorial", factorial, 40),
+        ("comparison", comparison, 91),
+        ("UQ", uq, 5),
+    )
+    for name, payload, expected_count in archive_counts:
+        if (
+            int(payload.get("n_archived_runs", -1)) != expected_count
+            or not isinstance(payload.get("archived_runs"), list)
+            or len(payload["archived_runs"]) != expected_count
+        ):
+            raise ValueError(
+                f"{name} bundle lacks all {expected_count} archived runs"
+            )
     configuration_coverage = comparison.get("configuration_coverage")
     if not isinstance(configuration_coverage, Mapping):
         raise ValueError("comparison bundle lacks controlled configuration coverage")
@@ -215,6 +318,27 @@ def validate_contract(
             )
     if int(uq.get("n_members", -1)) != 5:
         raise ValueError("UQ bundle must contain five ensemble members")
+    uq_sources = uq.get("member_sources")
+    if (
+        not isinstance(uq_sources, list)
+        or len(uq_sources) != 5
+        or any(not isinstance(source, Mapping) for source in uq_sources)
+        or len({source.get("seed") for source in uq_sources}) != 5
+        or len({source.get("config_sha256") for source in uq_sources}) != 5
+        or {source.get("split_id") for source in uq_sources}
+        != {"uq_calibration_s62"}
+    ):
+        raise ValueError("UQ bundle member evidence is incomplete")
+    materials_sources = materials.get("sources")
+    if (
+        not isinstance(materials_sources, list)
+        or len(materials_sources) != 5
+        or any(not isinstance(source, Mapping) for source in materials_sources)
+        or len({source.get("config_sha256") for source in materials_sources}) != 5
+        or {source.get("split_id") for source in materials_sources}
+        != {f"pair_cv5_f{fold}" for fold in range(5)}
+    ):
+        raise ValueError("materials bundle pair-OOF evidence is incomplete")
     expected_uq = protocol.get("uq_split_counts", {})
     expected_calibration = int(expected_uq.get("calibration", -1))
     expected_test = int(expected_uq.get("test", -1))
@@ -393,6 +517,28 @@ def load_inputs(paths: Mapping[str, Path]) -> Dict[str, Any]:
         strict_json(inputs[name])
     for name, expected in RECORDED_OUTPUTS.items():
         require_recorded_output_hashes(inputs[name], name, paths, expected)
+    standard_artifacts = {
+        "manifest", "metrics", "split_indices", "validation_predictions",
+        "test_predictions",
+    }
+    validate_training_archive(
+        inputs["factorial"],
+        paths["factorial"],
+        expected_count=40,
+        expected_artifacts=standard_artifacts,
+    )
+    validate_training_archive(
+        inputs["comparison"],
+        paths["comparison"],
+        expected_count=91,
+        expected_artifacts=standard_artifacts,
+    )
+    validate_training_archive(
+        inputs["uq"],
+        paths["uq"],
+        expected_count=5,
+        expected_artifacts=standard_artifacts | {"calibration_predictions"},
+    )
     return inputs
 
 

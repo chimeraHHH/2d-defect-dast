@@ -28,6 +28,7 @@ from scripts.prm_make_result_assets import (
     strict_json,
     text_sha256,
     validate_contract,
+    validate_training_archive,
     write_manifest_then_ready_marker,
     write_ready_marker,
 )
@@ -89,6 +90,48 @@ def test_recorded_output_hashes_are_recomputed_before_asset_generation(tmp_path)
     second.write_text("value\n3\n")
     with pytest.raises(ValueError, match="output hash mismatch for second"):
         require_recorded_output_hashes(payload, "fixture", paths, expected)
+
+
+def test_training_archive_recomputes_every_artifact_hash(tmp_path):
+    bundle_path = tmp_path / "results" / "bundle.json"
+    archive_dir = bundle_path.parent / "runs" / "model"
+    archive_dir.mkdir(parents=True)
+    artifacts = {}
+    for name in ("manifest", "metrics"):
+        path = archive_dir / f"{name}.json"
+        path.write_text(f"{name}\n")
+        artifacts[name] = {
+            "archive_relative_path": str(path.relative_to(bundle_path.parent)),
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+    payload = {
+        "n_archived_runs": 1,
+        "archived_runs": [
+            {
+                "output_dir": "model",
+                "config_sha256": "a" * 64,
+                "git": {"commit": "training", "dirty": False},
+                "artifacts": artifacts,
+                "omitted_outputs": {"checkpoint": {"sha256": "b" * 64}},
+            }
+        ],
+    }
+
+    validate_training_archive(
+        payload,
+        bundle_path,
+        expected_count=1,
+        expected_artifacts={"manifest", "metrics"},
+    )
+
+    (archive_dir / "metrics.json").write_text("changed\n")
+    with pytest.raises(ValueError, match="archived metrics hash mismatch"):
+        validate_training_archive(
+            payload,
+            bundle_path,
+            expected_count=1,
+            expected_artifacts={"manifest", "metrics"},
+        )
 
 
 def minimal_claims():
@@ -343,6 +386,7 @@ def contract_inputs():
     factorial = {
         "schema_version": "prm_factorial_bundle_v1", "collector_git": clean,
         "data_sha256": "data", "n_runs": 40,
+        "n_archived_runs": 40, "archived_runs": [{}] * 40,
         "selection": {
             "selected_variant": "g111", "selection_data": "validation only",
         },
@@ -355,6 +399,7 @@ def contract_inputs():
         "data_sha256": "data",
         "selection": {"selected_variant": "g111"},
         "descriptor_selection": descriptor_selection,
+        "n_archived_runs": 91, "archived_runs": [{}] * 91,
         "configuration_coverage": {
             model: {
                 "n_expected": 48,
@@ -371,15 +416,31 @@ def contract_inputs():
     uq = {
         "schema_version": "prm_uq_results_v1", "collector_git": clean,
         "data_sha256": "data", "n_members": 5,
+        "n_archived_runs": 5, "archived_runs": [{}] * 5,
         "selection": {"selected_variant": "g111"},
         "calibration_contract": {"dedicated_calibration_partition": 511},
         "test": {"n": 1023},
+        "member_sources": [
+            {
+                "seed": seed,
+                "config_sha256": f"{seed:064x}",
+                "split_id": "uq_calibration_s62",
+            }
+            for seed in range(5)
+        ],
     }
     materials = {
         "schema_version": "prm_materials_analysis_v1", "collector_git": clean,
         "data_sha256": "data",
         "selection": {"selected_variant": "g111"},
         "sample_oof": {"n": 10224},
+        "sources": [
+            {
+                "config_sha256": f"{fold + 100:064x}",
+                "split_id": f"pair_cv5_f{fold}",
+            }
+            for fold in range(5)
+        ],
     }
     pooled = []
     paired = []
