@@ -5,8 +5,13 @@ below. These notices do not assign a license to the rest of this repository.
 
 ## IMP2D data
 
-The canonical sample table and split definitions are derived from the IMP2D
-database accompanying:
+The canonical sample table and split definitions are derived from:
+
+Fabian Felix Bertoldo, Joel Davidsson, Kristian Sommer Thygesen, and Rickard
+Armiento, "Interstitial and Adsorbate Structure Database," version 2 (2022),
+https://doi.org/10.11583/DTU.19692238.v2.
+
+The dataset is described in:
 
 Joel Davidsson, Fabian Bertoldo, Kristian S. Thygesen, and Rickard Armiento,
 "Absorption versus adsorption: high-throughput computation of impurities in

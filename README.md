@@ -31,8 +31,10 @@ available through Git history and legacy scripts but are not summarized here.
 Large data and model files are intentionally excluded from Git. Reproduction
 must verify them against `artifacts/prm_assets/manifest.json`.
 
-The canonical protocol tables are modified derivatives of the IMP2D data
-published with Davidsson *et al.*,
+The canonical protocol tables are modified derivatives of version 2 of the
+IMP2D Interstitial and Adsorbate Structure Database,
+[`10.11583/DTU.19692238.v2`](https://doi.org/10.11583/DTU.19692238.v2),
+described by Davidsson *et al.*,
 [`10.1038/s41699-023-00380-6`](https://doi.org/10.1038/s41699-023-00380-6).
 The upstream dataset is CC BY 4.0; its attribution, license link, and the
 changes made by this study are recorded in `THIRD_PARTY_NOTICES.md`.
