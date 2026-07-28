@@ -5,7 +5,8 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 
 ## Current state
 
-- State class: `protocol_frozen`, `factorial_active`, `paper_result_gated`.
+- State class: `protocol_frozen`, `factorial_complete`,
+  `downstream_campaigns_active`, `paper_result_gated`.
 - Git anchor: GitHub branch `prm-revision`; every formal campaign records its
   own clean commit rather than inheriting the moving branch tip.
 - Writing anchor: `paper_Q1/`; the Q1 source has been rewritten as the active
@@ -16,9 +17,13 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 - Compute anchor: `/storage/ssd/metaiot_guest/yiminghua/prm_env/bin/python`
   on WHU L40S.
 - Formal result root: `/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2`.
-- Active factorial anchor: clean commit
+- Completed factorial anchor: clean training commit
   `7a6593a7eaaf991fd9c18a15653c3d888b060c7e`, queue
-  `factorial-v4-indexed`, with GPU 2 excluded.
+  `factorial-v4-indexed`, and clean collector commit
+  `865e90a695e3641e21bc9f2c98fc05c80723abcf`.
+- Active downstream anchor: clean commit
+  `6c401374baa9ac22b5fa4353d467366ac7cc222f`, queues
+  `dart-g111-v1` and `schnet-v1`, with disjoint GPU sets and GPU 2 excluded.
 
 ## Trust ranking
 
@@ -28,7 +33,8 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 | IMP2D protocol v2 | authoritative | canonical dataset and splits | target, identity, duplicate, schema, and hash audits complete |
 | Corrected ct-UAE and JARVIS initialization assets | authoritative when hash-matched | DART initialization | exact hashes and copied/seeded tensors are checked in every run |
 | Protocol-v2 descriptor archive | authoritative | classical baselines | 27 formal splits collected with validation-only model selection |
-| Corrected paired factorial | pending collection | architecture selection | clean 40-run campaign is active; no result is admissible before collector validation |
+| Corrected paired factorial | authoritative | architecture selection | all 40 runs passed collector validation; `g111` was selected by mean validation MAE only |
+| Promoted DART and periodic SchNet campaigns | pending collection | transfer, comparison, and UQ | clean 48-run queues are active; partial metrics are inadmissible |
 | V2 seeds 42-45 | usable with verification | development comparator | fixed targets and archived checkpoints, but old protocol was repeatedly inspected |
 | V4 MoE single run | usable with verification | development comparator | only one seed; no significant advantage over V2 |
 | Existing 2^3 component runs | reference only | none until rerun | incomplete seed coverage and historical baseline was confounded |
@@ -59,7 +65,8 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 
 ## Next decision scope
 
-Complete and validate the corrected paired factorial, then promote exactly one
-architecture by the preregistered validation-only rule.  The factorial evidence
-determines whether the final paper leads with architecture or with
-applicability-domain analysis; test metrics do not participate in promotion.
+Allow both downstream queues to complete without failures, then collect all 96
+runs from a separate clean checkout.  Generate comparison, uncertainty, and
+materials analyses only after complete-run validation.  The final narrative
+will be chosen from the canonical intervals and applicability-domain evidence,
+not from partial queue metrics.

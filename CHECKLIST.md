@@ -68,6 +68,8 @@
       framing and state their exclusion from the evidence contract.
 - [ ] Generate all main figures and supplementary tables from canonical data.
 - [x] Add provisional Data and Code Availability statements.
+- [x] Audit all DOI-bearing bibliography entries and remove the unresolvable
+      `10.1021/acs.chemmater.4c02907` record and dependent claim.
 - [x] Compile and visually inspect the provisional result-gated PDF.
 - [ ] Compile the final populated PDF and resolve warnings that affect content.
 - [ ] Cross-check all numerical claims against result files.
