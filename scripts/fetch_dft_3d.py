@@ -1,9 +1,9 @@
-"""Fetch JARVIS dft_3d (~75k pristine 3D materials) for backbone enrichment.
+"""Build a deterministic JARVIS dft_3d subset for source-task pretraining.
 
-This provides massive structural diversity that the IMP2D-trained model
-has never seen. Even if the prediction target (pristine formation energy
-per atom) differs from defect formation energy, the SHARED backbone
-should benefit from exposure to ~10× more chemistry/structure space.
+The source target is pristine formation energy per atom, which differs from
+the IMP2D impurity-formation-energy target. The two corpora are not chemically
+disjoint; their reduced-formula and element overlap is audited separately by
+``scripts/prm_pretraining_overlap.py``.
 
 Outputs
 -------

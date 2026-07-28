@@ -101,3 +101,15 @@
   docstring, and disclose trainable parameter counts for DART and SchNet.
 - Status: complete.
 - Blocks finalization: no.
+
+### REV-010: Public repository front page
+
+- Severity: major submission-package integrity issue.
+- Fix type: repository documentation.
+- Change: replace the historical 982-line README, which mixed withdrawn scores,
+  stale novelty claims, and prospective DFT statements, with a concise PRM
+  evidence map, asset reconstruction route, verification commands, and scope
+  boundary. Correct the JARVIS conversion script's stale chemistry-disjoint
+  claim.
+- Status: complete.
+- Blocks finalization: no.
