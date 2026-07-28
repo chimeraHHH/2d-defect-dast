@@ -22,6 +22,7 @@ from src.prm_provenance import (
     load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
+    require_clean_git_snapshot,
     validate_dart_assets,
     validate_manifest_config,
     validate_protocol_targets,
@@ -66,13 +67,28 @@ def load_aligned_predictions(
     for run_dir in run_dirs:
         path = run_dir / f"{split_name}_predictions.npz"
         with np.load(path, allow_pickle=False) as archive:
+            expected_fields = {
+                "schema_version", "split_id", "split", "indices", "preds", "targets",
+            }
+            if set(archive.files) != expected_fields:
+                raise ValueError(f"prediction fields are incomplete: {path}")
             if str(archive["schema_version"].item()) != "prm_predictions_v1":
                 raise ValueError(f"unsupported prediction schema: {path}")
             if str(archive["split"].item()) != split_name:
                 raise ValueError(f"prediction split mismatch: {path}")
-            indices = np.asarray(archive["indices"], dtype=np.int64)
+            if str(archive["split_id"].item()) != "uq_calibration_s62":
+                raise ValueError(f"prediction split ID mismatch: {path}")
+            raw_indices = np.asarray(archive["indices"])
             targets = np.asarray(archive["targets"])
             predictions = np.asarray(archive["preds"], dtype=float)
+        if not np.issubdtype(raw_indices.dtype, np.integer):
+            raise ValueError(f"prediction indices are not integers: {path}")
+        if (
+            not np.issubdtype(targets.dtype, np.floating)
+            or targets.dtype.itemsize < np.dtype(np.float32).itemsize
+        ):
+            raise ValueError(f"prediction targets have unsupported dtype: {path}")
+        indices = raw_indices.astype(np.int64, copy=False)
         if (
             indices.ndim != 1
             or targets.ndim != 1
@@ -91,7 +107,9 @@ def load_aligned_predictions(
             reference_indices, reference_targets = indices, targets
         elif not np.array_equal(indices, reference_indices):
             raise ValueError(f"member indices do not align: {path}")
-        elif not np.allclose(targets, reference_targets, rtol=0.0, atol=1e-10):
+        elif targets.dtype != reference_targets.dtype or not np.array_equal(
+            targets, reference_targets
+        ):
             raise ValueError(f"member targets do not align: {path}")
         members.append(predictions)
     if reference_indices is None or reference_targets is None:
@@ -479,10 +497,12 @@ def main() -> None:
     risk_metrics, risk_rows = risk_coverage(
         test_targets, test_mean, test_sigma,
     )
+    collector_git = git_snapshot()
+    require_clean_git_snapshot(collector_git, context="UQ collection")
     metrics = {
         "schema_version": "prm_uq_results_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "collector_git": git_snapshot(),
+        "collector_git": collector_git,
         "selection": {
             "path": str(args.selection.resolve()),
             "sha256": file_sha256(args.selection),

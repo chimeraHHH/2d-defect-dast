@@ -51,6 +51,54 @@ def test_prediction_loader_rejects_nonfinite_member_values(tmp_path):
         load_aligned_predictions([run], "test")
 
 
+def test_prediction_loader_rejects_noninteger_indices(tmp_path):
+    run = tmp_path / "seed1"
+    run.mkdir()
+    np.savez(
+        run / "test_predictions.npz",
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"), split_id=np.asarray("uq_calibration_s62"),
+        indices=np.asarray([1.0, 2.0]), targets=np.asarray([1.0, 2.0]),
+        preds=np.asarray([1.0, 2.0]),
+    )
+    with pytest.raises(ValueError, match="indices are not integers"):
+        load_aligned_predictions([run], "test")
+
+
+def test_prediction_loader_rejects_wrong_split_id(tmp_path):
+    run = tmp_path / "seed1"
+    run.mkdir()
+    np.savez(
+        run / "test_predictions.npz",
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"), split_id=np.asarray("pair_cv5_f0"),
+        indices=np.asarray([1, 2]), targets=np.asarray([1.0, 2.0]),
+        preds=np.asarray([1.0, 2.0]),
+    )
+    with pytest.raises(ValueError, match="split ID mismatch"):
+        load_aligned_predictions([run], "test")
+
+
+def test_prediction_members_require_exact_target_storage_values(tmp_path):
+    first = tmp_path / "seed1"
+    second = tmp_path / "seed2"
+    first.mkdir()
+    second.mkdir()
+    base = np.asarray([1.0, 2.0], dtype=np.float32)
+    mutated = base.copy()
+    mutated[1] = np.nextafter(mutated[1], np.float32(np.inf))
+    for run, targets in ((first, base), (second, mutated)):
+        np.savez(
+            run / "test_predictions.npz",
+            schema_version=np.asarray("prm_predictions_v1"),
+            split=np.asarray("test"), split_id=np.asarray("uq_calibration_s62"),
+            indices=np.asarray([1, 2]), targets=targets,
+            preds=np.asarray([1.0, 2.0]),
+        )
+    with pytest.raises(ValueError, match="member targets do not align"):
+        load_aligned_predictions([first, second], "test")
+
+
 def test_calibration_halves_are_label_independent_and_disjoint():
     indices = np.asarray([8, 2, 6, 4, 0, 10])
     variance, conformal = calibration_subsets(indices)

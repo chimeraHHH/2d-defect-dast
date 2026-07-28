@@ -111,6 +111,8 @@ def test_materials_prediction_loader_preserves_target_storage_precision(tmp_path
     np.savez(
         path,
         schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"),
+        split_id=np.asarray("pair_cv5_f0"),
         indices=np.asarray([1]),
         preds=np.asarray([0.5], dtype=np.float32),
         targets=np.asarray([1.234567890123], dtype=np.float32),
@@ -121,3 +123,47 @@ def test_materials_prediction_loader_preserves_target_storage_precision(tmp_path
     assert indices.dtype == np.int64
     assert predictions.dtype == np.float64
     assert targets.dtype == np.float32
+
+
+def test_materials_prediction_loader_rejects_noninteger_indices(tmp_path):
+    path = tmp_path / "test_predictions.npz"
+    np.savez(
+        path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"),
+        split_id=np.asarray("pair_cv5_f0"),
+        indices=np.asarray([1.0]),
+        preds=np.asarray([0.5]),
+        targets=np.asarray([1.0]),
+    )
+
+    with pytest.raises(ValueError, match="indices are not integers"):
+        load_prediction_array(path)
+
+
+def test_materials_prediction_loader_rejects_partition_or_split_mismatch(tmp_path):
+    path = tmp_path / "test_predictions.npz"
+    np.savez(
+        path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("validation"),
+        split_id=np.asarray("pair_cv5_f0"),
+        indices=np.asarray([1]),
+        preds=np.asarray([0.5]),
+        targets=np.asarray([1.0]),
+    )
+
+    with pytest.raises(ValueError, match="partition mismatch"):
+        load_prediction_array(path, expected_split_id="pair_cv5_f0")
+
+    np.savez(
+        path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        split=np.asarray("test"),
+        split_id=np.asarray("pair_cv5_f1"),
+        indices=np.asarray([1]),
+        preds=np.asarray([0.5]),
+        targets=np.asarray([1.0]),
+    )
+    with pytest.raises(ValueError, match="split ID mismatch"):
+        load_prediction_array(path, expected_split_id="pair_cv5_f0")

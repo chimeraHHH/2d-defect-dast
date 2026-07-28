@@ -54,6 +54,19 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def require_clean_git_snapshot(
+    snapshot: Mapping[str, Any], *, context: str,
+) -> None:
+    if (
+        not isinstance(snapshot, Mapping)
+        or not isinstance(snapshot.get("commit"), str)
+        or not snapshot["commit"]
+        or snapshot.get("dirty") is not False
+        or snapshot.get("status_porcelain") not in (None, [])
+    ):
+        raise ValueError(f"{context} requires a clean Git commit")
+
+
 def load_protocol_targets(path: Path) -> Dict[int, float]:
     with path.open(newline="") as handle:
         reader = csv.DictReader(handle)

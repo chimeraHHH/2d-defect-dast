@@ -21,6 +21,7 @@ from src.prm_provenance import (
     load_verified_factorial_selection,
     load_protocol_targets,
     load_expected_configs,
+    require_clean_git_snapshot,
     validate_dart_assets,
     validate_manifest_config,
     validate_protocol_targets,
@@ -45,14 +46,47 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_prediction_array(path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_prediction_array(
+    path: Path, expected_split_id: str | None = None,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
+        expected_fields = {
+            "schema_version", "split_id", "split", "indices", "preds", "targets",
+        }
+        if set(archive.files) != expected_fields:
+            raise ValueError(f"prediction fields are incomplete: {path}")
         if str(archive["schema_version"].item()) != "prm_predictions_v1":
             raise ValueError(f"unsupported prediction schema: {path}")
-        indices = np.asarray(archive["indices"], dtype=np.int64)
+        if str(archive["split"].item()) != "test":
+            raise ValueError(f"prediction partition mismatch: {path}")
+        split_id = str(archive["split_id"].item())
+        if expected_split_id is not None and split_id != expected_split_id:
+            raise ValueError(f"prediction split ID mismatch: {path}")
+        raw_indices = np.asarray(archive["indices"])
         predictions = np.asarray(archive["preds"], dtype=float)
         targets = np.asarray(archive["targets"])
-    return indices, predictions, targets
+    if not np.issubdtype(raw_indices.dtype, np.integer):
+        raise ValueError(f"prediction indices are not integers: {path}")
+    if (
+        not np.issubdtype(targets.dtype, np.floating)
+        or targets.dtype.itemsize < np.dtype(np.float32).itemsize
+    ):
+        raise ValueError(f"prediction targets have unsupported dtype: {path}")
+    indices = raw_indices.astype(np.int64, copy=False)
+    if (
+        indices.ndim != 1
+        or predictions.ndim != 1
+        or targets.ndim != 1
+        or len(indices) == 0
+        or len(indices) != len(predictions)
+        or len(indices) != len(targets)
+        or len(np.unique(indices)) != len(indices)
+        or not np.isfinite(predictions).all()
+        or not np.isfinite(targets).all()
+    ):
+        raise ValueError(f"prediction vectors are not finite and uniquely aligned: {path}")
+    order = np.argsort(indices)
+    return indices[order], predictions[order], targets[order]
 
 
 def git_snapshot() -> Dict[str, Any]:
@@ -134,7 +168,9 @@ def load_oof_predictions(
         observed_splits.add(split_id)
         commits.add(commit)
         prediction_path = run_dir / "test_predictions.npz"
-        indices, values, targets = load_prediction_array(prediction_path)
+        indices, values, targets = load_prediction_array(
+            prediction_path, expected_split_id=split_id
+        )
         validate_protocol_targets(
             indices, targets, protocol_targets,
             context=f"pair-OOF predictions in {prediction_path}",
@@ -425,10 +461,12 @@ def main() -> None:
     preference_rows = [row for row in pair_rows if row["preference_eligible"]]
     top2_site_rows = [row for row in site_rows if row["top2_eligible"]]
     residual = np.asarray([row["residual_eV"] for row in sample_rows])
+    collector_git = git_snapshot()
+    require_clean_git_snapshot(collector_git, context="materials collection")
     summary = {
         "schema_version": "prm_materials_analysis_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "collector_git": git_snapshot(),
+        "collector_git": collector_git,
         "selection": {
             "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
             "selected_variant": variant, "selection_data": selection["selection_data"],
