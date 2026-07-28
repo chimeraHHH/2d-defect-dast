@@ -230,7 +230,9 @@ MAE only; the best descriptor family used in each reported regime is likewise
 chosen by mean validation MAE across folds.
 
 Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
-channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA cutoff.
+channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA{} cutoff.
+Its prespecified graph prediction sums learned atomwise scalar contributions,
+following the additive energy readout of the original SchNet formulation.
 It uses batch size 32 but otherwise follows the same target normalization,
 150-epoch AdamW schedule, host balancing, gradient clipping, and target-noise
 protocol as DART; it uses a conventional learned atomic-number embedding and
@@ -241,8 +243,9 @@ impurity-held-out, and chemistry-block evaluation uses three independently
 prespecified seeds (242--244 for DART and 342--344 for SchNet).  Predictions
 are averaged within each split before pooled out-of-fold metrics are
 calculated.  Consequently, DART--SchNet contrasts compare the complete
-prespecified learning recipes, including their different input representations
-and initialization; they do not isolate a pure backbone-architecture effect.
+prespecified learning recipes, including their different input
+representations, initialization, and graph readouts; they do not isolate a pure
+backbone-architecture effect.
 The selected DART has 820,558 trainable parameters, compared with 455,937 for
 SchNet.
 For the same reason, ``host held out'' and ``impurity held out'' refer
