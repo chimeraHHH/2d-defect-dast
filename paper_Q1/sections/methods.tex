@@ -182,9 +182,10 @@ sets.
 The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved
 configuration, command, Python/PyTorch/CUDA environment, data and split
-hashes, seed, partition indices, epoch history, checkpoint, and validation and
-test predictions.  SHA-256 digests bind the metrics, checkpoint, split-index,
-and prediction files to that manifest.  Before aggregation, collectors verify
+hashes, seed, partition indices, epoch history, checkpoint, validation and
+test predictions, and calibration predictions when the split defines them.
+SHA-256 digests bind the metrics, checkpoint, split-index, and prediction files
+to that manifest.  Before aggregation, collectors verify
 partition membership and independently recompute all reported regression
 metrics from the stored targets and predictions.  Interrupted jobs resume from
 complete optimizer, scheduler, model, and random-number-generator state.
@@ -237,10 +238,11 @@ by Gaussian negative log likelihood; the other half estimates finite-sample
 split-conformal quantiles of
 $|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$~\cite{angelopoulos2023,
 hu2022}.
-Under exchangeability, the resulting intervals have
-finite-sample marginal coverage at each prespecified level; this guarantee does
-not imply conditional coverage for every host or impurity group.  The test set
-is opened only after these parameters and interval quantiles are fixed.
+Under exchangeability, the resulting intervals have finite-sample marginal
+coverage at each prespecified level; this guarantee does not imply conditional
+coverage for every host or impurity group.  Test labels do not enter either
+calibration step, and test metrics are computed only after the scale, floor,
+and interval quantiles are fixed.
 
 For materials-facing analysis, the five host--impurity-pair folds yield one
 out-of-fold prediction per retained structure.  Within each host--impurity
