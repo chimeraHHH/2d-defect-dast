@@ -4,7 +4,7 @@
 
 - Draft: result-gated PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: E4--E7 in `paper_experiment_matrix.md`, full author and
+- Blocking items: E5--E7 in `paper_experiment_matrix.md`, full author and
   contact metadata, and final release metadata.
 
 ## Issue log

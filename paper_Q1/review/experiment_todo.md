@@ -2,6 +2,8 @@
 
 ## EXP-001: Complete aligned neural campaigns
 
+- Status: in progress. The comparison inputs are complete; the five-member UQ
+  campaign is still running.
 - Matrix rows: E4 and E5.
 - Route: existing frozen DART and SchNet campaigns.
 - Tier: main required.
@@ -13,6 +15,7 @@
 
 ## EXP-002: Generate comparison and applicability evidence
 
+- Status: complete in `artifacts/prm_results/comparison/`.
 - Matrix row: E4.
 - Route: existing-result analysis after EXP-001.
 - Tier: main required.
@@ -35,6 +38,7 @@
 
 ## EXP-004: Generate materials-facing decision analysis
 
+- Status: ready to execute from the complete pair-held-out OOF predictions.
 - Matrix row: E6.
 - Route: existing-result analysis after EXP-002.
 - Tier: main required.
