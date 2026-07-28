@@ -48,22 +48,36 @@ chemical transferability in two-dimensional materials}
 \date{\today}
 
 \begin{abstract}
+\ifprmresultsready
+Machine-learned formation energies can accelerate impurity screening in
+two-dimensional materials, but random splits do not establish chemical
+transferability or a reliable deployment domain.  We develop a defect-aware
+graph transformer and evaluate it on 10,224 provenance-audited IMP2D
+structures.  A paired $2^3$ factorial selects the architecture using validation
+data only.  Its mean absolute errors are \PRMIdCvDARTMAE\eV{} for random
+out-of-fold prediction and \PRMPairCvDARTMAE, \PRMHostCvDARTMAE,
+\PRMDopantCvDARTMAE, and \PRMChemistryBlockDARTMAE\eV{} when
+host--impurity pairs, hosts, impurities, and a predefined chemistry block are
+held out, respectively.  Paired bootstrap intervals favor the proposed model
+over periodic SchNet and validation-selected descriptor baselines in every
+regime.  A post-hoc control reduces SchNet's host-held-out error from
+\PRMSchNetAddHostMAE{} to \PRMSchNetMeanHostMAE\eV{} by replacing atomwise
+addition with mean pooling, but does not close the gap to the proposed model.
+On a separate held-out split, 90\% conformal intervals attain
+\PRMUQNinetyCoverage\% coverage at \PRMUQNinetyWidth\eV{} mean width.
+Pair-held-out predictions recover the preferred incorporation class with
+\PRMPreferenceAccuracy\% accuracy and incur \PRMGlobalRegret\eV{} mean global
+site-selection regret.  These results distinguish interpolation from bounded
+chemical transfer within IMP2D; external first-principles validation remains
+outside the present scope.
+\else
 Machine-learned formation energies can accelerate impurity screening in
 two-dimensional materials, but random-split accuracy alone does not establish
-chemical transferability or a reliable deployment domain.  We develop a
-defect-aware graph transformer and evaluate it on a provenance-audited,
-leakage-controlled subset of the IMP2D database.  A paired $2^3$ factorial
-separates the contributions of gated graph readout, defect-environment
-features, and a pre-normalized, distance-gated local interaction block.  The
-architecture is selected using validation data only and is then tested under
-random, host-held-out, impurity-held-out, host--impurity-pair-held-out, and
-predefined compositional-block protocols against periodic SchNet and tuned
-descriptor baselines.  A separate calibration partition supports ensemble
-uncertainty and split-conformal intervals, while out-of-fold predictions
-quantify defect-type preference and site-screening regret.  The resulting
-analysis is designed to distinguish interpolation accuracy from chemically
-meaningful transfer and to state the applicability limits supported by IMP2D.
-External first-principles validation is outside the present scope.
+chemical transferability or a reliable deployment domain.  We define a
+provenance-audited, leakage-controlled evaluation of a defect-aware graph
+transformer on IMP2D.  Numerical claims are withheld until all prespecified
+non-DFT analyses and paper assets pass their provenance checks.
+\fi
 \end{abstract}
 
 \maketitle

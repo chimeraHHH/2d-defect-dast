@@ -347,6 +347,10 @@ def test_generated_table_body_rows_have_latex_terminators():
         assert rows
         assert all(row.endswith(r"\\") for row in rows)
 
+    readout = render_schnet_readout_table(claims)
+    assert r"\begin{table}[htbp]" in readout
+    assert r"\begin{table*}" not in readout
+
 
 def test_applicability_table_does_not_equate_nonpositive_targets_with_stability():
     table = render_applicability_table(minimal_claims())

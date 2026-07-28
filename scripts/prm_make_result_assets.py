@@ -1069,7 +1069,7 @@ def render_schnet_readout_table(claims: Mapping[str, Any]) -> str:
         f"{finite_format(paired['ci_high_eV'], signed=True)}]"
     )
     return rf"""% Auto-generated; do not edit.
-\begin{{table*}}[t]
+\begin{{table}}[htbp]
 \caption{{Post-hoc SchNet graph-readout sensitivity under the fixed
 host-held-out protocol. Each fold prediction averages seeds 342--344. The
 difference is mean-readout MAE minus additive-readout MAE, in eV. The pooled
@@ -1084,7 +1084,7 @@ Partition & $n$ & Add MAE & Mean MAE & Mean $-$ add \\
 {body}
 \bottomrule
 \end{{tabular}}
-\end{{table*}}
+\end{{table}}
 """
 
 

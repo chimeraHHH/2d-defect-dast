@@ -248,6 +248,18 @@ representations, initialization, and graph readouts; they do not isolate a pure
 backbone-architecture effect.
 The selected DART has 820,558 trainable parameters, compared with 455,937 for
 SchNet.
+
+After completing the prespecified comparison, we performed one bounded
+post-hoc sensitivity for the unusually large SchNet host-held-out error.
+Only the graph readout was changed from atomwise addition to mean pooling; the
+five frozen host-CV folds, seeds 342--344, architecture, optimizer, schedule,
+host balancing, gradient clipping, target noise, and 150-epoch budget were
+unchanged.  Predictions were averaged over the three seeds within each fold,
+and the mean-minus-add difference in absolute error was assigned a 95\%
+percentile interval from 20,000 host-cluster bootstrap samples.  This
+exploratory control does not replace the additive-readout SchNet result in the
+main benchmark.
+
 For the same reason, ``host held out'' and ``impurity held out'' refer
 specifically to IMP2D target supervision.
 

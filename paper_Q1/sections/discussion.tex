@@ -44,6 +44,19 @@ recipes under aligned samples and splits; they cannot assign any difference
 to the backbone architecture, input representation, initialization, or graph
 readout alone.
 
+Atomwise addition is physically natural for extensive total energies, whereas
+the present defect formation energy is localized and non-extensive with
+respect to supercell atom count.  More generally, pooling choice can materially
+affect atomistic prediction of localized and intensive quantum
+properties~\cite{buterez2023pooling}.
+\input{generated/results_schnet_readout_narrative.tex}
+The reduction identifies additive pooling as an important contributor to the
+extreme prespecified SchNet host-CV error.  However, the mean-readout MAE
+remains \PRMSchNetMeanHostMAE\eV{}, compared with
+\PRMHostCvDARTMAE\eV{} for DART, so readout alone does not explain the
+remaining recipe-level difference.  Fold-resolved errors and size--error
+diagnostics are reported in the Supplemental Material~\cite{supplemental}.
+
 All grouped tests remain internal to the 44-host, 65-impurity IMP2D chemical
 universe.  They therefore quantify transfer across defined partitions of this
 database, not generalization to arbitrary 2D compounds, charge states, defect

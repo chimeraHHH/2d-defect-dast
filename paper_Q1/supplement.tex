@@ -1,0 +1,64 @@
+\documentclass[aps,prmaterials,onecolumn,superscriptaddress,floatfix]{revtex4-2}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=blue!60!black,
+            citecolor=green!50!black,
+            urlcolor=blue!70!black]{hyperref}
+
+\input{generated/results_macros.tex}
+
+\begin{document}
+
+\title{Supplemental Material for ``Defect-aware graph learning of impurity
+incorporation energetics and chemical transferability in two-dimensional
+materials''}
+
+\author{Yiming Hua}
+\affiliation{Wuhan University, Wuhan, China}
+
+\date{\today}
+
+\maketitle
+
+\section{Post-hoc SchNet graph-readout sensitivity}
+
+The prespecified periodic SchNet comparator follows the original
+energy-oriented construction~\cite{schutt2018}: its learned atomwise scalar
+contributions are summed to produce the graph prediction.  Defect formation
+energy is instead localized and non-extensive with respect to supercell atom
+count, and prior atomistic studies show that graph pooling can materially
+affect localized or intensive quantum-property prediction
+~\cite{buterez2023pooling}.  We therefore performed one bounded post-hoc
+sensitivity analysis after completing the main comparison.
+
+The intervention changed only the graph readout from atomwise addition to mean
+pooling.  It retained all five immutable host-held-out folds, seeds 342--344,
+the SchNet interaction stack, learned atomic-number input, optimizer, learning
+rate schedule, host-balanced sampler, target normalization, target-noise
+stream, gradient clipping, and 150-epoch budget.  Predictions were averaged
+over the three seeds within each fold.  The pooled mean-minus-add difference in
+absolute error was evaluated with 20,000 bootstrap samples clustered by the 44
+host materials.
+
+\input{generated/tab_schnet_readout.tex}
+
+Mean pooling reduced the host-held-out MAE in all
+\PRMSchNetMeanBetterFolds{}/5 folds.  Across individual samples, the Spearman
+association between atom count and absolute error changed from
+\PRMSchNetAddSampleSizeErrorSpearman{} for additive pooling to
+\PRMSchNetMeanSampleSizeErrorSpearman{} for mean pooling.  Across the 44 hosts,
+the corresponding association between median atom count and host MAE changed
+from \PRMSchNetAddHostSizeErrorSpearman{} to
+\PRMSchNetMeanHostSizeErrorSpearman{}.  These descriptive associations are
+consistent with a size-sensitive additive readout, but atom count covaries with
+host chemistry and therefore does not identify a standalone causal mechanism.
+The intervention establishes that readout choice contributes to the extreme
+additive-SchNet error; it neither replaces the prespecified main comparator nor
+attributes the remaining DART--SchNet difference to a single component.
+
+\bibliography{references}
+
+\end{document}

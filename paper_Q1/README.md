@@ -27,4 +27,5 @@ Build from this directory with:
 
 ```bash
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error supplement.tex
 ```
