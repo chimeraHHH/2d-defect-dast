@@ -34,7 +34,25 @@ must verify them against `artifacts/prm_assets/manifest.json`.
 The ct-UAE source checkpoint is available from
 [`fduabinitio/ct-UAE`](https://github.com/fduabinitio/ct-UAE) at commit
 `0141ff9e09277d2229c9d7a24c1bcc5eac9de78e`. The derived 100 by 128 elemental
-table is checked by `scripts/prm_verify_ct_uae_asset.py`.
+table is generated and checked as follows:
+
+```bash
+mkdir -p data/external/ct-uae
+curl -L --fail \
+  -o data/external/ct-uae/model_best_mt3_256.pth.tar \
+  https://raw.githubusercontent.com/fduabinitio/ct-UAE/0141ff9e09277d2229c9d7a24c1bcc5eac9de78e/embeddings/model_best_mt3_256.pth.tar
+python scripts/prm_verify_ct_uae_asset.py \
+  --checkpoint data/external/ct-uae/model_best_mt3_256.pth.tar \
+  --asset data/ct_uae_mt3_embeddings.pt \
+  --derive \
+  --expected-checkpoint-sha256 6f5305770a64a91f683e27c1d9b2c574f5b748b381598590e9b675ee9b43e26b \
+  --expected-asset-sha256 ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc \
+  --expected-tensor-sha256 acf66488770f2e82d81cf396c0c28a3a3c244e9825f7e0ae443d2ff0e7a32edc
+```
+
+The pinned ct-UAE source is MIT licensed; its notice is retained in
+`THIRD_PARTY_NOTICES.md`. This notice does not assign a license to this
+repository.
 
 The JARVIS-DFT source-task subset is reconstructed with:
 

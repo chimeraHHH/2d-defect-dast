@@ -38,6 +38,8 @@
       "checkpoint_size_bytes": 35770509,
       "git_commit": "0141ff9e09277d2229c9d7a24c1bcc5eac9de78e",
       "git_tag_v1_0": "010bbc33f0db1242837b760daa729b40fb1c217a",
+      "license": "MIT",
+      "license_path": "LICENSE",
       "repository": "https://github.com/fduabinitio/ct-UAE"
     }
   },

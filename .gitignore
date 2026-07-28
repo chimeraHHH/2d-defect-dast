@@ -58,6 +58,7 @@ __pycache__/
 .pytest_cache/
 
 # Data and large artifacts
+data/external/
 data/raw/*.db
 data/processed/*.pkl
 data/processed/*.lmdb
