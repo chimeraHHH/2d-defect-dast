@@ -102,9 +102,22 @@ def test_prediction_members_require_exact_target_storage_values(tmp_path):
 def test_calibration_halves_are_label_independent_and_disjoint():
     indices = np.asarray([8, 2, 6, 4, 0, 10])
     variance, conformal = calibration_subsets(indices)
+    repeated_variance, repeated_conformal = calibration_subsets(indices)
     assert set(variance).isdisjoint(conformal)
     assert sorted(np.concatenate([variance, conformal]).tolist()) == list(range(6))
-    assert indices[variance].tolist() == [0, 4, 8]
+    assert np.array_equal(variance, repeated_variance)
+    assert np.array_equal(conformal, repeated_conformal)
+    assert not np.array_equal(
+        variance,
+        calibration_subsets(indices, seed=6202)[0],
+    )
+
+
+def test_calibration_halves_reject_invalid_indices():
+    with pytest.raises(ValueError, match="unique one-dimensional integer"):
+        calibration_subsets(np.asarray([1.0, 2.0]))
+    with pytest.raises(ValueError, match="unique one-dimensional integer"):
+        calibration_subsets(np.asarray([1, 1]))
 
 
 def test_finite_sample_conformal_quantile_uses_higher_rank():

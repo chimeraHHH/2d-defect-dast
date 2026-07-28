@@ -32,6 +32,7 @@ from src.prm_provenance import (
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
+CALIBRATION_SUBSET_SEED = 6201
 
 
 def strict_json(payload: Any) -> str:
@@ -117,11 +118,23 @@ def load_aligned_predictions(
     return reference_indices, reference_targets, np.stack(members)
 
 
-def calibration_subsets(indices: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Split calibration rows by sorted sample index, without using labels."""
-    order = np.argsort(np.asarray(indices, dtype=np.int64))
-    variance_fit = order[::2]
-    conformal = order[1::2]
+def calibration_subsets(
+    indices: np.ndarray, seed: int = CALIBRATION_SUBSET_SEED,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Randomly split calibration rows with a fixed seed and no labels."""
+    indices = np.asarray(indices)
+    if (
+        indices.ndim != 1
+        or len(indices) < 2
+        or not np.issubdtype(indices.dtype, np.integer)
+        or len(np.unique(indices)) != len(indices)
+    ):
+        raise ValueError(
+            "calibration indices must be a unique one-dimensional integer vector"
+        )
+    order = np.random.default_rng(seed).permutation(len(indices))
+    variance_fit = np.sort(order[::2])
+    conformal = np.sort(order[1::2])
     if not len(variance_fit) or not len(conformal):
         raise ValueError("calibration partition must contain at least two samples")
     return variance_fit, conformal
@@ -519,7 +532,10 @@ def main() -> None:
             "dedicated_calibration_partition": len(cal_indices),
             "variance_fit_subset": len(variance_rows),
             "conformal_subset": len(conformal_rows),
-            "subset_rule": "sort by sample index; alternating rows for variance fit and conformal calibration",
+            "subset_rule": (
+                "fixed-seed random partition of calibration rows without labels"
+            ),
+            "subset_seed": CALIBRATION_SUBSET_SEED,
             "variance_calibration": variance,
         },
         "n_members": len(run_dirs),

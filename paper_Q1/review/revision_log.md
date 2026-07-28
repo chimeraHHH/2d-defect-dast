@@ -69,3 +69,14 @@
 - Evidence: `artifacts/prm_results/operations/pretraining_overlap_3a98513.json`.
 - Status: complete.
 - Blocks finalization: no.
+
+### REV-007: Calibration-subset exchangeability
+
+- Severity: major statistical-design issue.
+- Fix type: prespecified analysis correction before result exposure.
+- Change: replaced source-index alternation with a label-independent random
+  partition of the dedicated calibration rows using fixed seed 6201. The
+  frozen train/validation/calibration/test split and all trained models remain
+  unchanged.
+- Status: implemented before UQ collection.
+- Blocks finalization: through E5 only.
