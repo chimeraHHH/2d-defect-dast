@@ -7,6 +7,7 @@ import hashlib
 import json
 import pickle
 import subprocess
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,10 +16,11 @@ from typing import Any, Dict, Iterable, Mapping, Sequence
 from ase.data import chemical_symbols
 from ase.formula import Formula
 
-from src.prm_provenance import require_clean_git_snapshot
-
-
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.prm_provenance import require_clean_git_snapshot
 
 
 def strict_json(payload: Any) -> str:
