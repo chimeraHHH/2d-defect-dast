@@ -1,10 +1,13 @@
 import hashlib
+import json
 import re
 from pathlib import Path
 
 import pytest
 
+import scripts.prm_make_result_assets as result_assets
 from scripts.prm_make_result_assets import (
+    READY_MARKER_CONTENT,
     comparison_status,
     effect_status,
     finite_format,
@@ -18,7 +21,9 @@ from scripts.prm_make_result_assets import (
     render_uq_table,
     require_recorded_output_hashes,
     strict_json,
+    text_sha256,
     validate_contract,
+    write_manifest_then_ready_marker,
     write_ready_marker,
 )
 
@@ -177,6 +182,33 @@ def test_ready_marker_is_invalidated_until_all_assets_succeed(tmp_path):
 
     write_ready_marker(ready)
     assert ready.read_text().endswith(r"\def\PRMResultAssetsReady{1}" + "\n")
+
+
+def test_manifest_precedes_ready_marker_and_partial_marker_is_removed(
+    tmp_path, monkeypatch,
+):
+    generated = tmp_path / "paper/generated"
+    generated.mkdir(parents=True)
+    ready = generated / "results_ready.tex"
+    manifest_path = tmp_path / "results/paper/result_assets.json"
+    marker_key = result_assets.repository_path(ready)
+    manifest = {
+        "schema_version": "test",
+        "outputs": {marker_key: text_sha256(READY_MARKER_CONTENT)},
+    }
+    observed = {}
+
+    def fail_after_partial_marker(path):
+        observed["manifest"] = json.loads(manifest_path.read_text())
+        path.write_text("partial\n")
+        raise OSError("injected marker failure")
+
+    monkeypatch.setattr(result_assets, "write_ready_marker", fail_after_partial_marker)
+    with pytest.raises(OSError, match="injected marker failure"):
+        write_manifest_then_ready_marker(manifest, manifest_path, ready)
+
+    assert observed["manifest"] == manifest
+    assert not ready.exists()
 
 
 def test_manuscript_uses_only_macros_emitted_by_result_generator():

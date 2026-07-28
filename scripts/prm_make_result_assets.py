@@ -68,6 +68,10 @@ RECORDED_OUTPUTS = {
         "group_errors": "group_errors",
     },
 }
+READY_MARKER_CONTENT = (
+    "% Auto-generated after all canonical paper assets succeeded; do not edit.\n"
+    "\\def\\PRMResultAssetsReady{1}\n"
+)
 
 
 def file_sha256(path: Path) -> str:
@@ -76,6 +80,10 @@ def file_sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def text_sha256(content: str) -> str:
+    return hashlib.sha256(content.encode()).hexdigest()
 
 
 def strict_json(payload: Any) -> str:
@@ -708,10 +716,26 @@ def invalidate_ready_marker(generated_dir: Path) -> Path:
 
 
 def write_ready_marker(ready_path: Path) -> None:
-    ready_path.write_text(
-        "% Auto-generated after all canonical paper assets succeeded; do not edit.\n"
-        "\\def\\PRMResultAssetsReady{1}\n"
-    )
+    ready_path.write_text(READY_MARKER_CONTENT)
+
+
+def write_manifest_then_ready_marker(
+    manifest: Mapping[str, Any], manifest_path: Path, ready_path: Path,
+) -> None:
+    marker_key = repository_path(ready_path)
+    expected_hash = text_sha256(READY_MARKER_CONTENT)
+    if manifest.get("outputs", {}).get(marker_key) != expected_hash:
+        raise ValueError("result-assets manifest has an invalid ready-marker hash")
+
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(strict_json(manifest) + "\n")
+    try:
+        write_ready_marker(ready_path)
+        if file_sha256(ready_path) != expected_hash:
+            raise ValueError("ready-marker hash mismatch after writing")
+    except Exception:
+        ready_path.unlink(missing_ok=True)
+        raise
 
 
 def plot_factorial(factorial: Mapping[str, Any], output_pdf: Path) -> list[Path]:
@@ -1005,8 +1029,10 @@ def write_outputs(
             figure_dir / "fig_screening.pdf",
         )
     )
-    write_ready_marker(ready_path)
-    output_paths.append(ready_path)
+    output_hashes = {
+        repository_path(path): file_sha256(path) for path in output_paths
+    }
+    output_hashes[repository_path(ready_path)] = text_sha256(READY_MARKER_CONTENT)
 
     manifest = {
         "schema_version": "prm_paper_assets_v1",
@@ -1019,13 +1045,10 @@ def write_outputs(
             name: {"path": repository_path(path), "sha256": file_sha256(path)}
             for name, path in paths.items()
         },
-        "outputs": {
-            repository_path(path): file_sha256(path) for path in output_paths
-        },
+        "outputs": output_hashes,
     }
     manifest_path = result_root / "paper/result_assets.json"
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(strict_json(manifest) + "\n")
+    write_manifest_then_ready_marker(manifest, manifest_path, ready_path)
     return manifest
 
 
