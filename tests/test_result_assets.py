@@ -355,6 +355,18 @@ def contract_inputs():
         "data_sha256": "data",
         "selection": {"selected_variant": "g111"},
         "descriptor_selection": descriptor_selection,
+        "configuration_coverage": {
+            model: {
+                "n_expected": 48,
+                "n_observed": 48,
+                "complete": True,
+                "missing_output_dirs": [],
+                "expected_config_sha256": [
+                    f"{index:064x}" for index in range(48)
+                ],
+            }
+            for model in ("dart", "schnet")
+        },
     }
     uq = {
         "schema_version": "prm_uq_results_v1", "collector_git": clean,
@@ -390,4 +402,16 @@ def test_complete_result_contract_accepts_only_aligned_evidence():
     broken = list(inputs)
     broken[3] = dict(broken[3], data_sha256="stale")
     with pytest.raises(ValueError, match="data hash"):
+        validate_contract(*broken)
+
+    broken = list(inputs)
+    comparison = dict(broken[2])
+    coverage = {
+        model: dict(record)
+        for model, record in comparison["configuration_coverage"].items()
+    }
+    coverage["schnet"]["complete"] = False
+    comparison["configuration_coverage"] = coverage
+    broken[2] = comparison
+    with pytest.raises(ValueError, match="incomplete schnet configuration"):
         validate_contract(*broken)

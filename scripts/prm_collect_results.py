@@ -7,7 +7,7 @@ import hashlib
 import json
 import math
 import subprocess
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
@@ -164,6 +164,7 @@ def load_neural_runs(
             "git_commit": manifest["git"]["commit"],
             "config_sha256": manifest["config_sha256"],
             "expected_config_path": str(expected_config.path),
+            "controlled_output_dir": str(expected_config.config["output_dir"]),
         }
         for partition in ("validation", "test"):
             for metric in SCALAR_METRICS:
@@ -220,6 +221,59 @@ def comparison_archive_manifests(
     if len(unique) != len(paths):
         raise ValueError("comparison archive contains duplicate neural manifests")
     return unique
+
+
+def validate_expected_config_coverage(
+    rows: Sequence[Mapping[str, Any]],
+    model: str,
+    expected_configs: Mapping[str, ExpectedConfig],
+    result_root: Path,
+    *,
+    require_all: bool = True,
+) -> Dict[str, Any]:
+    model_rows = [row for row in rows if row.get("model") == model]
+    observed = Counter(str(row.get("controlled_output_dir", "")) for row in model_rows)
+    expected = set(expected_configs)
+    unknown = sorted(set(observed) - expected)
+    duplicates = sorted(
+        output_dir for output_dir, count in observed.items() if count != 1
+    )
+    if unknown:
+        raise ValueError(f"{model} runs include uncontrolled outputs: {unknown}")
+    if duplicates:
+        raise ValueError(
+            f"{model} controlled configurations are not represented once: {duplicates}"
+        )
+
+    resolved_root = result_root.resolve()
+    for row in model_rows:
+        output_dir = str(row["controlled_output_dir"])
+        expected_manifest = (resolved_root / output_dir / "run_manifest.json").resolve()
+        observed_manifest = Path(str(row["manifest_path"])).resolve()
+        if not expected_manifest.is_relative_to(resolved_root):
+            raise ValueError(
+                f"{model} controlled output escapes the result root: {output_dir}"
+            )
+        if observed_manifest != expected_manifest:
+            raise ValueError(
+                f"{model} manifest is outside its controlled output directory: "
+                f"expected {expected_manifest}, observed {observed_manifest}"
+            )
+
+    missing = sorted(expected - set(observed))
+    if require_all and missing:
+        raise ValueError(
+            f"{model} campaign lacks {len(missing)} controlled configurations: {missing}"
+        )
+    return {
+        "n_expected": len(expected),
+        "n_observed": len(observed),
+        "complete": not missing,
+        "missing_output_dirs": missing,
+        "expected_config_sha256": sorted(
+            expected_config.sha256 for expected_config in expected_configs.values()
+        ),
+    }
 
 
 def validate_neural_campaign_commits(
@@ -644,14 +698,31 @@ def main() -> None:
     schnet_expected_configs = load_expected_configs(
         sorted((ROOT / "configs/prm/generated/schnet").glob("*.yaml"))
     )
-    rows = load_neural_runs(
+    dart_rows = load_neural_runs(
         dart_paths, "dart", protocol_dir, protocol["data_sha256"],
         dart_expected_configs,
     )
-    rows += load_neural_runs(
+    schnet_rows = load_neural_runs(
         schnet_paths, "schnet", protocol_dir, protocol["data_sha256"],
         schnet_expected_configs,
     )
+    configuration_coverage = {
+        "dart": validate_expected_config_coverage(
+            dart_rows,
+            "dart",
+            dart_expected_configs,
+            result_root,
+            require_all=not args.allow_incomplete,
+        ),
+        "schnet": validate_expected_config_coverage(
+            schnet_rows,
+            "schnet",
+            schnet_expected_configs,
+            result_root,
+            require_all=not args.allow_incomplete,
+        ),
+    }
+    rows = dart_rows + schnet_rows
     descriptor_root = result_root / "baselines" / "descriptors"
     validate_descriptor_root(descriptor_root, protocol_dir)
     descriptor_evidence = validate_descriptor_evidence_bundle(
@@ -823,6 +894,7 @@ def main() -> None:
         },
         "n_run_rows": len(retained_rows), "n_fold_rows": len(fold_rows),
         "neural_campaign_commits": campaign_commits,
+        "configuration_coverage": configuration_coverage,
         "archive_policy": {
             "scope": "43 selected-DART transfer runs and 48 SchNet runs; "
                      "selected factorial runs are bound through the factorial bundle",

@@ -1,4 +1,5 @@
 import json
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -13,6 +14,7 @@ from scripts.prm_collect_results import (
     regime_for_split,
     select_descriptor_families,
     validate_descriptor_root,
+    validate_expected_config_coverage,
     validate_neural_campaign_commits,
     write_csv,
 )
@@ -219,3 +221,72 @@ def test_neural_campaigns_require_one_bound_commit_each():
     )
     with pytest.raises(ValueError, match="schnet results do not share one"):
         validate_neural_campaign_commits(rows, selection)
+
+
+def test_neural_campaign_requires_each_controlled_output_exactly_once(tmp_path):
+    result_root = tmp_path / "results"
+    expected = {
+        "selected/g111/transfer/id_cv5_f0/seed242": SimpleNamespace(
+            sha256="a" * 64
+        ),
+        "selected/g111/transfer/id_cv5_f1/seed242": SimpleNamespace(
+            sha256="b" * 64
+        ),
+    }
+    rows = [
+        {
+            "model": "dart",
+            "controlled_output_dir": output_dir,
+            "manifest_path": str(result_root / output_dir / "run_manifest.json"),
+        }
+        for output_dir in expected
+    ]
+
+    coverage = validate_expected_config_coverage(
+        rows, "dart", expected, result_root
+    )
+
+    assert coverage["n_expected"] == 2
+    assert coverage["n_observed"] == 2
+    assert coverage["complete"] is True
+    assert coverage["missing_output_dirs"] == []
+
+    with pytest.raises(ValueError, match="not represented once"):
+        validate_expected_config_coverage(
+            rows + [dict(rows[0])], "dart", expected, result_root
+        )
+
+
+def test_neural_campaign_rejects_missing_or_misplaced_outputs(tmp_path):
+    result_root = tmp_path / "results"
+    output_dir = "baselines/schnet/id_cv5_f0/seed342"
+    expected = {
+        output_dir: SimpleNamespace(sha256="c" * 64),
+        "baselines/schnet/id_cv5_f1/seed342": SimpleNamespace(
+            sha256="d" * 64
+        ),
+    }
+    row = {
+        "model": "schnet",
+        "controlled_output_dir": output_dir,
+        "manifest_path": str(result_root / output_dir / "run_manifest.json"),
+    }
+
+    with pytest.raises(ValueError, match="lacks 1 controlled"):
+        validate_expected_config_coverage(
+            [row], "schnet", expected, result_root
+        )
+    partial = validate_expected_config_coverage(
+        [row], "schnet", expected, result_root, require_all=False
+    )
+    assert partial["complete"] is False
+
+    misplaced = dict(row)
+    misplaced["manifest_path"] = str(result_root / "elsewhere/run_manifest.json")
+    with pytest.raises(ValueError, match="outside its controlled output"):
+        validate_expected_config_coverage(
+            [misplaced],
+            "schnet",
+            {output_dir: expected[output_dir]},
+            result_root,
+        )

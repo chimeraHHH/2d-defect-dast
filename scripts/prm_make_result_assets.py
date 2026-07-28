@@ -187,6 +187,32 @@ def validate_contract(
         raise ValueError(f"selected architecture differs across bundles: {variants}")
     if int(factorial.get("n_runs", -1)) != 40:
         raise ValueError("factorial bundle must contain all 40 paired runs")
+    configuration_coverage = comparison.get("configuration_coverage")
+    if not isinstance(configuration_coverage, Mapping):
+        raise ValueError("comparison bundle lacks controlled configuration coverage")
+    for model in ("dart", "schnet"):
+        coverage = configuration_coverage.get(model)
+        if not isinstance(coverage, Mapping):
+            raise ValueError(f"comparison bundle lacks {model} configuration coverage")
+        hashes = coverage.get("expected_config_sha256")
+        if (
+            int(coverage.get("n_expected", -1)) != 48
+            or int(coverage.get("n_observed", -1)) != 48
+            or coverage.get("complete") is not True
+            or coverage.get("missing_output_dirs") != []
+            or not isinstance(hashes, list)
+            or len(hashes) != 48
+            or len(set(hashes)) != 48
+            or any(
+                not isinstance(value, str)
+                or len(value) != 64
+                or any(character not in "0123456789abcdef" for character in value)
+                for value in hashes
+            )
+        ):
+            raise ValueError(
+                f"comparison bundle has incomplete {model} configuration coverage"
+            )
     if int(uq.get("n_members", -1)) != 5:
         raise ValueError("UQ bundle must contain five ensemble members")
     expected_uq = protocol.get("uq_split_counts", {})
