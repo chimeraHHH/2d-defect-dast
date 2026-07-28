@@ -1112,7 +1112,7 @@ def plot_factorial(factorial: Mapping[str, Any], output_pdf: Path) -> list[Path]
     axes[1].invert_yaxis()
     axes[1].set_xlabel(r"Factorial effect on MAE (eV)")
     axes[1].set_title("Orthogonal effects", loc="left", pad=5)
-    axes[1].legend(frameon=False, loc="lower right")
+    axes[1].legend(frameon=False, loc="upper right")
     axes[1].grid(axis="x", color=COLORS["grid"], lw=0.45)
     axes[1].spines[["top", "right", "left"]].set_visible(False)
     axes[1].tick_params(axis="y", length=0)
@@ -1298,9 +1298,10 @@ def plot_uq(
         mean = np.asarray(archive["test_mean"], dtype=float)
         sigma = np.asarray(archive["test_sigma"], dtype=float)
     absolute_error = np.abs(mean - targets)
+    displayed_error = np.clip(absolute_error, 1e-3, None)
     image = axes[2].hexbin(
-        sigma, absolute_error, gridsize=28, mincnt=1, bins="log",
-        cmap="Greys", linewidths=0.0,
+        sigma, displayed_error, gridsize=28, mincnt=1, bins="log",
+        xscale="linear", yscale="log", cmap="Greys", linewidths=0.0,
     )
     colorbar = figure.colorbar(image, ax=axes[2], fraction=0.05, pad=0.03)
     colorbar.set_label("log count", fontsize=6.2)
@@ -1308,7 +1309,7 @@ def plot_uq(
     rho = float(uq["test"]["uncertainty_absolute_error_spearman"])
     axes[2].text(0.04, 0.94, rf"$\rho_s={rho:.2f}$", transform=axes[2].transAxes, va="top")
     axes[2].set_xlabel(r"Calibrated $\sigma$ (eV)")
-    axes[2].set_ylabel("Absolute error (eV)")
+    axes[2].set_ylabel("Absolute error (eV; log scale)")
     axes[2].set_title("Error discrimination", loc="left", pad=5)
     axes[2].spines[["top", "right"]].set_visible(False)
     panel_label(axes[2], "(c)")
@@ -1349,6 +1350,7 @@ def plot_screening(
         x, y = empirical_cdf(values)
         axes[1].step(x, y, where="post", color=color, label=label)
     axes[1].set_xlabel("Screening regret (eV)")
+    axes[1].set_xscale("symlog", linthresh=0.05, linscale=0.8)
     axes[1].set_ylabel("Cumulative fraction")
     axes[1].set_title("Decision regret", loc="left", pad=5)
     axes[1].legend(frameon=False, loc="lower right")
