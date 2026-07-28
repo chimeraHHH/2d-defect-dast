@@ -96,17 +96,23 @@ chemical coverage, target distribution, and fixed partition geometry.
 \label{sec:architecture}
 %----------------------------------------------------------------------
 
-Each periodic supercell is represented by an atomistic graph.  The initial
+Each periodic supercell is represented by an atomistic graph.  We refer to the
+resulting model as the Defect-Aware Radial Transformer (DART).  The initial
 node representation concatenates nine standardized elemental attributes with
-a 128-dimensional ct-UAE elemental embedding~\cite{ctuae2025}, projects the
-result to 128 hidden channels, and adds a learned binary embedding that marks
-the impurity atom.  Three local interaction layers aggregate neighbors within
+a fixed 128-dimensional ct-UAE elemental vector~\cite{ctuae2025}.  We
+reconstruct a 100-element table from the published checkpoint by applying its
+linear \texttt{atom\_embed} layer to each one-hot elemental code,
+$\mathbf U=\mathbf W^{\mathsf T}+\mathbf 1\mathbf b^{\mathsf T}$.  A zero
+padding row is prepended internally, so atomic numbers 1--100 address rows
+0--99 of $\mathbf U$ without an index shift.  The concatenated representation
+is projected to 128 hidden channels, and a learned binary embedding marks the
+impurity atom.  Three local interaction layers aggregate neighbors within
 5~\AA.  Distances are expanded in 32 Gaussian radial basis functions, and
 three-body messages use a 32-function angular expansion.  Two subsequent
 four-head geometric Transformer blocks apply self-attention with a learned
 radial bias derived from the periodic pair-distance matrix on a radial grid
-ending at 12~\AA.  A two-layer multilayer perceptron maps the pooled graph
-representation to $\hat E_{\mathrm f}$.
+ending at 12~\AA~\cite{crystalformer2024}.  A two-layer multilayer perceptron
+maps the pooled graph representation to $\hat E_{\mathrm f}$.
 Because every formal row passes the identity audit, the binary impurity
 embedding always marks exactly one compositionally unique atom; no array-order
 heuristic is used.
@@ -125,9 +131,10 @@ holding every other training and model setting fixed:
  \item[Pre-norm gated local block (P).]
  The on state normalizes node states before message construction and applies a
  learned scalar distance gate to each edge before a residual update.  The off
- state uses the original ungated message and post-residual normalization.  We
- treat this as one composite local-block change and do not attribute its effect
- to normalization or edge gating separately.
+ state uses the original ungated message and post-residual
+ normalization~\cite{xiong2020}.  We treat this as one composite local-block
+ change and do not attribute its effect to normalization or edge gating
+ separately.
 \end{description}
 
 The full $2^3$ factorial contains all eight G/E/P combinations on each of the
@@ -155,14 +162,22 @@ standard deviation 0.03~eV; no coordinate or strain augmentation is applied.
 A host-balanced sampler draws 200 structures per host per epoch; its sequence
 and the independent target-noise stream are deterministically indexed by model
 seed and epoch so paired variants see the same batches and noise realizations.
-Every factorial variant uses the same fixed pretraining
-checkpoint.  Its nine-feature input-projection block and bias, together with
-all 51 shape-matched V1 local-message tensors, initialize the corresponding
-DART parameters.  The 128 input-projection columns associated with the fixed
-ct-UAE vectors retain their seeded initialization; for P-enabled variants, the
-12 new edge-gate tensors do likewise.  All trainable model parameters are then
-optimized.  Both input assets are verified against SHA-256 digests, and each
-run manifest records the exact copied and seeded parameter sets.
+Every factorial variant uses the same two fixed input assets.  The ct-UAE table
+described above is a non-trainable buffer.  Separately, we pretrained the
+nine-feature input projection and V1 local interaction stack for 30 epochs on
+19,902 pristine three-dimensional crystals sampled from JARVIS-DFT
+\texttt{dft\_3d}~\cite{jarvis2020}, using formation energy per atom as the
+source target, an 80/10/10 random partition, and seed 42.  No IMP2D target is
+used in this pretraining stage.
+
+The resulting checkpoint contributes its nine-feature input-projection block
+and bias together with all 51 shape-matched V1 local-message tensors.  The 128
+input-projection columns associated with the fixed ct-UAE vectors retain their
+seeded initialization; for P-enabled variants, the 12 new edge-gate tensors do
+likewise.  All trainable model parameters are then optimized on the assigned
+IMP2D training partition.  Both input assets are verified against SHA-256
+digests, and each run manifest records the exact copied and seeded parameter
+sets.
 
 The checkpoint with minimum validation MAE is evaluated once on its test
 partition.  Each run records the code commit and dirty state, resolved
@@ -195,10 +210,13 @@ channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA cutoff.
 It uses batch size 32 but otherwise follows the same target normalization,
 150-epoch AdamW schedule, host balancing, gradient clipping, and target-noise
 protocol as DART; it uses a conventional learned atomic-number embedding and
-no DART pretraining.  For grouped transfer and the chemistry block, each
-architecture uses three independently prespecified seeds (242--244 for DART
-and 342--344 for SchNet).  Predictions are averaged within each split before
-pooled out-of-fold metrics are calculated.
+no DART pretraining.  Random and host--impurity-pair fivefold evaluation uses
+one prespecified model
+seed per fold (242 for DART and 342 for SchNet).  Host-held-out,
+impurity-held-out, and chemistry-block evaluation uses three independently
+prespecified seeds (242--244 for DART and 342--344 for SchNet).  Predictions
+are averaged within each split before pooled out-of-fold metrics are
+calculated.
 
 %----------------------------------------------------------------------
 \subsection{Held-out uncertainty calibration and screening analysis}

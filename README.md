@@ -1,12 +1,30 @@
-# 二维材料缺陷形成能：紧凑混合 GNN-Transformer + 顶刊四维评估 + Prospective DFT
+# IMP2D defect learning: PRM revision
 
-[![paper](https://img.shields.io/badge/paper-pdf%20(18%20pages)-blue)](paper/main.pdf)
-[![dataset](https://img.shields.io/badge/data-IMP2D%20(CMR)-green)](https://cmr.fysik.dtu.dk/imp2d/imp2d.html)
-[![best test MAE](https://img.shields.io/badge/best%20ensemble%20MAE-0.344%20eV-red)](#v50--crystaltransformerv2-架构优化2026-05-19)
-[![best single](https://img.shields.io/badge/best%20single-0.379%20eV-orange)](#v50--crystaltransformerv2-架构优化2026-05-19)
-[![OOD](https://img.shields.io/badge/constrained%20OOD-0.540%20eV-yellow)](#v41--constrained-ood-evaluation2026-05-11)
-[![calibrated](https://img.shields.io/badge/cov90%20after%20τ-93.4%25-brightgreen)](#不确定度量化)
-[![DFT discovery](https://img.shields.io/badge/prospective%20DFT-70%25%20A%20hit%20rate-9cf)](#v30-prospective-dft-验证-2026-05-07)
+> [!IMPORTANT]
+> `paper_Q1/` is the only active manuscript. Its numerical sections are
+> fail-closed until the canonical PRM result bundle is complete. Historical
+> scores, ensembles, OOD claims, uncertainty calibration, and prospective-DFT
+> claims below are exploratory archive material and must not be cited as
+> evidence for the PRM submission.
+
+The authoritative revision surfaces are:
+
+- `PLAN.md` and `CHECKLIST.md`: current scope, evidence gates, and run status.
+- `artifacts/prm_protocol_v2/`: the immutable 10,224-structure protocol.
+- `artifacts/prm_assets/manifest.json`: pinned ct-UAE and JARVIS pretraining
+  provenance, including the one-based atomic-number lookup contract.
+- `configs/prm/`: controlled factorial, transfer, and SchNet configurations.
+- `artifacts/prm_results/`: validated result and operations records.
+- `paper_Q1/`: the result-gated PRM manuscript.
+
+New first-principles validation is outside the present paper. No archived QE,
+GPAW, or unmatched DFT result supports a predictive-accuracy or discovery
+claim in the active manuscript.
+
+## Historical exploratory archive
+
+Everything below this marker predates the frozen PRM protocol unless a
+canonical artifact above explicitly incorporates it.
 
 我们以 *Impurities in 2D Materials Database*（IMP2D, DTU 公开数据集，
 10641 个 DFT 收敛缺陷构型）为基准，针对二维材料缺陷形成能预测做了
