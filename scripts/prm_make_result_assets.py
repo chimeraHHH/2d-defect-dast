@@ -249,6 +249,36 @@ def comparison_status(ci_low: float, ci_high: float) -> str:
     return "inconclusive"
 
 
+def factorial_effect_claim(
+    row: Mapping[str, Any], split: str, term: str,
+) -> Dict[str, Any]:
+    repeat_effects = np.asarray(row["repeat_effects"], dtype=float)
+    n_paired_repeats = int(row["n_paired_repeats"])
+    mean = float(row["mean"])
+    if (
+        repeat_effects.ndim != 1
+        or len(repeat_effects) != n_paired_repeats
+        or n_paired_repeats < 2
+        or not np.isfinite(repeat_effects).all()
+        or not math.isfinite(mean)
+    ):
+        raise ValueError(
+            f"factorial repeat effects are incomplete for {split} {term}"
+        )
+    ci_low = float(row["ci_low"])
+    ci_high = float(row["ci_high"])
+    return {
+        "mean_eV": mean,
+        "ci_low_eV": ci_low,
+        "ci_high_eV": ci_high,
+        "status": effect_status(ci_low, ci_high),
+        "n_paired_repeats": n_paired_repeats,
+        "direction_agreeing_repeats": int(
+            np.sum(np.sign(repeat_effects) == np.sign(mean))
+        ),
+    }
+
+
 def model_label(model: str) -> str:
     labels = {
         "dart": "DART", "schnet": "SchNet", "descriptor:mean": "Mean",
@@ -353,12 +383,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
         effects[split] = {}
         for term in TERM_ORDER:
             row = find_row(factorial["effects"], split=split, metric="mae", term=term)
-            effects[split][term] = {
-                "mean_eV": float(row["mean"]),
-                "ci_low_eV": float(row["ci_low"]),
-                "ci_high_eV": float(row["ci_high"]),
-                "status": effect_status(float(row["ci_low"]), float(row["ci_high"])),
-            }
+            effects[split][term] = factorial_effect_claim(row, split, term)
 
     benchmarks: Dict[str, Any] = {}
     for regime in REGIME_ORDER:
@@ -528,10 +553,31 @@ def render_factorial_narrative(claims: Mapping[str, Any]) -> str:
             "No prespecified interaction contrast had a 95\\% validation "
             "interval excluding zero."
         )
+    directional_terms = [
+        term for term in TERM_ORDER
+        if effects[term]["status"] != "inconclusive"
+    ]
+    if directional_terms:
+        consistency_text = (
+            " The repeat-level contrast agreed with the pooled point-estimate "
+            "direction in "
+            + ", ".join(
+                rf"${term}$ "
+                f"{effects[term]['direction_agreeing_repeats']}/"
+                f"{effects[term]['n_paired_repeats']}"
+                for term in directional_terms
+            )
+            + " paired repeats."
+        )
+    else:
+        consistency_text = ""
     return (
         "% Auto-generated from canonical factorial claims; do not edit.\n"
         "On validation MAE, the enabled-minus-disabled main-effect contrasts "
-        f"were {main_effects}. {interaction_text}\n"
+        f"were {main_effects}. {interaction_text}{consistency_text} "
+        "With five paired repeats, the percentile intervals and sign counts "
+        "are descriptive uncertainty summaries rather than large-sample "
+        "hypothesis tests.\n"
     )
 
 

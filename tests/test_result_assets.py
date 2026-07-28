@@ -11,6 +11,7 @@ from scripts.prm_make_result_assets import (
     READY_MARKER_CONTENT,
     comparison_status,
     effect_status,
+    factorial_effect_claim,
     finite_format,
     invalidate_ready_marker,
     latex_escape,
@@ -39,6 +40,27 @@ def test_directional_statuses_respect_interval_signs():
     assert comparison_status(0.1, 0.2) == "dart_better"
     assert comparison_status(-0.2, -0.1) == "comparator_better"
     assert comparison_status(-0.1, 0.2) == "inconclusive"
+
+
+def test_factorial_effect_claim_counts_direction_and_rejects_bad_repeats():
+    row = {
+        "mean": -0.2,
+        "ci_low": -0.3,
+        "ci_high": -0.1,
+        "n_paired_repeats": 5,
+        "repeat_effects": [-0.1, -0.2, 0.1, -0.3, -0.4],
+    }
+
+    claim = factorial_effect_claim(row, "validation", "G")
+
+    assert claim["status"] == "improves"
+    assert claim["direction_agreeing_repeats"] == 4
+    with pytest.raises(ValueError, match="repeat effects are incomplete"):
+        factorial_effect_claim(
+            {**row, "repeat_effects": [-0.1, float("nan"), -0.3, -0.4, -0.5]},
+            "validation",
+            "G",
+        )
 
 
 def test_latex_and_number_formatting_are_stable():
@@ -110,6 +132,8 @@ def minimal_claims():
                         "ci_low_eV": values[1],
                         "ci_high_eV": values[2],
                         "status": effect_status(values[1], values[2]),
+                        "n_paired_repeats": 5,
+                        "direction_agreeing_repeats": 5,
                     }
                     for term, values in (
                         ("G", (-0.2, -0.3, -0.1)),
@@ -195,6 +219,8 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
     assert "(supported reduction)" in factorial
     assert "(supported increase)" in factorial
     assert "No prespecified interaction contrast" in factorial
+    assert "$G$ 5/5" in factorial
+    assert "descriptive uncertainty summaries" in factorial
     assert "SchNet $\\Delta=+0.100$" in transfer
     assert "(inconclusive)" in transfer
     assert "(supports lower DART error)" in transfer

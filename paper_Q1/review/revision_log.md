@@ -80,3 +80,14 @@
   unchanged.
 - Status: implemented before UQ collection.
 - Blocks finalization: through E5 only.
+
+### REV-008: Five-repeat factorial interval strength
+
+- Severity: major interpretation issue.
+- Fix type: existing-result robustness reporting and claim boundary.
+- Change: preserve the canonical percentile intervals and selection bundle,
+  but add repeat-level directional consistency for every interval-directional
+  contrast and state that five-repeat intervals are descriptive uncertainty
+  summaries rather than large-sample hypothesis tests.
+- Status: implemented in the result-asset generator and Evaluation Protocol.
+- Blocks finalization: through E7 only.
