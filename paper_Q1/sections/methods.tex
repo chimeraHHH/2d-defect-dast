@@ -164,11 +164,12 @@ and the independent target-noise stream are deterministically indexed by model
 seed and epoch so paired variants see the same batches and noise realizations.
 Every factorial variant uses the same two fixed input assets.  The ct-UAE table
 described above is a non-trainable buffer.  Separately, we pretrained the
-nine-feature input projection and V1 local interaction stack for 30 epochs on
-19,902 pristine three-dimensional crystals sampled from JARVIS-DFT
-\texttt{dft\_3d}~\cite{jarvis2020}, using formation energy per atom as the
-source target, an 80/10/10 random partition, and seed 42.  No IMP2D target is
-used in this pretraining stage.
+nine-feature input projection and V1 local interaction stack for 30 epochs.
+We first drew 20,000 records uniformly without replacement from JARVIS-DFT
+\texttt{dft\_3d} with seed 42; conversion and graph-validity filters retained
+19,902 pristine three-dimensional crystals~\cite{jarvis2020}.  Pretraining
+used formation energy per atom as the source target, an 80/10/10 random
+partition, and seed 42.  No IMP2D target is used in this stage.
 
 The resulting checkpoint contributes its nine-feature input-projection block
 and bias together with all 51 shape-matched V1 local-message tensors.  The 128
@@ -217,7 +218,9 @@ seed per fold (242 for DART and 342 for SchNet).  Host-held-out,
 impurity-held-out, and chemistry-block evaluation uses three independently
 prespecified seeds (242--244 for DART and 342--344 for SchNet).  Predictions
 are averaged within each split before pooled out-of-fold metrics are
-calculated.
+calculated.  Consequently, DART--SchNet contrasts compare the complete
+prespecified learning recipes, including their different input representations
+and initialization; they do not isolate a pure backbone-architecture effect.
 
 %----------------------------------------------------------------------
 \subsection{Held-out uncertainty calibration and screening analysis}

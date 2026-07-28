@@ -56,11 +56,13 @@ The three highest risks are:
 - Risk: major if the paper claims general neural state of the art; moderate
   under the current scoped claim.
 - Evidence: the aligned neural comparator is periodic SchNet; descriptor
-  families and the complete G/E/P factorial provide additional controls.
+  families and the complete G/E/P factorial provide additional controls. DART
+  also uses fixed ct-UAE vectors and JARVIS initialization that SchNet does not.
 - Route: report paired split-aligned differences and explicitly call SchNet and
   descriptors strong comparators rather than an exhaustive architecture
-  benchmark. Do not compare against literature point estimates as if they used
-  the same audited rows and partitions.
+  benchmark. Treat DART--SchNet as an end-to-end recipe comparison rather than
+  a pure backbone effect. Do not compare against literature point estimates as
+  if they used the same audited rows and partitions.
 
 ### R3: Novelty can be overstated easily
 

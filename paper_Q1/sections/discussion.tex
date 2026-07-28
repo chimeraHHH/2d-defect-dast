@@ -36,6 +36,13 @@ combination.  The paired confidence intervals against SchNet and the selected
 descriptor baseline further distinguish a supported model difference from a
 small aggregate fluctuation.
 
+The DART--SchNet contrast is deliberately end to end.  DART includes fixed
+ct-UAE vectors and the JARVIS-initialized input and local blocks, whereas
+SchNet uses a learned atomic-number embedding without that initialization.
+The paired differences therefore compare the two prespecified learning
+recipes under aligned samples and splits; they cannot assign any difference
+to the backbone architecture, input representation, or initialization alone.
+
 All grouped tests remain internal to the 44-host, 65-impurity IMP2D chemical
 universe.  They therefore quantify transfer across defined partitions of this
 database, not generalization to arbitrary 2D compounds, charge states, defect
