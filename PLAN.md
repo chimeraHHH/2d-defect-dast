@@ -87,6 +87,10 @@ checkpoints, so it contributes no scientific evidence. Formal DART and SchNet
 configs now freeze `num_workers: 0`. The 160-file failure tree is archived with
 a canonical digest, the clean recovery commit passes all 133 tests, and a
 two-epoch GPU smoke run completed with all five declared output hashes
-verified. The next action is the replacement formal queue; after completion,
-the route is validation-only promotion, transfer, SchNet, ensemble UQ, and
+verified. That smoke run established the loader repair but exposed an independent
+element-indexing error: the zero-based ct-UAE rows were indexed by one-based
+atomic numbers. The replacement queue was stopped after two completions, its
+entire tree was archived as scientifically invalid, and the lookup now uses an
+explicit zero-padding row. A clean test, GPU smoke, and full factorial rerun are
+required before validation-only promotion, transfer, SchNet, ensemble UQ, and
 paper result generation.

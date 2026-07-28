@@ -45,6 +45,7 @@ from src.prm_assets import load_pretrained_initialization, verify_training_asset
 from src.prm_metrics import regression_metrics
 from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
+from src.models.element_table import lookup_ct_uae
 from src.models import (
     CrystalTransformer,
     DefectAwareTransformer,
@@ -1007,8 +1008,8 @@ def main() -> None:
                         if getattr(model, "ct_uae_table", None) is not None:
                             z = batch.get("atomic_numbers")
                             if z is not None:
-                                z_c = z.clamp(0, model.ct_uae_table.shape[0] - 1)
-                                _x_aux = torch.cat([_x_aux, model.ct_uae_table[z_c]], dim=-1)
+                                uae_fea = lookup_ct_uae(model.ct_uae_table, z)
+                                _x_aux = torch.cat([_x_aux, uae_fea], dim=-1)
                         h_embed = model.embed(_x_aux)
                     logits = aux_defect_head(h_embed, mask)
                     aux_loss = nn.functional.binary_cross_entropy_with_logits(

@@ -89,17 +89,18 @@ def existing_run_status(
     if payload.get("git", {}).get("dirty"):
         raise ValueError(f"dirty existing run is inadmissible: {manifest}")
     status = payload.get("status")
+    run_commit = payload.get("git", {}).get("commit")
+    if current_commit is not None and run_commit != current_commit:
+        action = "reuse" if status == "complete" else "resume"
+        raise ValueError(
+            f"refusing to {action} {manifest} from commit {run_commit}; "
+            f"current commit is {current_commit}"
+        )
     if status == "complete":
         validate_training_completion(payload, manifest)
         return "complete"
     if status != "running":
         raise ValueError(f"unsupported existing run status {status!r}: {manifest}")
-    run_commit = payload.get("git", {}).get("commit")
-    if current_commit is not None and run_commit != current_commit:
-        raise ValueError(
-            f"refusing to resume {manifest} from commit {run_commit}; "
-            f"current commit is {current_commit}"
-        )
     return "pending"
 
 

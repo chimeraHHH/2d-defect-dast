@@ -124,6 +124,18 @@ def test_existing_complete_run_requires_the_current_config(tmp_path):
         prm_scheduler.existing_run_status(tmp_path, changed, "abc")
 
 
+def test_existing_complete_run_cannot_be_reused_across_commits(tmp_path):
+    config = {
+        "output_dir": "factorial/g000/split42_seed142",
+        "split_path": "split.json",
+        "seed": 142,
+        "epochs": 1,
+    }
+    _write_run_manifest(tmp_path, config, status="complete", commit="old")
+    with pytest.raises(ValueError, match="refusing to reuse"):
+        prm_scheduler.existing_run_status(tmp_path, config, "new")
+
+
 def test_existing_dirty_run_is_rejected(tmp_path):
     config = {
         "output_dir": "factorial/g000/split42_seed142",

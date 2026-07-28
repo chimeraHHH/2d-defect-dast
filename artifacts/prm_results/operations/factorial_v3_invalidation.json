@@ -1,0 +1,48 @@
+{
+  "schema_version": "prm_factorial_invalidation_v1",
+  "recorded_at": "2026-07-28T08:54:40.550021+00:00",
+  "affected_commit": "d00bac7f49df436112b503ebb752df40b7996d98",
+  "disposition": "archive_and_rerun",
+  "formal_queue": {
+    "archive_manifest_sha256": "f350cd72a5894c434895de361ffab5ddca08fea190f7d11067df28101d0b6c68",
+    "archive_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/_failed_attempts/factorial-v3-fd0-d00bac7-ctuae-index-invalid-20260728",
+    "archive_tree_excluding_manifest": {
+      "file_count": 46,
+      "sha256": "dcd7f80f3f1cf00e22fcf68ea53444837522ba3addc5abfaf58475bbfc338917",
+      "size_bytes": 75933596
+    },
+    "queue_id": "factorial-v3-fd0",
+    "scheduler_counts_at_stop": {
+      "complete": 2,
+      "failed": 4,
+      "pending": 34,
+      "running": 0,
+      "stopped": 0
+    },
+    "scheduler_state_sha256": "d5a92ddd758a1b2833fa521ec890f1b39da4c6ecef33baa624b23ea1fa6b700f",
+    "scientific_valid": false
+  },
+  "invalidation": {
+    "asset_table_shape": [
+      100,
+      128
+    ],
+    "bug": "The zero-based ct-UAE table rows were indexed directly by one-based atomic numbers.",
+    "correct_mapping": "padding 0 maps to zeros; atomic numbers 1 through 100 map to table rows 0 through 99",
+    "source_atom_init_sha256": "72b822e4a4cf53e6ba3bd6aeaf38ab10052dc219c3f2592b5c559e6251ba3da9",
+    "source_commit": "0141ff9e09277d2229c9d7a24c1bcc5eac9de78e",
+    "source_repository": "https://github.com/fduabinitio/ct-UAE",
+    "verified_example": "atomic number 1 is encoded by one-hot column 0"
+  },
+  "prior_smoke": {
+    "archive_manifest_sha256": "4f9b9b294ceda5fea49db8ba0de13d16ea1578b22ad5938ff130c584b8b0f06c",
+    "archive_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/_failed_attempts/smoke-factorial-v3-fd0-d00bac7-ctuae-index-invalid-20260728",
+    "archive_tree_excluding_manifest": {
+      "file_count": 8,
+      "sha256": "f96f9c0e35b2ada1ce96e586bb354983b3ddfc2801381df2525a39395602fd39",
+      "size_bytes": 13557785
+    },
+    "data_loader_smoke_valid": true,
+    "scientific_valid": false
+  }
+}

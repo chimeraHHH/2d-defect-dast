@@ -35,6 +35,7 @@ if str(ROOT) not in sys.path:
 from src.dataset import (CrystalGraphDataset, collate_fn,  # noqa: E402
                           get_atom_feature_table, split_indices)
 from src.models import CrystalTransformer  # noqa: E402
+from src.models.element_table import lookup_ct_uae  # noqa: E402
 
 # ── Config ───────────────────────────────────────────────────────────────
 DATA_PATHS = {
@@ -112,8 +113,7 @@ class MultiHeadCrystalTransformer(nn.Module):
         if bb.ct_uae_table is not None:
             z = batch.get("atomic_numbers")
             if z is not None:
-                z_clamped = z.clamp(0, bb.ct_uae_table.shape[0] - 1)
-                uae_fea = bb.ct_uae_table[z_clamped]
+                uae_fea = lookup_ct_uae(bb.ct_uae_table, z)
                 x = torch.cat([x, uae_fea], dim=-1)
 
         h = bb.embed(x)

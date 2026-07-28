@@ -27,8 +27,11 @@
       workers exhausted process file descriptors. No metrics or checkpoints
       were produced. The 160-file failure tree is preserved under
       `_failed_attempts`, all formal configs now freeze `num_workers: 0`, and a
-      clean two-epoch GPU smoke run passed with five output hashes verified.
-      The replacement formal queue is the remaining step.)
+      clean two-epoch GPU smoke run passed the loader check. The replacement
+      `factorial-v3-fd0` queue was then stopped and archived after discovering
+      that one-based atomic numbers incorrectly indexed the zero-based ct-UAE
+      table. Its outputs are scientifically invalid. The corrected lookup,
+      source-derivation audit, regression tests, and a clean rerun are required.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,

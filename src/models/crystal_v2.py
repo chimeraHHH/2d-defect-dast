@@ -34,6 +34,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .baseline import RBFExpansion
+from .element_table import lookup_ct_uae, prepare_ct_uae_table
 
 
 # ---------------------------------------------------------------------------
@@ -775,8 +776,10 @@ class CrystalTransformerV2(nn.Module):
 
         # --- Input embedding ---
         if ct_uae_path is not None:
-            uae_table = torch.load(ct_uae_path, map_location="cpu",
-                                   weights_only=False)
+            source_table = torch.load(
+                ct_uae_path, map_location="cpu", weights_only=True
+            )
+            uae_table = prepare_ct_uae_table(source_table)
             self.register_buffer("ct_uae_table", uae_table)
             uae_dim = uae_table.shape[1]
             self.embed = nn.Linear(atom_fea_len + uae_dim, hidden_dim)
@@ -964,8 +967,7 @@ class CrystalTransformerV2(nn.Module):
         if self.ct_uae_table is not None:
             z = batch.get("atomic_numbers")
             if z is not None:
-                z_clamped = z.clamp(0, self.ct_uae_table.shape[0] - 1)
-                uae_fea = self.ct_uae_table[z_clamped]
+                uae_fea = lookup_ct_uae(self.ct_uae_table, z)
                 x = torch.cat([x, uae_fea], dim=-1)
         h = self.embed(x)
 
