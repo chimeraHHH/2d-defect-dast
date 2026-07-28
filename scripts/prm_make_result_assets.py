@@ -901,14 +901,15 @@ def render_applicability_table(claims: Mapping[str, Any]) -> str:
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
 \caption{{Applicability-domain diagnostics for DART. Macro MAEs weight each
-host or impurity equally. Stable MAE uses $E_\mathrm{{f}}\leq0$; low-decile
-MAE and recall use the true and predicted lowest 10\% of each pooled test
-regime. Energy errors are in eV and recall is in percent.}}
+host or impurity equally. Nonpositive-target MAE uses
+$E_\mathrm{{f}}\leq0$; low-decile MAE and recall use the true and predicted
+lowest 10\% of each pooled test regime. Energy errors are in eV and recall is
+in percent.}}
 \label{{tab:applicability}}
 \centering
 \begin{{tabular}}{{lccccc}}
 \toprule
-Regime & Host macro & Impurity macro & Stable MAE & Low-decile MAE & Low-decile recall \\
+Regime & Host macro & Impurity macro & Nonpositive-target MAE & Low-decile MAE & Low-decile recall \\
 \midrule
 {body}
 \bottomrule

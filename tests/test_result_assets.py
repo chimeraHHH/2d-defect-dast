@@ -297,6 +297,12 @@ def test_generated_table_body_rows_have_latex_terminators():
         assert all(row.endswith(r"\\") for row in rows)
 
 
+def test_applicability_table_does_not_equate_nonpositive_targets_with_stability():
+    table = render_applicability_table(minimal_claims())
+    assert "Nonpositive-target MAE" in table
+    assert "Stable MAE" not in table
+
+
 def test_ready_marker_is_invalidated_until_all_assets_succeed(tmp_path):
     generated = tmp_path / "generated"
     generated.mkdir()
