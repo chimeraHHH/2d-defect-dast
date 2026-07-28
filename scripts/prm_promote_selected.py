@@ -4,16 +4,19 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import yaml
 
 from src.prm_provenance import load_verified_factorial_selection
 
-
-ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
 
 

@@ -6,17 +6,20 @@ import hashlib
 import json
 import shutil
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 
 from src.prm_metrics import regression_metrics
 from src.prm_provenance import load_protocol_targets, validate_protocol_targets
 
-
-ROOT = Path(__file__).resolve().parent.parent
 METRIC_ENCODING_SCHEMA = "prm_nullable_correlations_v1"
 
 

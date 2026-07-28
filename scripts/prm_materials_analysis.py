@@ -7,10 +7,15 @@ import hashlib
 import json
 import math
 import subprocess
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 from ase.data import atomic_numbers
@@ -28,8 +33,6 @@ from src.prm_provenance import (
     validate_training_completion,
 )
 
-
-ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
 ENERGY_TIE_TOLERANCE_EV = 1e-8
 

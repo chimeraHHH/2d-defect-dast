@@ -13,13 +13,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import yaml
 
 from src.prm_provenance import config_sha256, validate_training_completion
-
-
-ROOT = Path(__file__).resolve().parent.parent
-
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()

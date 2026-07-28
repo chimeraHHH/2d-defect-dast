@@ -5,9 +5,14 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from scripts.prm_collect_results import (
     aggregate_fold_rows,
@@ -18,8 +23,6 @@ from scripts.prm_collect_results import (
     write_csv,
 )
 
-
-ROOT = Path(__file__).resolve().parent.parent
 EXPECTED_PAPER_SPLITS = {
     "id_repeat": 5,
     "id_cv": 5,

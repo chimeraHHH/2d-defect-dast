@@ -6,10 +6,15 @@ import csv
 import hashlib
 import json
 import subprocess
+import sys
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 
@@ -22,8 +27,6 @@ from src.prm_provenance import (
     validate_training_completion,
 )
 
-
-ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = (
     ("G", "use_gated_pooling"),
     ("E", "use_env_enrichment"),

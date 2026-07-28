@@ -7,9 +7,14 @@ import hashlib
 import json
 import math
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 from scipy.optimize import minimize
@@ -29,8 +34,6 @@ from src.prm_provenance import (
     validate_training_completion,
 )
 
-
-ROOT = Path(__file__).resolve().parent.parent
 COMPONENTS = ("use_gated_pooling", "use_env_enrichment", "use_prenorm_local")
 CALIBRATION_SUBSET_SEED = 6201
 
