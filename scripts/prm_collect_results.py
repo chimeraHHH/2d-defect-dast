@@ -799,15 +799,21 @@ def main() -> None:
                 indices, targets, protocol_targets,
                 context=f"{regime}/{model} pooled predictions",
             )
-            pooled[model] = (indices, canonical_targets, predictions)
             hosts = [sample_metadata[int(index)]["host"] for index in indices]
             dopants = [sample_metadata[int(index)]["dopant"] for index in indices]
+            try:
+                metrics = regression_metrics(
+                    canonical_targets, predictions, hosts, dopants
+                )
+            except ValueError:
+                if args.allow_incomplete:
+                    continue
+                raise
+            pooled[model] = (indices, canonical_targets, predictions)
             pooled_rows.append(
                 {
                     "model": model, "regime": regime, "n": len(indices),
-                    **regression_metrics(
-                        canonical_targets, predictions, hosts, dopants
-                    ),
+                    **metrics,
                 }
             )
         if "dart" not in pooled:
