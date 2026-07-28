@@ -71,26 +71,21 @@ constant-baseline correlations are represented as `null`. The verified 55-file
 descriptor archive is mirrored byte-for-byte to the formal result store.
 Validation selects LightGBM for the random, pair, and chemistry-block regimes
 and histogram gradient boosting for host- and dopant-held-out evaluation. The
-two DART initialization assets are pinned by SHA-256, and formal runs must record
-a fail-closed parameter-load report. On WHUServer-L40S, clean training commit
-`af6eeec` passed bounded protocol-v2 DART and SchNet CPU smoke runs. All
-9,871,460 stored periodic graph edges were independently reconstructed without
-topology or cutoff violations. GitHub code and evidence commit `866fcd4` passes
-all 133 tests in an isolated remote checkout. UQ and materials collectors reject
-non-finite inputs, undefined rank statistics, non-standard JSON numbers, and
-trivial or tied decision sets where the corresponding accuracy is not defined.
-The stale protocol-v1 queue was stopped before it launched any jobs. The
-systemd-managed `factorial-v2` queue subsequently attempted every paired run
-twice, but all 40 jobs failed before completing an epoch because DataLoader
-worker IPC exhausted process file descriptors. It produced no metrics or model
-checkpoints, so it contributes no scientific evidence. Formal DART and SchNet
-configs now freeze `num_workers: 0`. The 160-file failure tree is archived with
-a canonical digest, the clean recovery commit passes all 133 tests, and a
-two-epoch GPU smoke run completed with all five declared output hashes
-verified. That smoke run established the loader repair but exposed an independent
-element-indexing error: the zero-based ct-UAE rows were indexed by one-based
-atomic numbers. The replacement queue was stopped after two completions, its
-entire tree was archived as scientifically invalid, and the lookup now uses an
-explicit zero-padding row. A clean test, GPU smoke, and full factorial rerun are
-required before validation-only promotion, transfer, SchNet, ensemble UQ, and
-paper result generation.
+two DART initialization assets are pinned by SHA-256, and formal runs record a
+fail-closed parameter-load report. All 9,871,460 stored periodic graph edges
+were independently reconstructed without topology or cutoff violations.
+
+Two failed factorial attempts are retained only as negative operational
+evidence. `factorial-v2` exhausted process file descriptors before completing
+an epoch and produced no metrics or checkpoints; formal configs now freeze
+`num_workers: 0`. `factorial-v3-fd0` was stopped and archived after discovering
+that one-based atomic numbers indexed a zero-based ct-UAE table. Its outputs
+are scientifically invalid. The corrected implementation prepends an explicit
+zero-padding row, maps atomic numbers 1--100 to source rows 0--99, and passes
+138 remote tests. A clean two-epoch GPU smoke at commit `7a6593a` completed all
+five declared outputs and independently verified the 101-row checkpoint table,
+zero padding, and exact endpoint mappings. The formal 40-run
+`factorial-v4-indexed` queue started from the same clean frozen commit with GPU
+2 excluded. Validation-only promotion, transfer, SchNet, ensemble UQ,
+materials analysis, and paper result generation remain gated on completion and
+collection of this queue.

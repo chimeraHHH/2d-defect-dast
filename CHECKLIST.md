@@ -19,19 +19,21 @@
       from clean training commit `af6eeec`.
 - [x] Reconstruct all 9,871,460 stored graph-edge distances from positions,
       periodic image shifts, and cells without topology or cutoff violations.
+- [x] Correct ct-UAE atomic-number indexing with a zero-padding row; verify the
+      published checkpoint derivation, exact Z=1/Z=100 endpoint mappings, and
+      all 138 tests from a clean remote checkout.
+- [x] Complete a two-epoch corrected-index GPU smoke at clean commit `7a6593a`;
+      verify both asset hashes, all five declared output hashes, two history
+      epochs, zero worker processes, and the 101-row checkpoint table.
 
 ## Experiments
 
-- [ ] Run 2^3 architecture factorial for seeds 42-46. (`factorial-v2` failed
-      before completing an epoch in all 40 jobs because concurrent DataLoader
-      workers exhausted process file descriptors. No metrics or checkpoints
-      were produced. The 160-file failure tree is preserved under
-      `_failed_attempts`, all formal configs now freeze `num_workers: 0`, and a
-      clean two-epoch GPU smoke run passed the loader check. The replacement
-      `factorial-v3-fd0` queue was then stopped and archived after discovering
-      that one-based atomic numbers incorrectly indexed the zero-based ct-UAE
-      table. Its outputs are scientifically invalid. The corrected lookup,
-      source-derivation audit, regression tests, and a clean rerun are required.)
+- [ ] Run 2^3 architecture factorial for seeds 42-46.
+      (`factorial-v2` and `factorial-v3-fd0` are archived and scientifically
+      excluded for, respectively, DataLoader file-descriptor exhaustion and
+      shifted ct-UAE indexing. The corrected 40-run `factorial-v4-indexed`
+      queue is active from clean commit `7a6593a`, with `num_workers: 0`,
+      asset-integrity checks enabled, and GPU 2 excluded.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,
