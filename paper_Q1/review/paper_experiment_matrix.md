@@ -9,7 +9,7 @@ Status date: 2026-07-28
 | E3 | Select descriptor comparators using validation data on every formal regime | Complete, awaiting joint table | `artifacts/prm_results/descriptors/` | Classical baseline rows in the main comparison |
 | E4 | Compare promoted DART with periodic SchNet under aligned transfer partitions | Running; no partial result admissible | remote queues `dart-g111-v1` and `schnet-v1` | Main transfer table, paired intervals, and applicability diagnostics |
 | E5 | Evaluate five-member DART uncertainty on a separate calibration/test split | Running; no partial result admissible | five promoted UQ configurations in `dart-g111-v1` | Calibration table, risk--coverage figure, and abstention claims |
-| E6 | Convert pair-held-out predictions into preference and site-screening decisions | Analysis implemented; predictions pending E4 | `scripts/prm_materials_analysis.py` | Screening table and regret figure |
+| E6 | Convert pair-held-out predictions into preference/site-screening decisions and descriptive error-heterogeneity diagnostics | Analysis implemented; predictions pending E4 | `scripts/prm_materials_analysis.py` | Screening table, regret figure, and host/impurity/incorporation error analysis |
 | E7 | Generate fail-closed manuscript tables, figures, and macros | Pending E4--E6 | `scripts/prm_make_result_assets.py` | Releases all numerical Results, Discussion, and Conclusion text |
 
 ## Claim mapping

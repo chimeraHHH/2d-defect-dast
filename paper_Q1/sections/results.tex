@@ -82,6 +82,26 @@ architecture or hyperparameter selection.
 \input{generated/tab_applicability.tex}
 
 %----------------------------------------------------------------------
+\subsection{Descriptive error heterogeneity}
+\label{sec:error_heterogeneity}
+%----------------------------------------------------------------------
+
+\input{generated/results_error_heterogeneity_narrative.tex}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_error_heterogeneity.pdf}
+\caption{Error heterogeneity from DART host--impurity-pair-held-out
+  out-of-fold predictions.
+  (a,b) Host- and impurity-group MAE versus the number of retained structures;
+  labels mark the three largest group MAEs and $\rho_s$ is the descriptive
+  Spearman association.
+  (c) MAE by incorporation class and source site label.  These summaries were
+  not used for architecture, hyperparameter, or model selection.}
+\label{fig:error_heterogeneity}
+\end{figure*}
+
+%----------------------------------------------------------------------
 \subsection{Held-out uncertainty and selective prediction}
 \label{sec:uq_results}
 %----------------------------------------------------------------------

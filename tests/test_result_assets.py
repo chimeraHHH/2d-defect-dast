@@ -16,6 +16,7 @@ from scripts.prm_make_result_assets import (
     latex_escape,
     render_applicability_table,
     render_benchmark_table,
+    render_error_heterogeneity_narrative,
     render_factorial_narrative,
     render_factorial_table,
     render_macros,
@@ -153,6 +154,21 @@ def minimal_claims():
                 "top2_accuracy": summary(0.7),
                 "screening_regret_eV": summary(0.08),
             },
+            "error_heterogeneity": {
+                "basis": "descriptive",
+                "host": {
+                    "sample_count_mae_spearman": -0.4,
+                    "worst_groups": [
+                        {"group": "H_1", "n": 12, "mae_eV": 0.9, "bias_eV": 0.1}
+                    ],
+                },
+                "dopant": {
+                    "sample_count_mae_spearman": -0.3,
+                    "worst_groups": [
+                        {"group": "X", "n": 14, "mae_eV": 0.8, "bias_eV": -0.1}
+                    ],
+                },
+            },
         },
     }
 
@@ -173,6 +189,7 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
 
     factorial = render_factorial_narrative(claims)
     transfer = render_transfer_narrative(claims)
+    heterogeneity = render_error_heterogeneity_narrative(claims)
 
     assert "G$: $\\Delta=-0.200$" in factorial
     assert "(supported reduction)" in factorial
@@ -181,6 +198,8 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
     assert "SchNet $\\Delta=+0.100$" in transfer
     assert "(inconclusive)" in transfer
     assert "(supports lower DART error)" in transfer
+    assert "H\\_1" in heterogeneity
+    assert "descriptive associations" in heterogeneity
 
 
 def test_generated_table_body_rows_have_latex_terminators():

@@ -286,6 +286,71 @@ def group_error_rows(
     return rows
 
 
+def summarize_error_heterogeneity(
+    group_rows: Sequence[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Summarize descriptive group errors without using them for selection."""
+    output: Dict[str, Any] = {
+        "basis": (
+            "pair-held-out out-of-fold predictions; descriptive associations "
+            "not used for model selection"
+        )
+    }
+    for axis in ("host", "dopant"):
+        members = [row for row in group_rows if row["axis"] == axis]
+        if len(members) < 2:
+            raise ValueError(f"{axis} error summary requires at least two groups")
+        counts = np.asarray([int(row["n"]) for row in members], dtype=float)
+        errors = np.asarray([float(row["mae_eV"]) for row in members], dtype=float)
+        if (
+            not np.isfinite(counts).all()
+            or not np.isfinite(errors).all()
+            or len(np.unique(counts)) < 2
+            or len(np.unique(errors)) < 2
+        ):
+            raise ValueError(f"{axis} group-size/error association is undefined")
+        worst = sorted(
+            members, key=lambda row: (-float(row["mae_eV"]), str(row["group"]))
+        )[:5]
+        output[axis] = {
+            "n_groups": len(members),
+            "sample_count_mae_spearman": finite_spearman(
+                counts,
+                errors,
+                context=f"{axis} sample-count/group-MAE Spearman correlation",
+            ),
+            "group_mae_mean_eV": float(np.mean(errors)),
+            "group_mae_median_eV": float(np.median(errors)),
+            "worst_groups": [
+                {
+                    "group": str(row["group"]),
+                    "n": int(row["n"]),
+                    "mae_eV": float(row["mae_eV"]),
+                    "bias_eV": float(row["bias_eV"]),
+                }
+                for row in worst
+            ],
+        }
+    for axis in ("defecttype", "site"):
+        members = sorted(
+            (row for row in group_rows if row["axis"] == axis),
+            key=lambda row: str(row["group"]),
+        )
+        if not members:
+            raise ValueError(f"{axis} error summary is empty")
+        output[axis] = [
+            {
+                "group": str(row["group"]),
+                "n": int(row["n"]),
+                "mae_eV": float(row["mae_eV"]),
+                "rmse_eV": float(row["rmse_eV"]),
+                "bias_eV": float(row["bias_eV"]),
+            }
+            for row in members
+        ]
+    return output
+
+
 def analyse_preferences(
     samples: Sequence[Mapping[str, Any]],
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -461,6 +526,9 @@ def main() -> None:
     preference_rows = [row for row in pair_rows if row["preference_eligible"]]
     top2_site_rows = [row for row in site_rows if row["top2_eligible"]]
     residual = np.asarray([row["residual_eV"] for row in sample_rows])
+    group_rows = []
+    for axis in ("host", "dopant", "defecttype", "site"):
+        group_rows.extend(group_error_rows(sample_rows, axis))
     collector_git = git_snapshot()
     require_clean_git_snapshot(collector_git, context="materials collection")
     summary = {
@@ -525,6 +593,7 @@ def main() -> None:
                 site_rows, "screening_regret_eV", seed=20263007,
             ),
         },
+        "error_heterogeneity": summarize_error_heterogeneity(group_rows),
         "interpretation_boundary": (
             "Out-of-fold associations and screening regret are descriptive; "
             "they are not causal mechanisms or external DFT validation."
@@ -532,9 +601,6 @@ def main() -> None:
     }
     strict_json(summary)
 
-    group_rows = []
-    for axis in ("host", "dopant", "defecttype", "site"):
-        group_rows.extend(group_error_rows(sample_rows, axis))
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     write_csv(out_dir / "sample_predictions.csv", sample_rows)

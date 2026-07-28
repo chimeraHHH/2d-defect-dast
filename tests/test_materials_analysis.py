@@ -6,6 +6,7 @@ from scripts.prm_materials_analysis import (
     bootstrap_mean,
     cluster_bootstrap_mean,
     load_prediction_array,
+    summarize_error_heterogeneity,
 )
 
 
@@ -167,3 +168,26 @@ def test_materials_prediction_loader_rejects_partition_or_split_mismatch(tmp_pat
     )
     with pytest.raises(ValueError, match="split ID mismatch"):
         load_prediction_array(path, expected_split_id="pair_cv5_f0")
+
+
+def test_error_heterogeneity_summarizes_groups_without_selection_claims():
+    rows = [
+        {"axis": "host", "group": "H1", "n": 10, "mae_eV": 0.8, "rmse_eV": 1.0, "bias_eV": 0.1},
+        {"axis": "host", "group": "H2", "n": 20, "mae_eV": 0.4, "rmse_eV": 0.6, "bias_eV": -0.1},
+        {"axis": "dopant", "group": "C", "n": 8, "mae_eV": 0.9, "rmse_eV": 1.1, "bias_eV": 0.2},
+        {"axis": "dopant", "group": "O", "n": 18, "mae_eV": 0.3, "rmse_eV": 0.5, "bias_eV": -0.2},
+        {"axis": "defecttype", "group": "adsorbate", "n": 20, "mae_eV": 0.5, "rmse_eV": 0.7, "bias_eV": 0.0},
+        {"axis": "defecttype", "group": "interstitial", "n": 16, "mae_eV": 0.6, "rmse_eV": 0.8, "bias_eV": 0.1},
+        {"axis": "site", "group": "ads0", "n": 12, "mae_eV": 0.4, "rmse_eV": 0.6, "bias_eV": 0.0},
+        {"axis": "site", "group": "int0", "n": 10, "mae_eV": 0.7, "rmse_eV": 0.9, "bias_eV": 0.2},
+    ]
+
+    summary = summarize_error_heterogeneity(rows)
+
+    assert summary["host"]["sample_count_mae_spearman"] == pytest.approx(-1.0)
+    assert summary["dopant"]["sample_count_mae_spearman"] == pytest.approx(-1.0)
+    assert summary["host"]["worst_groups"][0]["group"] == "H1"
+    assert "not used for model selection" in summary["basis"]
+    assert [row["group"] for row in summary["defecttype"]] == [
+        "adsorbate", "interstitial",
+    ]

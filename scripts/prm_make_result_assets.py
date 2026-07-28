@@ -411,6 +411,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
             "sample_oof": materials["sample_oof"],
             "defect_type_preference": materials["defect_type_preference"],
             "within_defect_type_site_selection": materials["within_defect_type_site_selection"],
+            "error_heterogeneity": materials["error_heterogeneity"],
             "interpretation_boundary": materials["interpretation_boundary"],
         },
     }
@@ -565,6 +566,31 @@ def render_transfer_narrative(claims: Mapping[str, Any]) -> str:
         "% Auto-generated from canonical paired comparisons; do not edit.\n"
         + " ".join(sentences)
         + "\n"
+    )
+
+
+def render_error_heterogeneity_narrative(claims: Mapping[str, Any]) -> str:
+    heterogeneity = claims["materials"]["error_heterogeneity"]
+    host = heterogeneity["host"]
+    dopant = heterogeneity["dopant"]
+    worst_host = host["worst_groups"][0]
+    worst_dopant = dopant["worst_groups"][0]
+    return (
+        "% Auto-generated from pair-held-out group errors; do not edit.\n"
+        "Across host and impurity groups, the Spearman associations between "
+        "group sample count and group MAE were "
+        rf"{finite_format(host['sample_count_mae_spearman'])} and "
+        rf"{finite_format(dopant['sample_count_mae_spearman'])}, respectively. "
+        f"The largest group MAEs occurred for host "
+        rf"{latex_escape(worst_host['group'])} "
+        rf"({finite_format(worst_host['mae_eV'])}~eV; "
+        rf"$n={int(worst_host['n'])}$) and impurity "
+        rf"{latex_escape(worst_dopant['group'])} "
+        rf"({finite_format(worst_dopant['mae_eV'])}~eV; "
+        rf"$n={int(worst_dopant['n'])}$). "
+        "Because group size covaries with chemistry, these are descriptive "
+        "associations rather than evidence that sample count alone causes the "
+        "observed errors.\n"
     )
 
 
@@ -935,6 +961,81 @@ def plot_transfer(
     return save_figure(figure, output_pdf)
 
 
+def plot_error_heterogeneity(
+    materials: Mapping[str, Any], group_rows: Sequence[Mapping[str, str]],
+    output_pdf: Path,
+) -> list[Path]:
+    configure_style()
+    figure, axes = plt.subplots(1, 3, figsize=(7.05, 2.75))
+    heterogeneity = materials["error_heterogeneity"]
+    for panel, axis_name, marker, color, label in (
+        (0, "host", "o", COLORS["dart"], "Host"),
+        (1, "dopant", "s", COLORS["descriptor"], "Impurity"),
+    ):
+        rows = [row for row in group_rows if row["axis"] == axis_name]
+        counts = np.asarray([int(row["n"]) for row in rows], dtype=float)
+        errors = np.asarray([float(row["mae_eV"]) for row in rows], dtype=float)
+        axes[panel].scatter(
+            counts, errors, marker=marker, s=16, alpha=0.72, color=color,
+            edgecolors="white", linewidths=0.3,
+        )
+        for row in sorted(rows, key=lambda item: -float(item["mae_eV"]))[:3]:
+            axes[panel].annotate(
+                str(row["group"]),
+                (int(row["n"]), float(row["mae_eV"])),
+                xytext=(3, 2), textcoords="offset points", fontsize=5.2,
+            )
+        rho = float(heterogeneity[axis_name]["sample_count_mae_spearman"])
+        axes[panel].text(
+            0.04, 0.95, rf"$\rho_s={rho:.2f}$",
+            transform=axes[panel].transAxes, va="top",
+        )
+        axes[panel].set_xscale("log")
+        axes[panel].set_xlabel(f"{label} sample count")
+        axes[panel].set_ylabel("Group MAE (eV)")
+        axes[panel].set_title(f"{label}-level error", loc="left", pad=5)
+        axes[panel].grid(color=COLORS["grid"], lw=0.4)
+        axes[panel].spines[["top", "right"]].set_visible(False)
+        panel_label(axes[panel], f"({chr(ord('a') + panel)})")
+
+    categories = [
+        row for row in group_rows if row["axis"] in {"defecttype", "site"}
+    ]
+    categories.sort(
+        key=lambda row: (
+            0 if row["axis"] == "defecttype" else 1,
+            str(row["group"]),
+        )
+    )
+    positions = np.arange(len(categories))
+    values = np.asarray([float(row["mae_eV"]) for row in categories])
+    category_colors = [
+        COLORS["test"] if row["axis"] == "defecttype" else COLORS["muted"]
+        for row in categories
+    ]
+    axes[2].scatter(values, positions, s=18, c=category_colors, zorder=2)
+    axes[2].hlines(
+        positions, 0.0, values, color=COLORS["grid"], lw=0.7, zorder=1,
+    )
+    axes[2].set_yticks(
+        positions,
+        [
+            ("class: " if row["axis"] == "defecttype" else "site: ")
+            + str(row["group"])
+            for row in categories
+        ],
+    )
+    axes[2].invert_yaxis()
+    axes[2].set_xlabel("MAE (eV)")
+    axes[2].set_title("Incorporation and site labels", loc="left", pad=5)
+    axes[2].grid(axis="x", color=COLORS["grid"], lw=0.4)
+    axes[2].spines[["top", "right", "left"]].set_visible(False)
+    axes[2].tick_params(axis="y", length=0, labelsize=5.2)
+    panel_label(axes[2], "(c)")
+    figure.tight_layout(w_pad=1.6)
+    return save_figure(figure, output_pdf)
+
+
 def plot_uq(
     uq: Mapping[str, Any], interval_rows: Sequence[Mapping[str, str]],
     risk_rows: Sequence[Mapping[str, str]], predictions_path: Path,
@@ -1079,6 +1180,9 @@ def write_outputs(
         "results_macros.tex": render_macros(claims),
         "results_factorial_narrative.tex": render_factorial_narrative(claims),
         "results_transfer_narrative.tex": render_transfer_narrative(claims),
+        "results_error_heterogeneity_narrative.tex": (
+            render_error_heterogeneity_narrative(claims)
+        ),
         "tab_factorial.tex": render_factorial_table(inputs["factorial"]),
         "tab_benchmark.tex": render_benchmark_table(claims),
         "tab_applicability.tex": render_applicability_table(claims),
@@ -1095,6 +1199,12 @@ def write_outputs(
         plot_transfer(
             inputs["comparison"], inputs["pooled"], inputs["paired"],
             figure_dir / "fig_transfer.pdf",
+        )
+    )
+    output_paths.extend(
+        plot_error_heterogeneity(
+            inputs["materials"], inputs["group_errors"],
+            figure_dir / "fig_error_heterogeneity.pdf",
         )
     )
     output_paths.extend(
