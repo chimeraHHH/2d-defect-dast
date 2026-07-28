@@ -98,6 +98,16 @@ def test_constant_mean_baseline_has_explicitly_undefined_rank_metric():
     assert metrics["spearman"] is None
 
 
+def test_pooled_metrics_mark_empty_nonpositive_stratum_as_undefined():
+    targets = np.asarray([1.0, 2.0, 3.0])
+    predictions = np.asarray([1.1, 2.1, 2.9])
+
+    metrics = regression_metrics(targets, predictions)
+
+    assert metrics["favorable_n"] == 0
+    assert metrics["favorable_mae"] is None
+
+
 def test_single_fold_interval_is_explicitly_not_estimable():
     summary = bootstrap_ci([0.5], seed=1)
 

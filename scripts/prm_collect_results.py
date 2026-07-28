@@ -577,9 +577,10 @@ def regression_metrics(
     }
     favorable = np.asarray(targets) <= 0.0
     output["favorable_n"] = int(np.sum(favorable))
-    if not np.any(favorable):
-        raise ValueError("pooled evaluation has no non-positive formation energies")
-    output["favorable_mae"] = float(np.mean(np.abs(residual[favorable])))
+    output["favorable_mae"] = (
+        float(np.mean(np.abs(residual[favorable])))
+        if np.any(favorable) else None
+    )
     low = low_energy_metrics(targets, predictions, fraction=0.1)
     low_order = np.argsort(np.asarray(targets), kind="stable")[: int(low["k"])]
     output.update(

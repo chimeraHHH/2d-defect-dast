@@ -440,8 +440,10 @@ def model_label(model: str) -> str:
     return labels.get(model, model.replace("descriptor:", ""))
 
 
-def finite_format(value: float, digits: int = 3, signed: bool = False) -> str:
-    if not math.isfinite(float(value)):
+def finite_format(
+    value: float | None, digits: int = 3, signed: bool = False,
+) -> str:
+    if value is None or not math.isfinite(float(value)):
         return "--"
     threshold = 0.5 * 10 ** (-digits)
     numeric = 0.0 if abs(float(value)) < threshold else float(value)
@@ -904,7 +906,8 @@ def render_applicability_table(claims: Mapping[str, Any]) -> str:
 host or impurity equally. Nonpositive-target MAE uses
 $E_\mathrm{{f}}\leq0$; low-decile MAE and recall use the true and predicted
 lowest 10\% of each pooled test regime. Energy errors are in eV and recall is
-in percent.}}
+in percent. A dash denotes a regime with no eligible nonpositive test
+targets.}}
 \label{{tab:applicability}}
 \centering
 \begin{{tabular}}{{lccccc}}

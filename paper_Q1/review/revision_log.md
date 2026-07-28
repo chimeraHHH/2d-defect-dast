@@ -123,3 +123,14 @@
   version 2, DOI `10.11583/DTU.19692238.v2`.
 - Status: complete.
 - Blocks finalization: no.
+
+### REV-012: Empty nonpositive-target stratum
+
+- Severity: major result-packaging issue.
+- Fix type: analysis edge-case correction.
+- Change: represent a pooled regime with no test targets satisfying
+  $E_{\mathrm f}\leq0$ by an eligible count of zero and an undefined stratum
+  MAE, rendered as a dash with an explicit table note, instead of aborting the
+  complete comparison collector.
+- Status: complete before exposure of pooled metrics.
+- Blocks finalization: no.

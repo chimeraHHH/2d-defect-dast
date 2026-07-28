@@ -2,6 +2,7 @@ import hashlib
 import json
 import re
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -67,6 +68,7 @@ def test_factorial_effect_claim_counts_direction_and_rejects_bad_repeats():
 def test_latex_and_number_formatting_are_stable():
     assert latex_escape("host_pair%") == r"host\_pair\%"
     assert finite_format(-0.0001, digits=3, signed=True) == "+0.000"
+    assert finite_format(None) == "--"
     assert finite_format(float("nan")) == "--"
     with pytest.raises(ValueError, match="Out of range float values"):
         strict_json({"paper_metric": float("nan")})
@@ -301,6 +303,23 @@ def test_applicability_table_does_not_equate_nonpositive_targets_with_stability(
     table = render_applicability_table(minimal_claims())
     assert "Nonpositive-target MAE" in table
     assert "Stable MAE" not in table
+    assert "no eligible nonpositive test" in table
+
+
+def test_applicability_table_renders_empty_nonpositive_stratum_as_dash():
+    claims = minimal_claims()
+    chemistry = deepcopy(claims["benchmarks"]["chemistry_block"])
+    chemistry["models"]["dart"]["favorable_mae"] = None
+    claims["benchmarks"] = {
+        **claims["benchmarks"], "chemistry_block": chemistry,
+    }
+
+    table = render_applicability_table(claims)
+    chemistry_row = next(
+        line for line in table.splitlines() if line.startswith("Chemistry block")
+    )
+
+    assert " & -- & " in chemistry_row
 
 
 def test_ready_marker_is_invalidated_until_all_assets_succeed(tmp_path):
