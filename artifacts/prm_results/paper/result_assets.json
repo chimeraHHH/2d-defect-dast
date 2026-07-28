@@ -1,31 +1,31 @@
 {
   "collector_git": {
-    "commit": "c6c5a2d31968d3b1c4e70caac6df8762e9c67e42",
+    "commit": "288cefe61b58768a9f0da0741d4c2087a934ef31",
     "dirty": false,
     "status_porcelain": []
   },
-  "created_at": "2026-07-28T17:43:05.166619+00:00",
+  "created_at": "2026-07-28T18:43:25.535123+00:00",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
   "inputs": {
     "comparison": {
       "path": "artifacts/prm_results/comparison/manifest.json",
-      "sha256": "ce163031b7e2755896529cce21e86dfb4b5b97f5b1d9d1a4e0bdff4fd71274ea"
+      "sha256": "c57ffdd0b9f70c9129353d2d6981ec5431b508e18f8a7f835fb2e5af23e2d729"
     },
     "comparison_descriptor_selection": {
       "path": "artifacts/prm_results/comparison/descriptor_selection.json",
-      "sha256": "363d61114d22476b00ae28502dc79ead3ed9550f475dffd4bd2caed84565b313"
+      "sha256": "b55923a7d775c9a80a05c2a111f4506a688d9eba83e8b9de3dd427460f7dd542"
     },
     "comparison_fold_metrics": {
       "path": "artifacts/prm_results/comparison/fold_metrics.csv",
-      "sha256": "8d02d69feb19b48d3e35cd99f4f259f85625016683bebf235475edc8df1dd3fa"
+      "sha256": "99a95911cd43f37e24ceb436d14b5c53408884deeb00ae199e175e26ecd5d6d7"
     },
     "comparison_run_metrics": {
       "path": "artifacts/prm_results/comparison/run_metrics.csv",
-      "sha256": "b2f02c7e1b65069b2591d5471646a9dc7e0038bf3e8010c27f66f6c11c08c728"
+      "sha256": "c4a532620092bf4fb411ad75b04cf74c0243e2938d84a39a8675b930cfb81d2b"
     },
     "comparison_summary": {
       "path": "artifacts/prm_results/comparison/summary.csv",
-      "sha256": "ace231ce99953daa1315483e4fcdfaa06af74a83cac744fb589be8b714e420de"
+      "sha256": "1e9097140af0c1cc1f97d461b976102250c499c6e8805770cd4cd0e92e02e11a"
     },
     "factorial": {
       "path": "artifacts/prm_results/factorial/bundle.json",
@@ -37,19 +37,19 @@
     },
     "materials": {
       "path": "artifacts/prm_results/materials/summary.json",
-      "sha256": "97a7a9d6854f17a308237349704f18358106694a109068ed960031b6fbfa97ac"
+      "sha256": "efd018270d270c25b5d30696b6a6e82bbb4e3ec2c5b990c328d81da0fd45e60a"
     },
     "pair_preferences": {
       "path": "artifacts/prm_results/materials/pair_preferences.csv",
-      "sha256": "a83647a27544327e8c53fda61c97b3d5ac7279b1bed26c00fed9d9c38fce3e23"
+      "sha256": "00b3621c7c30462e2841d66633a7f4565af4bf21f17910a13435c93de88cdd89"
     },
     "paired": {
       "path": "artifacts/prm_results/comparison/paired_comparisons.csv",
-      "sha256": "a67b33602bfcd999862d4690ef5f8b1a7a5a470ce41d72659ec7fae3733eba7d"
+      "sha256": "692b393a4650c3b013895e878482ea602002875f2ece99f3df1e2ce376f72830"
     },
     "pooled": {
       "path": "artifacts/prm_results/comparison/pooled_metrics.csv",
-      "sha256": "ec61298a5ce029e0b00b642001aa561fbc7b8b0077270e5733ec27efed8a9869"
+      "sha256": "6204b9e9bab8700b3292e9d4a6d534a0a0cc49fef4b97cdd0023330b2bef835a"
     },
     "protocol": {
       "path": "artifacts/prm_protocol_v2/manifest.json",
@@ -61,7 +61,7 @@
     },
     "schnet_readout": {
       "path": "artifacts/prm_results/sensitivity/schnet_readout/manifest.json",
-      "sha256": "ae4202d6c5adf2dc10f93d4e873a674754caf56db26e2f177abb2f3bcb6f3872"
+      "sha256": "1ebad477305e64421e5d80b41c45fc66762f28ca18e3d83f49757bad25e4d369"
     },
     "schnet_readout_config_manifest": {
       "path": "configs/prm/sensitivity/schnet_mean_host/manifest.json",
@@ -89,7 +89,7 @@
     },
     "site_selection": {
       "path": "artifacts/prm_results/materials/site_selection.csv",
-      "sha256": "d5adb98c39a4a2f798d89441804b3aa4ce10125bed41b26b102c90e538ebcbb0"
+      "sha256": "f0daa4d9016d979d4a60dd5cf4e873143474360508ed9e88275ab59fc450f984"
     },
     "uq": {
       "path": "artifacts/prm_results/uq/metrics.json",
@@ -109,29 +109,29 @@
     }
   },
   "outputs": {
-    "paper_Q1/figures/fig_error_heterogeneity.pdf": "9ad6cd949288e39f09e347a2d14bdbfeeaf49d932d0fa3a64e586df68f554e08",
-    "paper_Q1/figures/fig_error_heterogeneity.png": "d893e25ad84cdd842e193314a2835384d7b39e3e0d56d4e33df9daa191282fcd",
-    "paper_Q1/figures/fig_factorial.pdf": "e08e02e0f23ada4b12adc41eb4a842c4e9af85e440528d31d5b9b5b59c0e010e",
-    "paper_Q1/figures/fig_factorial.png": "9a2cf0b78b364526a2d92bff3b52863a19453893a11837d8d06988a9c59c3200",
-    "paper_Q1/figures/fig_screening.pdf": "ecb8bf0d6d676ee4ec1c6da3128a413793a497ad02ff60bb585ece3bd7f94e2a",
-    "paper_Q1/figures/fig_screening.png": "0dbc4e3bcff2ccaf47fa09677c041b01fb2850cf6e68093b3af33872c09e035b",
-    "paper_Q1/figures/fig_transfer.pdf": "2b5910af45c6e15db1d9aab2c40e70927ef40ed008dae355192b0dbd37244ba5",
-    "paper_Q1/figures/fig_transfer.png": "f7799cb1d3ab59b67577a8ad4be84496fe1f1609d44dd98cbb1791b21558446d",
-    "paper_Q1/figures/fig_uq.pdf": "b63aa3c8fcc6eb283dc373b83308e02e7c787e9b9d73e11887249978e1bb4401",
-    "paper_Q1/figures/fig_uq.png": "2bfc294551205b68396b2ee662d0f0c0bb69612d7c1b2dddb7f996db87e6a939",
-    "paper_Q1/generated/claims.json": "fb844a7980579364bb449d13265ecd7216e9de71fc96062ca0d22c59bff593d8",
+    "paper_Q1/figures/fig_error_heterogeneity.pdf": "273d78462be8b40b0fc8adf99236e0c273aa69fa312bf8450df8908b3e6b769f",
+    "paper_Q1/figures/fig_error_heterogeneity.png": "8f6b372c391a5303bbdeed5cf035fcbaee9ea15dc13325a7c7140236a71c4dcb",
+    "paper_Q1/figures/fig_factorial.pdf": "f14e0aa5bd72b2ede9e9bfb6f917aef25a3ee3d5a9c93fddb5b605f87b1cfc92",
+    "paper_Q1/figures/fig_factorial.png": "2157a96a0f88939a08ffc81d382c54f2b6e5ec847a836a681aa170191f84d409",
+    "paper_Q1/figures/fig_screening.pdf": "6095519c2310387e9fb99e5ac26e69f55052f8407f52ba590c4546bc732f5e5c",
+    "paper_Q1/figures/fig_screening.png": "3ce3b25990b2c4cbf91cf636cfbcf5b7c70ee5b60c3c4d8c3caac35385aa1aec",
+    "paper_Q1/figures/fig_transfer.pdf": "873495e941cda8db6af309b36297c790dc8acb93ba5241eaa4dd913e39860e0c",
+    "paper_Q1/figures/fig_transfer.png": "cae57adef2b1e37a34aa9a8f04c168d5d511f5b2e14fad6e08a967e7a51163c1",
+    "paper_Q1/figures/fig_uq.pdf": "700b86cfdf25e5937e2e71d236d35c74a0042b56123130785e042b3401350209",
+    "paper_Q1/figures/fig_uq.png": "64dab31c1aecef44cfb0b4b0e51b69682a2ec394144ac7a717943c5d5bf64064",
+    "paper_Q1/generated/claims.json": "e1dadc82cfd168e1f0e9ad14e5eb9dd735f766de652734d4f6f0737d285e089a",
     "paper_Q1/generated/results_error_heterogeneity_narrative.tex": "74e350f4403a688fa0aeec68c7cddc925bc71885f77bdf7dc250a77d667e7438",
     "paper_Q1/generated/results_factorial_narrative.tex": "a1d30207dbbdbdc2f7d7a855f30c88bbdc8db5c2b82e541a99dee0a83f0aa017",
-    "paper_Q1/generated/results_macros.tex": "f2db231877d3fbabde496d1e6c47631bb731983d29eab2c445899d3936aba913",
+    "paper_Q1/generated/results_macros.tex": "7b483a26e104a4b2e0460f70594c68e50cffe60027a9762f6551dc94939e7e90",
     "paper_Q1/generated/results_ready.tex": "1c9771a27939eae4b73003bc1f480c2737ced84cef15b272fc66de1a65f20824",
     "paper_Q1/generated/results_schnet_readout_narrative.tex": "035c122cb39fe43de8dbb625af1bd2d320496c058a51bb8b2f1378ae30a3fc7e",
-    "paper_Q1/generated/results_transfer_narrative.tex": "36e0bf439a50a4a1523a4a3edfabf4cd066e79c8989fa794ece53ed8872b44f6",
+    "paper_Q1/generated/results_transfer_narrative.tex": "1dd689e6fe730f767d1800950fe79ccf50933598c47ac72bffb731f88d54f988",
     "paper_Q1/generated/tab_applicability.tex": "d1476bb5a166a6eea090629a57a554147ac246d3ceab280c2be8ed94feea4d09",
-    "paper_Q1/generated/tab_benchmark.tex": "39a283306234c8220dc9c09add04ae34f3938dbdf7fe4a9f7ea96ee4af3fd026",
+    "paper_Q1/generated/tab_benchmark.tex": "61135809d170c3bd8d1e3f478fcf659528c8dfe6623c2c39140eb09a74a20543",
     "paper_Q1/generated/tab_factorial.tex": "3346d43a697b1dc1060a658ad3d3e68278e51cb21faeb0b47292b0d20291da7d",
     "paper_Q1/generated/tab_schnet_readout.tex": "bebacfa7a3545db0b97841615d83a5a2fde0ff22648ed8dbb0de14f917e5c29a",
-    "paper_Q1/generated/tab_screening.tex": "3f19d0fce42e6fcc3afe9a7c176c65f9f0d5f95998e8df3dc3ac7c5d4076c189",
-    "paper_Q1/generated/tab_uq.tex": "97daacb369a385b219067b8299af8b83bf52e491455c49b24dd29d09095bb88f"
+    "paper_Q1/generated/tab_screening.tex": "cc1e7cf92db9433240d6936317ee00cce8683fca210bc0ed67a7b62573bb80f5",
+    "paper_Q1/generated/tab_uq.tex": "5733d64d11503fec8dfcaf2240d21eb326f86990273c9883169222fa7f2dd2cd"
   },
   "schema_version": "prm_paper_assets_v2",
   "selected_variant": "g111",

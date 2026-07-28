@@ -1,7 +1,10 @@
 {
   "benchmarks": {
     "chemistry_block": {
-      "descriptor_model": "descriptor:lightgbm",
+      "descriptor_family_counts": {
+        "lightgbm": 1
+      },
+      "descriptor_model": "descriptor:validation_selected",
       "models": {
         "dart": {
           "bias": 0.08479051427444768,
@@ -16,19 +19,6 @@
           "rmse": 0.7367254537262592,
           "spearman": 0.9264965216683161
         },
-        "descriptor:lightgbm": {
-          "bias": 0.2290442313653657,
-          "dopant_macro_mae": 0.6307425568158888,
-          "favorable_mae": null,
-          "host_macro_mae": 0.6234417957443436,
-          "low_energy_mae": 0.5002526839785746,
-          "low_energy_recall": 0.7777777777777778,
-          "mae": 0.6418160664372107,
-          "n": 365,
-          "r2": 0.8080076577864768,
-          "rmse": 1.0450747337433761,
-          "spearman": 0.8624004560451901
-        },
         "descriptor:mean": {
           "bias": -1.5112556889685156,
           "dopant_macro_mae": 1.7733780920676305,
@@ -41,6 +31,19 @@
           "r2": -0.4014811024173437,
           "rmse": 2.823572983202333,
           "spearman": null
+        },
+        "descriptor:validation_selected": {
+          "bias": 0.2290442313653657,
+          "dopant_macro_mae": 0.6307425568158888,
+          "favorable_mae": null,
+          "host_macro_mae": 0.6234417957443436,
+          "low_energy_mae": 0.5002526839785746,
+          "low_energy_recall": 0.7777777777777778,
+          "mae": 0.6418160664372107,
+          "n": 365,
+          "r2": 0.8080076577864768,
+          "rmse": 1.0450747337433761,
+          "spearman": 0.8624004560451901
         },
         "schnet": {
           "bias": 0.19562201576925162,
@@ -57,7 +60,7 @@
         }
       },
       "paired_comparisons": {
-        "descriptor:lightgbm": {
+        "descriptor:validation_selected": {
           "ci_high_eV": 0.3231889355435037,
           "ci_low_eV": 0.18916777836186827,
           "delta_comparator_minus_dart_eV": 0.2558512488592797,
@@ -74,7 +77,11 @@
       }
     },
     "dopant_cv": {
-      "descriptor_model": "descriptor:hist_gradient_boosting",
+      "descriptor_family_counts": {
+        "hist_gradient_boosting": 4,
+        "lightgbm": 1
+      },
+      "descriptor_model": "descriptor:validation_selected",
       "models": {
         "dart": {
           "bias": 0.006011285463413104,
@@ -89,19 +96,6 @@
           "rmse": 1.3029709417805817,
           "spearman": 0.8816802549185887
         },
-        "descriptor:hist_gradient_boosting": {
-          "bias": 0.2597615073863349,
-          "dopant_macro_mae": 1.3367040265333683,
-          "favorable_mae": 1.6189222990465975,
-          "host_macro_mae": 1.389369619250249,
-          "low_energy_mae": 1.6970949986060198,
-          "low_energy_recall": 0.6350293542074364,
-          "mae": 1.3309673559344766,
-          "n": 10224,
-          "r2": 0.6691390161505,
-          "rmse": 1.8417490552758538,
-          "spearman": 0.7449958730145065
-        },
         "descriptor:mean": {
           "bias": -0.000504431133394269,
           "dopant_macro_mae": 2.3428983275096904,
@@ -114,6 +108,19 @@
           "r2": -0.008779403394092444,
           "rmse": 3.2159240282805834,
           "spearman": -0.09119135891497684
+        },
+        "descriptor:validation_selected": {
+          "bias": 0.2429982740662936,
+          "dopant_macro_mae": 1.3415736932931477,
+          "favorable_mae": 1.6177973004436643,
+          "host_macro_mae": 1.3920968990559572,
+          "low_energy_mae": 1.7010151855206013,
+          "low_energy_recall": 0.6360078277886497,
+          "mae": 1.3356168517541873,
+          "n": 10224,
+          "r2": 0.6684988305807015,
+          "rmse": 1.8435300017054608,
+          "spearman": 0.743743301884105
         },
         "schnet": {
           "bias": 0.03951030090515366,
@@ -130,10 +137,10 @@
         }
       },
       "paired_comparisons": {
-        "descriptor:hist_gradient_boosting": {
-          "ci_high_eV": 0.61932301959218,
-          "ci_low_eV": 0.36278610896767244,
-          "delta_comparator_minus_dart_eV": 0.48702394849468955,
+        "descriptor:validation_selected": {
+          "ci_high_eV": 0.6231620086077402,
+          "ci_low_eV": 0.36792336867948205,
+          "delta_comparator_minus_dart_eV": 0.49167344431440063,
           "n": 10224,
           "status": "dart_better"
         },
@@ -147,7 +154,11 @@
       }
     },
     "host_cv": {
-      "descriptor_model": "descriptor:hist_gradient_boosting",
+      "descriptor_family_counts": {
+        "hist_gradient_boosting": 4,
+        "lightgbm": 1
+      },
+      "descriptor_model": "descriptor:validation_selected",
       "models": {
         "dart": {
           "bias": 0.014373052300176966,
@@ -162,19 +173,6 @@
           "rmse": 1.631324765529439,
           "spearman": 0.8651697646165473
         },
-        "descriptor:hist_gradient_boosting": {
-          "bias": 0.03754146598822734,
-          "dopant_macro_mae": 1.3019873415951937,
-          "favorable_mae": 1.489862896516313,
-          "host_macro_mae": 1.2825885995445794,
-          "low_energy_mae": 1.6506037041236732,
-          "low_energy_recall": 0.62720156555773,
-          "mae": 1.2732322909092866,
-          "n": 10224,
-          "r2": 0.5784391337472841,
-          "rmse": 2.078920211238512,
-          "spearman": 0.7780554302145541
-        },
         "descriptor:mean": {
           "bias": -0.002536874746270336,
           "dopant_macro_mae": 2.343985708433773,
@@ -187,6 +185,19 @@
           "r2": -0.0153602901353318,
           "rmse": 3.2263966985279042,
           "spearman": -0.06816500631750741
+        },
+        "descriptor:validation_selected": {
+          "bias": 0.022800284893116,
+          "dopant_macro_mae": 1.2938530620737154,
+          "favorable_mae": 1.477774225956091,
+          "host_macro_mae": 1.275008753006311,
+          "low_energy_mae": 1.6409479661695534,
+          "low_energy_recall": 0.6213307240704501,
+          "mae": 1.2660968122112504,
+          "n": 10224,
+          "r2": 0.5838892100201412,
+          "rmse": 2.065438014900457,
+          "spearman": 0.7800652020834531
         },
         "schnet": {
           "bias": 3.7218391633381405,
@@ -203,10 +214,10 @@
         }
       },
       "paired_comparisons": {
-        "descriptor:hist_gradient_boosting": {
-          "ci_high_eV": 0.46094160110252613,
-          "ci_low_eV": 0.2097719184408833,
-          "delta_comparator_minus_dart_eV": 0.3349008523684106,
+        "descriptor:validation_selected": {
+          "ci_high_eV": 0.45003677530897773,
+          "ci_low_eV": 0.205291989486006,
+          "delta_comparator_minus_dart_eV": 0.3277653736703744,
           "n": 10224,
           "status": "dart_better"
         },
@@ -220,7 +231,10 @@
       }
     },
     "id_cv": {
-      "descriptor_model": "descriptor:lightgbm",
+      "descriptor_family_counts": {
+        "lightgbm": 5
+      },
+      "descriptor_model": "descriptor:validation_selected",
       "models": {
         "dart": {
           "bias": -0.03419709312079024,
@@ -235,19 +249,6 @@
           "rmse": 0.9187632465548937,
           "spearman": 0.9654006471258807
         },
-        "descriptor:lightgbm": {
-          "bias": -0.01589604391762417,
-          "dopant_macro_mae": 0.6434200855893902,
-          "favorable_mae": 0.6348488320971861,
-          "host_macro_mae": 0.6715986643842548,
-          "low_energy_mae": 0.6980871803234177,
-          "low_energy_recall": 0.8052837573385518,
-          "mae": 0.6251508641904348,
-          "n": 10224,
-          "r2": 0.8738413156214384,
-          "rmse": 1.1372769917790713,
-          "spearman": 0.9424148440147017
-        },
         "descriptor:mean": {
           "bias": 1.9812541612479202e-06,
           "dopant_macro_mae": 2.3270825546961804,
@@ -260,6 +261,19 @@
           "r2": -0.00018415067004040608,
           "rmse": 3.202194162399028,
           "spearman": -0.005398045308671953
+        },
+        "descriptor:validation_selected": {
+          "bias": -0.01589604391762417,
+          "dopant_macro_mae": 0.6434200855893902,
+          "favorable_mae": 0.6348488320971861,
+          "host_macro_mae": 0.6715986643842548,
+          "low_energy_mae": 0.6980871803234177,
+          "low_energy_recall": 0.8052837573385518,
+          "mae": 0.6251508641904348,
+          "n": 10224,
+          "r2": 0.8738413156214384,
+          "rmse": 1.1372769917790713,
+          "spearman": 0.9424148440147017
         },
         "schnet": {
           "bias": -0.02575592756479297,
@@ -276,7 +290,7 @@
         }
       },
       "paired_comparisons": {
-        "descriptor:lightgbm": {
+        "descriptor:validation_selected": {
           "ci_high_eV": 0.22105841042338142,
           "ci_low_eV": 0.19434236683671846,
           "delta_comparator_minus_dart_eV": 0.20751520751138955,
@@ -293,7 +307,10 @@
       }
     },
     "pair_cv": {
-      "descriptor_model": "descriptor:lightgbm",
+      "descriptor_family_counts": {
+        "lightgbm": 5
+      },
+      "descriptor_model": "descriptor:validation_selected",
       "models": {
         "dart": {
           "bias": -0.033911584866839026,
@@ -308,19 +325,6 @@
           "rmse": 0.9487303084008024,
           "spearman": 0.9622978797987629
         },
-        "descriptor:lightgbm": {
-          "bias": -0.021132070718013794,
-          "dopant_macro_mae": 0.6985791929123664,
-          "favorable_mae": 0.6981243507482222,
-          "host_macro_mae": 0.7273432731222826,
-          "low_energy_mae": 0.7701670622048035,
-          "low_energy_recall": 0.7896281800391389,
-          "mae": 0.6742392172664664,
-          "n": 10224,
-          "r2": 0.8601939900993958,
-          "rmse": 1.1972107225503654,
-          "spearman": 0.9360412834760542
-        },
         "descriptor:mean": {
           "bias": 4.48143123873175e-07,
           "dopant_macro_mae": 2.327078829843586,
@@ -333,6 +337,19 @@
           "r2": -0.00011691136437441685,
           "rmse": 3.202086523755295,
           "spearman": -0.00030242107320022077
+        },
+        "descriptor:validation_selected": {
+          "bias": -0.021132070718013794,
+          "dopant_macro_mae": 0.6985791929123664,
+          "favorable_mae": 0.6981243507482222,
+          "host_macro_mae": 0.7273432731222826,
+          "low_energy_mae": 0.7701670622048035,
+          "low_energy_recall": 0.7896281800391389,
+          "mae": 0.6742392172664664,
+          "n": 10224,
+          "r2": 0.8601939900993958,
+          "rmse": 1.1972107225503654,
+          "spearman": 0.9360412834760542
         },
         "schnet": {
           "bias": -0.018251734478773273,
@@ -349,7 +366,7 @@
         }
       },
       "paired_comparisons": {
-        "descriptor:lightgbm": {
+        "descriptor:validation_selected": {
           "ci_high_eV": 0.24211638866194204,
           "ci_low_eV": 0.20730984332744548,
           "delta_comparator_minus_dart_eV": 0.2244714202220877,
@@ -535,6 +552,32 @@
         "resampling_unit": "host_dopant_pair",
         "std": 0.2856837776281455
       },
+      "accuracy_reference": {
+        "accuracy": {
+          "ci_high": 0.684971098265896,
+          "ci_low": 0.6404624277456648,
+          "mean": 0.6624277456647398,
+          "n": 1730,
+          "n_clusters": 1730,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.47301856275452603
+        },
+        "class_counts": {
+          "adsorbate": 1146,
+          "interstitial": 584
+        },
+        "kind": "empirical_majority_class",
+        "majority_class": "adsorbate",
+        "model_minus_reference": {
+          "ci_high": 0.2722543352601156,
+          "ci_low": 0.22369942196531792,
+          "mean": 0.24797687861271675,
+          "n": 1730,
+          "n_clusters": 1730,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.516146418152025
+        }
+      },
       "eligibility": {
         "binary_accuracy": "non-tied reference adsorbate/interstitial minima",
         "n_binary_eligible_pairs": 1730,
@@ -549,6 +592,27 @@
         "n_clusters": 1730,
         "resampling_unit": "host_dopant_pair",
         "std": 0.4606262109163993
+      },
+      "global_exact_site_reference": {
+        "accuracy": {
+          "ci_high": 0.23696004794017803,
+          "ci_low": 0.23017684535278465,
+          "mean": 0.23353770988164055,
+          "n": 1730,
+          "n_clusters": 1730,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.07218917768492425
+        },
+        "kind": "uniform_over_observed_candidates",
+        "model_minus_reference": {
+          "ci_high": 0.48260624827965865,
+          "ci_low": 0.4398813021836866,
+          "mean": 0.4612599779796312,
+          "n": 1730,
+          "n_clusters": 1730,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.45476477980814706
+        }
       },
       "global_screening_regret_eV": {
         "ci_high": 0.16889836411979814,
@@ -775,6 +839,27 @@
         "resampling_unit": "host_dopant_pair",
         "std": 0.4410466769470846
       },
+      "exact_accuracy_reference": {
+        "accuracy": {
+          "ci_high": 0.374039864419965,
+          "ci_low": 0.36754689444628025,
+          "mean": 0.37077380952380945,
+          "n": 3140,
+          "n_clusters": 2346,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.09579545327998167
+        },
+        "kind": "uniform_over_observed_candidates",
+        "model_minus_reference": {
+          "ci_high": 0.379955581921298,
+          "ci_low": 0.35007754769463345,
+          "mean": 0.36489498028510775,
+          "n": 3140,
+          "n_clusters": 2346,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.43133910165202644
+        }
+      },
       "screening_regret_eV": {
         "ci_high": 0.12091337199438322,
         "ci_low": 0.08651177983896219,
@@ -792,6 +877,27 @@
         "n_clusters": 1898,
         "resampling_unit": "host_dopant_pair",
         "std": 0.2807940242760958
+      },
+      "top2_accuracy_reference": {
+        "accuracy": {
+          "ci_high": 0.6251463078623408,
+          "ci_low": 0.6175756811991822,
+          "mean": 0.6214263514263515,
+          "n": 2145,
+          "n_clusters": 1898,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.09026189878213998
+        },
+        "kind": "uniform_size_two_subset",
+        "model_minus_reference": {
+          "ci_high": 0.30394211990220343,
+          "ci_low": 0.28014086703896823,
+          "mean": 0.2923265623265623,
+          "n": 2145,
+          "n_clusters": 1898,
+          "resampling_unit": "host_dopant_pair",
+          "std": 0.27995183579388855
+        }
       }
     }
   },
