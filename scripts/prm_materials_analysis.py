@@ -8,7 +8,7 @@ import json
 import math
 import subprocess
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
@@ -397,6 +397,15 @@ def analyse_preferences(
                         int(bool(true_best_indices & top_two))
                         if top2_eligible else None
                     ),
+                    "uniform_exact_expectation": (
+                        len(true_best_indices) / len(typed)
+                    ),
+                    "uniform_top2_expectation": (
+                        uniform_top_k_hit_probability(
+                            len(typed), len(true_best_indices), 2
+                        )
+                        if top2_eligible else None
+                    ),
                     "screening_regret_eV": float(selected["target_eV"] - true_best["target_eV"]),
                 }
             )
@@ -452,12 +461,75 @@ def analyse_preferences(
                 "global_site_correct": int(
                     predicted_global["sample_index"] in true_global_indices
                 ),
+                "global_uniform_exact_expectation": (
+                    len(true_global_indices) / len(members)
+                ),
                 "global_screening_regret_eV": float(
                     predicted_global["target_eV"] - true_global["target_eV"]
                 ),
             }
         )
     return pair_rows, site_rows
+
+
+def uniform_top_k_hit_probability(
+    n_candidates: int, n_successes: int, k: int,
+) -> float:
+    """Probability that a uniformly sampled size-k set contains a success."""
+    if (
+        n_candidates < 1
+        or n_successes < 1
+        or n_successes > n_candidates
+        or k < 1
+        or k > n_candidates
+    ):
+        raise ValueError("uniform top-k probability received invalid counts")
+    misses = n_candidates - n_successes
+    miss_probability = (
+        math.comb(misses, k) / math.comb(n_candidates, k)
+        if misses >= k else 0.0
+    )
+    return float(1.0 - miss_probability)
+
+
+def attach_screening_references(
+    pair_rows: Sequence[Dict[str, Any]],
+    site_rows: Sequence[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Attach row-aligned majority and candidate-uniform reference scores."""
+    eligible = [row for row in pair_rows if row["preference_eligible"]]
+    counts = Counter(str(row["true_preference"]) for row in eligible)
+    if set(counts) != {"adsorbate", "interstitial"}:
+        raise ValueError("binary preference reference requires both classes")
+    majority_class = min(counts, key=lambda label: (-counts[label], label))
+    for row in pair_rows:
+        if row["preference_eligible"]:
+            reference = int(row["true_preference"] == majority_class)
+            row["majority_preference_correct"] = reference
+            row["preference_gain_over_majority"] = (
+                int(row["preference_correct"]) - reference
+            )
+        else:
+            row["majority_preference_correct"] = None
+            row["preference_gain_over_majority"] = None
+        row["global_exact_gain_over_uniform"] = (
+            int(row["global_site_correct"])
+            - float(row["global_uniform_exact_expectation"])
+        )
+    for row in site_rows:
+        row["exact_gain_over_uniform"] = (
+            int(row["exact_site_correct"])
+            - float(row["uniform_exact_expectation"])
+        )
+        row["top2_gain_over_uniform"] = (
+            int(row["true_best_in_predicted_top2"])
+            - float(row["uniform_top2_expectation"])
+            if row["top2_eligible"] else None
+        )
+    return {
+        "majority_class": majority_class,
+        "class_counts": dict(sorted(counts.items())),
+    }
 
 
 def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
@@ -526,6 +598,7 @@ def main() -> None:
         sample_rows.append(row)
 
     pair_rows, site_rows = analyse_preferences(sample_rows)
+    reference_metadata = attach_screening_references(pair_rows, site_rows)
     preference_rows = [row for row in pair_rows if row["preference_eligible"]]
     top2_site_rows = [row for row in site_rows if row["top2_eligible"]]
     residual = np.asarray([row["residual_eV"] for row in sample_rows])
@@ -563,6 +636,20 @@ def main() -> None:
             "accuracy": cluster_bootstrap_mean(
                 preference_rows, "preference_correct", seed=20263001,
             ),
+            "accuracy_reference": {
+                "kind": "empirical_majority_class",
+                **reference_metadata,
+                "accuracy": cluster_bootstrap_mean(
+                    preference_rows,
+                    "majority_preference_correct",
+                    seed=20263008,
+                ),
+                "model_minus_reference": cluster_bootstrap_mean(
+                    preference_rows,
+                    "preference_gain_over_majority",
+                    seed=20263009,
+                ),
+            },
             "margin_mae_eV": cluster_bootstrap_mean(
                 pair_rows, "margin_absolute_error_eV", seed=20263002,
             ),
@@ -577,6 +664,19 @@ def main() -> None:
             "global_exact_site_accuracy": cluster_bootstrap_mean(
                 pair_rows, "global_site_correct", seed=20263004,
             ),
+            "global_exact_site_reference": {
+                "kind": "uniform_over_observed_candidates",
+                "accuracy": cluster_bootstrap_mean(
+                    pair_rows,
+                    "global_uniform_exact_expectation",
+                    seed=20263010,
+                ),
+                "model_minus_reference": cluster_bootstrap_mean(
+                    pair_rows,
+                    "global_exact_gain_over_uniform",
+                    seed=20263011,
+                ),
+            },
         },
         "within_defect_type_site_selection": {
             "eligibility": {
@@ -589,9 +689,35 @@ def main() -> None:
             "exact_accuracy": cluster_bootstrap_mean(
                 site_rows, "exact_site_correct", seed=20263005,
             ),
+            "exact_accuracy_reference": {
+                "kind": "uniform_over_observed_candidates",
+                "accuracy": cluster_bootstrap_mean(
+                    site_rows,
+                    "uniform_exact_expectation",
+                    seed=20263012,
+                ),
+                "model_minus_reference": cluster_bootstrap_mean(
+                    site_rows,
+                    "exact_gain_over_uniform",
+                    seed=20263013,
+                ),
+            },
             "top2_accuracy": cluster_bootstrap_mean(
                 top2_site_rows, "true_best_in_predicted_top2", seed=20263006,
             ),
+            "top2_accuracy_reference": {
+                "kind": "uniform_size_two_subset",
+                "accuracy": cluster_bootstrap_mean(
+                    top2_site_rows,
+                    "uniform_top2_expectation",
+                    seed=20263014,
+                ),
+                "model_minus_reference": cluster_bootstrap_mean(
+                    top2_site_rows,
+                    "top2_gain_over_uniform",
+                    seed=20263015,
+                ),
+            },
             "screening_regret_eV": cluster_bootstrap_mean(
                 site_rows, "screening_regret_eV", seed=20263007,
             ),

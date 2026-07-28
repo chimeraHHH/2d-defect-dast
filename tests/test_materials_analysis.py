@@ -3,10 +3,12 @@ import pytest
 
 from scripts.prm_materials_analysis import (
     analyse_preferences,
+    attach_screening_references,
     bootstrap_mean,
     cluster_bootstrap_mean,
     load_prediction_array,
     summarize_error_heterogeneity,
+    uniform_top_k_hit_probability,
 )
 
 
@@ -77,6 +79,39 @@ def test_tied_defect_type_minima_are_ineligible_for_binary_preference():
     assert pairs[0]["true_preference"] == "tie"
     assert pairs[0]["preference_eligible"] == 0
     assert pairs[0]["preference_correct"] is None
+
+
+def test_screening_references_use_majority_class_and_exact_uniform_chance():
+    samples = [
+        row(0, "H1", "C", "adsorbate", "a0", 0.0, 0.0),
+        row(1, "H1", "C", "adsorbate", "a1", 1.0, 1.0),
+        row(2, "H1", "C", "interstitial", "i0", 2.0, 2.0),
+        row(3, "H1", "C", "interstitial", "i1", 3.0, 3.0),
+        row(4, "H2", "N", "adsorbate", "a0", 2.0, 2.0),
+        row(5, "H2", "N", "adsorbate", "a1", 3.0, 3.0),
+        row(6, "H2", "N", "interstitial", "i0", 0.0, 0.0),
+        row(7, "H2", "N", "interstitial", "i1", 1.0, 1.0),
+        row(8, "H3", "O", "adsorbate", "a0", 0.0, 0.0),
+        row(9, "H3", "O", "adsorbate", "a1", 1.0, 1.0),
+        row(10, "H3", "O", "interstitial", "i0", 2.0, 2.0),
+        row(11, "H3", "O", "interstitial", "i1", 3.0, 3.0),
+    ]
+
+    pairs, sites = analyse_preferences(samples)
+    metadata = attach_screening_references(pairs, sites)
+
+    assert metadata == {
+        "majority_class": "adsorbate",
+        "class_counts": {"adsorbate": 2, "interstitial": 1},
+    }
+    assert [item["majority_preference_correct"] for item in pairs] == [1, 0, 1]
+    assert all(item["global_uniform_exact_expectation"] == 0.25 for item in pairs)
+    assert all(item["uniform_exact_expectation"] == 0.5 for item in sites)
+
+
+def test_uniform_top_k_reference_accounts_for_tied_minima():
+    assert uniform_top_k_hit_probability(4, 1, 2) == 0.5
+    assert uniform_top_k_hit_probability(4, 2, 2) == pytest.approx(5 / 6)
 
 
 def test_materials_bootstrap_is_chunked_and_requires_multiple_units():
