@@ -57,3 +57,15 @@
   released data/software in the reference list and Data Availability Statement.
 - Status: pending.
 - Blocks finalization: yes.
+
+### REV-006: Source-task chemistry overlap
+
+- Severity: major claim-boundary issue.
+- Fix type: provenance analysis and claim downgrade.
+- Change: added a clean, hash-bound JARVIS--IMP2D overlap audit and revised
+  Methods and Discussion so grouped holdout means absence from IMP2D target
+  supervision, not complete exclusion from source-task formula or element
+  exposure.
+- Evidence: `artifacts/prm_results/operations/pretraining_overlap_3a98513.json`.
+- Status: complete.
+- Blocks finalization: no.

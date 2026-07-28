@@ -83,6 +83,18 @@ The three highest risks are:
   author-supplied archival DOI; add the contact-author email required by APS.
   Do not invent any of these fields.
 
+### R5: Grouped transfer is not disjoint from source-task chemistry
+
+- Risk: major if host- or impurity-held-out results are described as completely
+  unseen chemistry.
+- Evidence: the clean overlap audit at commit `3a98513` finds reduced-formula
+  matches for 26 of 44 IMP2D host labels (25 of 42 unique reduced formulas)
+  among 69 JARVIS records; all 65 IMP2D impurity elements occur in the source
+  corpus.
+- Route: define grouped holdout as absence from IMP2D target supervision,
+  distinguish formula overlap from structural identity, and retain the
+  end-to-end DART--SchNet comparison boundary.
+
 ## Priority revision plan
 
 1. Complete and collect the two downstream campaigns without exposing partial

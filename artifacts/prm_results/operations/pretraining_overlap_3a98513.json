@@ -1,0 +1,247 @@
+{
+  "created_at": "2026-07-28T13:20:51.638224+00:00",
+  "git": {
+    "commit": "3a98513558a48a07258059597d7bbe7bac4bb0dc",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "imp2d": {
+    "n_canonical_rows": 10224,
+    "n_hosts": 44,
+    "n_impurities": 65
+  },
+  "inputs": {
+    "imp2d_samples": {
+      "file_name": "samples.csv",
+      "sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168",
+      "size_bytes": 1140942
+    },
+    "jarvis_pretraining": {
+      "file_name": "dft_3d_lite.pkl",
+      "sha256": "41284603e6eeb6920fe132975570e657e69601a414257bb48d2196d7389369fa",
+      "size_bytes": 297169701
+    }
+  },
+  "interpretation_boundary": "Reduced-formula and element overlap is not structural identity or IMP2D-target leakage. Grouped IMP2D tests hold chemistry out from IMP2D target supervision, but DART may have encountered the same host formula or impurity element during JARVIS source-task pretraining.",
+  "overlap": {
+    "host_reduced_formula": {
+      "details": [
+        {
+          "imp2d_host": "As2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "As"
+        },
+        {
+          "imp2d_host": "Bi2I6",
+          "pretraining_record_count": 4,
+          "reduced_formula": "BiI3"
+        },
+        {
+          "imp2d_host": "Ge2",
+          "pretraining_record_count": 4,
+          "reduced_formula": "Ge"
+        },
+        {
+          "imp2d_host": "Hf2Te6",
+          "pretraining_record_count": 1,
+          "reduced_formula": "HfTe3"
+        },
+        {
+          "imp2d_host": "HfS2",
+          "pretraining_record_count": 2,
+          "reduced_formula": "HfS2"
+        },
+        {
+          "imp2d_host": "HfSe2",
+          "pretraining_record_count": 2,
+          "reduced_formula": "HfSe2"
+        },
+        {
+          "imp2d_host": "MoS2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "MoS2"
+        },
+        {
+          "imp2d_host": "MoSe2",
+          "pretraining_record_count": 3,
+          "reduced_formula": "MoSe2"
+        },
+        {
+          "imp2d_host": "NbS2",
+          "pretraining_record_count": 4,
+          "reduced_formula": "NbS2"
+        },
+        {
+          "imp2d_host": "NbSe2",
+          "pretraining_record_count": 2,
+          "reduced_formula": "NbSe2"
+        },
+        {
+          "imp2d_host": "PbI2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "PbI2"
+        },
+        {
+          "imp2d_host": "PtS2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "PtS2"
+        },
+        {
+          "imp2d_host": "PtSe2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "PtSe2"
+        },
+        {
+          "imp2d_host": "Si2",
+          "pretraining_record_count": 10,
+          "reduced_formula": "Si"
+        },
+        {
+          "imp2d_host": "Sn2",
+          "pretraining_record_count": 2,
+          "reduced_formula": "Sn"
+        },
+        {
+          "imp2d_host": "SnS2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "SnS2"
+        },
+        {
+          "imp2d_host": "SnSe2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "SnSe2"
+        },
+        {
+          "imp2d_host": "TaS2",
+          "pretraining_record_count": 3,
+          "reduced_formula": "TaS2"
+        },
+        {
+          "imp2d_host": "TaSe2",
+          "pretraining_record_count": 6,
+          "reduced_formula": "TaSe2"
+        },
+        {
+          "imp2d_host": "TiO2",
+          "pretraining_record_count": 7,
+          "reduced_formula": "TiO2"
+        },
+        {
+          "imp2d_host": "TiS2",
+          "pretraining_record_count": 4,
+          "reduced_formula": "TiS2"
+        },
+        {
+          "imp2d_host": "W2Se4",
+          "pretraining_record_count": 3,
+          "reduced_formula": "WSe2"
+        },
+        {
+          "imp2d_host": "WS2",
+          "pretraining_record_count": 3,
+          "reduced_formula": "WS2"
+        },
+        {
+          "imp2d_host": "WSe2",
+          "pretraining_record_count": 3,
+          "reduced_formula": "WSe2"
+        },
+        {
+          "imp2d_host": "ZrS2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "ZrS2"
+        },
+        {
+          "imp2d_host": "ZrSe2",
+          "pretraining_record_count": 1,
+          "reduced_formula": "ZrSe2"
+        }
+      ],
+      "fraction_imp2d_hosts_present": 0.5909090909090909,
+      "n_imp2d_hosts_present": 26,
+      "n_imp2d_reduced_formulas": 42,
+      "n_imp2d_reduced_formulas_present": 25,
+      "n_pretraining_records": 69
+    },
+    "impurity_element": {
+      "absent": [],
+      "fraction_imp2d_impurities_present": 1.0,
+      "n_imp2d_impurities_present": 65,
+      "present": [
+        "Ag",
+        "Al",
+        "As",
+        "Au",
+        "B",
+        "Ba",
+        "Be",
+        "Bi",
+        "Br",
+        "C",
+        "Ca",
+        "Cd",
+        "Cl",
+        "Co",
+        "Cr",
+        "Cs",
+        "Cu",
+        "F",
+        "Fe",
+        "Ga",
+        "Ge",
+        "H",
+        "Hf",
+        "Hg",
+        "I",
+        "In",
+        "Ir",
+        "K",
+        "Li",
+        "Lu",
+        "Mg",
+        "Mn",
+        "Mo",
+        "N",
+        "Na",
+        "Nb",
+        "Ni",
+        "O",
+        "Os",
+        "P",
+        "Pb",
+        "Pd",
+        "Pt",
+        "Rb",
+        "Re",
+        "Rh",
+        "Ru",
+        "S",
+        "Sb",
+        "Sc",
+        "Se",
+        "Si",
+        "Sn",
+        "Sr",
+        "Ta",
+        "Tc",
+        "Te",
+        "Ti",
+        "Tl",
+        "V",
+        "W",
+        "Xe",
+        "Y",
+        "Zn",
+        "Zr"
+      ]
+    }
+  },
+  "pretraining": {
+    "n_elements": 89,
+    "n_records": 19902,
+    "source_names": [
+      "jarvis_dft_3d"
+    ]
+  },
+  "schema_version": "prm_pretraining_overlap_v1"
+}

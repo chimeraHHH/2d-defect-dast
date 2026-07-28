@@ -46,9 +46,14 @@ to the backbone architecture, input representation, or initialization alone.
 All grouped tests remain internal to the 44-host, 65-impurity IMP2D chemical
 universe.  They therefore quantify transfer across defined partitions of this
 database, not generalization to arbitrary 2D compounds, charge states, defect
-families, or chemical-potential conventions.  Macro errors and low-energy
-diagnostics are important because a favorable pooled MAE can coexist with
-poor performance for rare hosts or the candidates most relevant to screening.
+families, or chemical-potential conventions.  Moreover, the JARVIS source task
+contains reduced-formula matches for 26 IMP2D host labels and contains every
+IMP2D impurity element.  The grouped results therefore test transfer without
+IMP2D target labels for the held-out chemistry, not de novo extrapolation from
+an element- or formula-disjoint pretraining corpus.  Macro errors and
+low-energy diagnostics are important because a favorable pooled MAE can
+coexist with poor performance for rare hosts or the candidates most relevant
+to screening.
 
 %----------------------------------------------------------------------
 \subsection{Uncertainty supports abstention, not universal reliability}

@@ -172,6 +172,13 @@ We first drew 20,000 records uniformly without replacement from JARVIS-DFT
 19,902 pristine three-dimensional crystals~\cite{jarvis2020}.  Pretraining
 used formation energy per atom as the source target, an 80/10/10 random
 partition, and seed 42.  No IMP2D target is used in this stage.
+An explicit chemistry-overlap audit found that 26 of the 44 IMP2D host labels
+(25 of 42 distinct reduced host formulas) occur among 69 JARVIS source
+records, and that all 65 IMP2D impurity elements occur somewhere in the
+source-task structures.  Formula overlap does not establish structural
+identity, but it means that the grouped partitions withhold IMP2D
+formation-energy supervision rather than all prior source-task exposure to the
+same reduced host formula or impurity element.
 
 The resulting checkpoint contributes its nine-feature input-projection block
 and bias together with all 51 shape-matched V1 local-message tensors.  The 128
@@ -223,6 +230,8 @@ are averaged within each split before pooled out-of-fold metrics are
 calculated.  Consequently, DART--SchNet contrasts compare the complete
 prespecified learning recipes, including their different input representations
 and initialization; they do not isolate a pure backbone-architecture effect.
+For the same reason, ``host held out'' and ``impurity held out'' refer
+specifically to IMP2D target supervision.
 
 %----------------------------------------------------------------------
 \subsection{Held-out uncertainty calibration and screening analysis}

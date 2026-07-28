@@ -11,6 +11,7 @@ Status date: 2026-07-28
 | E5 | Evaluate five-member DART uncertainty on a separate calibration/test split | Running; no partial result admissible | five promoted UQ configurations in `dart-g111-v1` | Calibration table, risk--coverage figure, and abstention claims |
 | E6 | Convert pair-held-out predictions into preference/site-screening decisions and descriptive error-heterogeneity diagnostics | Analysis implemented; predictions pending E4 | `scripts/prm_materials_analysis.py` | Screening table, regret figure, and host/impurity/incorporation error analysis |
 | E7 | Generate fail-closed manuscript tables, figures, and macros | Pending E4--E6 | `scripts/prm_make_result_assets.py` | Releases all numerical Results, Discussion, and Conclusion text |
+| E8 | Audit chemistry overlap between JARVIS source-task pretraining and canonical IMP2D | Complete and written | `artifacts/prm_results/operations/pretraining_overlap_3a98513.json` | Bounds grouped transfer as holdout from IMP2D target supervision |
 
 ## Claim mapping
 
@@ -18,7 +19,7 @@ Status date: 2026-07-28
 |---|---|---|
 | C1: the reported modeling set is reconstructable and leakage controlled under the declared audits | E1 | completed and written |
 | C2: selected architectural effects are supported or inconclusive under paired repeats | E2 | completed and written |
-| C3: interpolation and chemical-transfer behavior differ across held-out axes and comparators | E3, E4 | written but not yet fully evidenced |
+| C3: interpolation and chemical-transfer behavior differ across held-out axes and comparators | E3, E4, E8 | written but not yet fully evidenced |
 | C4: held-out ensemble uncertainty supports a bounded selective-prediction policy | E5 | written but not yet evidenced |
 | C5: pair-held-out predictions have measurable screening utility and regret within IMP2D | E4, E6 | written but not yet evidenced |
 
