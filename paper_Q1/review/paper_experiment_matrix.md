@@ -12,6 +12,7 @@ Status date: 2026-07-29
 | E6 | Convert pair-held-out predictions into preference/site-screening decisions and descriptive error-heterogeneity diagnostics | Complete and collector-validated | `artifacts/prm_results/materials/` | Screening table, regret figure, and host/impurity/incorporation error analysis |
 | E7 | Generate fail-closed manuscript tables, figures, and macros | Ready to run | `scripts/prm_make_result_assets.py` | Releases all numerical Results, Discussion, and Conclusion text |
 | E8 | Audit chemistry overlap between JARVIS source-task pretraining and canonical IMP2D | Complete and written | `artifacts/prm_results/operations/pretraining_overlap_3a98513.json` | Bounds grouped transfer as holdout from IMP2D target supervision |
+| E9 | Test whether SchNet's additive graph readout contributes to host-held-out failure | Configured; 15-run bounded campaign pending | `configs/prm/sensitivity/schnet_mean_host/` | Post-hoc exploratory robustness result for Discussion and Supplement |
 
 ## Claim mapping
 
@@ -22,6 +23,7 @@ Status date: 2026-07-29
 | C3: interpolation and chemical-transfer behavior differ across held-out axes and comparators | E3, E4, E8 | evidenced; paper asset generation pending |
 | C4: held-out ensemble uncertainty supports a bounded selective-prediction policy | E5 | evidenced; paper asset generation pending |
 | C5: pair-held-out predictions have measurable screening utility and regret within IMP2D | E4, E6 | evidenced; paper asset generation pending |
+| C6: the SchNet host-held-out result is interpreted at the complete-recipe rather than backbone-only level | E4, E9 | main comparison evidenced; readout sensitivity pending |
 
-No claim in C3--C5 becomes paper-ready until E7 creates the readiness marker
+No claim in C3--C6 becomes paper-ready until E7 creates the readiness marker
 from complete, collector-validated bundles.

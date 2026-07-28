@@ -83,3 +83,40 @@ def test_batched_prediction_matches_individual_graphs():
         separate = torch.cat([model(first), model(second)])
 
     torch.testing.assert_close(batched, separate, rtol=1e-6, atol=1e-6)
+
+
+def test_mean_readout_is_additive_output_divided_by_atom_count():
+    torch.manual_seed(11)
+    additive = PBCSchNet(
+        hidden_channels=32, num_filters=32, num_interactions=2, readout="add"
+    ).eval()
+    mean = PBCSchNet(
+        hidden_channels=32, num_filters=32, num_interactions=2, readout="mean"
+    ).eval()
+    mean.load_state_dict(additive.state_dict())
+    batch = {
+        "atomic_numbers": torch.tensor([[6, 8, 0], [14, 1, 1]]),
+        "atom_mask": torch.tensor(
+            [[True, True, False], [True, True, True]]
+        ),
+        "edge_index_list": [
+            torch.tensor([[0, 1], [1, 0]]),
+            torch.tensor([[0, 1, 0, 2], [1, 0, 2, 0]]),
+        ],
+        "edge_dist_list": [
+            torch.tensor([1.2, 1.2]),
+            torch.tensor([1.5, 1.5, 1.6, 1.6]),
+        ],
+        "num_atoms_list": [2, 3],
+    }
+
+    with torch.no_grad():
+        additive_output = additive(batch)
+        mean_output = mean(batch)
+
+    torch.testing.assert_close(
+        mean_output,
+        additive_output / torch.tensor([2.0, 3.0]),
+        rtol=1e-6,
+        atol=1e-6,
+    )

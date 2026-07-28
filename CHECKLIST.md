@@ -54,6 +54,9 @@
 - [x] Complete mechanism-preference, error and applicability-domain analyses.
       (The pair-OOF screening and heterogeneity evidence is archived under
       `artifacts/prm_results/materials/`.)
+- [ ] Complete the bounded 15-run SchNet mean-readout host-CV sensitivity,
+      archive its paired host-cluster comparison, and retain it as post-hoc
+      supporting evidence rather than a replacement main baseline.
 
 ## Paper
 

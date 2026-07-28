@@ -88,6 +88,23 @@ def test_every_generated_config_inherits_the_canonical_recipe():
         _assert_canonical_schnet(_load(ROOT / relative_path))
 
 
+def test_readout_sensitivity_configs_change_only_the_declared_readout():
+    sensitivity_dir = ROOT / "configs/prm/sensitivity/schnet_mean_host"
+    manifest = json.loads((sensitivity_dir / "manifest.json").read_text())
+    assert manifest["analysis_role"] == "post_hoc_exploratory_robustness"
+    assert manifest["n_configs"] == 15
+    for record in manifest["configs"]:
+        parent = _load(ROOT / record["parent_path"])
+        sensitivity = _load(ROOT / record["path"])
+        assert parent["model_kwargs"]["readout"] == "add"
+        assert sensitivity["model_kwargs"]["readout"] == "mean"
+        parent.pop("output_dir")
+        sensitivity.pop("output_dir")
+        parent["model_kwargs"].pop("readout")
+        sensitivity["model_kwargs"].pop("readout")
+        assert sensitivity == parent
+
+
 def test_schnet_scheduler_warms_up_then_decays_to_floor():
     parameter = torch.nn.Parameter(torch.tensor(0.0))
     optimizer = torch.optim.AdamW([parameter], lr=5e-4)

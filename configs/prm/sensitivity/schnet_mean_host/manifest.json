@@ -1,0 +1,141 @@
+{
+  "analysis_role": "post_hoc_exploratory_robustness",
+  "configs": [
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f0_seed342.yaml",
+      "parent_sha256": "e6d38402be76c8917b17a273397322e5044987604a380c2f26f2156bc7e091ef",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f0_seed342.yaml",
+      "seed": 342,
+      "sha256": "7657b4e421a13d94b234348a8deef9928ac85528d8d80d54265e6455f052cf96",
+      "split_id": "host_cv5_f0"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f0_seed343.yaml",
+      "parent_sha256": "22373af9734ecbf1542c62bad84e873d10ee8b0ccf55c0c0c7ccb43c3cdf8bb4",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f0_seed343.yaml",
+      "seed": 343,
+      "sha256": "f29ffeb8eb1ba4ff47f43acfae02c25d812879637660bab725c718ba2b74ff19",
+      "split_id": "host_cv5_f0"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f0_seed344.yaml",
+      "parent_sha256": "7503dae44aba107598425e866fef4fe32e2cfd1a4b7522fc714bddb91e9e07bb",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f0_seed344.yaml",
+      "seed": 344,
+      "sha256": "381078d43f690f0dab7ee0e0981b4a6862fc5e8bc56c1d3e9e81df1e5438812e",
+      "split_id": "host_cv5_f0"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f1_seed342.yaml",
+      "parent_sha256": "9596d1849a6fcd61dc8c59b12784bfe6c490d808187109486e05b37cca2f2ecf",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f1_seed342.yaml",
+      "seed": 342,
+      "sha256": "f833dfeaaf785a6bd18ac78cfb0ed11b67c3e801f768842cc4a59318b8282d76",
+      "split_id": "host_cv5_f1"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f1_seed343.yaml",
+      "parent_sha256": "cdb0935b250061d20254e2eb9926a5b732b271386d625e181719aab6b8582680",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f1_seed343.yaml",
+      "seed": 343,
+      "sha256": "b1ef1b23bf69d5f9d36b8f152d548e41422eb4cf43fab86d75f7befa1c17c062",
+      "split_id": "host_cv5_f1"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f1_seed344.yaml",
+      "parent_sha256": "e7d1514f8e82715b1b36ed771f381f5ac21bb8fed4d9139bf9259e8262704090",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f1_seed344.yaml",
+      "seed": 344,
+      "sha256": "07a94cb8acd3822bac1f8f9efe93b7feb2a80dd6c725c51c24337f77b770c2e7",
+      "split_id": "host_cv5_f1"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f2_seed342.yaml",
+      "parent_sha256": "e3d63feec02bdbc7763da6bc74be1103b9301cfd070c11e9b177e24106afa1fc",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f2_seed342.yaml",
+      "seed": 342,
+      "sha256": "8301b162b326aaea6ab79e181b2d7cd0621d8b019424b41dd3c4183086e9173b",
+      "split_id": "host_cv5_f2"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f2_seed343.yaml",
+      "parent_sha256": "a0c4a84bbd8a29c5c9188267249c44eef9a689c226532a2da0451c80e18973f3",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f2_seed343.yaml",
+      "seed": 343,
+      "sha256": "32cf3bbe1d72b6a7aec8e996575711571e16f1c419e7aed4d9456792b11838d4",
+      "split_id": "host_cv5_f2"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f2_seed344.yaml",
+      "parent_sha256": "8867b58b5a7e241df5b6cb95c365a6c58d62e3e1c9cc2a727cecebf2cd242f62",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f2_seed344.yaml",
+      "seed": 344,
+      "sha256": "17ae6c553678efeab7c2fe46f88d4f3b201b10d7971f16c4f579bb29f93a46ff",
+      "split_id": "host_cv5_f2"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f3_seed342.yaml",
+      "parent_sha256": "48deb6ff31bd9a577f114ef75a6da5f7677495a21799090dca82d1d4fac43e06",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f3_seed342.yaml",
+      "seed": 342,
+      "sha256": "daeaaede5ee40353e520ffa125e58175fe29d77a98735f52e3b81b9d6a37d817",
+      "split_id": "host_cv5_f3"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f3_seed343.yaml",
+      "parent_sha256": "7eb89c57a5fc33ca8e3b860f0090c935b42c238f50d5e886316e5d2c75b5bd6d",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f3_seed343.yaml",
+      "seed": 343,
+      "sha256": "4cbddcf7a7fdea0027faf54a1d64ebb686e69a2dabf9b10f409c91a62d5611a8",
+      "split_id": "host_cv5_f3"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f3_seed344.yaml",
+      "parent_sha256": "e2ad6bec175da7134d2aa85d634cd4e6e3288905edb31913707a48d8129579f8",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f3_seed344.yaml",
+      "seed": 344,
+      "sha256": "a09edc4d2ce4807f56b1ad699f99a15e4d75a124a98f0509d95826dfd02b8ac4",
+      "split_id": "host_cv5_f3"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f4_seed342.yaml",
+      "parent_sha256": "fd5e927f1bdd7c24ba8d96ec6e732a9ec9e7f3957aed7a8a13530b41742fe5f9",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f4_seed342.yaml",
+      "seed": 342,
+      "sha256": "45214da2369451bf157c5902ac645d27473366754eb99ca35d81c3c0500ff465",
+      "split_id": "host_cv5_f4"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f4_seed343.yaml",
+      "parent_sha256": "a7e06c8b9eb69b93366ac8b4701ce8fd7442b8192d8ebb9a800e5f214fe3c1ec",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f4_seed343.yaml",
+      "seed": 343,
+      "sha256": "d66d73c2a61eac8ad54d25e05ef926c8eacf7fd83a41c50aca39d45f6ac020ac",
+      "split_id": "host_cv5_f4"
+    },
+    {
+      "parent_path": "configs/prm/generated/schnet/host_cv5_f4_seed344.yaml",
+      "parent_sha256": "051b5f6a9fa8317ca8763fee14d79113944ef2ea0e83e34999ad40846bf138da",
+      "path": "configs/prm/sensitivity/schnet_mean_host/host_cv5_f4_seed344.yaml",
+      "seed": 344,
+      "sha256": "c45d9670183a48fd8374208e789b9c35128bd9fafd4c4c35d53bda55da4d7afa",
+      "split_id": "host_cv5_f4"
+    }
+  ],
+  "fixed_conditions": [
+    "dataset and immutable host-CV splits",
+    "five folds and seeds 342-344",
+    "SchNet architecture except graph readout",
+    "optimizer, schedule, sampling, label noise, and 150 epochs"
+  ],
+  "intervention": {
+    "model_kwargs.readout": {
+      "from": "add",
+      "to": "mean"
+    }
+  },
+  "n_configs": 15,
+  "question": "Does replacing SchNet atomwise sum readout with mean readout reduce the host-held-out error under otherwise fixed conditions?",
+  "schema_version": "prm_schnet_readout_sensitivity_configs_v1",
+  "stop_condition": "exactly 15 complete runs and one paired host-cluster analysis"
+}

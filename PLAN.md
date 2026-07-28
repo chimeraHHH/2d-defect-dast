@@ -85,7 +85,11 @@ from every queue.
 7. Run `scripts.prm_uq_analysis` and `scripts.prm_materials_analysis` from a
    clean collector commit.  Then run `scripts.prm_make_result_assets`, which
    writes the result manifest before creating the manuscript readiness marker.
-8. Rebuild the REVTeX manuscript, inspect every rendered page, cross-check all
+8. Run the bounded post-hoc SchNet readout sensitivity on host-CV only. Change
+   atomwise graph readout from sum to mean while holding the other 15
+   configurations fixed; archive it separately from the prespecified main
+   comparison.
+9. Rebuild the REVTeX manuscript, inspect every rendered page, cross-check all
    prose numbers against machine-readable bundles, and perform a final
    review-style audit before tagging an archival release.
 
@@ -115,28 +119,19 @@ two DART initialization assets are pinned by SHA-256, and formal runs record a
 fail-closed parameter-load report. All 9,871,460 stored periodic graph edges
 were independently reconstructed without topology or cutoff violations.
 
-Two failed factorial attempts are retained only as negative operational
-evidence. `factorial-v2` exhausted process file descriptors before completing
-an epoch and produced no metrics or checkpoints; formal configs now freeze
-`num_workers: 0`. `factorial-v3-fd0` was stopped and archived after discovering
-that one-based atomic numbers indexed a zero-based ct-UAE table. Its outputs
-are scientifically invalid. The corrected implementation prepends an explicit
-zero-padding row, maps atomic numbers 1--100 to source rows 0--99, and passes
-138 remote tests. A clean two-epoch GPU smoke at commit `7a6593a` completed all
-five declared outputs and independently verified the 101-row checkpoint table,
-zero padding, and exact endpoint mappings. The formal 40-run
-`factorial-v4-indexed` queue completed from the same clean frozen commit with
-GPU 2 excluded and no failed jobs. A separate clean collector at `865e90a`
-validated all 40 runs, archived the evidence, and selected `g111` using
-validation MAE only. The committed selection then generated 43 transfer and
-five UQ-member `g111` configurations with unique output directories and
-content hashes. Two-epoch GPU smoke runs at commit `6fdf20d` then validated the
-promoted DART UQ path, including calibration predictions, and the periodic
-SchNet path. SchNet's first smoke-only YAML retained an invalid ten-epoch
-warmup after reducing total training to two epochs and failed before training;
-a separate one-epoch-warmup smoke configuration passed without changing any
-formal 150-epoch YAML. Two clean worktrees at commit `6c40137` now run the
-48-config DART and 48-config SchNet campaigns on disjoint GPU sets
-`{1,4,5}` and `{6,7}`, respectively; GPU 2 is excluded from both. Transfer,
-ensemble UQ, materials analysis, and paper result generation remain gated on
-successful completion and collection of both queues.
+The corrected 40-run factorial completed from clean commit `7a6593a`; a
+separate collector selected `g111` by validation MAE only. The promoted DART
+and periodic-SchNet queues then completed 48 runs each from clean commit
+`6c40137`, with GPU 2 excluded. The complete aligned comparison, five-member
+held-out UQ analysis, and pair-OOF materials screening analysis are archived
+under `artifacts/prm_results/`. No partial queue metric entered the manuscript.
+
+The prespecified SchNet comparator uses the original atomwise additive energy
+readout. Its large host-held-out error is repeatable but cannot be attributed
+to the interaction backbone alone because formation energy is not extensive
+in supercell atom count. A bounded post-hoc sensitivity therefore reruns only
+the 15 host-CV SchNet configurations with mean readout. The campaign must use
+GPUs 1, 4, and 5 only, preserve every other controlled field, and stop after
+one paired host-cluster analysis. It is supporting evidence and cannot replace
+or retroactively redefine the main comparator. Result-asset generation,
+manuscript population, compilation, and final review remain pending.

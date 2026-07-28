@@ -49,4 +49,23 @@
   and prediction coverage agree with the frozen contract.
 - Placement: screening table and figure.
 
+## EXP-005: Bound the SchNet readout interpretation
+
+- Status: configured; training not yet launched.
+- Matrix row: E9.
+- Route: post-hoc exploratory robustness campaign.
+- Tier: supporting.
+- Question: does replacing atomwise sum readout with mean readout reduce the
+  repeated host-held-out SchNet error?
+- Intervention: change only `model_kwargs.readout` from `add` to `mean`.
+- Fixed conditions: all five host-CV folds, seeds 342--344, dataset, splits,
+  SchNet interaction stack, optimizer, schedule, sampling, label noise, and
+  150-epoch budget.
+- Acceptance: exactly 15 complete runs, aligned out-of-fold predictions,
+  host-cluster paired interval, size--error diagnostics, and archived
+  provenance.
+- Interpretation: exploratory and mechanism-informative; it does not replace
+  the prespecified additive-SchNet main comparator.
+- Placement: Discussion and Supplement.
+
 No additional DFT calculation is part of this frontier.
