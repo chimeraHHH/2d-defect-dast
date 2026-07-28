@@ -28,12 +28,12 @@
 
 ## Experiments
 
-- [ ] Run 2^3 architecture factorial for seeds 42-46.
-      (`factorial-v2` and `factorial-v3-fd0` are archived and scientifically
-      excluded for, respectively, DataLoader file-descriptor exhaustion and
-      shifted ct-UAE indexing. The corrected 40-run `factorial-v4-indexed`
-      queue is active from clean commit `7a6593a`, with `num_workers: 0`,
-      asset-integrity checks enabled, and GPU 2 excluded.)
+- [x] Run 2^3 architecture factorial for seeds 42-46.
+      (`factorial-v2` and `factorial-v3-fd0` remain scientifically excluded.
+      The corrected 40-run `factorial-v4-indexed` queue completed from clean
+      commit `7a6593a` with no failed jobs and GPU 2 excluded. Clean collector
+      commit `865e90a` validated and archived all 40 runs; validation-only
+      selection promoted `g111`.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,
@@ -42,7 +42,8 @@
 - [ ] Run SchNet comparator under the same split contract. (Implementation,
       configurations, periodic-edge audit, and bounded smoke run complete;
       formal runs await GPU capacity.)
-- [ ] Select the final DART configuration from validation/CV evidence only.
+- [x] Select the final DART configuration from validation/CV evidence only.
+      (`g111`; test metrics were not used by the ordering rule.)
 - [ ] Run random out-of-fold and host--dopant-pair cross-validation.
 - [ ] Run host-group cross-validation.
 - [ ] Run dopant-group cross-validation.

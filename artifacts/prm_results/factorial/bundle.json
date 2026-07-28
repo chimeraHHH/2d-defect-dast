@@ -1,0 +1,3594 @@
+{
+  "archive_policy": {
+    "checkpoint": "SHA-256 recorded; binary retained outside Git",
+    "included": [
+      "run_manifest.json",
+      "metrics.json",
+      "split_indices.npz",
+      "val_predictions.npz",
+      "test_predictions.npz"
+    ]
+  },
+  "archived_runs": [
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g000/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split42_seed142/run_manifest.json",
+          "sha256": "37fff4c4ca8757cd1f42f8c69d5d06b23ee777e5f02def8203c6118cb4168b35"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g000/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split42_seed142/metrics.json",
+          "sha256": "a95ceba8b56816534a801608dc976f9f7ac491f0bde14ac47cb8e24098f1e23e"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g000/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g000/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split42_seed142/test_predictions.npz",
+          "sha256": "623c06d92d8d70e0ba8c0af65b1044d4f5abc8d2df964de0523ad5c63bd637ce"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g000/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split42_seed142/val_predictions.npz",
+          "sha256": "fc55b3922b94cfe1017f55a3e68aa64cd79c9e6dc9f9fa71d263618ae84c2bbf"
+        }
+      },
+      "config_sha256": "899c7d7460f4822a6e9b6986302ad9b8d8934285a21b34e0d2f90807e9ff7992",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "8a33cf500d9b3da3e242c4f9f465dab73894037df023a1508bfe354e280159a0"
+        }
+      },
+      "output_dir": "factorial/g000/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g000/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split43_seed143/run_manifest.json",
+          "sha256": "b8069583f18da7133b6c0ee18e5eaceb471358a41418fb302ba4c78d22861e06"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g000/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split43_seed143/metrics.json",
+          "sha256": "fef960e052efee4345402ff87f02f90f376239a23ac8f4489f2f034b0627abbe"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g000/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g000/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split43_seed143/test_predictions.npz",
+          "sha256": "681dfc171fb3879818eaaa679d2d861d943386bb1ffe2414efc282a0ee379204"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g000/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split43_seed143/val_predictions.npz",
+          "sha256": "7c164ef06b46317a71d0180832a2606b279d3b3b6d3d820397b29ebd404978e2"
+        }
+      },
+      "config_sha256": "ae90726d1bf39ee745303b7eada5d1e574ea90ab4b83609ee05b04e38878d40b",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "7dd4c3d666bec9bc1289892ce8fd6e19ef5de34461ae1518bce4c1ced409a68d"
+        }
+      },
+      "output_dir": "factorial/g000/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g000/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split44_seed144/run_manifest.json",
+          "sha256": "aa3798d2e932c33444020c4b2514142f720ac7d5bbec884bb274aab0c8b3703f"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g000/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split44_seed144/metrics.json",
+          "sha256": "5404347c114d7595134384b0a7a78dba6910005f582f52fb4ebf7153c00876e1"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g000/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g000/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split44_seed144/test_predictions.npz",
+          "sha256": "582bcd360cfd19104035c5b3c498fb4c35cd95fc8cf64775743b8db146695369"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g000/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split44_seed144/val_predictions.npz",
+          "sha256": "19c25c88dfadcd4defa518829df418d07dc394d0bdff204f667affa272e11131"
+        }
+      },
+      "config_sha256": "ef627e36ab14dd2f7a05811fcc1a32caa3b76c45616adb227dc05cbb3f8c3d4a",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "9e5dc30a5a67b62301e42c13f023ef5600327347abe6f2201dfff2cf388e9121"
+        }
+      },
+      "output_dir": "factorial/g000/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g000/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split45_seed145/run_manifest.json",
+          "sha256": "f7937ac125a161dc67d65f832b6ffa9bf68adf829daa14fdb43c411343bf68bd"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g000/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split45_seed145/metrics.json",
+          "sha256": "7439cf080d1a7889ee3cc250423108d4309f44695ecf79bd6ebed85263325f06"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g000/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g000/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split45_seed145/test_predictions.npz",
+          "sha256": "9344556bf537747bcf14cd4baaf6d182202cd17b59e44c2d004dbd24cbb7bc8d"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g000/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split45_seed145/val_predictions.npz",
+          "sha256": "063225ee9b16bbd06e58c063c285cab6e40b9c56a6b4a864ff09a60cb778d2c6"
+        }
+      },
+      "config_sha256": "66555dcce091c1dbcdab5a825fa5e1668c36f9359dd72d39ed91a6675f783d38",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "a5f7daa904d29f63a916923b10cdd37a1e7bf8ede7136454d58bd9fb764f064e"
+        }
+      },
+      "output_dir": "factorial/g000/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g000/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split46_seed146/run_manifest.json",
+          "sha256": "16c2f3d80397352c2f174d4452a945036f38be8393f7aff98cff6670a2a80a3f"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g000/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g000/split46_seed146/metrics.json",
+          "sha256": "dff0cf915b1838c5556c3cf16b2e89ff2c16eb5eaa859dea7a16449bed887ac2"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g000/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g000/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split46_seed146/test_predictions.npz",
+          "sha256": "0ed723aef6f978cca39d16f0de17934a8e7f83db593b6189f9fc2016676bf96a"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g000/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g000/split46_seed146/val_predictions.npz",
+          "sha256": "57f7558072cdec40226770bc007dc696aafb1fa6994143286b55cd63193009d0"
+        }
+      },
+      "config_sha256": "95c857e5eeee8fd5a9a03639673b4bb3d28cf036a9b863a081fa55800b816d5e",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "01205265e328b51e11d2994d6f96afa028a98682a25493a3ad5ef84017b63b1b"
+        }
+      },
+      "output_dir": "factorial/g000/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g001/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split42_seed142/run_manifest.json",
+          "sha256": "0a79532129f91412e45e14fa5dee7192f70b3cc2753f11507ebf6978d3a41a0a"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g001/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split42_seed142/metrics.json",
+          "sha256": "8eeee855da32cdb890d83203f43d252ef3d405b5faa845da025305a88ddec909"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g001/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g001/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split42_seed142/test_predictions.npz",
+          "sha256": "ff9480fc894010c086cd46760c4f56770d40db1f196f12867541f5818315da5d"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g001/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split42_seed142/val_predictions.npz",
+          "sha256": "aa47341f774b7d12176cdb2005f58e7d7a47840974f15387753ff5cb4b940fd7"
+        }
+      },
+      "config_sha256": "cd559d252859a2694174c23d2161f967abcebedf48c87bd6d1e43114a16fc165",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "b0b000a283066367134c185e99b3bb26d512fa8d0a8e39081469157af65bd61b"
+        }
+      },
+      "output_dir": "factorial/g001/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g001/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split43_seed143/run_manifest.json",
+          "sha256": "a6ad4ca8f8dbe3c40994fb2afe460ad67d3306bfdbb9073f5d386a3f621ebae0"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g001/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split43_seed143/metrics.json",
+          "sha256": "d8bdf025019270bafa609550de577631e832b4940256d4da40b53212fa5d6386"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g001/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g001/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split43_seed143/test_predictions.npz",
+          "sha256": "1de4aca72a61fe2051daa17977c9f39dd7dcdb4808e3da96a139acf4d615d298"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g001/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split43_seed143/val_predictions.npz",
+          "sha256": "653d18c7e8f4a363dce3663b3c1efb94e1e011e54415a584b61f521951bf623b"
+        }
+      },
+      "config_sha256": "45603498a3284fbd5a0e56c97e0324b1106e9cfb9dfa4e88bf77163c11f1f43a",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "16ee988e91a38a2afc08b28d4e69e647f0e59a7d6098bb8bb6fd6325cf63f59a"
+        }
+      },
+      "output_dir": "factorial/g001/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g001/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split44_seed144/run_manifest.json",
+          "sha256": "67b3f694265636d0d8a15893b25ee88b0037a9522572d6248f87060e672d1f36"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g001/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split44_seed144/metrics.json",
+          "sha256": "f4df0c6d6f8a751ed1550057a95ef0c8fb634af1f5748978ae1ac51202e37da6"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g001/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g001/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split44_seed144/test_predictions.npz",
+          "sha256": "d7b969a88be8611c322af831c7ebff24f69782a61b7cf4ed99de89e8b9e2a87e"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g001/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split44_seed144/val_predictions.npz",
+          "sha256": "1c8db90d9897c0d08bf015ec5cabded48082f949ccd783eb76ec3dc845142d82"
+        }
+      },
+      "config_sha256": "917bfefc4c7584fa7850d2e1a5c67a36134b16bf98efb24e48e81d96bc56811a",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "887ee627b7635734b4413e908e4923de2a2f8be92509f893966087944a1b313d"
+        }
+      },
+      "output_dir": "factorial/g001/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g001/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split45_seed145/run_manifest.json",
+          "sha256": "26ebc65aeb67acea89ce7058914f603f8b4e41a3d9f6a65d819a9df024734542"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g001/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split45_seed145/metrics.json",
+          "sha256": "13b1e8de35c936a987d0146c4b5ffd45879310a9d9f1846b8bc8fcc0c18ff80b"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g001/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g001/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split45_seed145/test_predictions.npz",
+          "sha256": "98f37272691a2b28a47041b46d65f8b8ed83780e6b2955186cf3932bd0434741"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g001/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split45_seed145/val_predictions.npz",
+          "sha256": "3f23ceb53da489d117fbe7e6ded179c62c2e0bb7232d971c68e2aff3fd6eaa1d"
+        }
+      },
+      "config_sha256": "5d1dfc56e4d7b2e7e3613d233be8e7022a80691ab5f7524ca28356559a299f25",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "350b3a2bb998da2dca495b62fc542e7bc46f5f8713d58447430e4e8b4aa0d887"
+        }
+      },
+      "output_dir": "factorial/g001/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g001/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split46_seed146/run_manifest.json",
+          "sha256": "a54d5d6dd4419c952fc7eb9a40507d1bc6d7a8fca8e03a164ff39507e983d1d1"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g001/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g001/split46_seed146/metrics.json",
+          "sha256": "ba0cb34f58623f37ea0dfbedbc53aaab525a2889937107b1b1b9c99c21db281d"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g001/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g001/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split46_seed146/test_predictions.npz",
+          "sha256": "e2fc9b4ae49529ac36a85f59c142d29fa70dffdbdd8b21006119b2ee2f07cca3"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g001/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g001/split46_seed146/val_predictions.npz",
+          "sha256": "c2ab559b32b6c96d0c0ec2436850ae089a2b0324341dd33b34ee3297603e6a27"
+        }
+      },
+      "config_sha256": "35edc0aa04d885876a994eec634ece849780a0d4764038263c4d955a76f65bcf",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "66598678d562927550d6ef87e1408cd5832ee88256637020c242c09df29ba316"
+        }
+      },
+      "output_dir": "factorial/g001/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g010/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split42_seed142/run_manifest.json",
+          "sha256": "f43ab5eadedce20e0a44f4bca6505861a531e8e241bcc4a94ba4f45f68900b73"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g010/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split42_seed142/metrics.json",
+          "sha256": "abc8c1edd38b7f1111faf394cf25738dc7bea1238b83eeb53084e953d4c3d1eb"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g010/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g010/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split42_seed142/test_predictions.npz",
+          "sha256": "12750b829045e38e29d6625bce6220f58ab0b30425e783c396db635367589804"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g010/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split42_seed142/val_predictions.npz",
+          "sha256": "fdafe239d2a1b2968b4c9f273bf61e68a147c96f4848d49e9f5bfd4785df6dd3"
+        }
+      },
+      "config_sha256": "3aafd51ad3df15fe0a321ec1966dae2fbbfdb708d0f37bddbfd77d56ed83c849",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "1ecc0367360883712bbc5904b8e69393b833c34bc9e339c5848c25c5721a4086"
+        }
+      },
+      "output_dir": "factorial/g010/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g010/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split43_seed143/run_manifest.json",
+          "sha256": "7bf51eb06af6bbdffc5bfa5aaf31dee219ff7d5ea36b036b94ae3ec771bd90f9"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g010/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split43_seed143/metrics.json",
+          "sha256": "fd309161f15a6c05b16ac8e51088186dad6246efb6e46b2ffb4e815ea63fc6b6"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g010/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g010/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split43_seed143/test_predictions.npz",
+          "sha256": "6c6e94870cdaf4528a7e1ba24a4ce7baa700d347d615724b6d88019b6e98845e"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g010/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split43_seed143/val_predictions.npz",
+          "sha256": "d8e1477bd5e177b35d4abf10a09357cb6ef506817819d5c2032c9aac7b2461d2"
+        }
+      },
+      "config_sha256": "64caffed3cf1b27d77a76abf6e8d29b19930f9d7566d92a27e3d49ba34ecbe63",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "8041c682c4bab8266c74f1be4b825c23292d9258017f9a96d183af92ec0f9ea0"
+        }
+      },
+      "output_dir": "factorial/g010/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g010/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split44_seed144/run_manifest.json",
+          "sha256": "c52c208aeedf090647928bbe70604bac44f2481170d12a2bba046f792929da7c"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g010/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split44_seed144/metrics.json",
+          "sha256": "87d05167423256a9ce59849831df0a2aaaef4258918e1fc1479c7b072ebf8548"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g010/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g010/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split44_seed144/test_predictions.npz",
+          "sha256": "8ac7f34e059c3d8789d6361428f55533a77f3eaea108fe03a2724e55d30dc3ae"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g010/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split44_seed144/val_predictions.npz",
+          "sha256": "c1eca659f0d1cee9ac866964f48971e991e0ca122c18fd520d4b529be11196e0"
+        }
+      },
+      "config_sha256": "390a00f36163f25c7bcd4d286b6d4112a1a0cc0c0261b3ead1b4361c8eb7e531",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "d1cd3d01d600a8f9b723d589973780caf1a69986ba6a41e9ad554543ec98f048"
+        }
+      },
+      "output_dir": "factorial/g010/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g010/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split45_seed145/run_manifest.json",
+          "sha256": "fd9fc49aa475dcea25eb18264912064841135ccf99051f8e09b109691dccfd4e"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g010/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split45_seed145/metrics.json",
+          "sha256": "b11044d82818f7dacd7e11480f591427b8df77607e19f0d6f7af00d4d7bcc277"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g010/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g010/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split45_seed145/test_predictions.npz",
+          "sha256": "cdb02745656169696ca7d21d0b4580a834cd785723b3fbab05e215529563a556"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g010/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split45_seed145/val_predictions.npz",
+          "sha256": "9fc28513039817822ce31b54eb7462df8d52a810fe554c999ba2db6ec6a58be5"
+        }
+      },
+      "config_sha256": "44ee7ecb81675c0bc877e7048175c8d7d99bd32e5c752c339a7f9749da8b8212",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "77d3fdfab99526aaa6efb5643f22549866e213c5a1d294a05972bbd7515b96d0"
+        }
+      },
+      "output_dir": "factorial/g010/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g010/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split46_seed146/run_manifest.json",
+          "sha256": "c49a74a426d35454402ac31d84efa9c9ad74f75117f74f13aa672a037fdc3250"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g010/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g010/split46_seed146/metrics.json",
+          "sha256": "47583f18aa4654653761af90baf962865135d96ffc1871370898a12200fa76d4"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g010/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g010/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split46_seed146/test_predictions.npz",
+          "sha256": "14f49d0b6821b7d809085b65a5751e5599dbd467035334250ed774f0cc142fb7"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g010/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g010/split46_seed146/val_predictions.npz",
+          "sha256": "a9b032c5ba4b827646c31d1a8497cf8a7d4adad2b7719a25cfa8732c95a89d49"
+        }
+      },
+      "config_sha256": "39d9f1bf27f9118dcfefcee24b21246ba4563a2f26fa9e2097dc523e009edc11",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "a7d8b4025db41abea61999878723b56e2c62c823d94a4588a139a0b6e08fc101"
+        }
+      },
+      "output_dir": "factorial/g010/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g011/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split42_seed142/run_manifest.json",
+          "sha256": "974efa61198949ea1cb41fc2c8a61a43a6d91a1fe588efd160a9c5a2bed53295"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g011/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split42_seed142/metrics.json",
+          "sha256": "0ef544408abb381c2a44ccd5912aab7c0a067f2e50f8e3845459157bb155e684"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g011/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g011/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split42_seed142/test_predictions.npz",
+          "sha256": "486ada1ef6fcba267fc40fd6f0a390e6c549b4233d6f2f594eeff02e10d05016"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g011/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split42_seed142/val_predictions.npz",
+          "sha256": "2f9e5a4fd4441012240f65ac0f4b7e8c44e88a59cf7d59eea266aa9662b864d4"
+        }
+      },
+      "config_sha256": "0041605f3e90a1538890422cb9c1d90e788336d43752011a60a6773f36283241",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "b40fab8b380c5b2393fbda14baee388714c0a67fbc4063bb587b2afae1e61808"
+        }
+      },
+      "output_dir": "factorial/g011/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g011/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split43_seed143/run_manifest.json",
+          "sha256": "e625e0e59ffc62c48964ec438ff12d8d654369fbc14e8059905ea9224aae10a7"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g011/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split43_seed143/metrics.json",
+          "sha256": "7a3f3d6edf0b2d6f548d6a1612f553022ef8adf644ef066b41671ba12934a372"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g011/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g011/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split43_seed143/test_predictions.npz",
+          "sha256": "ddfecfb2ec4770b0631caadc969d1d86d14fe9c678be73fdeff25ff978dacc69"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g011/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split43_seed143/val_predictions.npz",
+          "sha256": "7e5500845ab51e692a49e5a1967cb57c54b4bc90a53fd0c4b567d61e866aa140"
+        }
+      },
+      "config_sha256": "c2b1fb5d02f367a1bddd1f19a25c9222ea4c5055527ca8511f4fe8cdbd3d4797",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "bba70c377ab032f552f4f696b6e529734b1517dd6d2a94ba6c0c3dd17c3e5741"
+        }
+      },
+      "output_dir": "factorial/g011/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g011/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split44_seed144/run_manifest.json",
+          "sha256": "b20c29ba665a338694346722412c01e822fa9a4e40b8d75ffbeebd512bd923d3"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g011/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split44_seed144/metrics.json",
+          "sha256": "6ddaf27055c639ae12018c4f57e2a4f8882584e6a65cc41781dd72e75131c8b4"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g011/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g011/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split44_seed144/test_predictions.npz",
+          "sha256": "6d46593e0ce91dcd441b5c17887c2fa237fe7572929925780efe83890017d963"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g011/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split44_seed144/val_predictions.npz",
+          "sha256": "a1c5790f6cabe6a02926dbd46f4140ba4d12187b4ea0fa5646e33fb3df6abf69"
+        }
+      },
+      "config_sha256": "e53464daa275d8c89e142679b318191871b8a0e2fe570f42168f65ef547e3312",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "8d4a491f18e2f58c93d1a4afda527359312384a353d0e3d7d9333274b074db32"
+        }
+      },
+      "output_dir": "factorial/g011/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g011/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split45_seed145/run_manifest.json",
+          "sha256": "0cf389e06dce44b64d78a11cbaddc9ea25857e1205dd47ece6e02d482280aaba"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g011/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split45_seed145/metrics.json",
+          "sha256": "35a23213c31cbd6c30f8d18c3641ce697f3b6388c1dd63447315f264f2294d9b"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g011/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g011/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split45_seed145/test_predictions.npz",
+          "sha256": "faaf6a68f3b135c48adaff4e6bd6b124abb91fe0d62ad41142edb27c57ce0062"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g011/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split45_seed145/val_predictions.npz",
+          "sha256": "d454b71b9913a89a14bfa3a512c0f542be362eba35465b87bb2421651f43cb59"
+        }
+      },
+      "config_sha256": "19f4d9a21394d75f22b89dc1cec584dca154c98c1baa471a19722933b7b9afaf",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "a182042e784b83497b8572cebb845f6045afd7883e6853d4dc15a0c34647d638"
+        }
+      },
+      "output_dir": "factorial/g011/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g011/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split46_seed146/run_manifest.json",
+          "sha256": "7c2c3fd7f7a4339c13f32b016a412242da45fd12baabeb4b5f80e78749d5fc20"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g011/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g011/split46_seed146/metrics.json",
+          "sha256": "0ebfa221462a95dfe779681fd6ce58501fab140c935daf071feef9abbe856039"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g011/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g011/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split46_seed146/test_predictions.npz",
+          "sha256": "cc6b858f2fdb038e1e5d6314a494c49b01a5caec90e0695c3c7974db5756b710"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g011/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g011/split46_seed146/val_predictions.npz",
+          "sha256": "47df8ca586538fa344b419e092aa82feb5f64d9cf86202fc0f3b182885a4f765"
+        }
+      },
+      "config_sha256": "a6e30a8593c3b0c1d9cf9ec8dbca035cfc8914653778d6772847c07d7b627640",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "37de82a942236446c3a80b3ef7f184023ab293a0b9138ad6e04721ac6e5dca7a"
+        }
+      },
+      "output_dir": "factorial/g011/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g100/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split42_seed142/run_manifest.json",
+          "sha256": "38a4891ce81858bf75d40e83176c1cf117218eff87d89fb45a26779504e77813"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g100/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split42_seed142/metrics.json",
+          "sha256": "132ee5cd9a8177a3ef0b7582d4fdb10ac23a6498cf0adc285bbc05c8ac87bc37"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g100/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g100/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split42_seed142/test_predictions.npz",
+          "sha256": "9c6b76ee41c2ff4712a8ef50c5b40ac3dd3e85c17656e9249f2cc5f85571b92e"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g100/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split42_seed142/val_predictions.npz",
+          "sha256": "3d8f0e20dc4569ed0d54aa2a22041c4e9639c8bd91983fcd4bc5752cc1a189e8"
+        }
+      },
+      "config_sha256": "7a05a3b00991054a9e889a785c79fd952bebddf4ad591af57e468351bd5d14fd",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "b8d677e13ce98a998aea2c7cf2ae113d19cf896b33980f25dce59f233b684730"
+        }
+      },
+      "output_dir": "factorial/g100/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g100/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split43_seed143/run_manifest.json",
+          "sha256": "2af65b28311405d9948ca265487484a3d1d657f68ca5e2c6ec12b19c57e7f21a"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g100/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split43_seed143/metrics.json",
+          "sha256": "2602e49ed807ca874c27f9055efdc585da822f5fde148a166e0942f730a6fc66"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g100/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g100/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split43_seed143/test_predictions.npz",
+          "sha256": "9050a7420bb84552c17cb3f23c0055a83afc4df4b69416e677004b8c1e606c17"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g100/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split43_seed143/val_predictions.npz",
+          "sha256": "1d632ea1190942247035a5c9c9b91fb0236880ebf0edd180da4b8c6cfb1b8034"
+        }
+      },
+      "config_sha256": "14247fbd8528264a9231a49219b2bea99251551828b876ab5c1ffcdb50b0ae22",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "37988ac82a2120a1a504d153386f2be23b82ef53cabe84e7c5796389887230e6"
+        }
+      },
+      "output_dir": "factorial/g100/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g100/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split44_seed144/run_manifest.json",
+          "sha256": "1b0f7209bd6e69a304862d500dcfe29c27c26e56895f22ad36b13a5632332299"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g100/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split44_seed144/metrics.json",
+          "sha256": "aeee9b2f2154477fb1646e81e269586cd64a138da23e2d46bedaeb0f8c4dfd5f"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g100/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g100/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split44_seed144/test_predictions.npz",
+          "sha256": "bd398bac96c7a3c487ea266e8f932ebe87af2984652441465a7c0d4b4df94dc1"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g100/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split44_seed144/val_predictions.npz",
+          "sha256": "106686cd482a7b9504a280705bd6af044d72541c5607911a293ac24180d6c0de"
+        }
+      },
+      "config_sha256": "b88fadf8151ce5124c843d989ba96f54278d3069e6a2cd73a505b9c6b6d3ccd0",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "8aa3619351a1c2b6107700a86e52152e727eac9db6fe51dfb5bcb017edba58af"
+        }
+      },
+      "output_dir": "factorial/g100/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g100/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split45_seed145/run_manifest.json",
+          "sha256": "d38536610c38e2a491c7337758b328f97203972d08b80c5f6a791eab0bf089e8"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g100/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split45_seed145/metrics.json",
+          "sha256": "914fcc403e1e16f1f30ce63a1058291c44c519cad576fe4fb8c8882c0dae2c3b"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g100/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g100/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split45_seed145/test_predictions.npz",
+          "sha256": "3a65abc9675f1ead060865c223c2c40ab1202127cc8069c9f978cb0e2781ee4c"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g100/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split45_seed145/val_predictions.npz",
+          "sha256": "5e39602adf7d8a5d55ccce94037643d247457bb48b4cc4bab8a9e71276b4a9b6"
+        }
+      },
+      "config_sha256": "93aa2b546e3b8aaf2ec9e325bd71d9ff3dd5b725f9b73520ce5c324f822fa606",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "b05666bf5ca74d5fbb6888aa4f62a650486220b930f3282d2c579c951a2c6f2d"
+        }
+      },
+      "output_dir": "factorial/g100/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g100/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split46_seed146/run_manifest.json",
+          "sha256": "0af88155e397d8c1ccaf3408857bc61f922736cd3aac78097f31706e8007655a"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g100/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g100/split46_seed146/metrics.json",
+          "sha256": "34f854a379788e990ddafa00693ae68abad4fa606e8c02e7fb2edb0276f2987a"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g100/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g100/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split46_seed146/test_predictions.npz",
+          "sha256": "7ff0694751f4aff7409aed045fd5d7aee0d8680c21ad5b4ea43b03a43252c23d"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g100/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g100/split46_seed146/val_predictions.npz",
+          "sha256": "1dc50a6080725fa0fbc1627cfc62f28015dfe50998cb077c48bb200855c40ceb"
+        }
+      },
+      "config_sha256": "5210c84f75184fda25914d5a54142b30e056c5cb9dfe7ba10e5d021cb5c7f4d1",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "d7e2f71c24da205303cedff0c8df97da8d9a8d14fd2b37f6a027e7b904389a69"
+        }
+      },
+      "output_dir": "factorial/g100/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g101/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split42_seed142/run_manifest.json",
+          "sha256": "ddea4c4f1c62eb7ed3e7ad94c0795c8757655e2fcf7be1492f67a4ebb3994318"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g101/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split42_seed142/metrics.json",
+          "sha256": "83e1067db314943f0bcd1a246cde54dd0eb53b77c41604245c851918c6e5c207"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g101/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g101/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split42_seed142/test_predictions.npz",
+          "sha256": "609016fd8c95d669b98c6c298939f508cef6ab24d5b3ef44b5001476ac3456d4"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g101/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split42_seed142/val_predictions.npz",
+          "sha256": "02a990aa47ef48c3c2f4c328d946841d21795346c0f8841c6a5ecd3a6ba212c0"
+        }
+      },
+      "config_sha256": "05f0ede60f2caad20238d35020d7032f6930e22e0efa33f43c5151628665ee7d",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "f7512d21632101ebc28c9317c0bf4bb95646190ca669c2323345138ff01c9e2d"
+        }
+      },
+      "output_dir": "factorial/g101/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g101/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split43_seed143/run_manifest.json",
+          "sha256": "c316e8c62dc39cff376ae21c0f8f5b0963f002a531f4b55ba23bf9251fbf3bdb"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g101/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split43_seed143/metrics.json",
+          "sha256": "2210a53feb65d85883e8c1f693ba380b9fa63d3f43e960fcdf8df53b926b438a"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g101/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g101/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split43_seed143/test_predictions.npz",
+          "sha256": "bb002fc30498d05ff9349733bac8e0aa61cac3a2c4a476083bd7267a25568eab"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g101/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split43_seed143/val_predictions.npz",
+          "sha256": "f2d28f1eef87e830677d193f7dfefd254f5c840a54de25b4542b7cff4f8d876c"
+        }
+      },
+      "config_sha256": "58d2e2d35a3ea28e5acaa892e772fa54f196969475685bcf54cbef7a78293f33",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "561c74640b25fd09faa29abe9cc010dfb5e1f1897c187a61bf28c8057519e043"
+        }
+      },
+      "output_dir": "factorial/g101/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g101/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split44_seed144/run_manifest.json",
+          "sha256": "596af278a6687442da32608734ef16ef74fb59dbcbc11572f59372d4ca665817"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g101/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split44_seed144/metrics.json",
+          "sha256": "318760921eb050006d4dba0b0e05ce0dd1e8e91e9b1a6e365e823ce9dbb8a756"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g101/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g101/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split44_seed144/test_predictions.npz",
+          "sha256": "81fa094d717c161d5f682b1aaba7d04c9e9352d3aa36ea989f00b3c87cc9b399"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g101/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split44_seed144/val_predictions.npz",
+          "sha256": "13106a73c8f670da70eac2788e301f94d081da28be8896ab2cc39e4439e1a385"
+        }
+      },
+      "config_sha256": "1e39ad517ee917d6904e13806843f256ba19dc5024f20487de5991d0813aa69f",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "e2855ad26999fd36ce7b6914d4347a34bbb89e4902e54758dcbea5a1f3154250"
+        }
+      },
+      "output_dir": "factorial/g101/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g101/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split45_seed145/run_manifest.json",
+          "sha256": "611bfad97b960f3e2ea6d9310b255fc06443f97c4c96bd0de50931133c952963"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g101/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split45_seed145/metrics.json",
+          "sha256": "4c78b04af78a85e054a9250b3d222c24616fab4cef2f05d7ba891372921dd5ac"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g101/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g101/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split45_seed145/test_predictions.npz",
+          "sha256": "ecbcdbb529995838e76342f539d795ae70b8331b654414c0f1617acec5ad3a39"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g101/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split45_seed145/val_predictions.npz",
+          "sha256": "b869b6c436913e2ae303f29be48979d83c468450eff988361af2f1876093f924"
+        }
+      },
+      "config_sha256": "4d2f2ce18869ba7150ba9190a49696157472fa2f0bd394404d85425e8ed83a09",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "51187a6248d475c7965472deefc45b0608f4c87734c0f292b9a0b4313c4457e0"
+        }
+      },
+      "output_dir": "factorial/g101/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g101/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split46_seed146/run_manifest.json",
+          "sha256": "21ecacb1ba5114e804d6aed012d4742e3fc628a4bad1b2da5f9478bb4dd38199"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g101/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g101/split46_seed146/metrics.json",
+          "sha256": "ae7a9b1b9ad1f8d8903a0d5c50e5b6bd1c712e8e4b2dc5c03176e90c824bd12f"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g101/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g101/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split46_seed146/test_predictions.npz",
+          "sha256": "263e3b9ccf53782758263c16530eda0b6ec0947a23f9fc9768964e4774fb3187"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g101/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g101/split46_seed146/val_predictions.npz",
+          "sha256": "83623e48b505ade92bd4b232df08afdc33ee3a7a5071394b5f6a41309433cf7f"
+        }
+      },
+      "config_sha256": "b67af2f049cbc5cb4f230046dd60ed52d4b7e14c5889cdfa484d29283df13a20",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "1708a8acdb6726e4c228cd437e355c216683973f46cc296d02d2fefb84449460"
+        }
+      },
+      "output_dir": "factorial/g101/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g110/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split42_seed142/run_manifest.json",
+          "sha256": "acc328bcaf544658c2d73f405961488489f5cd082ca3ec9b55da563843eb639c"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g110/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split42_seed142/metrics.json",
+          "sha256": "276bd5e5aca836d266d7c4e096e501e43127e084fa7da53e9ecf2051a28d6185"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g110/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g110/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split42_seed142/test_predictions.npz",
+          "sha256": "b72b7ae3ffefe4fa948c9a5043ca52cef17951274c737b0cf373f891e2248b39"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g110/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split42_seed142/val_predictions.npz",
+          "sha256": "418bb63be634538e11699ff1afceb09840f48ec9c48266be2c625fa7cee93dd6"
+        }
+      },
+      "config_sha256": "11141e8bd5581d4f716ce2bd6393630eb43cb299997914a3d4b790d044d0dffd",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "b020eecb920a9a27a97807ec6403b535aead884335a8f5d219b340661de80f3e"
+        }
+      },
+      "output_dir": "factorial/g110/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g110/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split43_seed143/run_manifest.json",
+          "sha256": "a3bc024de7aa9e518d6f2f1b1cc3305073d6eacdf0995f52f8b40fea25ef93f2"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g110/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split43_seed143/metrics.json",
+          "sha256": "59e4926e6b4e18828cf1385c83a9b08c5f58f3cf3516a6bc834b8381a01e9174"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g110/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g110/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split43_seed143/test_predictions.npz",
+          "sha256": "f498eaf4975dff833b096bfcb7cb468cf57f9df5d78bf6137ed1ad5f79af367e"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g110/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split43_seed143/val_predictions.npz",
+          "sha256": "3eebc0894c13664b67a13f3f0ca7affa432966daa132fe69cbfec98d6b1bbc11"
+        }
+      },
+      "config_sha256": "ee73fa0f575e1d7af8a9d7f3ad4fa48a226d4e40eb716c0a31f7f7f8884d9204",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "e9a88b92dd942e7847ca2d8b703f05d9c491a70c60d59f6b0cde111576f56361"
+        }
+      },
+      "output_dir": "factorial/g110/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g110/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split44_seed144/run_manifest.json",
+          "sha256": "208522c35ee90188b6f6275927490075bf7e75e88cede4e34e68fa6628dd0148"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g110/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split44_seed144/metrics.json",
+          "sha256": "9d3b3347f22ea4ce02b5bced6845784e6f4d2128ce34a886c29c97f3681069ab"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g110/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g110/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split44_seed144/test_predictions.npz",
+          "sha256": "b7fbf635ac5df3b33051bc8a6a9b95758aa4fe1b8474aeef2f48e7538efae2e3"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g110/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split44_seed144/val_predictions.npz",
+          "sha256": "5c5aafb1571859ea22e1b22b6d9f5396b589014467a6e9c9c2c6e2f909454bac"
+        }
+      },
+      "config_sha256": "98d7695d3e8da2d1f86261332ca0b322c9dc649d5f24858782fc5244dfe92549",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "60a4e682edcd919a03b1d2ac21ee3eca9ac24f0f6f9c8907d828ee5e033fe47b"
+        }
+      },
+      "output_dir": "factorial/g110/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g110/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split45_seed145/run_manifest.json",
+          "sha256": "ea00f5958b9b6976099249d8c81152707254466e8dad88759b91458acbd7503f"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g110/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split45_seed145/metrics.json",
+          "sha256": "f7927a7a8a260908e3a9ce09191143bd5caa88c326164c50efef16847be9c409"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g110/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g110/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split45_seed145/test_predictions.npz",
+          "sha256": "40bc94483899c8c3cd486d7bf034cab7a9452cddbe853b1a1c82bdda7a5671f9"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g110/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split45_seed145/val_predictions.npz",
+          "sha256": "5184d4c70368b03d5fc4a613c59fd2ef88583bea9d308d75e2015be02a37d6ec"
+        }
+      },
+      "config_sha256": "92fe1b8fbbb3a3ac4717a6b446d00381afd796f9101d6284ba74594ce0aa1e6d",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "0d9f26ae0d26c3f8c16c4455847bf30ff6c0259d95b202907e95cb0e97a816aa"
+        }
+      },
+      "output_dir": "factorial/g110/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g110/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split46_seed146/run_manifest.json",
+          "sha256": "0628471e13e322c0cb2e96bf3d8c167894118d1e72a51eecfbc16b8aadb79f45"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g110/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g110/split46_seed146/metrics.json",
+          "sha256": "835cb8eb2e167d6591a1be10d6a6f9aa3d7acd8764b1137953a0d7be96db307a"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g110/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g110/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split46_seed146/test_predictions.npz",
+          "sha256": "ac95144c26b52fdcf301ca9bcd74c966ee8bce01e282940cd16e67f2d9e56fae"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g110/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g110/split46_seed146/val_predictions.npz",
+          "sha256": "c6f2d9740c2ecc9f2a812c504aee9aa85f14488b77a84c90f1cd7dc7dc0da2ed"
+        }
+      },
+      "config_sha256": "30b320065ecc303d5ef74eff70ddfc61b88c76fefeea54b7beacb811ed3e02db",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "e68d728ae206586adea19c57cd90995a1a029b160b6f08fbc326de8e65b49351"
+        }
+      },
+      "output_dir": "factorial/g110/split46_seed146"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g111/split42_seed142/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split42_seed142/run_manifest.json",
+          "sha256": "2a42b0a9c8f617f80d825085635d6fe9eda613968d36990e8a0d269498c2ca64"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g111/split42_seed142/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split42_seed142/metrics.json",
+          "sha256": "fcbf61dc13c35dd0fd030722d10215867c7fd01224c501c3eb37b74dc2423939"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g111/split42_seed142/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split42_seed142/split_indices.npz",
+          "sha256": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g111/split42_seed142/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split42_seed142/test_predictions.npz",
+          "sha256": "8e7d1fedef9b231dac36b7db0d770f7244e5366152964b8820b23a8788f83d61"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g111/split42_seed142/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split42_seed142/val_predictions.npz",
+          "sha256": "930550eb79eaa349e4bb5aecff737b49ddfa4fc0fc3de9b189f6e3b27b747f8a"
+        }
+      },
+      "config_sha256": "0f25a9fb93e38978407fce309bfde4fd098ec22ee83f9fcc1588e69fc4aabc9a",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "a32a459c0d2c89c8430883a928b2e3573d49051dc311e549597104cd72c64930"
+        }
+      },
+      "output_dir": "factorial/g111/split42_seed142"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g111/split43_seed143/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split43_seed143/run_manifest.json",
+          "sha256": "7028cda23cb260b88e289c5544067eaa980ec58289a296151556c39392e5762b"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g111/split43_seed143/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split43_seed143/metrics.json",
+          "sha256": "0e551a2356260e93c5f92f20f64a6294ead369dd1dbae0e4942989ed18c77f7a"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g111/split43_seed143/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split43_seed143/split_indices.npz",
+          "sha256": "6c3f47bcfc5ccd5b5e07c226269423c6f55e6b2ecaab38d6216afbdc12d4d0fb"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g111/split43_seed143/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split43_seed143/test_predictions.npz",
+          "sha256": "7f3507b85914a1bd4d758d44909f2666194da4f518d4b380ea822f982ba98818"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g111/split43_seed143/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split43_seed143/val_predictions.npz",
+          "sha256": "e2e768f6facd96596dbe0663e386e1e8b5f4be371d3b5a4aacedac0f93dc9960"
+        }
+      },
+      "config_sha256": "6ee1a57eab3bd013eac64ebd73a416523e7564fa48c83e3773d7e5f1aeeac9ac",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "2a637e98dda3794b2857abda155ae8323bf563d74edc53ada002c8564b263389"
+        }
+      },
+      "output_dir": "factorial/g111/split43_seed143"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g111/split44_seed144/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split44_seed144/run_manifest.json",
+          "sha256": "3f9220727ebc48db609992010a547ea3890fb666da6871c92257c81c32cb3045"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g111/split44_seed144/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split44_seed144/metrics.json",
+          "sha256": "623a3451b1521979a867d0536aed5013a03e217404fba6ff7064026318844708"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g111/split44_seed144/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split44_seed144/split_indices.npz",
+          "sha256": "efe06a92a7db12dfef11556a5dbfca631d3e8ee977f4f703df168a5052f13e01"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g111/split44_seed144/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split44_seed144/test_predictions.npz",
+          "sha256": "673e3023c7b6565c133ef92b9e03ec883f785f64b5b489331b408a05db1affa6"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g111/split44_seed144/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split44_seed144/val_predictions.npz",
+          "sha256": "f7546a5e360e650bf4a082be321a547d224ebbb65d8c9c2fdc1174f38eaa9512"
+        }
+      },
+      "config_sha256": "518ba6044e22860cedfca027fd05ad0b3522eab23754945ac5fcee4d7f8cc26f",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "acf106204e4db5742c39c0306254116aa76936aec5d868b8669c821ab92b349c"
+        }
+      },
+      "output_dir": "factorial/g111/split44_seed144"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g111/split45_seed145/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split45_seed145/run_manifest.json",
+          "sha256": "d75589424c57da074cba9a766a1932d7b40962fc2e541a62e78aee6b31e2fb49"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g111/split45_seed145/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split45_seed145/metrics.json",
+          "sha256": "cf9cdfa6d91bb1bb8081805984771173391aeef0d8c84f85817a7aea23bdc3a5"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g111/split45_seed145/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split45_seed145/split_indices.npz",
+          "sha256": "ac7297d18337c4c92d4ac1cb50b0cb3c14f60742215fa416fbc64e3e1ad6631f"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g111/split45_seed145/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split45_seed145/test_predictions.npz",
+          "sha256": "3e5d46e2ddbacc756763d1471ce91e9bfc7e41331cb151d296267f5e52bde88d"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g111/split45_seed145/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split45_seed145/val_predictions.npz",
+          "sha256": "180fcdd2b409f9358b96fffd502fb77eeeb0e6170076f75ec7d44d22eb5f7b5f"
+        }
+      },
+      "config_sha256": "43eb091ed3862b645da73dba4d375921a56db8b844f8855604948c5f900eb257",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "cc0fb26d695369f321ca54e2096bc7f8f3f05f52b8ccbc193d4a670c93260b1d"
+        }
+      },
+      "output_dir": "factorial/g111/split45_seed145"
+    },
+    {
+      "artifacts": {
+        "manifest": {
+          "archive_relative_path": "runs/g111/split46_seed146/run_manifest.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split46_seed146/run_manifest.json",
+          "sha256": "0cdb990175816805cac6a194dfbd1e78b0dbdf32661cfdda92f69128c5c4ca7e"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/g111/split46_seed146/metrics.json",
+          "path": "artifacts/prm_results/factorial/runs/g111/split46_seed146/metrics.json",
+          "sha256": "5a709836c283f9e5fab82579187df6381f21d096cfd7b6f5c130f8618dc7f333"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/g111/split46_seed146/split_indices.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split46_seed146/split_indices.npz",
+          "sha256": "4967920038ef15d708611d2f808763b434ee6654a0a25ba06e66532040558466"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/g111/split46_seed146/test_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split46_seed146/test_predictions.npz",
+          "sha256": "08021042645bf7f97a5ccb9c2e5cf71002bfc15d128b0f95518bb7083478a13d"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/g111/split46_seed146/val_predictions.npz",
+          "path": "artifacts/prm_results/factorial/runs/g111/split46_seed146/val_predictions.npz",
+          "sha256": "5ed5cfbcb354ad862550a5d0f024eb94d05ccf6af01245d7f1a968f7c00b593e"
+        }
+      },
+      "config_sha256": "48e88a8c0f3124361cd5e18e26bfc8b1b19bdca50ad249677193b8e94f10e5a1",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "6ade592f547efb5f79489f641d06d162ad31f72902d87d98028157e876540d52"
+        }
+      },
+      "output_dir": "factorial/g111/split46_seed146"
+    }
+  ],
+  "bootstrap": {
+    "confidence": 0.95,
+    "method": "paired nonparametric bootstrap over the five repeat-level contrasts",
+    "samples": 50000
+  },
+  "collector_git": {
+    "commit": "865e90a695e3641e21bc9f2c98fc05c80723abcf",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "created_at": "2026-07-28T11:54:17.743220+00:00",
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "effects": [
+    {
+      "ci_high": -0.015934241553399807,
+      "ci_low": -0.01956832730486695,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.017765570090414472,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.015833262588333008,
+        -0.014937360854800297,
+        -0.01827281749354337,
+        -0.020758546901130548,
+        -0.019025862614265143
+      ],
+      "split": "validation",
+      "std": 0.002373611548155716,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.00431853062223565,
+      "ci_low": -0.00950123141155218,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.002591350394658265,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.01113023614481734,
+        0.004335089284169424,
+        0.008937476253521037,
+        -0.004952477964202673,
+        -0.010146603401961773
+      ],
+      "split": "validation",
+      "std": 0.008894643778231213,
+      "term": "E"
+    },
+    {
+      "ci_high": -0.017786391725253547,
+      "ci_low": -0.028708715969910183,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.02247829894140324,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.01688969327654477,
+        -0.021256085749071285,
+        -0.03464893208407538,
+        -0.022648540435271314,
+        -0.016948243162053456
+      ],
+      "split": "validation",
+      "std": 0.007270851541381902,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.0072868453826473,
+      "ci_low": -0.0024498838744336448,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.002630045767357425,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0012350059879867037,
+        -0.0061665965702918935,
+        0.003125185169353728,
+        0.004265288997773231,
+        0.010691345251965356
+      ],
+      "split": "validation",
+      "std": 0.006066934671502596,
+      "term": "G:E"
+    },
+    {
+      "ci_high": -0.003385251217272045,
+      "ci_low": -0.011408764522486714,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.007153128967449763,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0042396923918969764,
+        -0.01075392774428624,
+        -0.01402811163528861,
+        -0.005040954828987698,
+        -0.001702958236789287
+      ],
+      "split": "validation",
+      "std": 0.005071609502383254,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.00978662193078308,
+      "ci_low": 7.315531881186832e-05,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.004842677994376354,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.004970290403769395,
+        -0.002530967630773151,
+        0.007965835245452468,
+        0.013579521227514935,
+        0.00022871072591812425
+      ],
+      "split": "validation",
+      "std": 0.006359287884309652,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.00018018162480505363,
+      "ci_low": -0.015959949485809886,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.007557023598870926,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.000685000599866814,
+        -0.0013037650675910561,
+        -0.016266992571362215,
+        -0.021316696951209524,
+        0.00041733599594134807
+      ],
+      "split": "validation",
+      "std": 0.010438112692960775,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": -0.049576088890658496,
+      "ci_low": -0.06576488715583495,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.05761096320153829,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.05338654317547764,
+        -0.06075941426458753,
+        -0.043860407463429785,
+        -0.0715594927797032,
+        -0.0584889583244933
+      ],
+      "split": "validation",
+      "std": 0.010150967990648735,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.020988733252974012,
+      "ci_low": -0.043658437036094,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.012468294764641685,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.036783081026001696,
+        0.04211589811211891,
+        0.015379052954515027,
+        -0.021380664599214727,
+        -0.06167267926462594
+      ],
+      "split": "validation",
+      "std": 0.0413721509835576,
+      "term": "E"
+    },
+    {
+      "ci_high": -0.02180859284639767,
+      "ci_low": -0.05519529241427301,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.037712666073375624,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.031193484427152862,
+        -0.06872930280260281,
+        -0.0497158032347047,
+        -0.020072750428851927,
+        -0.01885198947356581
+      ],
+      "split": "validation",
+      "std": 0.021304333660029696,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.039245489858527736,
+      "ci_low": -0.0008087042348719376,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.017335227220065485,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.020396341628689196,
+        -0.014181358756724105,
+        0.0039007596887092877,
+        0.019250277547906314,
+        0.057310115991746735
+      ],
+      "split": "validation",
+      "std": 0.026385647997408404,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.01961132998635635,
+      "ci_low": -0.005352668066177313,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.006548982099924672,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.00990081658164832,
+        0.006674509870862377,
+        -0.01337078669087044,
+        -0.0013805139234850383,
+        0.03092088466146814
+      ],
+      "split": "validation",
+      "std": 0.016316512203497432,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.046611664445351655,
+      "ci_low": 0.0012465340009455428,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.020701234820049753,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.017649650930444905,
+        -0.004015302424399292,
+        0.018540368545311936,
+        0.07159324831627756,
+        -0.0002617912673863465
+      ],
+      "split": "validation",
+      "std": 0.030225544747330822,
+      "term": "E:P"
+    },
+    {
+      "ci_high": -0.004276425423247821,
+      "ci_low": -0.047193449657174605,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.021404063839710673,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.007589399439184907,
+        0.0004989164114176381,
+        -0.020568751532616725,
+        -0.07196580438822464,
+        -0.007395280249944736
+      ],
+      "split": "validation",
+      "std": 0.029257558288376482,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.025488755165247533,
+      "ci_low": 0.003209237039905703,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.013225049351992674,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0008205357946295053,
+        0.01878456818031005,
+        0.003430006467899465,
+        0.035545035642653766,
+        0.007545100674470576
+      ],
+      "split": "validation",
+      "std": 0.014240493989790446,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.010281565476303696,
+      "ci_low": -0.01217752430886905,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0005887868819638021,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.009565598227506508,
+        0.013889366020895032,
+        -0.011118586428478041,
+        -0.01977821111445791,
+        0.004497898884715398
+      ],
+      "split": "validation",
+      "std": 0.014297845129453358,
+      "term": "E"
+    },
+    {
+      "ci_high": -0.004834873440680906,
+      "ci_low": -0.021599212049738067,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.013217042745209486,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.024368009746891173,
+        -0.004512123486533792,
+        -0.02174467137065186,
+        -0.015770698013604267,
+        0.0003102888916336616
+      ],
+      "split": "validation",
+      "std": 0.01075116262072455,
+      "term": "P"
+    },
+    {
+      "ci_high": -0.000435660257498114,
+      "ci_low": -0.009117300618884614,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.004776480438191364,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0002634327005733503,
+        -0.01003399097639521,
+        -0.004731368616135854,
+        -0.010393576262748398,
+        0.0015399663648959921
+      ],
+      "split": "validation",
+      "std": 0.005464895189670184,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.00549529134177415,
+      "ci_low": -0.012777517039015335,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0019034181089083973,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0028493995185934207,
+        0.00574581750801631,
+        0.006567711087122355,
+        -0.001792379846311594,
+        -0.022887638811962478
+      ],
+      "split": "validation",
+      "std": 0.01217795096464929,
+      "term": "G:P"
+    },
+    {
+      "ci_high": -0.00025755403793021605,
+      "ci_low": -0.010385961547756383,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.005854717696016316,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.01253813120250366,
+        -0.007475186204956935,
+        -0.008978013160643977,
+        -0.005337400970626953,
+        0.005055143058649944
+      ],
+      "split": "validation",
+      "std": 0.006639683485059812,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.009328319170237052,
+      "ci_low": -0.006972637673413451,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0018313177061174226,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.004224512441750837,
+        0.010420737288702724,
+        -0.0017727355959364123,
+        0.010787804416014488,
+        -0.014503730019944525
+      ],
+      "split": "validation",
+      "std": 0.010482689879149494,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.005682873137774114,
+      "ci_low": 0.002739936807808063,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.00420066809970745,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.004667940166310003,
+        0.0027834031009934534,
+        0.004481542833465801,
+        0.006987674140522371,
+        0.00208278025724562
+      ],
+      "split": "validation",
+      "std": 0.001907794896055202,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.0023756739710659724,
+      "ci_low": -0.0009202802012482136,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0007304772190470654,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0027852776414465374,
+        -0.0006265405553792514,
+        -0.002197256503532641,
+        0.0010739964529645762,
+        0.0026169090597361055
+      ],
+      "split": "validation",
+      "std": 0.00213962364213716,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.0036924843984977194,
+      "ci_low": 0.00030006755484064397,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0018891073467028896,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0017520152054627536,
+        0.0014016166610189007,
+        0.004998072876860493,
+        0.0020665867008882177,
+        -0.0007727547107159172
+      ],
+      "split": "validation",
+      "std": 0.0020639232438134977,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.0002646036102097682,
+      "ci_low": -0.0024815784806487607,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.001107169355050841,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0008133004305298508,
+        -0.001110155129829371,
+        0.0011811094369025277,
+        -0.0013929549913392902,
+        -0.0034005456604582207
+      ],
+      "split": "validation",
+      "std": 0.001632776469504209,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.0015250620353448375,
+      "ci_low": -0.0021929071200167184,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.00019542323107357706,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0010377281702864671,
+        0.00034726494233716654,
+        0.0023776283270346976,
+        0.0012613942901588127,
+        -0.003925675544612095
+      ],
+      "split": "validation",
+      "std": 0.002432163748480707,
+      "term": "G:P"
+    },
+    {
+      "ci_high": -2.3207766346544644e-05,
+      "ci_low": -0.0043165473004085795,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.001955235063410199,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0031212784786327497,
+        -6.931584068037289e-05,
+        -0.0009323267232839161,
+        -0.006130714060909925,
+        0.0004774597864559693
+      ],
+      "split": "validation",
+      "std": 0.0027071811503976027,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.0030196733273483377,
+      "ci_low": -0.0004225618879531323,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0014908110617176673,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0017185432762336639,
+        0.0013855074168257486,
+        0.0024396877007737405,
+        0.0038896517672102338,
+        -0.0019793348524550503
+      ],
+      "split": "validation",
+      "std": 0.0021656215673150235,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.011188514904472946,
+      "ci_low": 0.008690182880492659,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.010066662987863717,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.009622175545793699,
+        0.011533498337646941,
+        0.007508494126906795,
+        0.010462716010871453,
+        0.011206430918099697
+      ],
+      "split": "validation",
+      "std": 0.001608518874813817,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.008022277930469413,
+      "ci_low": -0.003991337377596049,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.002214701006288622,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.006707883654238023,
+        -0.008036124604088202,
+        -0.0025561967299536636,
+        0.003220263078622887,
+        0.011737679632624065
+      ],
+      "split": "validation",
+      "std": 0.007741573777515002,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.010224268947534143,
+      "ci_low": 0.0038359142263131307,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0067758179072519905,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.005677898586774033,
+        0.012983612217129292,
+        0.008466742459960819,
+        0.0030470706460737906,
+        0.0037037656263220198
+      ],
+      "split": "validation",
+      "std": 0.004060247043761263,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.0005853688668944201,
+      "ci_low": -0.007475457715802736,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0030960783789624412,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.003844419824178713,
+        0.00293404868326963,
+        -0.0006821204669346104,
+        -0.0029376508576683946,
+        -0.010950249429300118
+      ],
+      "split": "validation",
+      "std": 0.005110350826357217,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.0005770802491513738,
+      "ci_low": -0.0038921830813421375,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.001524330064904289,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.001967108104028892,
+        -0.0016891093921352907,
+        0.0020878733433424834,
+        -0.0001940562502619203,
+        -0.005859249921437826
+      ],
+      "split": "validation",
+      "std": 0.0029082802764544215,
+      "term": "G:P"
+    },
+    {
+      "ci_high": -8.198102476790759e-05,
+      "ci_low": -0.00700117561890834,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.003240853789893028,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.003300334278746986,
+        0.001063125288036093,
+        -0.003199247547355455,
+        -0.01046886570219796,
+        -0.00029894670920083133
+      ],
+      "split": "validation",
+      "std": 0.004456132807353056,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.006993642923121235,
+      "ci_low": 0.0008445428348012651,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.003426510736863242,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0015233191623542641,
+        -0.00024682729629843525,
+        0.0036719761085962643,
+        0.010514355267769449,
+        0.001669730441894668
+      ],
+      "split": "validation",
+      "std": 0.004198202616089443,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": -0.01022493598754184,
+      "ci_low": -0.01765128757689921,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.013913433839369438,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.020344291036203777,
+        -0.007412013694287067,
+        -0.013611782387942362,
+        -0.012922225611508353,
+        -0.01527685646690563
+      ],
+      "split": "test",
+      "std": 0.0046517952663290155,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.002093648659438596,
+      "ci_low": -0.008854984211756345,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0030737685400606617,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.013000977724491936,
+        0.005867305255421229,
+        -0.0009222533028091506,
+        -0.0012219283918241675,
+        -0.006090988536599284
+      ],
+      "split": "test",
+      "std": 0.0069938227934722525,
+      "term": "E"
+    },
+    {
+      "ci_high": -0.011854720420549136,
+      "ci_low": -0.02157296772030266,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.016843260806791282,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.014628533631716178,
+        -0.007455370885084189,
+        -0.023453483268580322,
+        -0.022278955815776935,
+        -0.016399960432798788
+      ],
+      "split": "test",
+      "std": 0.006451275650767442,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.005435352959785788,
+      "ci_low": -0.012698980833595785,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0035492813318898087,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.00993079078435638,
+        -0.019411462199813156,
+        -0.0030052176754528093,
+        -0.010420718021373954,
+        0.005160200452834496
+      ],
+      "split": "test",
+      "std": 0.011797127262009599,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.0010973365748900398,
+      "ci_low": -0.01775372511031741,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.007859480917546624,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0028923158329035026,
+        -0.015384668938611679,
+        -0.024972764825910876,
+        0.0015343378647572625,
+        -0.003366624520871331
+      ],
+      "split": "test",
+      "std": 0.011974177050632343,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.008033335797501396,
+      "ci_low": 0.0008910306550940827,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.004374447654712388,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0005449295919734976,
+        0.010735374911782003,
+        0.007048667373248496,
+        0.0009118868789124712,
+        0.0037212387015924664
+      ],
+      "split": "test",
+      "std": 0.004588821423592703,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.006472865915251813,
+      "ci_low": -0.012518472594727048,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0031266758968108597,
+      "metric": "mae",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.008664186394801654,
+        -0.01952278554505099,
+        -0.005058366380848556,
+        0.004640180056319387,
+        0.012971778780327514
+      ],
+      "split": "test",
+      "std": 0.012477100590954077,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": -0.028810341908293215,
+      "ci_low": -0.05435277758808974,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.043735444593741304,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.044482090802140606,
+        -0.015960084376516748,
+        -0.051465248772266214,
+        -0.05868407081182503,
+        -0.04808572820595791
+      ],
+      "split": "test",
+      "std": 0.01638722354236784,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.02005325245521903,
+      "ci_low": -0.030782199410141087,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0035545901813562207,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.026613525623515044,
+        0.018596646035371034,
+        0.024197669036469693,
+        0.014677632132413687,
+        -0.048631372487520474
+      ],
+      "split": "test",
+      "std": 0.032237051256761816,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.005816151430079586,
+      "ci_low": -0.04639591837999461,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.023131984751644862,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.02564715663475281,
+        -0.004945596564420396,
+        -0.042915116189440106,
+        -0.040743375757140377,
+        -0.05270299188197625
+      ],
+      "split": "test",
+      "std": 0.03273426032090168,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.014460711564785522,
+      "ci_low": -0.04634415136516079,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.016959218667865362,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.036121892653337984,
+        -0.05604399358687939,
+        -0.028811872269699057,
+        -0.045410448691173055,
+        0.009348328555086716
+      ],
+      "split": "test",
+      "std": 0.038688722315734496,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.013710185066274194,
+      "ci_low": -0.024688211539455284,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.005489013236590545,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.018055712545451907,
+        -0.018771293991930338,
+        -0.03922129495633264,
+        0.01994769002060881,
+        -0.0074558798007504645
+      ],
+      "split": "test",
+      "std": 0.02509748175072211,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.030106597635256072,
+      "ci_low": -0.00168055696586078,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.014213020334697646,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.002644233623103509,
+        0.03753633889535679,
+        -0.00371515151528079,
+        0.004315985447464699,
+        0.03557216246905104
+      ],
+      "split": "test",
+      "std": 0.020638118844972075,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.027940810356573854,
+      "ci_low": -0.016426478329776107,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0028451164805908258,
+      "metric": "rmse",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.006098682552026169,
+        -0.027046067585903777,
+        -0.002694756256645281,
+        0.00170056736547608,
+        0.048364521432053276
+      ],
+      "split": "test",
+      "std": 0.02773756854786396,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.0242446825476336,
+      "ci_low": 0.00956380371357572,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.01690424313060466,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.006628119118169372,
+        0.018156369439784152,
+        0.008203205445877854,
+        0.0272786339357102,
+        0.02425488771348172
+      ],
+      "split": "test",
+      "std": 0.009280821113524424,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.010220272211268738,
+      "ci_low": -0.005301693649935228,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.00113738011404916,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.018761804784381383,
+        0.0005930505132162437,
+        -0.0008274412050275175,
+        -0.005777103810016702,
+        -0.007063409712307608
+      ],
+      "split": "test",
+      "std": 0.010366293988242594,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.004884683188571719,
+      "ci_low": -0.011679883040524183,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0031773222215247905,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.00264996989381628,
+        -0.009006546477068902,
+        -0.017766787655076208,
+        0.003907494239676609,
+        0.009629198678660827
+      ],
+      "split": "test",
+      "std": 0.010739088175813117,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.00124613610647058,
+      "ci_low": -0.007065834252132815,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.002806335559455298,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0022904996997799715,
+        0.003930599196565466,
+        -0.0024985952752543082,
+        -0.0030625217820891906,
+        -0.010110660236718486
+      ],
+      "split": "test",
+      "std": 0.004979103106862496,
+      "term": "G:E"
+    },
+    {
+      "ci_high": -0.00225781272233756,
+      "ci_low": -0.012280102629116203,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.005838450722447355,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.001971935188781946,
+        -0.0023003705027982058,
+        -0.003548954559794152,
+        -0.002744452228527497,
+        -0.018626541132334973
+      ],
+      "split": "test",
+      "std": 0.007173176243885798,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.003901493537694011,
+      "ci_low": -0.014893319937723703,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.004933944260036956,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.00036427364088340367,
+        -0.012329747862130664,
+        0.0063380111056222516,
+        -0.021911570461847444,
+        0.003597859559054478
+      ],
+      "split": "test",
+      "std": 0.011870849233622421,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.0017213950292339318,
+      "ci_low": -0.01377753887474828,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.006592730756845408,
+      "metric": "bias",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.009963299055835952,
+        0.008053231361674424,
+        -0.01396133050774083,
+        -0.0015913884311127835,
+        -0.015500867151211899
+      ],
+      "split": "test",
+      "std": 0.009804712112091505,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.005442471656908743,
+      "ci_low": 0.003519049814455788,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.004507815076745625,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0038171409346287044,
+        0.005420669774671261,
+        0.0027858127876596583,
+        0.004659885038335809,
+        0.005855566848432692
+      ],
+      "split": "test",
+      "std": 0.0012364451529520855,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.0012707541178027082,
+      "ci_low": -0.002510273971350241,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.00039569623488824315,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0010194525425966106,
+        -0.004259326457416224,
+        -0.00019106328658091698,
+        -0.0007928430270991438,
+        0.0022452990540584583
+      ],
+      "split": "test",
+      "std": 0.002454828960089863,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.0035115287851646302,
+      "ci_low": 0.00037534630235558364,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.002045405427733549,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.003410338436005911,
+        -0.0007097256839629917,
+        0.0038061227948474885,
+        0.0005955701276609826,
+        0.0031247214641163534
+      ],
+      "split": "test",
+      "std": 0.0019887722789635755,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.004223647252388929,
+      "ci_low": -0.0008063955694658897,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0017086258414615197,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0017202981439131682,
+        0.005776058023877928,
+        0.0024017246941911985,
+        0.0035821977599987953,
+        -0.0014965531268471555
+      ],
+      "split": "test",
+      "std": 0.003262106460115513,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.0036248767729424535,
+      "ci_low": -0.0002953840863926249,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0016647463432749143,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0007256896570894122,
+        0.0032353400007388844,
+        0.004900802443386421,
+        0.001852098976461658,
+        -0.0009388200471229791
+      ],
+      "split": "test",
+      "std": 0.0025232254531722025,
+      "term": "G:P"
+    },
+    {
+      "ci_high": -0.0006049129585280477,
+      "ci_low": -0.0029159321987391575,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0017604225786336026,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0030710963010972536,
+        -0.0032822035230429814,
+        -0.0018730613454153167,
+        -0.00022171692341754756,
+        -0.0003540348001949134
+      ],
+      "split": "test",
+      "std": 0.00144843985187873,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.001419893686403384,
+      "ci_low": -0.001826743686191179,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.00015519366962322146,
+      "metric": "spearman",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0018720917939494264,
+        0.0017421466779602435,
+        -0.0009538649078769668,
+        -0.0001290085118024198,
+        -0.0033073334003463906
+      ],
+      "split": "test",
+      "std": 0.0021380091812646944,
+      "term": "G:E:P"
+    },
+    {
+      "ci_high": 0.009611550850121508,
+      "ci_low": 0.0051854168354900755,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.007763253848010088,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.007985181968794608,
+        0.002938260473567933,
+        0.00912712078795197,
+        0.010526342231135688,
+        0.00823936377860024
+      ],
+      "split": "test",
+      "std": 0.002874512317900302,
+      "term": "G"
+    },
+    {
+      "ci_high": 0.0055760805828932725,
+      "ci_low": -0.003692206589095637,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0006055503058783662,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.004923656725417169,
+        -0.0033114900421047366,
+        -0.004497558963630133,
+        -0.0028429349340084453,
+        0.008756078743717977
+      ],
+      "split": "test",
+      "std": 0.005881201761130176,
+      "term": "E"
+    },
+    {
+      "ci_high": 0.008183813192155354,
+      "ci_low": -0.001073197846497731,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.00404436053149726,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.004483797526695699,
+        0.0005840074228956604,
+        0.007501395924702781,
+        0.007324119561795905,
+        0.00929607727478765
+      ],
+      "split": "test",
+      "std": 0.005809302136663836,
+      "term": "P"
+    },
+    {
+      "ci_high": 0.008172125682897158,
+      "ci_low": -0.002619161254826019,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0029856123887185503,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.006541850984244091,
+        0.009687075241129772,
+        0.005253091008104893,
+        0.008116693462060676,
+        -0.0015869467834584983
+      ],
+      "split": "test",
+      "std": 0.006856746902486569,
+      "term": "G:E"
+    },
+    {
+      "ci_high": 0.004368689388306346,
+      "ci_low": -0.002494705535086639,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": 0.0009369919266098536,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        -0.0031172444354309325,
+        0.0034785041429374886,
+        0.006816940658844972,
+        -0.0037457980712690686,
+        0.0012525573379668087
+      ],
+      "split": "test",
+      "std": 0.004458083041281012,
+      "term": "G:P"
+    },
+    {
+      "ci_high": 0.0003155489143160439,
+      "ci_low": -0.005242776895455115,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.002463613990569535,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0004483472830278945,
+        -0.006572830290643039,
+        0.0006441279107738396,
+        -0.0006072058160232485,
+        -0.006230509039983123
+      ],
+      "split": "test",
+      "std": 0.003628325592091521,
+      "term": "E:P"
+    },
+    {
+      "ci_high": 0.0028113466641833673,
+      "ci_low": -0.004786966070958232,
+      "definition": "mean(metric | contrast=+1) - mean(metric | contrast=-1)",
+      "mean": -0.0005165694039032775,
+      "metric": "r2",
+      "n_paired_repeats": 5,
+      "repeat_effects": [
+        0.0010333060080183198,
+        0.004701230686069757,
+        0.000438222287072465,
+        -0.0004851810243649002,
+        -0.00827042497631203
+      ],
+      "split": "test",
+      "std": 0.0047608413177899125,
+      "term": "G:E:P"
+    }
+  ],
+  "n_archived_runs": 40,
+  "n_runs": 40,
+  "protocol_manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/artifacts/prm_protocol_v2/manifest.json",
+  "repeats": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "schema_version": "prm_factorial_bundle_v1",
+  "selection": {
+    "locked_test": {
+      "bias": {
+        "ci_high": -0.012691812907169892,
+        "ci_low": -0.05188771798926336,
+        "mean": -0.03162173224353156,
+        "std": 0.02463892787809478
+      },
+      "mae": {
+        "ci_high": 0.3868856805561289,
+        "ci_low": 0.3771649361085529,
+        "mean": 0.3819841129156121,
+        "std": 0.006067071736584771
+      },
+      "r2": {
+        "ci_high": 0.9319059124768353,
+        "ci_low": 0.9220832841228237,
+        "mean": 0.927149511494324,
+        "std": 0.0060833512384524625
+      },
+      "rmse": {
+        "ci_high": 0.8971775665299493,
+        "ci_low": 0.8203108043117137,
+        "mean": 0.8625584961582815,
+        "std": 0.04851435023568295
+      },
+      "spearman": {
+        "ci_high": 0.9741149127192956,
+        "ci_low": 0.9666256735076125,
+        "mean": 0.9699854574005314,
+        "std": 0.004923599426842707
+      }
+    },
+    "rule": "minimum mean validation MAE; exact ties use fewer enabled components then variant code",
+    "selected_variant": "g111",
+    "selection_data": "validation only",
+    "validation_mae": {
+      "ci_high": 0.3853558653835131,
+      "ci_low": 0.35725813426175884,
+      "mean": 0.37130699982263593,
+      "std": 0.018037102092661024
+    }
+  },
+  "sources": [
+    {
+      "config_sha256": "899c7d7460f4822a6e9b6986302ad9b8d8934285a21b34e0d2f90807e9ff7992",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g000_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g000/split42_seed142/run_manifest.json",
+      "sha256": "37fff4c4ca8757cd1f42f8c69d5d06b23ee777e5f02def8203c6118cb4168b35"
+    },
+    {
+      "config_sha256": "ae90726d1bf39ee745303b7eada5d1e574ea90ab4b83609ee05b04e38878d40b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g000_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g000/split43_seed143/run_manifest.json",
+      "sha256": "b8069583f18da7133b6c0ee18e5eaceb471358a41418fb302ba4c78d22861e06"
+    },
+    {
+      "config_sha256": "ef627e36ab14dd2f7a05811fcc1a32caa3b76c45616adb227dc05cbb3f8c3d4a",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g000_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g000/split44_seed144/run_manifest.json",
+      "sha256": "aa3798d2e932c33444020c4b2514142f720ac7d5bbec884bb274aab0c8b3703f"
+    },
+    {
+      "config_sha256": "66555dcce091c1dbcdab5a825fa5e1668c36f9359dd72d39ed91a6675f783d38",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g000_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g000/split45_seed145/run_manifest.json",
+      "sha256": "f7937ac125a161dc67d65f832b6ffa9bf68adf829daa14fdb43c411343bf68bd"
+    },
+    {
+      "config_sha256": "95c857e5eeee8fd5a9a03639673b4bb3d28cf036a9b863a081fa55800b816d5e",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g000_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g000/split46_seed146/run_manifest.json",
+      "sha256": "16c2f3d80397352c2f174d4452a945036f38be8393f7aff98cff6670a2a80a3f"
+    },
+    {
+      "config_sha256": "cd559d252859a2694174c23d2161f967abcebedf48c87bd6d1e43114a16fc165",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g001_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g001/split42_seed142/run_manifest.json",
+      "sha256": "0a79532129f91412e45e14fa5dee7192f70b3cc2753f11507ebf6978d3a41a0a"
+    },
+    {
+      "config_sha256": "45603498a3284fbd5a0e56c97e0324b1106e9cfb9dfa4e88bf77163c11f1f43a",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g001_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g001/split43_seed143/run_manifest.json",
+      "sha256": "a6ad4ca8f8dbe3c40994fb2afe460ad67d3306bfdbb9073f5d386a3f621ebae0"
+    },
+    {
+      "config_sha256": "917bfefc4c7584fa7850d2e1a5c67a36134b16bf98efb24e48e81d96bc56811a",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g001_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g001/split44_seed144/run_manifest.json",
+      "sha256": "67b3f694265636d0d8a15893b25ee88b0037a9522572d6248f87060e672d1f36"
+    },
+    {
+      "config_sha256": "5d1dfc56e4d7b2e7e3613d233be8e7022a80691ab5f7524ca28356559a299f25",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g001_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g001/split45_seed145/run_manifest.json",
+      "sha256": "26ebc65aeb67acea89ce7058914f603f8b4e41a3d9f6a65d819a9df024734542"
+    },
+    {
+      "config_sha256": "35edc0aa04d885876a994eec634ece849780a0d4764038263c4d955a76f65bcf",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g001_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g001/split46_seed146/run_manifest.json",
+      "sha256": "a54d5d6dd4419c952fc7eb9a40507d1bc6d7a8fca8e03a164ff39507e983d1d1"
+    },
+    {
+      "config_sha256": "3aafd51ad3df15fe0a321ec1966dae2fbbfdb708d0f37bddbfd77d56ed83c849",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g010_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g010/split42_seed142/run_manifest.json",
+      "sha256": "f43ab5eadedce20e0a44f4bca6505861a531e8e241bcc4a94ba4f45f68900b73"
+    },
+    {
+      "config_sha256": "64caffed3cf1b27d77a76abf6e8d29b19930f9d7566d92a27e3d49ba34ecbe63",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g010_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g010/split43_seed143/run_manifest.json",
+      "sha256": "7bf51eb06af6bbdffc5bfa5aaf31dee219ff7d5ea36b036b94ae3ec771bd90f9"
+    },
+    {
+      "config_sha256": "390a00f36163f25c7bcd4d286b6d4112a1a0cc0c0261b3ead1b4361c8eb7e531",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g010_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g010/split44_seed144/run_manifest.json",
+      "sha256": "c52c208aeedf090647928bbe70604bac44f2481170d12a2bba046f792929da7c"
+    },
+    {
+      "config_sha256": "44ee7ecb81675c0bc877e7048175c8d7d99bd32e5c752c339a7f9749da8b8212",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g010_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g010/split45_seed145/run_manifest.json",
+      "sha256": "fd9fc49aa475dcea25eb18264912064841135ccf99051f8e09b109691dccfd4e"
+    },
+    {
+      "config_sha256": "39d9f1bf27f9118dcfefcee24b21246ba4563a2f26fa9e2097dc523e009edc11",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g010_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g010/split46_seed146/run_manifest.json",
+      "sha256": "c49a74a426d35454402ac31d84efa9c9ad74f75117f74f13aa672a037fdc3250"
+    },
+    {
+      "config_sha256": "0041605f3e90a1538890422cb9c1d90e788336d43752011a60a6773f36283241",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g011_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g011/split42_seed142/run_manifest.json",
+      "sha256": "974efa61198949ea1cb41fc2c8a61a43a6d91a1fe588efd160a9c5a2bed53295"
+    },
+    {
+      "config_sha256": "c2b1fb5d02f367a1bddd1f19a25c9222ea4c5055527ca8511f4fe8cdbd3d4797",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g011_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g011/split43_seed143/run_manifest.json",
+      "sha256": "e625e0e59ffc62c48964ec438ff12d8d654369fbc14e8059905ea9224aae10a7"
+    },
+    {
+      "config_sha256": "e53464daa275d8c89e142679b318191871b8a0e2fe570f42168f65ef547e3312",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g011_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g011/split44_seed144/run_manifest.json",
+      "sha256": "b20c29ba665a338694346722412c01e822fa9a4e40b8d75ffbeebd512bd923d3"
+    },
+    {
+      "config_sha256": "19f4d9a21394d75f22b89dc1cec584dca154c98c1baa471a19722933b7b9afaf",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g011_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g011/split45_seed145/run_manifest.json",
+      "sha256": "0cf389e06dce44b64d78a11cbaddc9ea25857e1205dd47ece6e02d482280aaba"
+    },
+    {
+      "config_sha256": "a6e30a8593c3b0c1d9cf9ec8dbca035cfc8914653778d6772847c07d7b627640",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g011_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g011/split46_seed146/run_manifest.json",
+      "sha256": "7c2c3fd7f7a4339c13f32b016a412242da45fd12baabeb4b5f80e78749d5fc20"
+    },
+    {
+      "config_sha256": "7a05a3b00991054a9e889a785c79fd952bebddf4ad591af57e468351bd5d14fd",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g100_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g100/split42_seed142/run_manifest.json",
+      "sha256": "38a4891ce81858bf75d40e83176c1cf117218eff87d89fb45a26779504e77813"
+    },
+    {
+      "config_sha256": "14247fbd8528264a9231a49219b2bea99251551828b876ab5c1ffcdb50b0ae22",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g100_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g100/split43_seed143/run_manifest.json",
+      "sha256": "2af65b28311405d9948ca265487484a3d1d657f68ca5e2c6ec12b19c57e7f21a"
+    },
+    {
+      "config_sha256": "b88fadf8151ce5124c843d989ba96f54278d3069e6a2cd73a505b9c6b6d3ccd0",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g100_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g100/split44_seed144/run_manifest.json",
+      "sha256": "1b0f7209bd6e69a304862d500dcfe29c27c26e56895f22ad36b13a5632332299"
+    },
+    {
+      "config_sha256": "93aa2b546e3b8aaf2ec9e325bd71d9ff3dd5b725f9b73520ce5c324f822fa606",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g100_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g100/split45_seed145/run_manifest.json",
+      "sha256": "d38536610c38e2a491c7337758b328f97203972d08b80c5f6a791eab0bf089e8"
+    },
+    {
+      "config_sha256": "5210c84f75184fda25914d5a54142b30e056c5cb9dfe7ba10e5d021cb5c7f4d1",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g100_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g100/split46_seed146/run_manifest.json",
+      "sha256": "0af88155e397d8c1ccaf3408857bc61f922736cd3aac78097f31706e8007655a"
+    },
+    {
+      "config_sha256": "05f0ede60f2caad20238d35020d7032f6930e22e0efa33f43c5151628665ee7d",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g101_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g101/split42_seed142/run_manifest.json",
+      "sha256": "ddea4c4f1c62eb7ed3e7ad94c0795c8757655e2fcf7be1492f67a4ebb3994318"
+    },
+    {
+      "config_sha256": "58d2e2d35a3ea28e5acaa892e772fa54f196969475685bcf54cbef7a78293f33",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g101_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g101/split43_seed143/run_manifest.json",
+      "sha256": "c316e8c62dc39cff376ae21c0f8f5b0963f002a531f4b55ba23bf9251fbf3bdb"
+    },
+    {
+      "config_sha256": "1e39ad517ee917d6904e13806843f256ba19dc5024f20487de5991d0813aa69f",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g101_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g101/split44_seed144/run_manifest.json",
+      "sha256": "596af278a6687442da32608734ef16ef74fb59dbcbc11572f59372d4ca665817"
+    },
+    {
+      "config_sha256": "4d2f2ce18869ba7150ba9190a49696157472fa2f0bd394404d85425e8ed83a09",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g101_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g101/split45_seed145/run_manifest.json",
+      "sha256": "611bfad97b960f3e2ea6d9310b255fc06443f97c4c96bd0de50931133c952963"
+    },
+    {
+      "config_sha256": "b67af2f049cbc5cb4f230046dd60ed52d4b7e14c5889cdfa484d29283df13a20",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g101_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g101/split46_seed146/run_manifest.json",
+      "sha256": "21ecacb1ba5114e804d6aed012d4742e3fc628a4bad1b2da5f9478bb4dd38199"
+    },
+    {
+      "config_sha256": "11141e8bd5581d4f716ce2bd6393630eb43cb299997914a3d4b790d044d0dffd",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g110_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g110/split42_seed142/run_manifest.json",
+      "sha256": "acc328bcaf544658c2d73f405961488489f5cd082ca3ec9b55da563843eb639c"
+    },
+    {
+      "config_sha256": "ee73fa0f575e1d7af8a9d7f3ad4fa48a226d4e40eb716c0a31f7f7f8884d9204",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g110_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g110/split43_seed143/run_manifest.json",
+      "sha256": "a3bc024de7aa9e518d6f2f1b1cc3305073d6eacdf0995f52f8b40fea25ef93f2"
+    },
+    {
+      "config_sha256": "98d7695d3e8da2d1f86261332ca0b322c9dc649d5f24858782fc5244dfe92549",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g110_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g110/split44_seed144/run_manifest.json",
+      "sha256": "208522c35ee90188b6f6275927490075bf7e75e88cede4e34e68fa6628dd0148"
+    },
+    {
+      "config_sha256": "92fe1b8fbbb3a3ac4717a6b446d00381afd796f9101d6284ba74594ce0aa1e6d",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g110_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g110/split45_seed145/run_manifest.json",
+      "sha256": "ea00f5958b9b6976099249d8c81152707254466e8dad88759b91458acbd7503f"
+    },
+    {
+      "config_sha256": "30b320065ecc303d5ef74eff70ddfc61b88c76fefeea54b7beacb811ed3e02db",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g110_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g110/split46_seed146/run_manifest.json",
+      "sha256": "0628471e13e322c0cb2e96bf3d8c167894118d1e72a51eecfbc16b8aadb79f45"
+    },
+    {
+      "config_sha256": "0f25a9fb93e38978407fce309bfde4fd098ec22ee83f9fcc1588e69fc4aabc9a",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g111_split42_seed142.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g111/split42_seed142/run_manifest.json",
+      "sha256": "2a42b0a9c8f617f80d825085635d6fe9eda613968d36990e8a0d269498c2ca64"
+    },
+    {
+      "config_sha256": "6ee1a57eab3bd013eac64ebd73a416523e7564fa48c83e3773d7e5f1aeeac9ac",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g111_split43_seed143.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g111/split43_seed143/run_manifest.json",
+      "sha256": "7028cda23cb260b88e289c5544067eaa980ec58289a296151556c39392e5762b"
+    },
+    {
+      "config_sha256": "518ba6044e22860cedfca027fd05ad0b3522eab23754945ac5fcee4d7f8cc26f",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g111_split44_seed144.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g111/split44_seed144/run_manifest.json",
+      "sha256": "3f9220727ebc48db609992010a547ea3890fb666da6871c92257c81c32cb3045"
+    },
+    {
+      "config_sha256": "43eb091ed3862b645da73dba4d375921a56db8b844f8855604948c5f900eb257",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g111_split45_seed145.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g111/split45_seed145/run_manifest.json",
+      "sha256": "d75589424c57da074cba9a766a1932d7b40962fc2e541a62e78aee6b31e2fb49"
+    },
+    {
+      "config_sha256": "48e88a8c0f3124361cd5e18e26bfc8b1b19bdca50ad249677193b8e94f10e5a1",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/factorial-20260728-865e90a/configs/prm/generated/factorial/g111_split46_seed146.yaml",
+      "git": {
+        "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/factorial/g111/split46_seed146/run_manifest.json",
+      "sha256": "0cdb990175816805cac6a194dfbd1e78b0dbdf32661cfdda92f69128c5c4ca7e"
+    }
+  ],
+  "variant_summary": [
+    {
+      "enabled_components": 0,
+      "test_mae": {
+        "ci_high": 0.4332432938205034,
+        "ci_low": 0.4095858646447034,
+        "mean": 0.4189412519986444,
+        "std": 0.016093883336102458
+      },
+      "validation_mae": {
+        "ci_high": 0.43033138716120883,
+        "ci_low": 0.4130670985347568,
+        "mean": 0.4216992428479829,
+        "std": 0.010919434133044402
+      },
+      "variant": "g000"
+    },
+    {
+      "enabled_components": 1,
+      "test_mae": {
+        "ci_high": 0.4128698518342236,
+        "ci_low": 0.3928046543085365,
+        "mean": 0.4024563485578764,
+        "std": 0.013166610537761064
+      },
+      "validation_mae": {
+        "ci_high": 0.41288514447200153,
+        "ci_low": 0.3750635980895627,
+        "mean": 0.39397437128078205,
+        "std": 0.024131662670435722
+      },
+      "variant": "g001"
+    },
+    {
+      "enabled_components": 1,
+      "test_mae": {
+        "ci_high": 0.42052133749981113,
+        "ci_low": 0.40519638057413054,
+        "mean": 0.41191564123895025,
+        "std": 0.009838705336778738
+      },
+      "validation_mae": {
+        "ci_high": 0.4172972486977423,
+        "ci_low": 0.3896644360407421,
+        "mean": 0.4040781450927199,
+        "std": 0.01752522533828858
+      },
+      "variant": "g010"
+    },
+    {
+      "enabled_components": 2,
+      "test_mae": {
+        "ci_high": 0.42885986835093126,
+        "ci_low": 0.3942066941622423,
+        "mean": 0.410432984901229,
+        "std": 0.0219701540668251
+      },
+      "validation_mae": {
+        "ci_high": 0.4068582381688164,
+        "ci_low": 0.39562761267496105,
+        "mean": 0.4011526767120137,
+        "std": 0.007263586777577665
+      },
+      "variant": "g011"
+    },
+    {
+      "enabled_components": 1,
+      "test_mae": {
+        "ci_high": 0.4199964811917547,
+        "ci_low": 0.4066233278320463,
+        "mean": 0.4133099045119005,
+        "std": 0.009036258833708991
+      },
+      "validation_mae": {
+        "ci_high": 0.4132907171785008,
+        "ci_low": 0.3885087475390788,
+        "mean": 0.4008997323587898,
+        "std": 0.01590597491965466
+      },
+      "variant": "g100"
+    },
+    {
+      "enabled_components": 2,
+      "test_mae": {
+        "ci_high": 0.3998331382653547,
+        "ci_low": 0.3748856437939674,
+        "mean": 0.387359391029661,
+        "std": 0.015867160002957997
+      },
+      "validation_mae": {
+        "ci_high": 0.38770877361294287,
+        "ci_low": 0.3569979241980869,
+        "mean": 0.3739826500544313,
+        "std": 0.019209493967118577
+      },
+      "variant": "g101"
+    },
+    {
+      "enabled_components": 2,
+      "test_mae": {
+        "ci_high": 0.41496644931115245,
+        "ci_low": 0.39369670770011345,
+        "mean": 0.4054390828820485,
+        "std": 0.013325870527493703
+      },
+      "validation_mae": {
+        "ci_high": 0.40960932801092076,
+        "ci_low": 0.39622662034148964,
+        "mean": 0.40365277333598354,
+        "std": 0.008351785056669692
+      },
+      "variant": "g110"
+    },
+    {
+      "enabled_components": 3,
+      "test_mae": {
+        "ci_high": 0.38679199505118034,
+        "ci_low": 0.3771649361085529,
+        "mean": 0.3819841129156121,
+        "std": 0.006067071736584771
+      },
+      "validation_mae": {
+        "ci_high": 0.3853558653835131,
+        "ci_low": 0.35725813426175884,
+        "mean": 0.37130699982263593,
+        "std": 0.018037102092661024
+      },
+      "variant": "g111"
+    }
+  ]
+}

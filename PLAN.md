@@ -125,7 +125,9 @@ zero-padding row, maps atomic numbers 1--100 to source rows 0--99, and passes
 138 remote tests. A clean two-epoch GPU smoke at commit `7a6593a` completed all
 five declared outputs and independently verified the 101-row checkpoint table,
 zero padding, and exact endpoint mappings. The formal 40-run
-`factorial-v4-indexed` queue started from the same clean frozen commit with GPU
-2 excluded. Validation-only promotion, transfer, SchNet, ensemble UQ,
-materials analysis, and paper result generation remain gated on completion and
-collection of this queue.
+`factorial-v4-indexed` queue completed from the same clean frozen commit with
+GPU 2 excluded and no failed jobs. A separate clean collector at `865e90a`
+validated all 40 runs, archived the evidence, and selected `g111` using
+validation MAE only. Configuration promotion, transfer, SchNet, ensemble UQ,
+materials analysis, and paper result generation remain gated on committing
+that selection and the generated promoted configurations.

@@ -1,0 +1,66 @@
+{
+  "archived_file_count": 205,
+  "checks": {
+    "all_forty_jobs_complete": true,
+    "archived_runs_complete": true,
+    "collector_git_clean": true,
+    "collector_git_exact": true,
+    "gpu2_excluded": true,
+    "local_archive_matches_remote": true,
+    "scheduler_git_clean": true,
+    "scheduler_git_exact": true,
+    "selection_validation_only": true,
+    "service_exit_success": true,
+    "zero_failed_pending_running_or_stopped": true
+  },
+  "collector_git": {
+    "commit": "865e90a695e3641e21bc9f2c98fc05c80723abcf",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "completed_at": "2026-07-28T11:53:25.454242+00:00",
+  "counts": {
+    "complete": 40,
+    "failed": 0,
+    "pending": 0,
+    "running": 0,
+    "stopped": 0
+  },
+  "factorial_bundle_sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e",
+  "queue_id": "factorial-v4-indexed",
+  "recorded_at": "2026-07-28T11:55:25Z",
+  "scheduler_git": {
+    "commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "scheduler_state_sha256": "48a0fea73675f00137951c57a7327785b8aeeea3d227243bd1fc744162d14e2b",
+  "schema_version": "prm_factorial_completion_v1",
+  "selection": {
+    "n_runs": 40,
+    "selected_variant": "g111",
+    "selection_data": "validation only",
+    "sha256": "6b0bef7c69fc12a6ed97885961ccde444cd60a0d5db47558a71391eeba2b0773"
+  },
+  "service": {
+    "active_state": "inactive",
+    "exec_main_status": 0,
+    "result": "success",
+    "sub_state": "dead"
+  },
+  "settings": {
+    "excluded_gpus": [
+      2
+    ],
+    "glob": "configs/prm/generated/factorial/*.yaml",
+    "idle_confirmations": 2,
+    "max_attempts": 2,
+    "max_memory_mib": 1500,
+    "max_parallel": 7,
+    "max_utilization": 5,
+    "module": "src.train_enhanced",
+    "poll_seconds": 30
+  },
+  "started_at": "2026-07-28T09:28:06.272212+00:00",
+  "status": "complete"
+}
