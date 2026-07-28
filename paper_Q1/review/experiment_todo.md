@@ -51,7 +51,8 @@
 
 ## EXP-005: Bound the SchNet readout interpretation
 
-- Status: configured; training not yet launched.
+- Status: running from clean commit `91cb8ac` on GPUs 1, 4, and 5; GPU 2 and
+  all other devices are explicitly excluded.
 - Matrix row: E9.
 - Route: post-hoc exploratory robustness campaign.
 - Tier: supporting.

@@ -4,7 +4,7 @@
 
 - Draft: result-gated PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: E7 in `paper_experiment_matrix.md`, full author and
+- Blocking items: E9 and final manuscript review, full author and
   contact metadata, and final release metadata.
 
 ## Issue log
@@ -25,8 +25,9 @@
 - Fix type: required experiment and analysis completion.
 - Change: Results, Discussion, and Conclusion remain behind the readiness
   marker until complete collector-validated assets exist.
-- Status: in progress.
-- Blocks finalization: yes.
+- Status: complete; the readiness marker is bound to the full canonical
+  comparison, UQ, and materials bundles.
+- Blocks finalization: no.
 
 ### REV-003: Novelty boundary
 
@@ -45,8 +46,9 @@
 - Change: use periodic SchNet, validation-selected descriptors, and the full
   factorial as aligned controls; explicitly state that these do not exhaust
   atomistic architectures.
-- Status: implemented in Methods and Discussion; final paired evidence pending.
-- Blocks finalization: yes, through E4 rather than a new comparator campaign.
+- Status: complete for the prespecified comparison; the post-hoc readout
+  sensitivity is tracked separately as REV-014.
+- Blocks finalization: no.
 
 ### REV-005: Author and archival metadata
 
@@ -79,7 +81,7 @@
   frozen train/validation/calibration/test split and all trained models remain
   unchanged.
 - Status: implemented before UQ collection.
-- Blocks finalization: through E5 only.
+- Blocks finalization: no.
 
 ### REV-008: Five-repeat factorial interval strength
 
@@ -90,7 +92,7 @@
   contrast and state that five-repeat intervals are descriptive uncertainty
   summaries rather than large-sample hypothesis tests.
 - Status: implemented in the result-asset generator and Evaluation Protocol.
-- Blocks finalization: through E7 only.
+- Blocks finalization: no.
 
 ### REV-009: Feature and capacity reproducibility
 
@@ -146,4 +148,16 @@
   member, split, prediction, checkpoint, and collector hashes.
 - Evidence: `artifacts/prm_results/uq/`.
 - Status: complete before paper asset generation.
-- Blocks finalization: through E7 only.
+- Blocks finalization: no.
+
+### REV-014: SchNet readout interpretation
+
+- Severity: major comparator-interpretation issue.
+- Fix type: explicit recipe boundary plus bounded post-hoc sensitivity.
+- Change: disclose that the prespecified periodic SchNet comparator uses
+  atomwise additive readout, avoid attributing its host-held-out error to the
+  interaction backbone alone, and rerun only the 15 host-CV configurations
+  with mean readout while holding all other controlled fields fixed.
+- Evidence: `configs/prm/sensitivity/schnet_mean_host/`; result archive pending.
+- Status: running.
+- Blocks finalization: yes.

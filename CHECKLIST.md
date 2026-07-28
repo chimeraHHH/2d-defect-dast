@@ -67,7 +67,9 @@
 - [ ] Replace old OOD and UQ sections with canonical results.
 - [x] Remove prospective-DFT success claims from the rewritten manuscript
       framing and state their exclusion from the evidence contract.
-- [ ] Generate all main figures and supplementary tables from canonical data.
+- [x] Generate all main figures and supplementary tables from canonical data.
+      (The 21 fail-closed outputs and readiness marker are hash-bound in
+      `artifacts/prm_results/paper/result_assets.json`.)
 - [x] Add provisional Data and Code Availability statements.
 - [x] Audit all DOI-bearing bibliography entries and remove the unresolvable
       `10.1021/acs.chemmater.4c02907` record and dependent claim.
