@@ -4,8 +4,8 @@
 
 - Draft: result-gated PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: E9 and final manuscript review, full author and
-  contact metadata, and final release metadata.
+- Blocking items: final independent manuscript review, verified author/contact/
+  funder metadata, rights-holder-approved licensing, and final release metadata.
 
 ## Issue log
 
@@ -36,7 +36,7 @@
 - Change: introduction and review materials position the contribution as the
   audited IMP2D protocol, paired factorial, chemical transfer, held-out UQ, and
   screening analysis; first-of-kind graph-model claims are excluded.
-- Status: complete, subject to final numerical rewrite.
+- Status: complete.
 - Blocks finalization: no.
 
 ### REV-004: Baseline breadth
@@ -158,6 +158,24 @@
   atomwise additive readout, avoid attributing its host-held-out error to the
   interaction backbone alone, and rerun only the 15 host-CV configurations
   with mean readout while holding all other controlled fields fixed.
-- Evidence: `configs/prm/sensitivity/schnet_mean_host/`; result archive pending.
-- Status: running.
-- Blocks finalization: yes.
+- Evidence: `artifacts/prm_results/sensitivity/schnet_readout/` and
+  `configs/prm/sensitivity/schnet_mean_host/`.
+- Result: all 15 runs completed from clean commit `91cb8ac`; pooled host-CV MAE
+  changes from 6.703 eV (additive) to 2.552 eV (mean), with paired difference
+  -4.151 eV, 95% host-cluster bootstrap interval [-7.704, -1.256] eV, and
+  improvement in all five folds.
+- Status: complete and written in Discussion and Supplemental Material.
+- Blocks finalization: no.
+
+### REV-015: Final scientific-content manuscript package
+
+- Severity: major packaging gate.
+- Fix type: fail-closed asset regeneration, compilation, and visual QA.
+- Change: generated schema-v2 assets with 23 hash-bound outputs, populated the
+  main manuscript, added a separate Supplemental Material file, and compiled
+  visually inspected 12-page and one-page PDFs.
+- Evidence: `artifacts/prm_results/paper/result_assets.json`,
+  `paper_Q1/main.pdf`, and `paper_Q1/supplement.pdf`.
+- Status: complete; no undefined references, content-affecting warnings,
+  clipping, overlap, or unreadable result elements remain.
+- Blocks finalization: no.

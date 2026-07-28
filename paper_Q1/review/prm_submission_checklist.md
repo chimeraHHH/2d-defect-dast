@@ -20,10 +20,10 @@ Verified against the APS author pages on 2026-07-28:
 
 - [x] State the question, relation to prior work, evaluation protocol, and
       limitations for a broad materials audience.
-- [ ] Populate all result-gated sections from canonical bundles.
-- [ ] Inspect all figure labels for readability without relying on color alone.
-- [ ] Supply any Supplemental Material as a separate file and cite it in the
-      reference list if a supplement is ultimately included.
+- [x] Populate all result-gated sections from canonical bundles.
+- [x] Inspect all figure labels for readability without relying on color alone.
+- [x] Supply Supplemental Material as a separate file and cite it from the main
+      manuscript using the APS publisher-link placeholder.
 
 ## Data and software
 
@@ -35,8 +35,8 @@ Verified against the APS author pages on 2026-07-28:
 - [ ] Replace the provisional availability sentence with the actual version,
       repository/archive, and persistent identifier. A DOI is preferred but
       must not be invented.
-- [ ] Confirm that every plotted value and table is present in an open,
-      machine-readable file included in the release.
+- [x] Confirm that every plotted value and table is present in a
+      machine-readable repository file selected by the paper asset manifest.
 - [ ] Decide and record the repository/data license with the rights holders.
 
 ## Author metadata
@@ -54,9 +54,11 @@ Verified against the APS author pages on 2026-07-28:
 
 ## Submission files
 
-- [ ] Final manuscript PDF with no undefined references or content-affecting
-      warnings.
-- [ ] Complete LaTeX source, bibliography, and all figure files.
+- [x] Current scientific-content manuscript PDF with no undefined references or
+      content-affecting warnings; final byline and release metadata remain
+      administrative substitutions.
+- [x] Complete LaTeX source, bibliography, Supplemental Material, and all
+      figure files.
 - [ ] Cover letter summarizing context, key findings, PRM fit, and relevant
       submission history.
 - [ ] Optional suggested/excluded referees, supplied by the authors rather than

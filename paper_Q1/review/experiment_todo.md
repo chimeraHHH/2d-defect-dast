@@ -51,8 +51,8 @@
 
 ## EXP-005: Bound the SchNet readout interpretation
 
-- Status: running from clean commit `91cb8ac` on GPUs 1, 4, and 5; GPU 2 and
-  all other devices are explicitly excluded.
+- Status: complete. All 15 runs finished from clean commit `91cb8ac` on GPUs
+  1, 4, and 5; GPU 2 and all other devices were explicitly excluded.
 - Matrix row: E9.
 - Route: post-hoc exploratory robustness campaign.
 - Tier: supporting.
@@ -65,8 +65,15 @@
 - Acceptance: exactly 15 complete runs, aligned out-of-fold predictions,
   host-cluster paired interval, size--error diagnostics, and archived
   provenance.
+- Evidence: `artifacts/prm_results/sensitivity/schnet_readout/`; all 15
+  run archives and their output hashes were independently verified after
+  collection from clean commit `f1756e4`.
+- Result: mean readout lowers pooled host-CV MAE from 6.703 to 2.552 eV. The
+  paired mean-minus-add difference is -4.151 eV with a 95% host-cluster
+  bootstrap interval of [-7.704, -1.256] eV, and all five folds improve.
 - Interpretation: exploratory and mechanism-informative; it does not replace
-  the prespecified additive-SchNet main comparator.
-- Placement: Discussion and Supplement.
+  the prespecified additive-SchNet main comparator, and the residual gap cannot
+  be assigned to the SchNet backbone alone.
+- Placement: complete in Discussion and Supplemental Material.
 
 No additional DFT calculation is part of this frontier.

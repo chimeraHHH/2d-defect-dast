@@ -126,12 +126,21 @@ and periodic-SchNet queues then completed 48 runs each from clean commit
 held-out UQ analysis, and pair-OOF materials screening analysis are archived
 under `artifacts/prm_results/`. No partial queue metric entered the manuscript.
 
-The prespecified SchNet comparator uses the original atomwise additive energy
-readout. Its large host-held-out error is repeatable but cannot be attributed
-to the interaction backbone alone because formation energy is not extensive
-in supercell atom count. A bounded post-hoc sensitivity therefore reruns only
-the 15 host-CV SchNet configurations with mean readout. The campaign must use
-GPUs 1, 4, and 5 only, preserve every other controlled field, and stop after
-one paired host-cluster analysis. It is supporting evidence and cannot replace
-or retroactively redefine the main comparator. Result-asset generation,
-manuscript population, compilation, and final review remain pending.
+The bounded post-hoc SchNet mean-readout sensitivity completed all 15 host-CV
+runs from clean commit `91cb8ac` on GPUs 1, 4, and 5, with GPU 2 excluded.
+The hash-verified archive is under
+`artifacts/prm_results/sensitivity/schnet_readout/`. Replacing additive with
+mean readout reduces pooled host-CV MAE from 6.703 to 2.552 eV; the paired
+mean-minus-add difference is -4.151 eV with a host-cluster bootstrap 95%
+interval of [-7.704, -1.256] eV and improvement in all five folds. The
+remaining 2.552 eV error is still substantially above DART's 0.938 eV, so the
+result identifies readout as an important part of the complete-recipe gap but
+does not isolate a backbone-only effect. The prespecified additive SchNet
+remains the main comparator.
+
+Fail-closed asset generation now validates 23 paper outputs, and the populated
+main manuscript and separate Supplemental Material compile to visually checked
+12-page and one-page PDFs. The remaining scientific gates are an independent
+numerical cross-check and skeptical manuscript review. Administrative release
+work remains blocked on verified author/contact/funder metadata and a
+rights-holder-approved code/data license.

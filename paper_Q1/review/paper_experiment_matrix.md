@@ -10,9 +10,9 @@ Status date: 2026-07-29
 | E4 | Compare promoted DART with periodic SchNet under aligned transfer partitions | Complete and collector-validated | `artifacts/prm_results/comparison/` | Main transfer table, paired intervals, and applicability diagnostics |
 | E5 | Evaluate five-member DART uncertainty on a separate calibration/test split | Complete and collector-validated | `artifacts/prm_results/uq/` | Calibration table, risk--coverage figure, and abstention claims |
 | E6 | Convert pair-held-out predictions into preference/site-screening decisions and descriptive error-heterogeneity diagnostics | Complete and collector-validated | `artifacts/prm_results/materials/` | Screening table, regret figure, and host/impurity/incorporation error analysis |
-| E7 | Generate fail-closed manuscript tables, figures, and macros | Complete and hash-validated | `artifacts/prm_results/paper/result_assets.json`; `paper_Q1/generated/`; `paper_Q1/figures/` | Releases all numerical Results, Discussion, and Conclusion text |
+| E7 | Generate fail-closed manuscript tables, figures, and macros | Complete and hash-validated as schema v2 with 23 outputs | `artifacts/prm_results/paper/result_assets.json`; `paper_Q1/generated/`; `paper_Q1/figures/` | Releases all numerical Results, Discussion, Conclusion, and Supplemental Material text |
 | E8 | Audit chemistry overlap between JARVIS source-task pretraining and canonical IMP2D | Complete and written | `artifacts/prm_results/operations/pretraining_overlap_3a98513.json` | Bounds grouped transfer as holdout from IMP2D target supervision |
-| E9 | Test whether SchNet's additive graph readout contributes to host-held-out failure | Running as a bounded 15-run campaign | `configs/prm/sensitivity/schnet_mean_host/` | Post-hoc exploratory robustness result for Discussion and Supplement |
+| E9 | Test whether SchNet's additive graph readout contributes to host-held-out failure | Complete and collector-validated; 15/15 runs | `artifacts/prm_results/sensitivity/schnet_readout/`; `configs/prm/sensitivity/schnet_mean_host/` | Post-hoc exploratory robustness result written in Discussion and Supplemental Material |
 
 ## Claim mapping
 
@@ -20,11 +20,12 @@ Status date: 2026-07-29
 |---|---|---|
 | C1: the reported modeling set is reconstructable and leakage controlled under the declared audits | E1 | completed and written |
 | C2: selected architectural effects are supported or inconclusive under paired repeats | E2 | completed and written |
-| C3: interpolation and chemical-transfer behavior differ across held-out axes and comparators | E3, E4, E8 | asset-backed; final prose audit pending |
-| C4: held-out ensemble uncertainty supports a bounded selective-prediction policy | E5 | asset-backed; final prose audit pending |
-| C5: pair-held-out predictions have measurable screening utility and regret within IMP2D | E4, E6 | asset-backed; final prose audit pending |
-| C6: the SchNet host-held-out result is interpreted at the complete-recipe rather than backbone-only level | E4, E9 | main comparison evidenced; readout sensitivity pending |
+| C3: interpolation and chemical-transfer behavior differ across held-out axes and comparators | E3, E4, E8 | asset-backed and written; final independent review pending |
+| C4: held-out ensemble uncertainty supports a bounded selective-prediction policy | E5 | asset-backed and written; final independent review pending |
+| C5: pair-held-out predictions have measurable screening utility and regret within IMP2D | E4, E6 | asset-backed and written; final independent review pending |
+| C6: the SchNet host-held-out result is interpreted at the complete-recipe rather than backbone-only level | E4, E9 | asset-backed and written; final independent review pending |
 
-C3--C5 now have a hash-validated E7 readiness marker. C6 remains pending E9,
-and all claims remain subject to final prose, compilation, and independent
-review gates.
+C3--C6 have the hash-validated E7 schema-v2 readiness marker and are present in
+the compiled manuscript package. All claims remain subject to the final
+independent numerical and prose review gates; author and archival metadata are
+separate administrative blockers.

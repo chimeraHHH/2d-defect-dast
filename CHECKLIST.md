@@ -54,26 +54,34 @@
 - [x] Complete mechanism-preference, error and applicability-domain analyses.
       (The pair-OOF screening and heterogeneity evidence is archived under
       `artifacts/prm_results/materials/`.)
-- [ ] Complete the bounded 15-run SchNet mean-readout host-CV sensitivity,
-      archive its paired host-cluster comparison, and retain it as post-hoc
-      supporting evidence rather than a replacement main baseline.
+- [x] Complete the bounded 15-run SchNet mean-readout host-CV sensitivity.
+      (All 15 runs completed from clean commit `91cb8ac` on GPUs 1, 4, and 5.
+      The hash-verified archive and paired host-cluster analysis are under
+      `artifacts/prm_results/sensitivity/schnet_readout/`; mean readout reduces
+      host-CV MAE from 6.703 to 2.552 eV, with a paired difference of
+      -4.151 eV and 95% cluster-bootstrap interval [-7.704, -1.256] eV. This
+      remains post-hoc supporting evidence and does not replace the additive
+      main comparator.)
 
 ## Paper
 
 - [x] Replace the Q1 title and provisional protocol-level abstract.
 - [x] Rewrite Introduction, Methods, and Evaluation Protocol around the frozen
       protocol.
-- [ ] Replace test-selected ensemble and confounded ablation tables.
-- [ ] Replace old OOD and UQ sections with canonical results.
+- [x] Replace test-selected ensemble and confounded ablation tables.
+- [x] Replace old OOD and UQ sections with canonical results.
 - [x] Remove prospective-DFT success claims from the rewritten manuscript
       framing and state their exclusion from the evidence contract.
 - [x] Generate all main figures and supplementary tables from canonical data.
-      (The 21 fail-closed outputs and readiness marker are hash-bound in
+      (The 23 fail-closed outputs, including the SchNet readout sensitivity
+      assets, and readiness marker are hash-bound in
       `artifacts/prm_results/paper/result_assets.json`.)
 - [x] Add provisional Data and Code Availability statements.
 - [x] Audit all DOI-bearing bibliography entries and remove the unresolvable
       `10.1021/acs.chemmater.4c02907` record and dependent claim.
 - [x] Compile and visually inspect the provisional result-gated PDF.
-- [ ] Compile the final populated PDF and resolve warnings that affect content.
+- [x] Compile and visually inspect the populated 12-page main PDF and one-page
+      Supplemental Material; no undefined references, content-affecting
+      warnings, clipping, or overlap remain.
 - [ ] Cross-check all numerical claims against result files.
 - [ ] Complete independent review and final revision.
