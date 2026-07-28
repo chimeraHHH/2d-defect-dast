@@ -31,13 +31,14 @@ coordination and longer-range periodic context.
 Benchmark accuracy, however, does not by itself define a useful materials
 model.  A random structure split can place closely related host--impurity
 chemistries, or even numerically equivalent structures, on both sides of the
-train--test boundary.  It also does not answer whether a model transfers to an
-unseen host or impurity, whether a reported architectural gain survives paired
-repeats, or whether prediction uncertainty identifies a subset on which
+train--test boundary, a known source of optimistic materials-learning
+estimates~\cite{li2024mdhit}.  It also does not answer whether a model transfers
+to an unseen host or impurity, whether a reported architectural gain survives
+paired repeats, or whether prediction uncertainty identifies a subset on which
 screening risk is acceptably low.  Structure-based out-of-distribution studies
 have emphasized that materials models can degrade sharply when test chemistry
-differs from training chemistry~\cite{omee2024,li2025ood}.  For defect
-screening, host and impurity axes must therefore be separated explicitly.
+differs from training chemistry~\cite{omee2024,li2025ood}.  For defect screening,
+host and impurity axes must therefore be separated explicitly.
 Uncertainty studies in atomistic machine learning have likewise shown that
 ensemble disagreement can provide a useful credibility signal, while
 calibration and out-of-domain reliability remain distinct
