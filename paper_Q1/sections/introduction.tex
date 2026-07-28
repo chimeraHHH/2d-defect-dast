@@ -15,12 +15,16 @@ makes supervised surrogates possible, and graph neural networks are natural
 models because they operate directly on periodic atomic structures.  ALIGNN
 demonstrated the value of joint bond and angle representations for crystalline
 properties~\cite{alignn2021}, while SchNet established continuous-filter
-message passing from interatomic distances~\cite{schutt2018}.  Defect-focused
-models and engineered structural descriptors have subsequently expanded this
-direction in both bulk and 2D settings~\cite{kesorn2024,elalouani2026,
-definet2025,fang2025,kiyohara2025}.  In particular, recent descriptor studies
-on IMP2D show that data representation and model selection materially affect
-the reported error~\cite{kesorn2024,elalouani2026}.  These developments motivate
+message passing from interatomic distances~\cite{schutt2018}.  Defect-specific
+learning has subsequently developed along several complementary directions.
+Bulk defect energetics have been treated with defect graph networks,
+semiconductor graph models, equivariant architectures, persistent-homology
+features, and charge-aware predictors~\cite{witman2023,rahman2024,definet2025,
+fang2025,kiyohara2025}.  For 2D systems, sparse defect representations have
+been evaluated on the 2DMD data, whereas tree and descriptor models have been
+applied directly to IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  The two
+IMP2D studies show in particular that data representation and model selection
+materially affect the reported error.  These developments motivate
 architectures that expose the impurity site while retaining both local
 coordination and longer-range periodic context.
 
@@ -34,6 +38,13 @@ screening risk is acceptably low.  Structure-based out-of-distribution studies
 have emphasized that materials models can degrade sharply when test chemistry
 differs from training chemistry~\cite{omee2024,li2025ood}.  For defect
 screening, host and impurity axes must therefore be separated explicitly.
+Uncertainty studies in atomistic machine learning have likewise shown that
+ensemble disagreement can provide a useful credibility signal, while
+calibration and out-of-domain reliability remain distinct
+requirements~\cite{peterson2017,hu2022,grasselli2025}.  A defect-screening
+surrogate should therefore be judged by its transfer partitions, uncertainty
+calibration, and decision-level screening consequences rather than by one
+random-split error.
 
 This work asks three connected questions.  First, do defect-centered readout,
 explicit local-environment features, and a distance-gated local interaction
