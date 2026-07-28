@@ -25,8 +25,10 @@
 - [ ] Run 2^3 architecture factorial for seeds 42-46. (`factorial-v2` failed
       before completing an epoch in all 40 jobs because concurrent DataLoader
       workers exhausted process file descriptors. No metrics or checkpoints
-      were produced. Formal configs now freeze `num_workers: 0`; the failed
-      tree must be archived before a clean GPU-smoked rerun.)
+      were produced. The 160-file failure tree is preserved under
+      `_failed_attempts`, all formal configs now freeze `num_workers: 0`, and a
+      clean two-epoch GPU smoke run passed with five output hashes verified.
+      The replacement formal queue is the remaining step.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,

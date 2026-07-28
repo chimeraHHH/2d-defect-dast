@@ -84,7 +84,9 @@ systemd-managed `factorial-v2` queue subsequently attempted every paired run
 twice, but all 40 jobs failed before completing an epoch because DataLoader
 worker IPC exhausted process file descriptors. It produced no metrics or model
 checkpoints, so it contributes no scientific evidence. Formal DART and SchNet
-configs now freeze `num_workers: 0`; the failed tree will be archived and a
-clean GPU smoke run must pass before launching a new queue. After completion,
+configs now freeze `num_workers: 0`. The 160-file failure tree is archived with
+a canonical digest, the clean recovery commit passes all 133 tests, and a
+two-epoch GPU smoke run completed with all five declared output hashes
+verified. The next action is the replacement formal queue; after completion,
 the route is validation-only promotion, transfer, SchNet, ensemble UQ, and
 paper result generation.
