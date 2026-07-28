@@ -10,6 +10,7 @@ from scripts.prm_collect_results import (
     file_sha256,
     load_prediction_array,
     paired_sample_comparison,
+    prediction_partitions_align,
     regression_metrics,
     regime_for_split,
     select_descriptor_families,
@@ -183,6 +184,24 @@ def test_neural_prediction_loader_preserves_target_storage_precision(tmp_path):
     assert targets.dtype == np.float32
     assert canonical.dtype == np.float64
     assert canonical.tolist() == [protocol_targets[1], protocol_targets[2]]
+
+
+def test_partial_prediction_partitions_are_not_pairable():
+    reference_indices = np.asarray([1, 2, 3])
+    reference_targets = np.asarray([0.1, 0.2, 0.3])
+
+    assert prediction_partitions_align(
+        reference_indices,
+        reference_targets,
+        reference_indices.copy(),
+        reference_targets.copy(),
+    )
+    assert not prediction_partitions_align(
+        reference_indices,
+        reference_targets,
+        np.asarray([1, 2]),
+        np.asarray([0.1, 0.2]),
+    )
 
 
 def test_comparison_archive_excludes_already_archived_factorial_runs(tmp_path):

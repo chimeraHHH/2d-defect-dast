@@ -517,6 +517,23 @@ def pooled_predictions(
     )
 
 
+def prediction_partitions_align(
+    reference_indices: np.ndarray,
+    reference_targets: np.ndarray,
+    comparator_indices: np.ndarray,
+    comparator_targets: np.ndarray,
+) -> bool:
+    return bool(
+        np.array_equal(comparator_indices, reference_indices)
+        and np.allclose(
+            comparator_targets,
+            reference_targets,
+            rtol=0.0,
+            atol=1e-10,
+        )
+    )
+
+
 def read_sample_metadata(path: Path) -> Dict[int, Dict[str, Any]]:
     with path.open(newline="") as handle:
         rows = list(csv.DictReader(handle))
@@ -821,9 +838,11 @@ def main() -> None:
             if comparator not in pooled:
                 continue
             indices, targets, predictions = pooled[comparator]
-            if not np.array_equal(indices, reference_indices) or not np.allclose(
-                targets, reference_targets, rtol=0.0, atol=1e-10,
+            if not prediction_partitions_align(
+                reference_indices, reference_targets, indices, targets
             ):
+                if args.allow_incomplete:
+                    continue
                 raise ValueError(f"pooled predictions do not align for {regime}/{comparator}")
             comparison_rows.append(
                 {
