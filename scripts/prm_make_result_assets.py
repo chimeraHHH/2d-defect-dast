@@ -1066,6 +1066,7 @@ def main() -> None:
     result_root = args.result_root.resolve()
     protocol_dir = args.protocol_dir.resolve()
     paper_dir = args.paper_dir.resolve()
+    invalidate_ready_marker(paper_dir / "generated")
     paths = input_paths(result_root, protocol_dir)
     inputs = load_inputs(paths)
     selected = validate_contract(

@@ -1,6 +1,7 @@
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -209,6 +210,31 @@ def test_manifest_precedes_ready_marker_and_partial_marker_is_removed(
 
     assert observed["manifest"] == manifest
     assert not ready.exists()
+
+
+def test_main_invalidates_stale_marker_before_loading_inputs(
+    tmp_path, monkeypatch,
+):
+    paper_dir = tmp_path / "paper"
+    generated = paper_dir / "generated"
+    generated.mkdir(parents=True)
+    stale = generated / "results_ready.tex"
+    stale.write_text(READY_MARKER_CONTENT)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "prm_make_result_assets.py",
+            "--result-root", str(tmp_path / "missing-results"),
+            "--protocol-dir", str(tmp_path / "missing-protocol"),
+            "--paper-dir", str(paper_dir),
+        ],
+    )
+
+    with pytest.raises(FileNotFoundError):
+        result_assets.main()
+
+    assert not stale.exists()
 
 
 def test_manuscript_uses_only_macros_emitted_by_result_generator():
