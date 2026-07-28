@@ -643,15 +643,15 @@
     }
   ],
   "collector_git": {
-    "commit": "f1756e4db66fcc18ea74ab8e11f9481656d232d1",
+    "commit": "ac585d5025fe6b60deb70741b42f4bb787fde8f5",
     "dirty": false,
     "status_porcelain": []
   },
   "config_manifest": {
-    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/schnet-readout-f1756e4/configs/prm/sensitivity/schnet_mean_host/manifest.json",
+    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-sensitivity/configs/prm/sensitivity/schnet_mean_host/manifest.json",
     "sha256": "4b97d8cace4d19cbdf48d0d64b6c6999a7109f85166e25e8c69314ae0bab212b"
   },
-  "created_at": "2026-07-28T17:29:21.181159+00:00",
+  "created_at": "2026-07-28T18:42:10.335445+00:00",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
   "n_archived_runs": 15,
   "n_runs": {
@@ -666,8 +666,8 @@
     "summary": "a0c5196915873b9933874e94fd5b8f4b826e3b2a358804a0e40c90c461c4d6e6"
   },
   "parent_comparison_manifest": {
-    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/schnet-readout-f1756e4/artifacts/prm_results/comparison/manifest.json",
-    "sha256": "ce163031b7e2755896529cce21e86dfb4b5b97f5b1d9d1a4e0bdff4fd71274ea"
+    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-comparison/artifacts/prm_results/comparison/manifest.json",
+    "sha256": "c57ffdd0b9f70c9129353d2d6981ec5431b508e18f8a7f835fb2e5af23e2d729"
   },
   "schema_version": "prm_schnet_readout_sensitivity_bundle_v1",
   "training_commits": {

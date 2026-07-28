@@ -1,10 +1,10 @@
 {
   "collector_git": {
-    "commit": "9f17a1426fa454f82cdd3e1bfe3d38b61d305f67",
+    "commit": "ac585d5025fe6b60deb70741b42f4bb787fde8f5",
     "dirty": false,
     "status_porcelain": []
   },
-  "created_at": "2026-07-28T16:04:27.178216+00:00",
+  "created_at": "2026-07-28T18:41:56.347391+00:00",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
   "defect_type_preference": {
     "accuracy": {
@@ -15,6 +15,32 @@
       "n_clusters": 1730,
       "resampling_unit": "host_dopant_pair",
       "std": 0.2856837776281455
+    },
+    "accuracy_reference": {
+      "accuracy": {
+        "ci_high": 0.684971098265896,
+        "ci_low": 0.6404624277456648,
+        "mean": 0.6624277456647398,
+        "n": 1730,
+        "n_clusters": 1730,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.47301856275452603
+      },
+      "class_counts": {
+        "adsorbate": 1146,
+        "interstitial": 584
+      },
+      "kind": "empirical_majority_class",
+      "majority_class": "adsorbate",
+      "model_minus_reference": {
+        "ci_high": 0.2722543352601156,
+        "ci_low": 0.22369942196531792,
+        "mean": 0.24797687861271675,
+        "n": 1730,
+        "n_clusters": 1730,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.516146418152025
+      }
     },
     "eligibility": {
       "binary_accuracy": "non-tied reference adsorbate/interstitial minima",
@@ -30,6 +56,27 @@
       "n_clusters": 1730,
       "resampling_unit": "host_dopant_pair",
       "std": 0.4606262109163993
+    },
+    "global_exact_site_reference": {
+      "accuracy": {
+        "ci_high": 0.23696004794017803,
+        "ci_low": 0.23017684535278465,
+        "mean": 0.23353770988164055,
+        "n": 1730,
+        "n_clusters": 1730,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.07218917768492425
+      },
+      "kind": "uniform_over_observed_candidates",
+      "model_minus_reference": {
+        "ci_high": 0.48260624827965865,
+        "ci_low": 0.4398813021836866,
+        "mean": 0.4612599779796312,
+        "n": 1730,
+        "n_clusters": 1730,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.45476477980814706
+      }
     },
     "global_screening_regret_eV": {
       "ci_high": 0.16889836411979814,
@@ -235,9 +282,9 @@
   "interpretation_boundary": "Out-of-fold associations and screening regret are descriptive; they are not causal mechanisms or external DFT validation.",
   "output_sha256": {
     "group_errors": "d5d434be0d679edafdbd0713037ce3ddb19110f12edd503bbf5fc82398ef96e0",
-    "pair_preferences": "a83647a27544327e8c53fda61c97b3d5ac7279b1bed26c00fed9d9c38fce3e23",
+    "pair_preferences": "00b3621c7c30462e2841d66633a7f4565af4bf21f17910a13435c93de88cdd89",
     "sample_predictions": "3579fa93043eb9a1a51b20e1dcc5074ad567a9b786585861ed390dd40d212d52",
-    "site_selection": "d5adb98c39a4a2f798d89441804b3aa4ce10125bed41b26b102c90e538ebcbb0"
+    "site_selection": "f0daa4d9016d979d4a60dd5cf4e873143474360508ed9e88275ab59fc450f984"
   },
   "sample_oof": {
     "bias_eV": -0.033911584866839026,
@@ -254,7 +301,7 @@
       "status_porcelain": []
     },
     "factorial_training_commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
-    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/artifacts/prm_results/factorial/selection.json",
+    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/artifacts/prm_results/factorial/selection.json",
     "selected_variant": "g111",
     "selection_data": "validation only",
     "sha256": "6b0bef7c69fc12a6ed97885961ccde444cd60a0d5db47558a71391eeba2b0773"
@@ -263,7 +310,7 @@
     {
       "config_sha256": "df8d782c1fe993b54f7036ad147727eb676a7a5b6363a1b926c960139bd1c728",
       "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
-      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/configs/prm/promoted/g111/transfer/pair_cv5_f0_seed242.yaml",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/configs/prm/promoted/g111/transfer/pair_cv5_f0_seed242.yaml",
       "git": {
         "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
         "dirty": false,
@@ -279,7 +326,7 @@
     {
       "config_sha256": "b5b6d32f6de23a4bc1040510caf1bcc365859ba7345e97f552df8ed20bdd161b",
       "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
-      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/configs/prm/promoted/g111/transfer/pair_cv5_f1_seed242.yaml",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/configs/prm/promoted/g111/transfer/pair_cv5_f1_seed242.yaml",
       "git": {
         "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
         "dirty": false,
@@ -295,7 +342,7 @@
     {
       "config_sha256": "02d45249f66e4a375f4fe0cdc97a2e4de6165b7c2a9b8e520c163d0bd603a5ec",
       "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
-      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/configs/prm/promoted/g111/transfer/pair_cv5_f2_seed242.yaml",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/configs/prm/promoted/g111/transfer/pair_cv5_f2_seed242.yaml",
       "git": {
         "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
         "dirty": false,
@@ -311,7 +358,7 @@
     {
       "config_sha256": "f8fd531835a82e8177c598f253657c8a55fc5f842f9913028d93b03f850f48d7",
       "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
-      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/configs/prm/promoted/g111/transfer/pair_cv5_f3_seed242.yaml",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/configs/prm/promoted/g111/transfer/pair_cv5_f3_seed242.yaml",
       "git": {
         "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
         "dirty": false,
@@ -327,7 +374,7 @@
     {
       "config_sha256": "f0cee0e4f0b0151774b432c1c58dc4074b717531230e5748fc16e8b210feb4a4",
       "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
-      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/materials-9f17a14/configs/prm/promoted/g111/transfer/pair_cv5_f4_seed242.yaml",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_collectors/final-ac585d5-materials/configs/prm/promoted/g111/transfer/pair_cv5_f4_seed242.yaml",
       "git": {
         "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
         "dirty": false,
@@ -359,6 +406,27 @@
       "resampling_unit": "host_dopant_pair",
       "std": 0.4410466769470846
     },
+    "exact_accuracy_reference": {
+      "accuracy": {
+        "ci_high": 0.374039864419965,
+        "ci_low": 0.36754689444628025,
+        "mean": 0.37077380952380945,
+        "n": 3140,
+        "n_clusters": 2346,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.09579545327998167
+      },
+      "kind": "uniform_over_observed_candidates",
+      "model_minus_reference": {
+        "ci_high": 0.379955581921298,
+        "ci_low": 0.35007754769463345,
+        "mean": 0.36489498028510775,
+        "n": 3140,
+        "n_clusters": 2346,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.43133910165202644
+      }
+    },
     "screening_regret_eV": {
       "ci_high": 0.12091337199438322,
       "ci_low": 0.08651177983896219,
@@ -376,6 +444,27 @@
       "n_clusters": 1898,
       "resampling_unit": "host_dopant_pair",
       "std": 0.2807940242760958
+    },
+    "top2_accuracy_reference": {
+      "accuracy": {
+        "ci_high": 0.6251463078623408,
+        "ci_low": 0.6175756811991822,
+        "mean": 0.6214263514263515,
+        "n": 2145,
+        "n_clusters": 1898,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.09026189878213998
+      },
+      "kind": "uniform_size_two_subset",
+      "model_minus_reference": {
+        "ci_high": 0.30394211990220343,
+        "ci_low": 0.28014086703896823,
+        "mean": 0.2923265623265623,
+        "n": 2145,
+        "n_clusters": 1898,
+        "resampling_unit": "host_dopant_pair",
+        "std": 0.27995183579388855
+      }
     }
   }
 }
