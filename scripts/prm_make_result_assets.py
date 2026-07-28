@@ -490,6 +490,84 @@ def render_macros(claims: Mapping[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_factorial_narrative(claims: Mapping[str, Any]) -> str:
+    effects = claims["factorial"]["effects"]["validation"]
+    status_text = {
+        "improves": "supported reduction",
+        "worsens": "supported increase",
+        "inconclusive": "inconclusive",
+    }
+
+    def entry(term: str) -> str:
+        effect = effects[term]
+        return (
+            rf"${term}$: $\Delta={finite_format(effect['mean_eV'], signed=True)}$ "
+            rf"[{finite_format(effect['ci_low_eV'], signed=True)}, "
+            rf"{finite_format(effect['ci_high_eV'], signed=True)}]~eV "
+            rf"({status_text[effect['status']]})"
+        )
+
+    main_effects = "; ".join(entry(term) for term in ("G", "E", "P"))
+    directional_interactions = [
+        term for term in TERM_ORDER[3:]
+        if effects[term]["status"] != "inconclusive"
+    ]
+    if directional_interactions:
+        interaction_text = (
+            "Directional validation intervals were also observed for "
+            + "; ".join(entry(term) for term in directional_interactions)
+            + "."
+        )
+        if len(directional_interactions) < len(TERM_ORDER[3:]):
+            interaction_text += (
+                " All other prespecified interaction intervals included zero."
+            )
+    else:
+        interaction_text = (
+            "No prespecified interaction contrast had a 95\\% validation "
+            "interval excluding zero."
+        )
+    return (
+        "% Auto-generated from canonical factorial claims; do not edit.\n"
+        "On validation MAE, the enabled-minus-disabled main-effect contrasts "
+        f"were {main_effects}. {interaction_text}\n"
+    )
+
+
+def render_transfer_narrative(claims: Mapping[str, Any]) -> str:
+    status_text = {
+        "dart_better": "supports lower DART error",
+        "comparator_better": "supports lower comparator error",
+        "inconclusive": "inconclusive",
+    }
+    sentences = []
+    for regime in REGIME_ORDER:
+        benchmark = claims["benchmarks"][regime]
+        descriptor = benchmark["descriptor_model"]
+        entries = []
+        for comparator, label in (
+            ("schnet", "SchNet"),
+            (descriptor, model_label(descriptor)),
+        ):
+            comparison = benchmark["paired_comparisons"][comparator]
+            entries.append(
+                rf"{latex_escape(label)} $\Delta="
+                rf"{finite_format(comparison['delta_comparator_minus_dart_eV'], signed=True)}$ "
+                rf"[{finite_format(comparison['ci_low_eV'], signed=True)}, "
+                rf"{finite_format(comparison['ci_high_eV'], signed=True)}]~eV "
+                rf"({status_text[comparison['status']]})"
+            )
+        sentences.append(
+            f"For {REGIME_LABELS[regime]}, the paired comparator-minus-DART "
+            "absolute-error differences were " + " and ".join(entries) + "."
+        )
+    return (
+        "% Auto-generated from canonical paired comparisons; do not edit.\n"
+        + " ".join(sentences)
+        + "\n"
+    )
+
+
 def render_factorial_table(factorial: Mapping[str, Any]) -> str:
     selected = factorial["selection"]["selected_variant"]
     rows = []
@@ -999,6 +1077,8 @@ def write_outputs(
     output_paths.append(claims_path)
     text_outputs = {
         "results_macros.tex": render_macros(claims),
+        "results_factorial_narrative.tex": render_factorial_narrative(claims),
+        "results_transfer_narrative.tex": render_transfer_narrative(claims),
         "tab_factorial.tex": render_factorial_table(inputs["factorial"]),
         "tab_benchmark.tex": render_benchmark_table(claims),
         "tab_applicability.tex": render_applicability_table(claims),

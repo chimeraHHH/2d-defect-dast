@@ -16,9 +16,11 @@ from scripts.prm_make_result_assets import (
     latex_escape,
     render_applicability_table,
     render_benchmark_table,
+    render_factorial_narrative,
     render_factorial_table,
     render_macros,
     render_screening_table,
+    render_transfer_narrative,
     render_uq_table,
     require_recorded_output_hashes,
     strict_json,
@@ -87,6 +89,7 @@ def minimal_claims():
                 "delta_comparator_minus_dart_eV": delta,
                 "ci_low_eV": delta - 0.1,
                 "ci_high_eV": delta + 0.1,
+                "status": comparison_status(delta - 0.1, delta + 0.1),
             }
             for comparator, delta in (
                 ("schnet", 0.1),
@@ -99,6 +102,26 @@ def minimal_claims():
         "factorial": {
             "validation_mae": {"mean": 0.4, "ci_low": 0.3, "ci_high": 0.5},
             "locked_test": {"mae": {"mean": 0.45, "ci_low": 0.35, "ci_high": 0.55}},
+            "effects": {
+                split: {
+                    term: {
+                        "mean_eV": values[0],
+                        "ci_low_eV": values[1],
+                        "ci_high_eV": values[2],
+                        "status": effect_status(values[1], values[2]),
+                    }
+                    for term, values in (
+                        ("G", (-0.2, -0.3, -0.1)),
+                        ("E", (0.0, -0.1, 0.1)),
+                        ("P", (0.2, 0.1, 0.3)),
+                        ("G:E", (0.0, -0.1, 0.1)),
+                        ("G:P", (0.0, -0.1, 0.1)),
+                        ("E:P", (0.0, -0.1, 0.1)),
+                        ("G:E:P", (0.0, -0.1, 0.1)),
+                    )
+                }
+                for split in ("validation", "test")
+            },
         },
         "benchmarks": {regime: benchmark for regime in (
             "id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block"
@@ -143,6 +166,21 @@ def test_macro_rendering_uses_machine_values_without_placeholders():
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
     assert "TODO" not in macros
+
+
+def test_result_narratives_preserve_direction_and_inconclusive_status():
+    claims = minimal_claims()
+
+    factorial = render_factorial_narrative(claims)
+    transfer = render_transfer_narrative(claims)
+
+    assert "G$: $\\Delta=-0.200$" in factorial
+    assert "(supported reduction)" in factorial
+    assert "(supported increase)" in factorial
+    assert "No prespecified interaction contrast" in factorial
+    assert "SchNet $\\Delta=+0.100$" in transfer
+    assert "(inconclusive)" in transfer
+    assert "(supports lower DART error)" in transfer
 
 
 def test_generated_table_body_rows_have_latex_terminators():
