@@ -1,0 +1,270 @@
+{
+  "asset_hashes": {
+    "inputs": 25,
+    "outputs": 23
+  },
+  "checks": {
+    "failures": [],
+    "n_checks": 1265,
+    "n_failures": 0
+  },
+  "direct_recomputations": {
+    "comparison_mae_eV": {
+      "chemistry_block": {
+        "dart": 0.3859648175779311,
+        "descriptor:lightgbm": 0.6418160664372107,
+        "descriptor:mean": 1.7728932913411153,
+        "schnet": 0.5078094796136393
+      },
+      "dopant_cv": {
+        "dart": 0.8439434074397869,
+        "descriptor:hist_gradient_boosting": 1.3309673559344766,
+        "descriptor:mean": 2.3141666106704712,
+        "schnet": 1.6921911115406916
+      },
+      "host_cv": {
+        "dart": 0.9383314385408759,
+        "descriptor:hist_gradient_boosting": 1.2732322909092866,
+        "descriptor:mean": 2.316838635422558,
+        "schnet": 6.703240465519477
+      },
+      "id_cv": {
+        "dart": 0.41763565667904506,
+        "descriptor:lightgbm": 0.6251508641904348,
+        "descriptor:mean": 2.2986023403376064,
+        "schnet": 0.571312831939776
+      },
+      "pair_cv": {
+        "dart": 0.4497677970443787,
+        "descriptor:lightgbm": 0.6742392172664664,
+        "descriptor:mean": 2.2985014096704957,
+        "schnet": 0.6276889692522206
+      }
+    },
+    "factorial": {
+      "locked_test_mae_eV": {
+        "ci_high": 0.3868856805561289,
+        "ci_low": 0.3771649361085529,
+        "mean": 0.3819841129156121,
+        "std": 0.006067071736584771
+      },
+      "selected_variant": "g111",
+      "validation_mae_eV": {
+        "ci_high": 0.3853558653835131,
+        "ci_low": 0.35725813426175884,
+        "mean": 0.37130699982263593,
+        "std": 0.018037102092661024
+      }
+    },
+    "materials": {
+      "accuracy": {
+        "ci_high": 0.923699421965318,
+        "ci_low": 0.8971098265895954,
+        "mean": 0.9104046242774566,
+        "n": 1730,
+        "n_clusters": 1730,
+        "std": 0.2856837776281455
+      },
+      "exact_accuracy": {
+        "ci_high": 0.7508716877241274,
+        "ci_low": 0.7201022713449875,
+        "mean": 0.7356687898089171,
+        "n": 3140,
+        "n_clusters": 2346,
+        "std": 0.4410466769470846
+      },
+      "global_exact_site_accuracy": {
+        "ci_high": 0.7167630057803468,
+        "ci_low": 0.6728323699421965,
+        "mean": 0.6947976878612717,
+        "n": 1730,
+        "n_clusters": 1730,
+        "std": 0.4606262109163993
+      },
+      "global_screening_regret_eV": {
+        "ci_high": 0.16889836411979814,
+        "ci_low": 0.11300615772471136,
+        "mean": 0.1390745124797692,
+        "n": 1730,
+        "n_clusters": 1730,
+        "std": 0.5934602043896163
+      },
+      "heterogeneity": {
+        "dopant": {
+          "spearman": -0.0006339490995532115,
+          "worst": {
+            "axis": "dopant",
+            "bias_eV": 1.0597169576944454,
+            "group": "In",
+            "mae_eV": 1.5015704391545466,
+            "n": 35.0,
+            "rmse_eV": 2.4568549284296615
+          }
+        },
+        "host": {
+          "spearman": -0.5233295794876468,
+          "worst": {
+            "axis": "host",
+            "bias_eV": -0.05480811079281903,
+            "group": "Bi2I6",
+            "mae_eV": 1.8511837555989408,
+            "n": 52.0,
+            "rmse_eV": 2.5294416835552918
+          }
+        }
+      },
+      "margin_mae_eV": {
+        "ci_high": 0.7998343340728788,
+        "ci_low": 0.7002204190185309,
+        "mean": 0.748624815279451,
+        "n": 1730,
+        "n_clusters": 1730,
+        "std": 1.0570267702274574
+      },
+      "margin_spearman": 0.9541308357807786,
+      "screening_regret_eV": {
+        "ci_high": 0.12091337199438322,
+        "ci_low": 0.08651177983896219,
+        "mean": 0.10265870060509572,
+        "n": 3140,
+        "n_clusters": 2346,
+        "std": 0.4536659905571147
+      },
+      "top2_accuracy": {
+        "ci_high": 0.9256159925615992,
+        "ci_low": 0.9015858208955224,
+        "mean": 0.9137529137529138,
+        "n": 2145,
+        "n_clusters": 1898,
+        "std": 0.2807940242760958
+      }
+    },
+    "method_facts": {
+      "ambiguous_identity_exclusions": 349,
+      "chemistry_split": {
+        "excluded": 417,
+        "test": 365,
+        "train": 9487,
+        "val": 372
+      },
+      "dart_parameters": 820558,
+      "duplicate_exclusions": 64,
+      "missing_or_nonfinite": 1828,
+      "modeling_rows": 10224,
+      "outside_abs_20_eV": 344,
+      "overlap_hosts": 26,
+      "overlap_impurities": 65,
+      "overlap_records": 69,
+      "overlap_reduced_formulas": 25,
+      "pretraining_records": 19902,
+      "raw_component_exclusions": 4,
+      "raw_rows": 17364,
+      "schnet_parameters": 455937,
+      "source_filtered_rows": 10641,
+      "unconverged": 4551,
+      "uq_split": {
+        "calibration": 511,
+        "excluded": 417,
+        "test": 1023,
+        "train": 7668,
+        "val": 1022
+      }
+    },
+    "schnet_readout": {
+      "add_mae": 6.703240465519477,
+      "ci_high": -1.2563637533501684,
+      "ci_low": -7.704173258445642,
+      "difference": -4.151120771634473,
+      "folds": [
+        {
+          "add_mae_eV": 3.88237583046421,
+          "mean_mae_eV": 2.178553167044351,
+          "mean_minus_add_mae_eV": -1.7038226634198588,
+          "n": 2023,
+          "split_id": "host_cv5_f0"
+        },
+        {
+          "add_mae_eV": 8.19943128140695,
+          "mean_mae_eV": 2.0676086076265277,
+          "mean_minus_add_mae_eV": -6.131822673780422,
+          "n": 2019,
+          "split_id": "host_cv5_f1"
+        },
+        {
+          "add_mae_eV": 5.483948930836702,
+          "mean_mae_eV": 2.5304386687965157,
+          "mean_minus_add_mae_eV": -2.953510262040186,
+          "n": 2069,
+          "split_id": "host_cv5_f2"
+        },
+        {
+          "add_mae_eV": 5.466300348518449,
+          "mean_mae_eV": 2.468025222534089,
+          "mean_minus_add_mae_eV": -2.9982751259843603,
+          "n": 2057,
+          "split_id": "host_cv5_f3"
+        },
+        {
+          "add_mae_eV": 10.474106178247967,
+          "mean_mae_eV": 3.501435518511183,
+          "mean_minus_add_mae_eV": -6.972670659736783,
+          "n": 2056,
+          "split_id": "host_cv5_f4"
+        }
+      ],
+      "host_size_spearman": {
+        "add": 0.31175974497349873,
+        "mean": 0.21822449113240205
+      },
+      "mean_better_folds": 5,
+      "mean_mae": 2.5521196938850044,
+      "sample_size_spearman": {
+        "add": 0.27818407595528016,
+        "mean": 0.010106084741230321
+      }
+    },
+    "uq": {
+      "aurc_eV": 0.17673358137383108,
+      "excess_aurc_eV": 0.095381115394738,
+      "gaussian_nll": 1.1278113989920748,
+      "intervals": {
+        "0.50": {
+          "conformal_quantile": 0.2702842095138303,
+          "mean_test_width_eV": 0.3363950114379098,
+          "observed_test_coverage": 0.520039100684262
+        },
+        "0.80": {
+          "conformal_quantile": 0.6041336707024575,
+          "mean_test_width_eV": 0.7519031667870357,
+          "observed_test_coverage": 0.782991202346041
+        },
+        "0.90": {
+          "conformal_quantile": 0.9169364158431362,
+          "mean_test_width_eV": 1.1412166350754,
+          "observed_test_coverage": 0.8719452590420332
+        },
+        "0.95": {
+          "conformal_quantile": 1.4837785321136603,
+          "mean_test_width_eV": 1.8467068319659248,
+          "observed_test_coverage": 0.9374389051808406
+        }
+      },
+      "mae": 0.37704740170378587,
+      "mean_gaussian_crps_eV": 0.32428945577191803,
+      "n": 1023,
+      "oracle_aurc_eV": 0.08135246597909308,
+      "uncertainty_absolute_error_spearman": 0.5462057180625937
+    }
+  },
+  "latex_contract": {
+    "defined_macros": 69,
+    "table_rows_checked": 34,
+    "used_macros": 37
+  },
+  "schema_version": "prm_paper_numeric_audit_v1",
+  "scope_notes": [
+    "Neural target arrays are stored as float32; alignment with the float64 protocol table is checked at 1e-6 eV.",
+    "Low-energy ranking diagnostics for the tied descriptor mean predictor are excluded because they are implementation-order dependent and are not used in the manuscript."
+  ],
+  "status": "pass"
+}
