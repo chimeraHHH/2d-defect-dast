@@ -1351,6 +1351,7 @@ def plot_screening(
         axes[1].step(x, y, where="post", color=color, label=label)
     axes[1].set_xlabel("Screening regret (eV)")
     axes[1].set_xscale("symlog", linthresh=0.05, linscale=0.8)
+    axes[1].set_xticks([0.0, 0.1, 1.0, 10.0], ["0", "0.1", "1", "10"])
     axes[1].set_ylabel("Cumulative fraction")
     axes[1].set_title("Decision regret", loc="left", pad=5)
     axes[1].legend(frameon=False, loc="lower right")
