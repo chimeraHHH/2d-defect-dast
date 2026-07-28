@@ -31,7 +31,6 @@ from src.prm_provenance import (  # noqa: E402
     ExpectedConfig,
     archive_training_artifacts,
     load_expected_configs,
-    load_protocol_targets,
     require_clean_git_snapshot,
     validate_manifest_config,
     validate_protocol_targets,
@@ -79,10 +78,27 @@ def validate_config_pair(
 
 def read_samples(path: Path) -> dict[int, dict[str, Any]]:
     with path.open(newline="") as handle:
-        rows = list(csv.DictReader(handle))
+        reader = csv.DictReader(handle)
+        required = {
+            "sample_index", "host", "natoms", "target_eV",
+            "canonical_retained",
+        }
+        if not required.issubset(reader.fieldnames or ()):
+            raise ValueError(f"protocol sample table lacks canonical fields: {path}")
+        rows = list(reader)
     samples = {}
     for row in rows:
+        retained = str(row["canonical_retained"]).strip().lower()
+        if retained not in {"true", "false"}:
+            raise ValueError(
+                f"invalid canonical_retained value {row['canonical_retained']!r}: "
+                f"{path}"
+            )
+        if retained != "true":
+            continue
         index = int(row["sample_index"])
+        if index in samples:
+            raise ValueError(f"duplicate canonical sample index {index}: {path}")
         samples[index] = {
             "host": str(row["host"]),
             "natoms": int(row["natoms"]),
@@ -271,8 +287,14 @@ def main() -> None:
     result_root = args.result_root.resolve()
     protocol_dir = args.protocol_dir.resolve()
     protocol = json.loads((protocol_dir / "manifest.json").read_text())
-    protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
     samples = read_samples(protocol_dir / "samples.csv")
+    if len(samples) != int(protocol["n_modeling_samples"]):
+        raise ValueError(
+            "canonical sample count does not match the protocol manifest"
+        )
+    protocol_targets = {
+        index: float(sample["target_eV"]) for index, sample in samples.items()
+    }
     config_manifest_path = args.config_dir / "manifest.json"
     config_manifest = json.loads(config_manifest_path.read_text())
     if (
