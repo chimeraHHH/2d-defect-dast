@@ -113,3 +113,13 @@
   claim.
 - Status: complete.
 - Blocks finalization: no.
+
+### REV-011: Source-dataset citation
+
+- Severity: major data-provenance issue.
+- Fix type: reference and availability correction.
+- Change: cite the exact IMP2D dataset version used in addition to the
+  accompanying article: Interstitial and Adsorbate Structure Database,
+  version 2, DOI `10.11583/DTU.19692238.v2`.
+- Status: complete.
+- Blocks finalization: no.
