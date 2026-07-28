@@ -40,17 +40,19 @@
       encode undefined constant-baseline correlations as strict-JSON `null`, and
       mirror the verified 55-file archive to the formal result store.
 - [ ] Run SchNet comparator under the same split contract. (Implementation,
-      configurations, periodic-edge audit, and bounded smoke run complete;
-      formal runs await GPU capacity.)
+      configurations, periodic-edge audit, and GPU smoke run complete; the
+      formal 48-run `schnet-v1` queue is active from clean commit `6c40137`.)
 - [x] Select the final DART configuration from validation/CV evidence only.
       (`g111`; test metrics were not used by the ordering rule.)
 - [ ] Run random out-of-fold and host--dopant-pair cross-validation.
-- [ ] Run host-group cross-validation.
-- [ ] Run dopant-group cross-validation.
+      (Formal `dart-g111-v1` queue active.)
+- [ ] Run host-group cross-validation. (Formal queue active.)
+- [ ] Run dopant-group cross-validation. (Formal queue active.)
 - [ ] Run predefined host-by-dopant chemistry block holdout.
+      (Formal queue active.)
 - [ ] Rebuild UQ with a distinct held-out calibration partition. (The collector
       is fail-closed for non-finite inputs, undefined rank statistics, and
-      non-standard JSON; formal members await GPU capacity.)
+      non-standard JSON; five formal members are active in `dart-g111-v1`.)
 - [ ] Complete mechanism-preference, error and applicability-domain analyses.
       (Eligibility and energy-tie contracts are implemented and tested; formal
       out-of-fold predictions await the selected architecture.)

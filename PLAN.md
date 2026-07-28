@@ -135,5 +135,8 @@ promoted DART UQ path, including calibration predictions, and the periodic
 SchNet path. SchNet's first smoke-only YAML retained an invalid ten-epoch
 warmup after reducing total training to two epochs and failed before training;
 a separate one-epoch-warmup smoke configuration passed without changing any
-formal 150-epoch YAML. Transfer, SchNet, ensemble UQ, materials analysis, and
-paper result generation now await clean, commit-pinned downstream launches.
+formal 150-epoch YAML. Two clean worktrees at commit `6c40137` now run the
+48-config DART and 48-config SchNet campaigns on disjoint GPU sets
+`{1,4,5}` and `{6,7}`, respectively; GPU 2 is excluded from both. Transfer,
+ensemble UQ, materials analysis, and paper result generation remain gated on
+successful completion and collection of both queues.
