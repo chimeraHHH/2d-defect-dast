@@ -290,6 +290,10 @@ def test_macro_rendering_uses_machine_values_without_placeholders():
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
     assert r"\newcommand{\PRMSchNetMeanHostMAE}{0.800}" in macros
+    assert (
+        r"\newcommand{\PRMSchNetMeanSampleSizeErrorSpearman}{0.200}"
+        in macros
+    )
     assert "TODO" not in macros
 
 

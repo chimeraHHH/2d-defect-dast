@@ -849,6 +849,38 @@ def render_macros(claims: Mapping[str, Any]) -> str:
                     ]
                 ),
             ),
+            macro_line(
+                "PRMSchNetAddSampleSizeErrorSpearman",
+                finite_format(
+                    sensitivity[
+                        "sample_natoms_vs_absolute_error_spearman"
+                    ]["add"]
+                ),
+            ),
+            macro_line(
+                "PRMSchNetMeanSampleSizeErrorSpearman",
+                finite_format(
+                    sensitivity[
+                        "sample_natoms_vs_absolute_error_spearman"
+                    ]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMSchNetAddHostSizeErrorSpearman",
+                finite_format(
+                    sensitivity[
+                        "host_median_natoms_vs_mae_spearman"
+                    ]["add"]
+                ),
+            ),
+            macro_line(
+                "PRMSchNetMeanHostSizeErrorSpearman",
+                finite_format(
+                    sensitivity[
+                        "host_median_natoms_vs_mae_spearman"
+                    ]["mean"]
+                ),
+            ),
         ]
     )
     return "\n".join(lines) + "\n"
