@@ -190,7 +190,9 @@
 - Change: added a standalone audit that reaggregates archived DART, SchNet, and
   descriptor predictions; reproduces paired and clustered bootstrap results,
   factorial summaries, UQ, materials screening, and readout sensitivity; and
-  verifies all asset hashes, result macros, and generated table rows.
+  verifies all asset hashes, result macros, and generated table rows. Report
+  floats are serialized to 15 significant digits so platform-specific libm
+  tails do not change the audit artifact.
 - Evidence: `scripts/prm_verify_paper_numbers.py` and
   `artifacts/prm_results/paper/numeric_audit.json`.
 - Status: complete; 1,331 checks pass with zero failures.

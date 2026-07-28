@@ -60,6 +60,26 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def canonicalize_json_numbers(value: Any) -> Any:
+    """Remove platform-specific floating-point tails from audit output."""
+    if isinstance(value, (float, np.floating)):
+        number = float(value)
+        if not math.isfinite(number):
+            raise ValueError("audit report contains a nonfinite number")
+        canonical = float(f"{number:.15g}")
+        return 0.0 if canonical == 0.0 else canonical
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, dict):
+        return {
+            key: canonicalize_json_numbers(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [canonicalize_json_numbers(item) for item in value]
+    return value
+
+
 def finite_spearman(left: Sequence[float], right: Sequence[float]) -> float:
     value = float(spearmanr(np.asarray(left), np.asarray(right)).statistic)
     if not np.isfinite(value):
@@ -1813,6 +1833,11 @@ def main() -> None:
                 "predictor are excluded because they are implementation-order "
                 "dependent and are not used in the manuscript."
             ),
+            (
+                "Report floats are serialized to 15 significant digits to "
+                "remove platform-specific libm tails without affecting any "
+                "audit tolerance or paper-facing value."
+            ),
         ],
         "direct_recomputations": {
             "comparison_mae_eV": compact_comparison(comparison),
@@ -1827,6 +1852,7 @@ def main() -> None:
             "method_facts": method_facts,
         },
     }
+    report = canonicalize_json_numbers(report)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
