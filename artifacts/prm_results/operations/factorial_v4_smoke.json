@@ -1,0 +1,49 @@
+{
+  "checks": {
+    "atomic_number_100_maps_asset_row_99": true,
+    "atomic_number_one_maps_asset_row_zero": true,
+    "checkpoint_padding_row_zero": true,
+    "checkpoint_table_shape_101x128": true,
+    "completed_at_present": true,
+    "ct_uae_asset_hash": true,
+    "five_output_hashes_match": true,
+    "git_clean_recorded": true,
+    "git_commit_exact": true,
+    "live_repo_still_exact_and_clean": true,
+    "no_known_runtime_errors": true,
+    "num_workers_zero": true,
+    "pretrained_asset_hash": true,
+    "two_epochs_recorded": true
+  },
+  "config_sha256": "8a00ca1bc836bfbfdffc78c1a7e5b408347590dc0820e0d482c5237ec4015193",
+  "ct_uae_table": {
+    "checkpoint_shape": [
+      101,
+      128
+    ],
+    "padding_row_nonzero_count": 0,
+    "source_shape": [
+      100,
+      128
+    ],
+    "z100_max_abs_delta_from_source_row99": 0.0,
+    "z1_max_abs_delta_from_source_row0": 0.0
+  },
+  "epochs_completed": 2,
+  "git_commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+  "gpu": "NVIDIA L40S",
+  "manifest_sha256": "ada26fdcfb143e3e2bcf6c1a19ec9f493fe423c02ad2974d75ccb4b94e19619b",
+  "output_sha256": {
+    "checkpoint": "b7528ac188c0862ac9a697e23e691d71ca0d6e92aafd4c89571faee4f3c524b6",
+    "metrics": "04e3470d46d4479f01df97789a1fdbd520d23993ff906b6af2d03abaa4957ed1",
+    "split_indices": "e51ed3aa85bcaaec73b3b7db8cbab5fdc818f64e2f9375e07758912c6890cf2f",
+    "test_predictions": "f28ba533773e742d2c009da1f1549a3f42c6eea4380a4a380e28961998758d8a",
+    "validation_predictions": "119b88a1a633169e39583dad73376b87b3c42c4dedd8116f8864832b39d05a74"
+  },
+  "purpose": "Operational validation of corrected one-based ct-UAE lookup before formal experiments",
+  "recorded_at": "2026-07-28T09:27:07.803880+00:00",
+  "run_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/smoke/factorial-v4-indexed/g111_split42_seed142_2ep",
+  "schema_version": "prm_corrected_ct_uae_smoke_v1",
+  "scientific_use": false,
+  "status": "complete"
+}
