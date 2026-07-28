@@ -4,8 +4,8 @@
 
 - Draft: result-gated PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: E4--E7 in `paper_experiment_matrix.md`, full author metadata,
-  and final release metadata.
+- Blocking items: E4--E7 in `paper_experiment_matrix.md`, full author and
+  contact metadata, and final release metadata.
 
 ## Issue log
 
@@ -53,6 +53,7 @@
 - Severity: administrative blocker.
 - Fix type: final packaging.
 - Change: replace the author TODO and provisional release sentence only from
-  verified author-supplied metadata and the actual tagged release.
+  verified author-supplied metadata and the actual tagged release; cite the
+  released data/software in the reference list and Data Availability Statement.
 - Status: pending.
 - Blocks finalization: yes.

@@ -77,8 +77,9 @@ The three highest risks are:
 
 - Risk: blocking only at final packaging.
 - Route: obtain the full author list and affiliations; replace the provisional
-  repository sentence with the final tagged release and any author-supplied
-  archival DOI. Do not invent either.
+  repository sentence with a reference to the final tagged release and any
+  author-supplied archival DOI; add the contact-author email required by APS.
+  Do not invent any of these fields.
 
 ## Priority revision plan
 
