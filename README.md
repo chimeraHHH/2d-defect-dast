@@ -31,6 +31,12 @@ available through Git history and legacy scripts but are not summarized here.
 Large data and model files are intentionally excluded from Git. Reproduction
 must verify them against `artifacts/prm_assets/manifest.json`.
 
+The canonical protocol tables are modified derivatives of the IMP2D data
+published with Davidsson *et al.*,
+[`10.1038/s41699-023-00380-6`](https://doi.org/10.1038/s41699-023-00380-6).
+The upstream dataset is CC BY 4.0; its attribution, license link, and the
+changes made by this study are recorded in `THIRD_PARTY_NOTICES.md`.
+
 The ct-UAE source checkpoint is available from
 [`fduabinitio/ct-UAE`](https://github.com/fduabinitio/ct-UAE) at commit
 `0141ff9e09277d2229c9d7a24c1bcc5eac9de78e`. The derived 100 by 128 elemental
