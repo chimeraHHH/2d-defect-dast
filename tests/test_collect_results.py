@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from scripts.prm_collect_results import (
+    DESCRIPTOR_SELECTED_MODEL,
     bootstrap_ci,
     comparison_archive_manifests,
     file_sha256,
@@ -13,6 +14,7 @@ from scripts.prm_collect_results import (
     prediction_partitions_align,
     regression_metrics,
     regime_for_split,
+    retain_selected_descriptor_rows,
     select_descriptor_families,
     validate_descriptor_root,
     validate_expected_config_coverage,
@@ -34,16 +36,66 @@ def test_descriptor_family_selection_ignores_test_metrics():
     rows = [
         {
             "model": "descriptor:a", "family": "a", "regime": "id_cv",
+            "split_id": "id_cv5_f0",
             "validation_mae": 0.4, "test_mae": 10.0,
         },
         {
             "model": "descriptor:b", "family": "b", "regime": "id_cv",
+            "split_id": "id_cv5_f0",
             "validation_mae": 0.5, "test_mae": 0.1,
         },
     ]
     selected = select_descriptor_families(rows)
-    assert selected["id_cv"]["selected_family"] == "a"
-    assert selected["id_cv"]["selection_data"] == "validation only"
+    assert (
+        selected["id_cv"]["split_selections"]["id_cv5_f0"]["selected_family"]
+        == "a"
+    )
+    assert (
+        selected["id_cv"]["selection_data"]
+        == "validation only within each split"
+    )
+
+
+def test_descriptor_family_selection_is_independent_in_each_split():
+    rows = [
+        {
+            "model": f"descriptor:{family}",
+            "family": family,
+            "regime": "host_cv",
+            "split_id": split_id,
+            "validation_mae": validation,
+            "test_mae": test,
+        }
+        for split_id, values in (
+            ("host_cv5_f0", {"a": (0.2, 9.0), "b": (0.4, 0.1)}),
+            ("host_cv5_f1", {"a": (0.5, 0.1), "b": (0.3, 9.0)}),
+        )
+        for family, (validation, test) in values.items()
+    ]
+    rows.extend(
+        {
+            "model": "descriptor:mean",
+            "family": "mean",
+            "regime": "host_cv",
+            "split_id": split_id,
+            "validation_mae": 2.0,
+            "test_mae": 2.0,
+        }
+        for split_id in ("host_cv5_f0", "host_cv5_f1")
+    )
+
+    selection = select_descriptor_families(rows)
+    retained = retain_selected_descriptor_rows(rows, selection)
+
+    assert selection["host_cv"]["family_counts"] == {"a": 1, "b": 1}
+    assert {
+        (row["split_id"], row["family"], row["model"])
+        for row in retained
+        if row["model"] == DESCRIPTOR_SELECTED_MODEL
+    } == {
+        ("host_cv5_f0", "a", DESCRIPTOR_SELECTED_MODEL),
+        ("host_cv5_f1", "b", DESCRIPTOR_SELECTED_MODEL),
+    }
 
 
 def test_paired_bootstrap_difference_is_positive_for_worse_comparator():

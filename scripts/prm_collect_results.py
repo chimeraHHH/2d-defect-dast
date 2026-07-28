@@ -34,6 +34,7 @@ from src.prm_provenance import (
 )
 
 SCALAR_METRICS = ("mae", "rmse", "bias", "spearman", "r2")
+DESCRIPTOR_SELECTED_MODEL = "descriptor:validation_selected"
 EXPECTED_RUNS = {
     "dart": {
         "id_repeat": 5, "id_cv": 5, "pair_cv": 5,
@@ -317,31 +318,101 @@ def validate_neural_campaign_commits(
 
 
 def select_descriptor_families(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    selected = {}
-    regimes = sorted({row["regime"] for row in rows if str(row["model"]).startswith("descriptor:")})
+    """Select one learned descriptor family independently inside each split."""
+    selected: Dict[str, Any] = {}
+    descriptor_rows = [
+        row
+        for row in rows
+        if str(row["model"]).startswith("descriptor:")
+        and str(row["family"]) != "mean"
+    ]
+    regimes = sorted({str(row["regime"]) for row in descriptor_rows})
     for regime in regimes:
-        candidates = []
-        families = sorted({
-            str(row["family"]) for row in rows
-            if row["regime"] == regime and str(row["model"]).startswith("descriptor:")
-        })
-        for family in families:
-            values = [
-                float(row["validation_mae"]) for row in rows
-                if row["regime"] == regime and row["family"] == family
-                and str(row["model"]).startswith("descriptor:")
-            ]
-            if not values or not np.isfinite(values).all():
-                raise ValueError(f"invalid descriptor validation MAE for {regime}/{family}")
-            candidates.append(
-                {"family": family, "mean_validation_mae_eV": float(np.mean(values)), "n": len(values)}
+        regime_rows = [
+            row for row in descriptor_rows if str(row["regime"]) == regime
+        ]
+        families = sorted({str(row["family"]) for row in regime_rows})
+        split_ids = sorted({str(row["split_id"]) for row in regime_rows})
+        split_selections: Dict[str, Any] = {}
+        family_counts: Counter[str] = Counter()
+        family_values: Dict[str, List[float]] = defaultdict(list)
+        for split_id in split_ids:
+            candidates = []
+            for family in families:
+                matches = [
+                    row
+                    for row in regime_rows
+                    if str(row["split_id"]) == split_id
+                    and str(row["family"]) == family
+                ]
+                if len(matches) != 1:
+                    raise ValueError(
+                        "descriptor selection requires exactly one result for "
+                        f"{regime}/{split_id}/{family}, found {len(matches)}"
+                    )
+                value = float(matches[0]["validation_mae"])
+                if not np.isfinite(value):
+                    raise ValueError(
+                        "invalid descriptor validation MAE for "
+                        f"{regime}/{split_id}/{family}"
+                    )
+                candidates.append(
+                    {"family": family, "validation_mae_eV": value}
+                )
+                family_values[family].append(value)
+            candidates.sort(
+                key=lambda item: (item["validation_mae_eV"], item["family"])
             )
-        candidates.sort(key=lambda item: (item["mean_validation_mae_eV"], item["family"]))
+            winner = str(candidates[0]["family"])
+            family_counts[winner] += 1
+            split_selections[split_id] = {
+                "selected_family": winner,
+                "selected_validation_mae_eV": float(
+                    candidates[0]["validation_mae_eV"]
+                ),
+                "candidates": candidates,
+            }
         selected[regime] = {
-            "selection_data": "validation only", "selected_family": candidates[0]["family"],
-            "candidates": candidates,
+            "selection_data": "validation only within each split",
+            "selection_unit": "split",
+            "selected_model": DESCRIPTOR_SELECTED_MODEL,
+            "family_counts": dict(sorted(family_counts.items())),
+            "family_validation_summary": [
+                {
+                    "family": family,
+                    "mean_validation_mae_eV": float(
+                        np.mean(family_values[family])
+                    ),
+                    "n": len(family_values[family]),
+                }
+                for family in families
+            ],
+            "split_selections": split_selections,
         }
     return selected
+
+
+def retain_selected_descriptor_rows(
+    rows: Sequence[Mapping[str, Any]],
+    selection: Mapping[str, Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Keep neural, mean, and foldwise validation-selected descriptor rows."""
+    retained: List[Dict[str, Any]] = []
+    for row in rows:
+        model = str(row["model"])
+        if not model.startswith("descriptor:") or str(row["family"]) == "mean":
+            retained.append(dict(row))
+            continue
+        regime = str(row["regime"])
+        split_id = str(row["split_id"])
+        selected_family = str(
+            selection[regime]["split_selections"][split_id]["selected_family"]
+        )
+        if str(row["family"]) == selected_family:
+            selected_row = dict(row)
+            selected_row["model"] = DESCRIPTOR_SELECTED_MODEL
+            retained.append(selected_row)
+    return retained
 
 
 def aggregate_fold_rows(rows: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
@@ -481,8 +552,13 @@ def seed_averaged_prediction(
     reference_targets = None
     predictions = []
     for member in members:
+        prediction_model = model
+        if model == DESCRIPTOR_SELECTED_MODEL:
+            prediction_model = f"descriptor:{member['family']}"
         indices, targets, values = load_prediction_array(
-            Path(member["prediction_path"]), model, expected_split_id=split_id,
+            Path(member["prediction_path"]),
+            prediction_model,
+            expected_split_id=split_id,
         )
         if reference_indices is None:
             reference_indices, reference_targets = indices, targets
@@ -771,12 +847,7 @@ def main() -> None:
     )
 
     descriptor_selection = select_descriptor_families(rows)
-    retained_rows = [
-        row for row in rows
-        if not str(row["model"]).startswith("descriptor:")
-        or row["family"] == descriptor_selection[row["regime"]]["selected_family"]
-        or row["family"] == "mean"
-    ]
+    retained_rows = retain_selected_descriptor_rows(rows, descriptor_selection)
     fold_rows = aggregate_fold_rows(retained_rows)
     summary_rows = summarize_folds(fold_rows)
 
@@ -785,7 +856,7 @@ def main() -> None:
     pooled_regimes = ("id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block")
     for regime_index, regime in enumerate(pooled_regimes):
         models = ["dart", "schnet"]
-        selected_descriptor = f"descriptor:{descriptor_selection[regime]['selected_family']}"
+        selected_descriptor = DESCRIPTOR_SELECTED_MODEL
         models.extend([selected_descriptor, "descriptor:mean"])
         models = list(dict.fromkeys(models))
         pooled = {}

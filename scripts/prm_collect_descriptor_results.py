@@ -15,9 +15,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.prm_collect_results import (
+    DESCRIPTOR_SELECTED_MODEL,
     aggregate_fold_rows,
     file_sha256,
     load_descriptor_runs,
+    retain_selected_descriptor_rows,
     select_descriptor_families,
     summarize_folds,
     write_csv,
@@ -181,10 +183,14 @@ def main() -> None:
     selection = select_descriptor_families(rows)
     fold_rows = aggregate_fold_rows(rows)
     summary_rows = summarize_folds(fold_rows)
+    selected_fold_rows = aggregate_fold_rows(
+        retain_selected_descriptor_rows(rows, selection)
+    )
+    selected_summary_rows = summarize_folds(selected_fold_rows)
     selected_rows = [
-        row for row in summary_rows
-        if row["model"] == "descriptor:mean"
-        or row["model"] == f"descriptor:{selection[row['regime']]['selected_family']}"
+        row
+        for row in selected_summary_rows
+        if row["model"] in {DESCRIPTOR_SELECTED_MODEL, "descriptor:mean"}
     ]
     collector_git = git_snapshot()
     if not collector_git["commit"] or collector_git["dirty"]:
@@ -220,6 +226,7 @@ def main() -> None:
             "metric_encoding": descriptor_manifest["metric_encoding"],
         },
         "selection_data": "validation only",
+        "family_selection_scope": "independently within each split",
         "expected_split_counts": EXPECTED_PAPER_SPLITS,
         "n_metric_rows": len(rows),
         "n_sources": len(sources),
