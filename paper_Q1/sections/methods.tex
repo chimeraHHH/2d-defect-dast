@@ -100,8 +100,14 @@ chemical coverage, target distribution, and fixed partition geometry.
 
 Each periodic supercell is represented by an atomistic graph.  We refer to the
 resulting model as the Defect-Aware Radial Transformer (DART).  The initial
-node representation concatenates nine standardized elemental attributes with
-a fixed 128-dimensional ct-UAE elemental vector~\cite{ctuae2025}.  We
+node representation concatenates a fixed 128-dimensional ct-UAE elemental
+vector with nine elemental attributes: group, period, Pauling
+electronegativity, covalent and van der Waals radii, a group-based valence
+count, first ionization energy, electron affinity, and atomic
+mass~\cite{ctuae2025}.  The nine columns are standardized over atomic numbers
+1--100.  An unavailable van der Waals radius is replaced by the corresponding
+covalent radius; the other tabulated values, including explicit unavailable or
+approximate entries, are fixed by the released feature table.  We
 reconstruct a 100-element table from the published checkpoint by applying its
 linear \texttt{atom\_embed} layer to each one-hot elemental code,
 $\mathbf U=\mathbf W^{\mathsf T}+\mathbf 1\mathbf b^{\mathsf T}$.  A zero
@@ -206,15 +212,22 @@ complete optimizer, scheduler, model, and random-number-generator state.
 %----------------------------------------------------------------------
 
 Two baseline classes use exactly the same canonical partitions.  First, an
-80-dimensional deterministic descriptor combines elemental-property
-statistics, impurity--host contrasts, cell geometry, nearest-neighbor
-distances, coordination counts, and one-hot site and defect labels.  We fit a
-training-target mean predictor, ridge regression, random forests, histogram
-gradient boosting, and LightGBM~\cite{ke2017lightgbm}.  These model families
-also permit direct comparison with earlier IMP2D descriptor
-studies~\cite{kesorn2024,elalouani2026}.  Hyperparameters within each family are
-selected by validation MAE only; the best descriptor family used in each
-reported regime is likewise chosen by mean validation MAE across folds.
+80-dimensional deterministic descriptor uses atomic number, mass, covalent
+radius, and Pauling electronegativity.  Mean, standard deviation, minimum,
+maximum, and median over all atoms and host atoms contribute 40 entries;
+impurity values and impurity-minus-host-mean contrasts contribute eight.
+Eighteen entries encode atom count, elemental diversity, cell lengths, area,
+volume, mass density, the first six impurity-neighbor distances, two
+coordination counts, and local-distance mean and standard deviation.  Twelve
+site indicators and two incorporation-class indicators complete the vector.
+Missing electronegativities use the fixed value 2.0 and fewer than six
+neighbors are padded at 20~\AA.  We fit a training-target mean predictor, ridge
+regression, random forests, histogram gradient boosting, and
+LightGBM~\cite{ke2017lightgbm}.  These model families also permit direct
+comparison with earlier IMP2D descriptor studies~\cite{kesorn2024,
+elalouani2026}.  Hyperparameters within each family are selected by validation
+MAE only; the best descriptor family used in each reported regime is likewise
+chosen by mean validation MAE across folds.
 
 Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
 channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA cutoff.
@@ -230,6 +243,8 @@ are averaged within each split before pooled out-of-fold metrics are
 calculated.  Consequently, DART--SchNet contrasts compare the complete
 prespecified learning recipes, including their different input representations
 and initialization; they do not isolate a pure backbone-architecture effect.
+The selected DART has 820,558 trainable parameters, compared with 455,937 for
+SchNet.
 For the same reason, ``host held out'' and ``impurity held out'' refer
 specifically to IMP2D target supervision.
 

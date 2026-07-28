@@ -91,3 +91,13 @@
   summaries rather than large-sample hypothesis tests.
 - Status: implemented in the result-asset generator and Evaluation Protocol.
 - Blocks finalization: through E7 only.
+
+### REV-009: Feature and capacity reproducibility
+
+- Severity: major methods-reporting issue.
+- Fix type: writing and code-documentation correction.
+- Change: enumerate all nine node attributes and all 80 descriptor dimensions,
+  state the actual fallback/padding rules, correct the false median-imputation
+  docstring, and disclose trainable parameter counts for DART and SchNet.
+- Status: complete.
+- Blocks finalization: no.

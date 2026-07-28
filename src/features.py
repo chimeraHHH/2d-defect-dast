@@ -5,10 +5,12 @@ Nine descriptors are extracted for atomic numbers Z = 1..100:
   radius, valence electrons, first ionisation energy, electron affinity, atomic
   mass.
 
-Values come from the standard tables shipped with ASE; missing entries are
-imputed with the column median so that the lookup table always returns a
-well-defined 9-vector. Each descriptor is z-score normalised across elements
-to keep magnitudes comparable.
+Mass and radius values come from ASE; group, period, electronegativity,
+ionisation-energy, electron-affinity, and valence tables are embedded below.
+An unavailable van-der-Waals radius falls back to the covalent radius.
+Undefined or approximate values in the embedded tables remain the explicit
+listed values rather than being imputed at runtime. Each descriptor is z-score
+normalised across elements to keep magnitudes comparable.
 """
 from __future__ import annotations
 
