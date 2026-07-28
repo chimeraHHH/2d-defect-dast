@@ -494,7 +494,7 @@ def render_factorial_table(factorial: Mapping[str, Any]) -> str:
         if variant == selected:
             validation = rf"\textbf{{{validation}}}"
             test = rf"\textbf{{{test}}}"
-        rows.append(f"{label} & {' & '.join(bits)} & {validation} & {test} \\")
+        rows.append(f"{label} & {' & '.join(bits)} & {validation} & {test} \\\\")
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
@@ -536,7 +536,7 @@ def render_benchmark_table(claims: Mapping[str, Any]) -> str:
             f"{REGIME_LABELS[regime]} & {finite_format(models['dart']['mae'])} & "
             f"{finite_format(models['schnet']['mae'])} & {finite_format(models[descriptor]['mae'])} & "
             f"{delta_cell(benchmark['paired_comparisons']['schnet'])} & "
-            f"{delta_cell(benchmark['paired_comparisons'][descriptor])} \\")
+            f"{delta_cell(benchmark['paired_comparisons'][descriptor])} \\\\")
     descriptor_note = ", ".join(sorted(descriptor_names))
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
@@ -566,7 +566,7 @@ def render_applicability_table(claims: Mapping[str, Any]) -> str:
         rows.append(
             f"{REGIME_LABELS[regime]} & {finite_format(dart['host_macro_mae'])} & "
             f"{finite_format(dart['dopant_macro_mae'])} & {finite_format(dart['favorable_mae'])} & "
-            f"{finite_format(dart['low_energy_mae'])} & {percent_format(dart['low_energy_recall'])} \\")
+            f"{finite_format(dart['low_energy_mae'])} & {percent_format(dart['low_energy_recall'])} \\\\")
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
@@ -595,7 +595,7 @@ def render_uq_table(uq: Mapping[str, Any]) -> str:
             f"{percent_format(float(nominal), 0)} & "
             f"{percent_format(interval['observed_test_coverage'])} & "
             f"{finite_format(interval['mean_test_width_eV'])} & "
-            f"{finite_format(interval['conformal_quantile'])} \\")
+            f"{finite_format(interval['conformal_quantile'])} \\\\")
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table}}[t]
@@ -635,7 +635,7 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
             value = finite_format(summary["mean"])
             low = finite_format(summary["ci_low"])
             high = finite_format(summary["ci_high"])
-        rows.append(f"{label} & {value} & [{low}, {high}] & {int(summary['n'])} \\")
+        rows.append(f"{label} & {value} & [{low}, {high}] & {int(summary['n'])} \\\\")
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]

@@ -10,7 +10,12 @@ from scripts.prm_make_result_assets import (
     finite_format,
     invalidate_ready_marker,
     latex_escape,
+    render_applicability_table,
+    render_benchmark_table,
+    render_factorial_table,
     render_macros,
+    render_screening_table,
+    render_uq_table,
     require_recorded_output_hashes,
     strict_json,
     validate_contract,
@@ -56,12 +61,31 @@ def test_recorded_output_hashes_are_recomputed_before_asset_generation(tmp_path)
 
 
 def minimal_claims():
+    metrics = {
+        "mae": 0.5,
+        "host_macro_mae": 0.6,
+        "dopant_macro_mae": 0.7,
+        "favorable_mae": 0.8,
+        "low_energy_mae": 0.9,
+        "low_energy_recall": 0.6,
+    }
     benchmark = {
         "descriptor_model": "descriptor:lightgbm",
         "models": {
-            "dart": {"mae": 0.5, "low_energy_mae": 0.7, "low_energy_recall": 0.6},
-            "schnet": {"mae": 0.6},
-            "descriptor:lightgbm": {"mae": 0.8},
+            "dart": metrics,
+            "schnet": {**metrics, "mae": 0.6},
+            "descriptor:lightgbm": {**metrics, "mae": 0.8},
+        },
+        "paired_comparisons": {
+            comparator: {
+                "delta_comparator_minus_dart_eV": delta,
+                "ci_low_eV": delta - 0.1,
+                "ci_high_eV": delta + 0.1,
+            }
+            for comparator, delta in (
+                ("schnet", 0.1),
+                ("descriptor:lightgbm", 0.3),
+            )
         },
     }
     return {
@@ -79,22 +103,33 @@ def minimal_claims():
             "uncertainty_absolute_error_spearman": 0.5,
             "selective_prediction": {"aurc_eV": 0.2, "excess_aurc_eV": 0.1},
             "intervals": {
-                key: {"observed_test_coverage": float(key), "mean_test_width_eV": 1.0}
+                key: {
+                    "observed_test_coverage": float(key),
+                    "mean_test_width_eV": 1.0,
+                    "conformal_quantile": 1.5,
+                }
                 for key in ("0.50", "0.80", "0.90", "0.95")
             },
         },
         "materials": {
             "defect_type_preference": {
-                "accuracy": {"mean": 0.8}, "margin_mae_eV": {"mean": 0.2},
-                "margin_spearman": 0.7, "global_screening_regret_eV": {"mean": 0.1},
-                "global_exact_site_accuracy": {"mean": 0.4},
+                "accuracy": summary(0.8),
+                "margin_mae_eV": summary(0.2),
+                "margin_spearman": 0.7,
+                "global_screening_regret_eV": summary(0.1),
+                "global_exact_site_accuracy": summary(0.4),
             },
             "within_defect_type_site_selection": {
-                "exact_accuracy": {"mean": 0.5}, "top2_accuracy": {"mean": 0.7},
-                "screening_regret_eV": {"mean": 0.08},
+                "exact_accuracy": summary(0.5),
+                "top2_accuracy": summary(0.7),
+                "screening_regret_eV": summary(0.08),
             },
         },
     }
+
+
+def summary(mean):
+    return {"mean": mean, "ci_low": mean - 0.05, "ci_high": mean + 0.05, "n": 10}
 
 
 def test_macro_rendering_uses_machine_values_without_placeholders():
@@ -102,6 +137,32 @@ def test_macro_rendering_uses_machine_values_without_placeholders():
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
     assert "TODO" not in macros
+
+
+def test_generated_table_body_rows_have_latex_terminators():
+    claims = minimal_claims()
+    factorial = {
+        "selection": {"selected_variant": "g101"},
+        "variant_summary": [
+            {
+                "variant": "g101",
+                "validation_mae": summary(0.4),
+                "test_mae": summary(0.45),
+            }
+        ],
+    }
+    tables = (
+        render_factorial_table(factorial),
+        render_benchmark_table(claims),
+        render_applicability_table(claims),
+        render_uq_table({"test": claims["uq"]}),
+        render_screening_table(claims["materials"]),
+    )
+    for table in tables:
+        body = table.split(r"\midrule", 1)[1].split(r"\bottomrule", 1)[0].strip()
+        rows = body.splitlines()
+        assert rows
+        assert all(row.endswith(r"\\") for row in rows)
 
 
 def test_ready_marker_is_invalidated_until_all_assets_succeed(tmp_path):
