@@ -1,0 +1,408 @@
+{
+  "component_flags": {
+    "use_env_enrichment": true,
+    "use_gated_pooling": true,
+    "use_prenorm_local": true
+  },
+  "configs": [
+    {
+      "output_dir": "selected/g111/transfer/id_cv5_f0/seed242",
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "db34ecf5ca9a43f315a98ffd929e4119e9befe53c91bc177404f02bfafe3d61d",
+      "split_path": "artifacts/prm_protocol_v2/splits/id_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/id_cv5_f1/seed242",
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f1_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "37da5070ea0e1039b27a39173752114e07f84927df12e598209b2422ba3c6517",
+      "split_path": "artifacts/prm_protocol_v2/splits/id_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/id_cv5_f2/seed242",
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f2_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "8c130ebf2e645de5dd764cc77b2295bb163ddf36a2046d0b980b3c079e799c64",
+      "split_path": "artifacts/prm_protocol_v2/splits/id_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/id_cv5_f3/seed242",
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f3_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "3219429ae4b699fcc877fdefd20a2aeb833d6787e840091ccedb0358188c263e",
+      "split_path": "artifacts/prm_protocol_v2/splits/id_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/id_cv5_f4/seed242",
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f4_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "f6b6d4c00e82fad457b581eb7e0af490c79a142790a35787c542e61bc24274ef",
+      "split_path": "artifacts/prm_protocol_v2/splits/id_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/pair_cv5_f0/seed242",
+      "path": "configs/prm/promoted/g111/transfer/pair_cv5_f0_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "04cdb90d48f8e55e0c15b92064ca1af4dc5d64dcc3db012c059e3ea58b642f8e",
+      "split_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/pair_cv5_f1/seed242",
+      "path": "configs/prm/promoted/g111/transfer/pair_cv5_f1_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "4dbf11fb894a9d8eebeae2998fc036814b9ecaeca445a99c350f7d30acdd65df",
+      "split_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/pair_cv5_f2/seed242",
+      "path": "configs/prm/promoted/g111/transfer/pair_cv5_f2_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "fe22352d83e3799b9fd0b16c192a276fdaec707a3713731864abec8c7bdba5a9",
+      "split_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/pair_cv5_f3/seed242",
+      "path": "configs/prm/promoted/g111/transfer/pair_cv5_f3_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "16733028c59dde962287424279420cac8aa70ca2f05af6a91da52fb1ae67c120",
+      "split_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/pair_cv5_f4/seed242",
+      "path": "configs/prm/promoted/g111/transfer/pair_cv5_f4_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "3177c6aaf7b831123193dd780755206e6fc5bd087563cb53d68e9888e4d9d732",
+      "split_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f0/seed242",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f0_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "4d0920d9e2d3e5cc95d4366fb48aad48cf6886cbf9e0bc0e7772417dd6203ff4",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f0/seed243",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f0_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "5ff2cd13c902e5c96cd714b07326684ed3989fb68d7b6103a82be0caeb15f369",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f0/seed244",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f0_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "48a0f3fc88a6b188782b4cc6d696bf72d014908e18e4d93264db82ef16df8ed0",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f1/seed242",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f1_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "43a8a8a6f3fbcb96a62537eab019d6ba67a8f6f790a836e73a739b2e756578ae",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f1/seed243",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f1_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "9bdf04bdf752c23fa25785f6b9e040c5a07b2367a84a11b337d87dd349ee5df7",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f1/seed244",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f1_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "65f3757aaa6be443908a3fbb9ee00d1ac6d430ce4ba432116f9e8ce8322ea4b0",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f2/seed242",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f2_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "9ff1f2f27330196af4b168bd7fadae2bb65b4e17509fb17dae627142eb07f07a",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f2/seed243",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f2_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "e7a9779603f503bfd747c159ec4d5db5f107f34488a95730a11ee51666e899c2",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f2/seed244",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f2_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "a9a3acc2b398e5db4e49dad3942b6751d891a4c6795a4068f59b72dffaadfde7",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f3/seed242",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f3_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "0903ef2cf28fbf21793778f62e4600aea9045707d08fe8cb403bf2fb9e196bf9",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f3/seed243",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f3_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "d44d3e3c77bb9a0a39b9614565380a84384d2dbb960b8e0471f84fa8ad9cd394",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f3/seed244",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f3_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "bda74ee5539599b45ffaaa27033cc08b6e30de52890cd6ebcf8de23ba847221d",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f4/seed242",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f4_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "d4f009abbcd41c854d9fd688e6e9b69e80a3d67e9b93ef23773ba4713bb80b2f",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f4/seed243",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f4_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "705bbc14e4eba8abb8e3cd85197f4bfec8267010f1dfd1a1fd628b634471dfb3",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/host_cv5_f4/seed244",
+      "path": "configs/prm/promoted/g111/transfer/host_cv5_f4_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "65910c3d7b1d3a47b19bcf6ecf734ecfd1d8fbcea48439f9444c5d7ef18e57b0",
+      "split_path": "artifacts/prm_protocol_v2/splits/host_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f0/seed242",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f0_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "5f1bfab945debcf61974529dcabd1bdd75e72797674417ec2943f01e9dd6458a",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f0/seed243",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f0_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "ee9d3d37745c2a72ad107896eec262b8c9f27f67f7e3b5ff1743f52195eb3383",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f0/seed244",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f0_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "dd5cbfd9b90c286582fe45b8bdc50103179e4a34faf2cab9f697f423276e1d27",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f0.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f1/seed242",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f1_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "44c0024deaf46a1df3fdad0b3e80b40dd6927e61c867c64204931188b14da197",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f1/seed243",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f1_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "13f2cf1fb6edd3d83d31fc0fbdfdb63fd1387583dcac4fbc8a23fa1274888030",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f1/seed244",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f1_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "1c89fb94d2eece66801e1e7fd7a74e2864f6eeb5ae9f6a8d6eeccd735953bc2b",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f1.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f2/seed242",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f2_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "458c324f8022ea47cca3c34f5dbe0d45444bb96a6a086445f3e2e2aaff157d0b",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f2/seed243",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f2_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "42e1b9403559c2ec02c1f8ebe2b3813f7ccea6688f6ab4bba8d4c4e93549c670",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f2/seed244",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f2_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "0e794ddf8e9394a7780a1f1ff0e37d68d806d8fdb49b989a02601418b59f07dd",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f2.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f3/seed242",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f3_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "5262fc75b477f3de7a45373f15e614ac2eb4357e9d03c0f641797e28da3a57a1",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f3/seed243",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f3_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "e5c6bb2b7651d2f9dfde6ca80790848d31fbf5993e6efdfd06e622ad21c5e570",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f3/seed244",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f3_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "9dec45d3de638dd2f940cab181095dcf00d5237520e698506e32c97411a1ca34",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f3.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f4/seed242",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f4_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "1e6f9e4b40954a3673c124040345097e37671d1e992bdeeec25c2c57c365f657",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f4/seed243",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f4_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "b77b258b38af56fddcd13de26c170cecf345ddf48bce1936da9dac467d8c8dab",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/dopant_cv5_f4/seed244",
+      "path": "configs/prm/promoted/g111/transfer/dopant_cv5_f4_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "b65461aa3da34b58ecbbf294ad088e5fb56f5465c636131eb4fc1db06ab5d608",
+      "split_path": "artifacts/prm_protocol_v2/splits/dopant_cv5_f4.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/chemistry_block_g6x3d/seed242",
+      "path": "configs/prm/promoted/g111/transfer/chemistry_block_g6x3d_seed242.yaml",
+      "purpose": "transfer",
+      "seed": 242,
+      "sha256": "b7ab2a10cad41e092340c127f8aeb7ca3893ccf8f4eb636839b7703c53aa2bac",
+      "split_path": "artifacts/prm_protocol_v2/splits/chemistry_block_g6x3d.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/chemistry_block_g6x3d/seed243",
+      "path": "configs/prm/promoted/g111/transfer/chemistry_block_g6x3d_seed243.yaml",
+      "purpose": "transfer",
+      "seed": 243,
+      "sha256": "24f90805fe170ac90f72b19f88fe42d3d1c0225fcd9a5a6eb581d5f437418252",
+      "split_path": "artifacts/prm_protocol_v2/splits/chemistry_block_g6x3d.json"
+    },
+    {
+      "output_dir": "selected/g111/transfer/chemistry_block_g6x3d/seed244",
+      "path": "configs/prm/promoted/g111/transfer/chemistry_block_g6x3d_seed244.yaml",
+      "purpose": "transfer",
+      "seed": 244,
+      "sha256": "d6bf495ea0f87e656c77faac52f1a7a7195b3c73927fca389a5c20b8df52f25d",
+      "split_path": "artifacts/prm_protocol_v2/splits/chemistry_block_g6x3d.json"
+    },
+    {
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed442",
+      "path": "configs/prm/promoted/g111/uq/uq_calibration_s62_seed442.yaml",
+      "purpose": "uq_ensemble",
+      "seed": 442,
+      "sha256": "56d9bc7d629a86ffb7dcac81fe9a1673d115dd4e8eaacd34d5fc4976d8beb51f",
+      "split_path": "artifacts/prm_protocol_v2/splits/uq_calibration_s62.json"
+    },
+    {
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed443",
+      "path": "configs/prm/promoted/g111/uq/uq_calibration_s62_seed443.yaml",
+      "purpose": "uq_ensemble",
+      "seed": 443,
+      "sha256": "79ec32b103cb64b634efec0131119b403bb602494f104a8bddc0ce1f5411529f",
+      "split_path": "artifacts/prm_protocol_v2/splits/uq_calibration_s62.json"
+    },
+    {
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed444",
+      "path": "configs/prm/promoted/g111/uq/uq_calibration_s62_seed444.yaml",
+      "purpose": "uq_ensemble",
+      "seed": 444,
+      "sha256": "72c9100edb70ad94350399c21e4b07049befea30f9c98e423b44debb2a2f733c",
+      "split_path": "artifacts/prm_protocol_v2/splits/uq_calibration_s62.json"
+    },
+    {
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed445",
+      "path": "configs/prm/promoted/g111/uq/uq_calibration_s62_seed445.yaml",
+      "purpose": "uq_ensemble",
+      "seed": 445,
+      "sha256": "f2cf2e1dc7d3dc52671fe34e92f81fe5bafcb302bd19536b1f2b80b840eef4d6",
+      "split_path": "artifacts/prm_protocol_v2/splits/uq_calibration_s62.json"
+    },
+    {
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed446",
+      "path": "configs/prm/promoted/g111/uq/uq_calibration_s62_seed446.yaml",
+      "purpose": "uq_ensemble",
+      "seed": 446,
+      "sha256": "38dd7def2492f446a68bf54dad05a38b3346f4bc2add9760a9188691adeb568f",
+      "split_path": "artifacts/prm_protocol_v2/splits/uq_calibration_s62.json"
+    }
+  ],
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "factorial_bundle": "/storage/ssd/metaiot_guest/yiminghua/prm_promoters/selected-20260728-7e0324f/artifacts/prm_results/factorial/bundle.json",
+  "factorial_bundle_sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e",
+  "factorial_collector_git": {
+    "commit": "865e90a695e3641e21bc9f2c98fc05c80723abcf",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "factorial_training_commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+  "n_configs": 48,
+  "schema_version": "prm_promoted_config_manifest_v1",
+  "selected_variant": "g111",
+  "selection_data": "validation only",
+  "selection_path": "/storage/ssd/metaiot_guest/yiminghua/prm_promoters/selected-20260728-7e0324f/artifacts/prm_results/factorial/selection.json",
+  "selection_sha256": "6b0bef7c69fc12a6ed97885961ccde444cd60a0d5db47558a71391eeba2b0773"
+}

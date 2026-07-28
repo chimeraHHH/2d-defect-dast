@@ -128,6 +128,8 @@ zero padding, and exact endpoint mappings. The formal 40-run
 `factorial-v4-indexed` queue completed from the same clean frozen commit with
 GPU 2 excluded and no failed jobs. A separate clean collector at `865e90a`
 validated all 40 runs, archived the evidence, and selected `g111` using
-validation MAE only. Configuration promotion, transfer, SchNet, ensemble UQ,
-materials analysis, and paper result generation remain gated on committing
-that selection and the generated promoted configurations.
+validation MAE only. The committed selection then generated 43 transfer and
+five UQ-member `g111` configurations with unique output directories and
+content hashes. Transfer, SchNet, ensemble UQ, materials analysis, and paper
+result generation remain gated on the two GPU smoke checks and clean,
+commit-pinned downstream launches.
