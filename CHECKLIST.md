@@ -35,6 +35,7 @@
       commit `865e90a` validated and archived all 40 runs; validation-only
       selection promoted `g111`.)
 - [x] Rerun descriptor baselines on protocol v2 with validation-only tuning
+      and select the learned family independently inside every split
       (27 formal splits; protocol-v1 outputs are superseded).
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,
       encode undefined constant-baseline correlations as strict-JSON `null`, and
@@ -48,12 +49,13 @@
 - [x] Run host-group cross-validation.
 - [x] Run dopant-group cross-validation.
 - [x] Run predefined host-by-dopant chemistry block holdout.
-- [x] Rebuild UQ with a distinct held-out calibration partition. (All five
-      members and the complete held-out analysis are archived under
-      `artifacts/prm_results/uq/`.)
+- [x] Rebuild UQ with a distinct calibration partition and dedicated internal
+      test partition. (All five members and the complete internal analysis are
+      archived under `artifacts/prm_results/uq/`; the test is not described as
+      untouched by earlier architecture development.)
 - [x] Complete mechanism-preference, error and applicability-domain analyses.
-      (The pair-OOF screening and heterogeneity evidence is archived under
-      `artifacts/prm_results/materials/`.)
+      (The pair-OOF screening, trivial reference comparisons, and heterogeneity
+      evidence are archived under `artifacts/prm_results/materials/`.)
 - [x] Complete the bounded 15-run SchNet mean-readout host-CV sensitivity.
       (All 15 runs completed from clean commit `91cb8ac` on GPUs 1, 4, and 5.
       The hash-verified archive and paired host-cluster analysis are under
@@ -76,15 +78,17 @@
       (The 23 fail-closed outputs, including the SchNet readout sensitivity
       assets, and readiness marker are hash-bound in
       `artifacts/prm_results/paper/result_assets.json`.)
+- [x] Add exact DART, SchNet, optimization, seed, and descriptor-search
+      specifications to the Supplemental Material.
 - [x] Add provisional Data and Code Availability statements.
 - [x] Audit all DOI-bearing bibliography entries and remove the unresolvable
       `10.1021/acs.chemmater.4c02907` record and dependent claim.
 - [x] Compile and visually inspect the provisional result-gated PDF.
-- [x] Compile and visually inspect the populated 12-page main PDF and one-page
-      Supplemental Material; no undefined references, content-affecting
-      warnings, clipping, or overlap remain.
+- [x] Compile and visually inspect the populated main PDF and Supplemental
+      Material; no undefined references, content-affecting warnings, overfull
+      boxes, clipping, or overlap remain.
 - [x] Independently cross-check all numerical claims against archived
       predictions and result files. (`scripts/prm_verify_paper_numbers.py`
-      passes 1,265 checks with zero failures; the deterministic report is
+      passes 1,331 checks with zero failures; the deterministic report is
       `artifacts/prm_results/paper/numeric_audit.json`.)
-- [ ] Complete independent review and final revision.
+- [x] Complete independent review and final scientific-content revision.

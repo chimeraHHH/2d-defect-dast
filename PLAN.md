@@ -110,12 +110,14 @@ from every queue.
 The final 10,224-structure protocol v2, periodic SchNet implementation, result
 collectors, and manuscript protocol sections are complete. All 27 descriptor
 splits have been rerun from a clean commit and passed content-level validation,
-artifact-hash collection, and a strict-JSON normalization in which undefined
+artifact-hash collection, and strict-JSON normalization in which undefined
 constant-baseline correlations are represented as `null`. The verified 55-file
 descriptor archive is mirrored byte-for-byte to the formal result store.
-Validation selects LightGBM for the random, pair, and chemistry-block regimes
-and histogram gradient boosting for host- and dopant-held-out evaluation. The
-two DART initialization assets are pinned by SHA-256, and formal runs record a
+Hyperparameters and learned descriptor families are selected independently
+inside every split using only that split's validation rows. LightGBM is selected
+in all random and pair folds and the chemistry block; host and impurity folds
+each select histogram gradient boosting four times and LightGBM once. The two
+DART initialization assets are pinned by SHA-256, and formal runs record a
 fail-closed parameter-load report. All 9,871,460 stored periodic graph edges
 were independently reconstructed without topology or cutoff violations.
 
@@ -123,8 +125,9 @@ The corrected 40-run factorial completed from clean commit `7a6593a`; a
 separate collector selected `g111` by validation MAE only. The promoted DART
 and periodic-SchNet queues then completed 48 runs each from clean commit
 `6c40137`, with GPU 2 excluded. The complete aligned comparison, five-member
-held-out UQ analysis, and pair-OOF materials screening analysis are archived
-under `artifacts/prm_results/`. No partial queue metric entered the manuscript.
+internal UQ analysis on a dedicated ensemble split, and pair-OOF materials
+screening analysis are archived under `artifacts/prm_results/`. No partial
+queue metric entered the manuscript.
 
 The bounded post-hoc SchNet mean-readout sensitivity completed all 15 host-CV
 runs from clean commit `91cb8ac` on GPUs 1, 4, and 5, with GPU 2 excluded.
@@ -138,12 +141,14 @@ result identifies readout as an important part of the complete-recipe gap but
 does not isolate a backbone-only effect. The prespecified additive SchNet
 remains the main comparator.
 
-Fail-closed asset generation now validates 23 paper outputs, and the populated
-main manuscript and separate Supplemental Material compile to visually checked
-12-page and one-page PDFs. An independent audit directly reaggregates archived
-predictions, reproduces all paper-facing bootstrap analyses, verifies every
-LaTeX macro and generated table row, and passes 1,265 checks with no failures;
-its report is `artifacts/prm_results/paper/numeric_audit.json`. The remaining
-scientific gate is the skeptical manuscript review. Administrative release
-work remains blocked on verified author/contact/funder metadata and a
+Fail-closed asset generation validates 23 paper outputs. An independent audit
+directly reaggregates archived predictions, reproduces all paper-facing
+bootstrap analyses including screening references, verifies every LaTeX macro
+and generated table row, and passes 1,331 checks with no failures; its report is
+`artifacts/prm_results/paper/numeric_audit.json`. The populated main manuscript
+and separate Supplemental Material include exact reproducibility settings,
+compile without undefined references or overfull boxes, and have passed
+page-by-page visual QA. The final skeptical review finds no remaining non-DFT
+scientific blocker under the current claims. Administrative release work
+remains blocked on verified author/contact/funder metadata and a
 rights-holder-approved code/data license.

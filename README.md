@@ -10,6 +10,12 @@ energies in two-dimensional materials.
 and Conclusion are fail-closed until the complete canonical result pipeline
 creates `paper_Q1/generated/results_ready.tex`.
 
+The current readiness marker is present. The populated manuscript has passed
+the independent 1,331-check numerical audit, the complete 179-test repository
+suite in the scientific environment, and final page-by-page PDF review.
+Remaining submission blockers are author-supplied metadata and the tagged
+archival release, not scientific-content gates.
+
 The paper is limited to the provenance-audited IMP2D evidence. Historical
 exploratory scores, unmatched first-principles calculations, and prospective
 DFT outputs are not admissible evidence for the active manuscript. They remain
@@ -86,6 +92,7 @@ Build the provisional manuscript from `paper_Q1/`:
 
 ```bash
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error supplement.tex
 ```
 
 Do not create the result readiness marker manually. It is written last by

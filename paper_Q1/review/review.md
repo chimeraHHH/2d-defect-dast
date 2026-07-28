@@ -1,124 +1,128 @@
-# Pre-result skeptical review
+# Final skeptical review
 
-## Review mode
+Review date: 2026-07-29
 
-- Review follow-up policy: auto-execute required non-DFT follow-ups.
-- Manuscript edit mode: LaTeX required.
-- Manuscript source status: reviewable, result-gated draft; not submission-ready.
+## Review basis
 
-## Summary
+This review treats `paper_Q1/main.tex`, `paper_Q1/supplement.tex`, the canonical
+result bundles under `artifacts/prm_results/`, and the independent numerical
+audit as the submission evidence. It does not credit historical exploratory
+results or any prospective DFT calculation.
 
-The manuscript has a defensible PRM route if it is presented as an audited
-evaluation of impurity-incorporation transfer and applicability domains rather
-than as the first defect graph network or a universal architecture advance.
-The dataset audit, paired factorial, immutable split contract, and
-held-out-calibration design are the strongest elements. The numerical
-comparison, uncertainty, and screening claims remain fail-closed until both
-downstream campaigns and all collectors finish.
+The review was performed after:
 
-The three highest risks are:
+- fold-specific validation selection replaced regime-wide descriptor-family
+  selection;
+- trivial screening references and paired model-minus-reference intervals were
+  added;
+- the UQ test was reclassified as an internal dedicated ensemble split rather
+  than an untouched outer holdout;
+- exact model, optimization, seed, and descriptor-search specifications were
+  added to the Supplemental Material.
 
-1. the principal transfer, UQ, and screening claims currently lack complete
-   result bundles;
-2. the neural baseline set is limited to periodic SchNet, so claims must stay
-   within split-aligned comparison rather than broad state-of-the-art
-   superiority;
-3. the scientific domain is neutral IMP2D adsorbates/interstitials, without
-   prospective DFT validation, charged defects, or arbitrary unseen
-   chemistries.
+## Judgment
 
-## Strengths
+No unresolved critical or major scientific defect remains under the manuscript's
+current claims. The scientific content is suitable to proceed as a
+*Physical Review Materials* Regular Article. Submission remains blocked by
+author-supplied metadata and archival-release actions, not by another
+non-DFT experiment.
 
-- The target formula, raw components, impurity identity, duplicate groups, and
-  split membership are explicitly audited.
-- The full paired factorial separates module evidence from sequential
-  test-driven ablation.
-- Architecture, descriptor family, and checkpoints are selected without test
-  labels.
-- Calibration and test partitions are distinct, with marginal-coverage limits
-  stated explicitly.
-- Screening metrics are tied to out-of-fold predictions and do not claim new
-  material discovery.
+The defensible claim is an audited, split-aligned IMP2D evaluation with a paired
+factorial, bounded chemical-transfer tests, internal uncertainty calibration,
+and retrospective screening decisions. The paper does not establish universal
+architecture superiority, prospective materials discovery, or performance on
+an external target-matched DFT set.
 
-## Key issues
+## Residual risks
 
-### R1: Canonical downstream evidence is incomplete
+### R1: Comparator breadth
 
-- Risk: critical until both 48-run queues complete and the collector verifies
-  every manifest, split, prediction, metric, and hash.
-- Route: finish E4--E7 in `paper_experiment_matrix.md`; never narrate partial
-  queue metrics.
-- Acceptance criterion: 48 DART and 48 SchNet runs complete with zero failures,
-  followed by complete comparison, UQ, materials, and paper-asset manifests.
+- Severity: moderate, disclosed.
+- Evidence: periodic SchNet, four learned descriptor families, a mean
+  predictor, and the full DART factorial are aligned to the same partitions.
+  They do not exhaust modern equivariant atomistic architectures.
+- Resolution: all superiority statements are restricted to the evaluated
+  comparators. DART--SchNet is explicitly an end-to-end recipe comparison.
+  The host-only mean-readout sensitivity is labeled post hoc.
+- Decision: no additional comparator is required for the present scoped PRM
+  claim. A modern equivariant comparator would strengthen impact but is not
+  needed to make the reported comparison valid.
 
-### R2: Baseline breadth limits the architecture claim
+### R2: UQ is internal
 
-- Risk: major if the paper claims general neural state of the art; moderate
-  under the current scoped claim.
-- Evidence: the aligned neural comparator is periodic SchNet; descriptor
-  families and the complete G/E/P factorial provide additional controls. DART
-  also uses fixed ct-UAE vectors and JARVIS initialization that SchNet does not.
-- Route: report paired split-aligned differences and explicitly call SchNet and
-  descriptors strong comparators rather than an exhaustive architecture
-  benchmark. Treat DART--SchNet as an end-to-end recipe comparison rather than
-  a pure backbone effect. Do not compare against literature point estimates as
-  if they used the same audited rows and partitions.
+- Severity: moderate, corrected.
+- Evidence: the 1,023 test rows are excluded from ensemble fitting, checkpoint
+  selection, and calibration, but many occur in other roles during earlier
+  architecture development on the same IMP2D corpus.
+- Resolution: the abstract, Methods, Results, Discussion, Conclusion, table
+  caption, and review records now call this an internal dedicated ensemble
+  split and exclude an outer-holdout guarantee.
+- Decision: acceptable as an internal calibration and selective-prediction
+  analysis; not evidence of chemically shifted calibration.
 
-### R3: Novelty can be overstated easily
+### R3: Screening evidence is retrospective
 
-- Risk: major if framed as the first defect-aware GNN or first IMP2D machine
-  learning study.
-- Evidence: Kesorn et al. and El Alouani et al. already model IMP2D; Kazeev et
-  al. model a distinct 2D defect database; several graph models already predict
-  bulk defect energetics.
-- Route: lead with the combined audit, paired factorial, transfer partitions,
-  held-out UQ, and decision-level screening analysis. The verified boundary is
-  recorded in `literature_positioning.md`.
+- Severity: moderate, disclosed.
+- Evidence: pair-out-of-fold predictions support incorporation-class, exact
+  site, top-two, and regret metrics within IMP2D. Empirical-majority and
+  analytic candidate-uniform references now quantify the trivial decision
+  floor, with pair-cluster bootstrap intervals for model gains.
+- Resolution: no synthesis, thermodynamic prevalence, or new-material claim is
+  made. External DFT validation remains outside scope.
+- Decision: sufficient for a materials-facing utility analysis, not for a
+  discovery claim.
 
-### R4: Submission metadata remains incomplete
+### R4: Dataset and transfer boundary
 
-- Risk: blocking only at final packaging.
-- Route: obtain the full author list and affiliations; replace the provisional
-  repository sentence with a reference to the final tagged release and any
-  author-supplied archival DOI; add the contact-author email required by APS.
-  Do not invent any of these fields.
+- Severity: moderate, disclosed.
+- Evidence: the protocol removes four non-reconstructable targets, 349 rows
+  without a permutation-invariant impurity identity, and 64 redundant rows.
+  JARVIS pretraining overlaps some host formulas and all impurity elements.
+- Resolution: grouped tests mean absence from IMP2D target supervision, not
+  element- or formula-disjoint pretraining. Claims are limited to 10,224
+  neutral adsorbate/interstitial structures.
+- Decision: the exclusions reduce coverage but prevent a more serious identity
+  and leakage problem.
 
-### R5: Grouped transfer is not disjoint from source-task chemistry
+### R5: Submission metadata
 
-- Risk: major if host- or impurity-held-out results are described as completely
-  unseen chemistry.
-- Evidence: the clean overlap audit at commit `3a98513` finds reduced-formula
-  matches for 26 of 44 IMP2D host labels (25 of 42 unique reduced formulas)
-  among 69 JARVIS records; all 65 IMP2D impurity elements occur in the source
-  corpus.
-- Route: define grouped holdout as absence from IMP2D target supervision,
-  distinguish formula overlap from structural identity, and retain the
-  end-to-end DART--SchNet comparison boundary.
+- Severity: administrative blocker.
+- Missing verified inputs: complete author order and affiliations,
+  corresponding-author email, funder wording, rights-holder-approved license,
+  and a tagged archival release with persistent identifier.
+- Decision: do not infer these fields from older drafts. Replace the explicit
+  placeholders only after author confirmation.
 
-## Priority revision plan
+## Verification
 
-1. Complete and collect the two downstream campaigns without exposing partial
-   test metrics.
-2. Run comparison, UQ, and materials analyses; generate the fail-closed result
-   assets.
-3. Rewrite the abstract last, using only canonical effect intervals,
-   transfer/comparator results, calibration, and screening metrics.
-4. Cross-check every manuscript number against machine-readable files and
-   inspect every rendered page.
-5. Run a final independent review, resolve author/release metadata, and create
-   the tagged GitHub release.
+- Remote scientific environment: 179 tests passed; two PyTorch JIT deprecation
+  warnings only.
+- Independent paper audit: 1,331 checks passed with zero failures.
+- Paper assets: 23 hash-bound generated outputs.
+- LaTeX: main manuscript and Supplemental Material compile without undefined
+  references, missing citations, overfull boxes, or fatal errors.
+- Visual QA: all rendered pages were checked for clipping, overlap, unreadable
+  text, broken glyphs, and figure/table legibility.
 
-## Novelty and related-work matrix
+## PRM fit
 
-| Topic | This paper | Closest prior work | Residual value |
-|---|---|---|---|
-| IMP2D modeling | audited graph and descriptor evaluation | Kesorn 2024; El Alouani 2026 | duplicate/identity control plus aligned chemical-transfer partitions |
-| 2D defect representation | explicit impurity node and periodic graph | Kazeev 2023 on 2DMD | distinct database, target, and split question |
-| Defect graph prediction | neutral incorporation formation energy | Witman 2023; Rahman 2024; Fang 2025; Kiyohara 2025 | IMP2D-specific audit, factorial, transfer, UQ, and screening protocol |
-| Dataset redundancy | coordinate and invariant-distance duplicate groups | MD-HIT 2024 | concrete integration into the IMP2D split contract |
+The paper fits the PRM Regular Article route: APS lists no fixed length limit
+for that article type and asks authors to provide broad materials context.
+Section M3-A, “Development of new methods for materials,” is the most direct
+fit. PRM is a hybrid journal, so the requested subscription-funded,
+non-open-access route can be selected during submission.
 
-## Current judgment
+APS also requires publicly shared data and software to be cited in the
+reference list and named in the Data Availability Statement. The manuscript's
+provisional repository sentence is scientifically adequate for review, but the
+final tagged release, citation, version, and persistent identifier remain
+mandatory packaging actions.
 
-Continue. There is no publishability stop-loss at the protocol stage, but the
-paper cannot be judged submission-ready until the pending numerical evidence
-passes collection and the final claims are audited against it.
+## Final decision
+
+Proceed to PRM submission after the administrative substitutions and archival
+release. No further non-DFT scientific experiment is required under the claims
+currently written. Do not broaden the claims unless a new aligned comparator,
+chemically shifted UQ evaluation, or target-matched external validation set is
+added.

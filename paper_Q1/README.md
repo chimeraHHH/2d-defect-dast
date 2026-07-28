@@ -6,8 +6,10 @@ The paper uses the APS `prmaterials` REVTeX profile.
 Numerical Results, Discussion, and Conclusion content is exposed only when
 `generated/results_ready.tex` exists. That gate is created by the canonical
 result pipeline after all required non-DFT runs and provenance checks pass.
-Until then, placeholder text is intentional and historical values must not be
-inserted manually.
+The current gate is present and the populated scientific content has passed
+the independent numerical and final skeptical reviews. If the gate is absent,
+placeholder text is intentional and historical values must not be inserted
+manually.
 
 Canonical inputs:
 
@@ -38,3 +40,14 @@ Build from this directory with:
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 latexmk -pdf -interaction=nonstopmode -halt-on-error supplement.tex
 ```
+
+Tectonic is an equivalent fallback when `latexmk` is unavailable:
+
+```bash
+tectonic --keep-logs --keep-intermediates main.tex
+tectonic --keep-logs --keep-intermediates supplement.tex
+```
+
+The remaining placeholders in `main.tex` are administrative: verified author
+order/affiliations, corresponding-author contact, funder wording, and the final
+tagged archival release identifier.

@@ -2,10 +2,10 @@
 
 ## Current state
 
-- Draft: result-gated PRM LaTeX manuscript.
+- Draft: scientific-content-complete PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: final independent manuscript review, verified author/contact/
-  funder metadata, rights-holder-approved licensing, and final release metadata.
+- Blocking items: verified author/contact/funder metadata,
+  rights-holder-approved licensing, and final release metadata.
 
 ## Issue log
 
@@ -34,7 +34,7 @@
 - Severity: major.
 - Fix type: literature positioning and claim downgrade.
 - Change: introduction and review materials position the contribution as the
-  audited IMP2D protocol, paired factorial, chemical transfer, held-out UQ, and
+  audited IMP2D protocol, paired factorial, chemical transfer, internal UQ, and
   screening analysis; first-of-kind graph-model claims are excluded.
 - Status: complete.
 - Blocks finalization: no.
@@ -137,14 +137,16 @@
 - Status: complete before exposure of pooled metrics.
 - Blocks finalization: no.
 
-### REV-013: Held-out uncertainty evidence
+### REV-013: Dedicated uncertainty evidence
 
 - Severity: critical evidence gate.
 - Fix type: complete-run collection and calibration analysis.
 - Change: collected all five promoted DART ensemble members, split the
   dedicated calibration partition label-independently into variance-scaling
   and conformal subsets, and evaluated all uncertainty metrics only on the
-  untouched 1,023-structure test partition. The complete archive records
+  dedicated 1,023-structure test partition. These rows were excluded from
+  ensemble fitting, checkpoint selection, and calibration, but not from the
+  earlier architecture-development corpus. The complete archive records
   member, split, prediction, checkpoint, and collector hashes.
 - Evidence: `artifacts/prm_results/uq/`.
 - Status: complete before paper asset generation.
@@ -173,7 +175,7 @@
 - Fix type: fail-closed asset regeneration, compilation, and visual QA.
 - Change: generated schema-v2 assets with 23 hash-bound outputs, populated the
   main manuscript, added a separate Supplemental Material file, and compiled
-  visually inspected 12-page and one-page PDFs.
+  visually inspected main and Supplemental Material PDFs.
 - Evidence: `artifacts/prm_results/paper/result_assets.json`,
   `paper_Q1/main.pdf`, and `paper_Q1/supplement.pdf`.
 - Status: complete; no undefined references, content-affecting warnings,
@@ -191,5 +193,63 @@
   verifies all asset hashes, result macros, and generated table rows.
 - Evidence: `scripts/prm_verify_paper_numbers.py` and
   `artifacts/prm_results/paper/numeric_audit.json`.
-- Status: complete; 1,265 checks pass with zero failures.
+- Status: complete; 1,331 checks pass with zero failures.
 - Blocks finalization: no.
+
+### REV-017: Descriptor-family selection leakage
+
+- Severity: critical comparison-design issue.
+- Fix type: split-local model selection and archive recollection.
+- Change: replaced one descriptor family selected from mean validation MAE
+  across all folds with independent family selection inside each split using
+  only that split's validation rows. The pooled descriptor prediction now
+  concatenates those foldwise selected test predictions; the mean predictor is
+  retained only as a separate baseline.
+- Evidence: `artifacts/prm_results/descriptors/selection.json` and
+  `artifacts/prm_results/comparison/descriptor_selection.json`.
+- Result: LightGBM is selected in all random and pair folds and the chemistry
+  block; host and impurity folds each select histogram gradient boosting four
+  times and LightGBM once.
+- Status: complete and independently audited.
+- Blocks finalization: no.
+
+### REV-018: Screening reference baselines
+
+- Severity: major interpretation issue.
+- Fix type: decision-level reference construction.
+- Change: added an empirical majority-class reference for incorporation class
+  and analytic candidate-uniform references for global exact-site,
+  within-class exact-site, and top-two decisions. Added row-aligned
+  model-minus-reference gains with host--impurity-pair cluster-bootstrap
+  intervals.
+- Evidence: `artifacts/prm_results/materials/summary.json` and
+  `paper_Q1/generated/tab_screening.tex`.
+- Status: complete and independently audited.
+- Blocks finalization: no.
+
+### REV-019: UQ development-scope correction
+
+- Severity: major claim-boundary issue.
+- Fix type: manuscript-wide wording correction.
+- Change: removed every claim that the dedicated UQ test is untouched by the
+  full development process. The paper now distinguishes exclusion from
+  ensemble fitting/checkpoint selection/calibration from reuse of the same
+  canonical corpus during earlier architecture development.
+- Status: complete in the abstract, Methods, Results, Discussion, Conclusion,
+  generated table caption, and review records.
+- Blocks finalization: no.
+
+### REV-020: Final skeptical review and reproducibility table
+
+- Severity: final scientific-content gate.
+- Fix type: independent review, reproducibility disclosure, compilation, and
+  visual QA.
+- Change: completed the post-result skeptical review, added exact DART,
+  SchNet, optimization, seed, and descriptor-search specifications to the
+  Supplemental Material, reran the complete test and numerical audit gates,
+  and inspected the rebuilt PDFs.
+- Evidence: `paper_Q1/review/review.md`, `paper_Q1/supplement.tex`,
+  `paper_Q1/main.pdf`, and `paper_Q1/supplement.pdf`.
+- Status: complete. Only author-supplied metadata and archival-release actions
+  remain.
+- Blocks finalization: no scientific blocker; administrative blockers remain.

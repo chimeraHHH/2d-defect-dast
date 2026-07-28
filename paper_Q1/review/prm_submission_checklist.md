@@ -24,6 +24,10 @@ Verified against the APS author pages on 2026-07-28:
 - [x] Inspect all figure labels for readability without relying on color alone.
 - [x] Supply Supplemental Material as a separate file and cite it from the main
       manuscript using the APS publisher-link placeholder.
+- [x] Include exact model, optimization, seed, and descriptor-search
+      specifications in the Supplemental Material.
+- [x] Complete the post-result skeptical review; no additional non-DFT
+      scientific experiment is required under the current claim boundary.
 
 ## Data and software
 
@@ -55,8 +59,8 @@ Verified against the APS author pages on 2026-07-28:
 ## Submission files
 
 - [x] Current scientific-content manuscript PDF with no undefined references or
-      content-affecting warnings; final byline and release metadata remain
-      administrative substitutions.
+      content-affecting warnings, overfull boxes, clipping, or overlap; final
+      byline and release metadata remain administrative substitutions.
 - [x] Complete LaTeX source, bibliography, Supplemental Material, and all
       figure files.
 - [ ] Cover letter summarizing context, key findings, PRM fit, and relevant

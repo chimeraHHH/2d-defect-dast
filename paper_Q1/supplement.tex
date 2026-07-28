@@ -1,7 +1,9 @@
 \documentclass[aps,prmaterials,onecolumn,superscriptaddress,floatfix]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
+\usepackage{array}
 \usepackage{booktabs}
+\usepackage{float}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,
             linkcolor=blue!60!black,
@@ -23,6 +25,76 @@ materials''}
 
 \maketitle
 
+\section{Reproducibility specification}
+
+Table~\ref{tab:reproducibility} records the fixed model and optimization
+settings used in the formal comparison.  The resolved configuration for every
+run, including split and seed, is archived under \path{configs/prm/}; the
+corresponding run manifests bind those configurations to checkpoints,
+predictions, environments, and output hashes.
+
+\begin{table}[H]
+\caption{Fixed settings for the promoted DART model and the prespecified
+periodic SchNet comparator.  Settings not shown as different were shared.}
+\label{tab:reproducibility}
+\centering
+\small
+\begin{tabular}{
+  >{\raggedright\arraybackslash}p{0.19\textwidth}
+  >{\raggedright\arraybackslash}p{0.36\textwidth}
+  >{\raggedright\arraybackslash}p{0.36\textwidth}}
+\toprule
+Setting & DART (\texttt{g111}) & Periodic SchNet \\
+\midrule
+Atomic input &
+Fixed 128-dimensional ct-UAE vector, nine tabulated elemental attributes, and
+a learned unique-impurity flag &
+Learned atomic-number embedding \\
+Interaction stack &
+Three 5-\AA{} local layers with 32 radial and 32 angular functions, followed
+by two four-head geometric Transformer blocks with 12-\AA{} radial bias &
+Six 5-\AA{} interaction blocks with 50 Gaussian functions \\
+Hidden width and readout &
+128 channels; gated fusion of an atom-attention sum and channelwise maximum &
+128 channels and filters; atomwise additive scalar readout \\
+Trainable parameters &
+820,558 &
+455,937 \\
+Optimization &
+AdamW, batch size 64 &
+AdamW, batch size 32 \\
+Shared schedule &
+\multicolumn{2}{p{0.74\textwidth}}{150 epochs; MAE objective; learning rate
+$5\times10^{-5}$ to $5\times10^{-4}$ over a ten-epoch linear warmup, then
+cosine decay to $10^{-6}$; weight decay $10^{-4}$; gradient clipping at 5.} \\
+Shared sampling and regularization &
+\multicolumn{2}{p{0.74\textwidth}}{Training-target standardization;
+host-balanced sampling of 200 structures per host per epoch; 0.03-eV Gaussian
+target noise; no coordinate or strain augmentation.  DART additionally uses
+0.1 dropout.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Factorial assignment seeds were 42--46 with paired model seeds 142--146.
+Transfer runs used DART seeds 242--244 and SchNet seeds 342--344, with one
+prespecified seed per fold for random and host--impurity-pair cross-validation
+and three seeds per split for host, impurity, and chemistry-block evaluation.
+The dedicated DART uncertainty ensemble used seeds 442--446.
+
+The descriptor search was also fixed before test aggregation.  Ridge used
+$\alpha\in\{0.01,0.1,1,10,100\}$.  Random forests used 400 trees with
+\texttt{max\_features} in $\{0.5,1.0\}$ and
+\texttt{min\_samples\_leaf} in $\{1,2\}$.  Histogram gradient boosting used
+400 iterations, learning rate 0.05, leaf counts in $\{31,63\}$, and
+$L_2$ regularization in $\{0,1\}$.  LightGBM used 600 trees, learning rate
+0.05, leaf counts in $\{31,63\}$, child counts in $\{20,50\}$,
+$L_2$ regularization 1, and row/column subsampling fractions 0.9.  A
+hyperparameter setting and then a learned family were selected independently
+inside each split by validation MAE; the training-target mean predictor was
+reported separately and never entered family selection.
+
+\clearpage
 \section{Post-hoc SchNet graph-readout sensitivity}
 
 The prespecified periodic SchNet comparator follows the original

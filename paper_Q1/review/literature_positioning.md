@@ -1,6 +1,6 @@
 # Literature positioning audit
 
-Audit date: 2026-07-28
+Audit date: 2026-07-29
 
 ## DOI integrity
 
@@ -48,8 +48,9 @@ the combination of:
 2. a paired repeated full-factorial test of three defect-aware modules;
 3. aligned graph and descriptor baselines across random, host, impurity,
    host--impurity-pair, and predefined block transfer;
-4. held-out uncertainty calibration, selective prediction, and
-   materials-facing screening-regret analysis.
+4. internal dedicated-split uncertainty calibration, selective prediction,
+   and materials-facing screening-regret analysis with trivial decision
+   references.
 
 Claims remain limited to the audited IMP2D evidence. No external DFT
 calculation is represented as validation.

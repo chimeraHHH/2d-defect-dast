@@ -25,16 +25,19 @@
   every plotted value is reproduced from canonical prediction files.
 - Placement: transfer table, applicability table, and transfer figure.
 
-## EXP-003: Generate held-out uncertainty evidence
+## EXP-003: Generate internal uncertainty evidence
 
 - Status: complete in `artifacts/prm_results/uq/`.
 - Matrix row: E5.
 - Route: existing-result analysis after EXP-001.
 - Tier: main required.
 - Minimum task: fit variance scale/floor and conformal quantiles on their
-  assigned calibration halves, then evaluate untouched test predictions.
+  assigned calibration halves, then evaluate the dedicated test predictions
+  excluded from ensemble fitting, checkpoint selection, and calibration.
 - Acceptance: coverage, width, NLL, CRPS, uncertainty--error rank correlation,
-  AURC, and excess AURC all pass finite-value and provenance checks.
+  AURC, and excess AURC all pass finite-value and provenance checks. The result
+  is reported as internal because earlier architecture development used other
+  partitions of the same canonical corpus.
 - Placement: uncertainty table and figure.
 
 ## EXP-004: Generate materials-facing decision analysis
@@ -44,9 +47,11 @@
 - Route: existing-result analysis after EXP-002.
 - Tier: main required.
 - Minimum task: compute incorporation-class preference, exact/top-two site
-  recovery, and regret from pair-held-out out-of-fold predictions.
+  recovery, regret, trivial reference accuracies, and
+  model-minus-reference gains from pair-held-out out-of-fold predictions.
 - Acceptance: eligibility counts, tie handling, cluster-bootstrap intervals,
-  and prediction coverage agree with the frozen contract.
+  prediction coverage, and analytic candidate-uniform references agree with
+  the frozen contract.
 - Placement: screening table and figure.
 
 ## EXP-005: Bound the SchNet readout interpretation
