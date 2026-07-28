@@ -4,7 +4,7 @@
 
 - Draft: result-gated PRM LaTeX manuscript.
 - Follow-up policy: execute all required non-DFT work.
-- Blocking items: E5 and E7 in `paper_experiment_matrix.md`, full author and
+- Blocking items: E7 in `paper_experiment_matrix.md`, full author and
   contact metadata, and final release metadata.
 
 ## Issue log
@@ -134,3 +134,16 @@
   complete comparison collector.
 - Status: complete before exposure of pooled metrics.
 - Blocks finalization: no.
+
+### REV-013: Held-out uncertainty evidence
+
+- Severity: critical evidence gate.
+- Fix type: complete-run collection and calibration analysis.
+- Change: collected all five promoted DART ensemble members, split the
+  dedicated calibration partition label-independently into variance-scaling
+  and conformal subsets, and evaluated all uncertainty metrics only on the
+  untouched 1,023-structure test partition. The complete archive records
+  member, split, prediction, checkpoint, and collector hashes.
+- Evidence: `artifacts/prm_results/uq/`.
+- Status: complete before paper asset generation.
+- Blocks finalization: through E7 only.

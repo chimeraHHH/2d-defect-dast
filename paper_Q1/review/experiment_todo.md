@@ -2,8 +2,8 @@
 
 ## EXP-001: Complete aligned neural campaigns
 
-- Status: in progress. The comparison inputs are complete; the five-member UQ
-  campaign is still running.
+- Status: complete. The formal queues contain exactly 48 complete DART runs and
+  48 complete SchNet runs, including all five promoted UQ members.
 - Matrix rows: E4 and E5.
 - Route: existing frozen DART and SchNet campaigns.
 - Tier: main required.
@@ -27,6 +27,7 @@
 
 ## EXP-003: Generate held-out uncertainty evidence
 
+- Status: complete in `artifacts/prm_results/uq/`.
 - Matrix row: E5.
 - Route: existing-result analysis after EXP-001.
 - Tier: main required.

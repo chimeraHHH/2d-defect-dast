@@ -39,23 +39,21 @@
 - [x] Hash the actual descriptor input file and all 27 metrics/prediction pairs,
       encode undefined constant-baseline correlations as strict-JSON `null`, and
       mirror the verified 55-file archive to the formal result store.
-- [ ] Run SchNet comparator under the same split contract. (Implementation,
-      configurations, periodic-edge audit, and GPU smoke run complete; the
-      formal 48-run `schnet-v1` queue is active from clean commit `6c40137`.)
+- [x] Run SchNet comparator under the same split contract. (All 48 formal
+      `schnet-v1` runs completed from clean commit `6c40137` and passed the
+      aligned comparison collector.)
 - [x] Select the final DART configuration from validation/CV evidence only.
       (`g111`; test metrics were not used by the ordering rule.)
-- [ ] Run random out-of-fold and host--dopant-pair cross-validation.
-      (Formal `dart-g111-v1` queue active.)
-- [ ] Run host-group cross-validation. (Formal queue active.)
-- [ ] Run dopant-group cross-validation. (Formal queue active.)
-- [ ] Run predefined host-by-dopant chemistry block holdout.
-      (Formal queue active.)
-- [ ] Rebuild UQ with a distinct held-out calibration partition. (The collector
-      is fail-closed for non-finite inputs, undefined rank statistics, and
-      non-standard JSON; five formal members are active in `dart-g111-v1`.)
-- [ ] Complete mechanism-preference, error and applicability-domain analyses.
-      (Eligibility and energy-tie contracts are implemented and tested; formal
-      out-of-fold predictions await the selected architecture.)
+- [x] Run random out-of-fold and host--dopant-pair cross-validation.
+- [x] Run host-group cross-validation.
+- [x] Run dopant-group cross-validation.
+- [x] Run predefined host-by-dopant chemistry block holdout.
+- [x] Rebuild UQ with a distinct held-out calibration partition. (All five
+      members and the complete held-out analysis are archived under
+      `artifacts/prm_results/uq/`.)
+- [x] Complete mechanism-preference, error and applicability-domain analyses.
+      (The pair-OOF screening and heterogeneity evidence is archived under
+      `artifacts/prm_results/materials/`.)
 
 ## Paper
 

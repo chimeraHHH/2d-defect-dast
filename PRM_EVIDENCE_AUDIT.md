@@ -6,7 +6,7 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 ## Current state
 
 - State class: `protocol_frozen`, `factorial_complete`,
-  `downstream_campaigns_active`, `paper_result_gated`.
+  `downstream_campaigns_complete`, `paper_result_gated`.
 - Git anchor: GitHub branch `prm-revision`; every formal campaign records its
   own clean commit rather than inheriting the moving branch tip.
 - Writing anchor: `paper_Q1/`; the Q1 source has been rewritten as the active
@@ -21,7 +21,7 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
   `7a6593a7eaaf991fd9c18a15653c3d888b060c7e`, queue
   `factorial-v4-indexed`, and clean collector commit
   `865e90a695e3641e21bc9f2c98fc05c80723abcf`.
-- Active downstream anchor: clean commit
+- Completed downstream anchor: clean commit
   `6c401374baa9ac22b5fa4353d467366ac7cc222f`, queues
   `dart-g111-v1` and `schnet-v1`, with disjoint GPU sets and GPU 2 excluded.
 
@@ -34,7 +34,7 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 | Corrected ct-UAE and JARVIS initialization assets | authoritative when hash-matched | DART initialization | exact hashes and copied/seeded tensors are checked in every run |
 | Protocol-v2 descriptor archive | authoritative | classical baselines | 27 formal splits collected with validation-only model selection |
 | Corrected paired factorial | authoritative | architecture selection | all 40 runs passed collector validation; `g111` was selected by mean validation MAE only |
-| Promoted DART and periodic SchNet campaigns | pending collection | transfer, comparison, and UQ | clean 48-run queues are active; partial metrics are inadmissible |
+| Promoted DART and periodic SchNet campaigns | authoritative | transfer, comparison, and UQ | both clean 48-run queues completed; collectors validated and archived the complete comparison and five-member UQ bundles |
 | V2 seeds 42-45 | usable with verification | development comparator | fixed targets and archived checkpoints, but old protocol was repeatedly inspected |
 | V4 MoE single run | usable with verification | development comparator | only one seed; no significant advantage over V2 |
 | Existing 2^3 component runs | reference only | none until rerun | incomplete seed coverage and historical baseline was confounded |
@@ -65,8 +65,7 @@ status is maintained in `PLAN.md` and `CHECKLIST.md`.
 
 ## Next decision scope
 
-Allow both downstream queues to complete without failures, then collect all 96
-runs from a separate clean checkout.  Generate comparison, uncertainty, and
-materials analyses only after complete-run validation.  The final narrative
-will be chosen from the canonical intervals and applicability-domain evidence,
-not from partial queue metrics.
+Generate the fail-closed result assets from the complete comparison, uncertainty,
+and materials bundles.  The final narrative must use the canonical intervals
+and applicability-domain evidence, preserve the end-to-end comparator boundary,
+and exclude all stale or prospective-DFT result routes listed above.
