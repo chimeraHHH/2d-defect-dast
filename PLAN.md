@@ -49,6 +49,46 @@ uncertainty identifies a useful selective-prediction domain.
 6. Generate paper-facing tables and figures from canonical result bundles.
 7. Rewrite Q1 as the PRM manuscript, compile it, and perform a skeptical audit.
 
+## Controlled execution sequence
+
+All formal commands run from a clean, commit-pinned worktree with
+`/storage/ssd/metaiot_guest/yiminghua/prm_env/bin/python`.  GPU 2 is excluded
+from every queue.
+
+1. Allow `factorial-v4-indexed` to reach 40 complete runs with no failed or
+   stopped jobs.  Validate every run against its versioned YAML, 150-epoch
+   history, split hash, asset hashes, prediction-derived metrics, and declared
+   output hashes.
+2. From a separate clean collector worktree, run
+   `scripts.prm_collect_factorial` against
+   `/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2`.  Commit the archived
+   numerical evidence, factorial contrasts, and validation-only
+   `selection.json` before generating any selected-model configuration.
+3. Run `scripts.prm_promote_selected` from the committed selection.  It must
+   produce 43 transfer configurations and five UQ-member configurations for
+   exactly one `g[01][01][01]` variant.  Commit and push these controlled YAML
+   files before training.
+4. Run bounded GPU smoke jobs for the promoted DART and periodic SchNet paths.
+   A smoke result is operational evidence only; it must not enter a paper
+   metric.  Verify configuration identity, split identity, complete declared
+   outputs, checkpoint readability, and DART calibration output where
+   applicable.
+5. Launch the promoted-DART and SchNet campaigns from two clean, frozen
+   worktrees.  Assign disjoint GPU sets using complementary
+   `--exclude-gpus` lists, keep GPU 2 excluded from both, and do not modify
+   either worktree while its scheduler is active.  The result directories and
+   scheduler queue IDs must also be disjoint.
+6. Admit neural results only after `scripts.prm_collect_results` verifies the
+   expected 48 SchNet runs, five selected factorial repeats, and 43 promoted
+   DART transfer runs.  Descriptor families and the DART architecture remain
+   validation-selected; no test metric is used for promotion.
+7. Run `scripts.prm_uq_analysis` and `scripts.prm_materials_analysis` from a
+   clean collector commit.  Then run `scripts.prm_make_result_assets`, which
+   writes the result manifest before creating the manuscript readiness marker.
+8. Rebuild the REVTeX manuscript, inspect every rendered page, cross-check all
+   prose numbers against machine-readable bundles, and perform a final
+   review-style audit before tagging an archival release.
+
 ## Go/no-go rules
 
 - Architecture superiority is claimed only when the paired 95% interval excludes
