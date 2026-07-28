@@ -130,6 +130,10 @@ GPU 2 excluded and no failed jobs. A separate clean collector at `865e90a`
 validated all 40 runs, archived the evidence, and selected `g111` using
 validation MAE only. The committed selection then generated 43 transfer and
 five UQ-member `g111` configurations with unique output directories and
-content hashes. Transfer, SchNet, ensemble UQ, materials analysis, and paper
-result generation remain gated on the two GPU smoke checks and clean,
-commit-pinned downstream launches.
+content hashes. Two-epoch GPU smoke runs at commit `6fdf20d` then validated the
+promoted DART UQ path, including calibration predictions, and the periodic
+SchNet path. SchNet's first smoke-only YAML retained an invalid ten-epoch
+warmup after reducing total training to two epochs and failed before training;
+a separate one-epoch-warmup smoke configuration passed without changing any
+formal 150-epoch YAML. Transfer, SchNet, ensemble UQ, materials analysis, and
+paper result generation now await clean, commit-pinned downstream launches.
