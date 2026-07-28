@@ -43,6 +43,9 @@ Verified against the APS author pages on 2026-07-28:
 
 - [ ] Replace `% TODO: add other authors` with the verified author order,
       affiliations, and contributions.
+- [ ] Resolve the candidate metadata present only in the older PeriDefT draft
+      (`Yiming Hua, Leyan Wu, Jiaqi Bi, Sheng Chang`) with all authors before
+      transferring any name or order into this manuscript.
 - [ ] Add the post-publication contact author and verified email using an APS
       byline footnote.
 - [ ] Verify funder name and award wording with the authors.
