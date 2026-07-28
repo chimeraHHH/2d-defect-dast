@@ -179,3 +179,17 @@
 - Status: complete; no undefined references, content-affecting warnings,
   clipping, overlap, or unreadable result elements remain.
 - Blocks finalization: no.
+
+### REV-016: Independent numerical audit
+
+- Severity: critical evidence gate.
+- Fix type: independent prediction-level recomputation and manuscript contract
+  verification.
+- Change: added a standalone audit that reaggregates archived DART, SchNet, and
+  descriptor predictions; reproduces paired and clustered bootstrap results,
+  factorial summaries, UQ, materials screening, and readout sensitivity; and
+  verifies all asset hashes, result macros, and generated table rows.
+- Evidence: `scripts/prm_verify_paper_numbers.py` and
+  `artifacts/prm_results/paper/numeric_audit.json`.
+- Status: complete; 1,265 checks pass with zero failures.
+- Blocks finalization: no.

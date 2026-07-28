@@ -140,7 +140,10 @@ remains the main comparator.
 
 Fail-closed asset generation now validates 23 paper outputs, and the populated
 main manuscript and separate Supplemental Material compile to visually checked
-12-page and one-page PDFs. The remaining scientific gates are an independent
-numerical cross-check and skeptical manuscript review. Administrative release
+12-page and one-page PDFs. An independent audit directly reaggregates archived
+predictions, reproduces all paper-facing bootstrap analyses, verifies every
+LaTeX macro and generated table row, and passes 1,265 checks with no failures;
+its report is `artifacts/prm_results/paper/numeric_audit.json`. The remaining
+scientific gate is the skeptical manuscript review. Administrative release
 work remains blocked on verified author/contact/funder metadata and a
 rights-holder-approved code/data license.

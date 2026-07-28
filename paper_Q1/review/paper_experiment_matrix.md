@@ -26,6 +26,7 @@ Status date: 2026-07-29
 | C6: the SchNet host-held-out result is interpreted at the complete-recipe rather than backbone-only level | E4, E9 | asset-backed and written; final independent review pending |
 
 C3--C6 have the hash-validated E7 schema-v2 readiness marker and are present in
-the compiled manuscript package. All claims remain subject to the final
-independent numerical and prose review gates; author and archival metadata are
-separate administrative blockers.
+the compiled manuscript package. The independent numerical audit passes 1,265
+checks with zero failures. All claims remain subject to the final skeptical
+prose review gate; author and archival metadata are separate administrative
+blockers.

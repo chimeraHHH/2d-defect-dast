@@ -23,6 +23,15 @@ result manifest. Historical exploratory figures and their hard-coded
 generators remain available through Git history, not in the active submission
 source.
 
+Verify the paper-facing numbers and asset hashes from the repository root:
+
+```bash
+python3 scripts/prm_verify_paper_numbers.py
+```
+
+The deterministic report is
+`../artifacts/prm_results/paper/numeric_audit.json`.
+
 Build from this directory with:
 
 ```bash

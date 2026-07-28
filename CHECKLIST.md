@@ -83,5 +83,8 @@
 - [x] Compile and visually inspect the populated 12-page main PDF and one-page
       Supplemental Material; no undefined references, content-affecting
       warnings, clipping, or overlap remain.
-- [ ] Cross-check all numerical claims against result files.
+- [x] Independently cross-check all numerical claims against archived
+      predictions and result files. (`scripts/prm_verify_paper_numbers.py`
+      passes 1,265 checks with zero failures; the deterministic report is
+      `artifacts/prm_results/paper/numeric_audit.json`.)
 - [ ] Complete independent review and final revision.
