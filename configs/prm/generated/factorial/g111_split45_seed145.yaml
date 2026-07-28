@@ -4,6 +4,7 @@ output_dir: factorial/g111/split45_seed145
 split_path: artifacts/prm_protocol_v2/splits/id_repeat_s45.json
 seed: 145
 batch_size: 64
+num_workers: 0
 epochs: 150
 loss: mae
 grad_clip: 5.0

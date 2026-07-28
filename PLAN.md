@@ -80,7 +80,11 @@ all 133 tests in an isolated remote checkout. UQ and materials collectors reject
 non-finite inputs, undefined rank statistics, non-standard JSON numbers, and
 trivial or tied decision sets where the corresponding accuracy is not defined.
 The stale protocol-v1 queue was stopped before it launched any jobs. The
-systemd-managed `factorial-v2` queue waits for the declared GPU idle thresholds;
-the latest audit found all 40 paired runs pending, no attempts consumed, and no
-failures. After completion, the route is validation-only promotion, transfer,
-SchNet, ensemble UQ, and paper result generation.
+systemd-managed `factorial-v2` queue subsequently attempted every paired run
+twice, but all 40 jobs failed before completing an epoch because DataLoader
+worker IPC exhausted process file descriptors. It produced no metrics or model
+checkpoints, so it contributes no scientific evidence. Formal DART and SchNet
+configs now freeze `num_workers: 0`; the failed tree will be archived and a
+clean GPU smoke run must pass before launching a new queue. After completion,
+the route is validation-only promotion, transfer, SchNet, ensemble UQ, and
+paper result generation.

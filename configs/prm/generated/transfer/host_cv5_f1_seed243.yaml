@@ -4,6 +4,7 @@ output_dir: transfer/host_cv5_f1/seed243
 split_path: artifacts/prm_protocol_v2/splits/host_cv5_f1.json
 seed: 243
 batch_size: 64
+num_workers: 0
 epochs: 150
 loss: mae
 grad_clip: 5.0

@@ -4,6 +4,7 @@ output_dir: transfer/dopant_cv5_f4/seed242
 split_path: artifacts/prm_protocol_v2/splits/dopant_cv5_f4.json
 seed: 242
 batch_size: 64
+num_workers: 0
 epochs: 150
 loss: mae
 grad_clip: 5.0

@@ -4,6 +4,7 @@ output_dir: factorial/g101/split43_seed143
 split_path: artifacts/prm_protocol_v2/splits/id_repeat_s43.json
 seed: 143
 batch_size: 64
+num_workers: 0
 epochs: 150
 loss: mae
 grad_clip: 5.0

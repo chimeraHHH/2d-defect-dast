@@ -5,6 +5,9 @@ output_dir: factorial/placeholder
 split_path: artifacts/prm_protocol_v2/splits/id_repeat_s42.json
 seed: 142
 batch_size: 64
+# Tensor-rich graph batches exhaust process file descriptors under concurrent
+# GPU runs when DataLoader multiprocessing is enabled.
+num_workers: 0
 epochs: 150
 loss: mae
 grad_clip: 5.0

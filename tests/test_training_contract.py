@@ -41,6 +41,7 @@ def _load(path: Path) -> dict:
 
 def _assert_canonical_dart(config: dict) -> None:
     assert config["online_aug"] is False
+    assert config["num_workers"] == 0
     assert FORBIDDEN_DART_KEYS.isdisjoint(config)
     assert config["asset_integrity_required"] is True
     assert config["asset_sha256"] == EXPECTED_ASSET_HASHES
@@ -48,6 +49,7 @@ def _assert_canonical_dart(config: dict) -> None:
 
 def _assert_canonical_schnet(config: dict) -> None:
     assert config["online_aug"] is False
+    assert config["num_workers"] == 0
     assert "online_aug_cfg" not in config
 
 

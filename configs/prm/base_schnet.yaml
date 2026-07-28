@@ -4,7 +4,9 @@ output_dir: baselines/schnet/placeholder
 split_path: artifacts/prm_protocol_v2/splits/id_repeat_s42.json
 seed: 342
 batch_size: 32
-num_workers: 4
+# Keep formal neural runs single-process at the DataLoader boundary. The
+# dataset is already resident in memory and worker IPC can exhaust server FDs.
+num_workers: 0
 cpu_threads: 8
 epochs: 150
 grad_clip: 5.0
