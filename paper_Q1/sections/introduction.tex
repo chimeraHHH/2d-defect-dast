@@ -67,7 +67,8 @@ fingerprints, and publish immutable split definitions.  The resulting 10,224
 structure modeling set is evaluated through a paired $2^3$ architecture
 experiment, random and chemistry-grouped cross-validation, and a predefined
 host--impurity matrix holdout.  Architecture and descriptor choices use
-validation data only.  A distinct calibration partition is used for variance
+validation data only, with descriptor families chosen independently inside
+each evaluation split.  A distinct calibration partition is used for variance
 scaling and split-conformal intervals, and all materials-facing conclusions
 are computed from out-of-fold predictions.
 

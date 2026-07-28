@@ -11,14 +11,16 @@ descriptor baselines.  The corresponding DART MAEs were
 \PRMIdCvDARTMAE, \PRMPairCvDARTMAE, \PRMHostCvDARTMAE,
 \PRMDopantCvDARTMAE, and \PRMChemistryBlockDARTMAE\eV{}.
 
-On a separate held-out uncertainty split, 90\% conformal intervals achieved
-\PRMUQNinetyCoverage\% marginal coverage at mean width
+On a dedicated ensemble split, internal 90\% conformal intervals achieved
+\PRMUQNinetyCoverage\% empirical marginal coverage at mean width
 \PRMUQNinetyWidth\eV{}.  Pair-held-out predictions recovered the preferred
-incorporation class with \PRMPreferenceAccuracy\% accuracy and incurred mean
-global site-selection regret \PRMGlobalRegret\eV{}.  Together, these results
-define both the predictive utility and the observable failure modes of the
-surrogate within IMP2D.  They do not constitute prospective first-principles
-validation or evidence for materials outside the audited chemical domain.
+incorporation class with \PRMPreferenceAccuracy\% accuracy versus a
+\PRMPreferenceReferenceAccuracy\% empirical-majority reference and incurred
+mean global site-selection regret \PRMGlobalRegret\eV{}.  Together, these
+results define both the predictive utility and the observable failure modes of
+the surrogate within IMP2D.  They do not constitute prospective
+first-principles validation, an untouched outer UQ evaluation, or evidence for
+materials outside the audited chemical domain.
 
 \else
 

@@ -61,9 +61,9 @@ directional model difference is supported.
 \centering
 \includegraphics[width=\textwidth]{fig_transfer.pdf}
 \caption{Interpolation and chemical-transfer evaluation.
-  (a) Pooled test MAE for DART, periodic SchNet, the descriptor family selected
-  within each regime using validation data, and a training-target mean
-  predictor.
+  (a) Pooled test MAE for DART, periodic SchNet, a descriptor family selected
+  independently inside each split using its validation data, and a
+  training-target mean predictor.
   (b) Paired differences in absolute error relative to DART with 95\%
   bootstrap intervals using the regime-matched resampling units defined in
   Sec.~\ref{sec:evaluation}.  Positive values favor DART.}
@@ -102,34 +102,37 @@ architecture or hyperparameter selection.
 \end{figure*}
 
 %----------------------------------------------------------------------
-\subsection{Held-out uncertainty and selective prediction}
+\subsection{Internal uncertainty and selective prediction}
 \label{sec:uq_results}
 %----------------------------------------------------------------------
 
-On the untouched uncertainty test partition, the five-member ensemble had
-MAE \PRMUQTestMAE\eV{}, Gaussian negative log likelihood \PRMUQNLL, and mean
-Gaussian CRPS \PRMUQCRPS\eV{}.  The Spearman correlation between calibrated
-standard deviation and absolute error was \PRMUQErrorSpearman.  The
-risk--coverage curve had AURC \PRMUQAURC\eV{} and excess AURC
-\PRMUQExcessAURC\eV{} relative to oracle error ordering.
+On the dedicated uncertainty test partition, which was excluded from ensemble
+fitting, checkpoint selection, and calibration but not from earlier
+architecture development on other partitions of the same corpus, the
+five-member ensemble had MAE \PRMUQTestMAE\eV{}, Gaussian negative log
+likelihood \PRMUQNLL, and mean Gaussian CRPS \PRMUQCRPS\eV{}.  The Spearman
+correlation between calibrated standard deviation and absolute error was
+\PRMUQErrorSpearman.  The risk--coverage curve had AURC \PRMUQAURC\eV{} and
+excess AURC \PRMUQExcessAURC\eV{} relative to oracle error ordering.
 
 \input{generated/tab_uq.tex}
 
 At 90\% nominal coverage, the split-conformal interval covered
 \PRMUQNinetyCoverage\% of test structures with mean width
 \PRMUQNinetyWidth\eV{}.  Table~\ref{tab:uq} reports all prespecified nominal
-levels.  These are marginal held-out coverage results; they do not establish
-conditional coverage for every host or impurity.
+levels.  These are internal empirical marginal-coverage results; they do not
+establish conditional coverage for every host or impurity or performance on a
+fully untouched external corpus.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_uq.pdf}
-\caption{Held-out uncertainty evaluation.
+\caption{Internal uncertainty evaluation on the dedicated ensemble split.
   (a) Nominal versus observed split-conformal coverage; annotations give mean
   interval widths.
   (b) MAE risk as increasingly uncertain predictions are rejected, compared
   with oracle ordering by realized error.
-  (c) Calibrated standard deviation versus absolute error on the untouched
+  (c) Calibrated standard deviation versus absolute error on the dedicated
   test partition.}
 \label{fig:uq}
 \end{figure*}
@@ -150,6 +153,16 @@ had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
 top-two site accuracies were \PRMWithinTypeExactAccuracy\% and
 \PRMWithinTypeTopTwoAccuracy\%, respectively, with mean regret
 \PRMWithinTypeRegret\eV{}.
+The corresponding empirical-majority or candidate-uniform reference
+accuracies were \PRMPreferenceReferenceAccuracy\%,
+\PRMGlobalReferenceAccuracy\%, \PRMWithinTypeReferenceExactAccuracy\%, and
+\PRMWithinTypeReferenceTopTwoAccuracy\%.  Model-minus-reference gains were
+\PRMPreferenceGain{} [\PRMPreferenceGainLow, \PRMPreferenceGainHigh],
+\PRMGlobalAccuracyGain{} [\PRMGlobalAccuracyGainLow,
+\PRMGlobalAccuracyGainHigh], \PRMWithinTypeExactAccuracyGain{}
+[\PRMWithinTypeExactAccuracyGainLow, \PRMWithinTypeExactAccuracyGainHigh], and
+\PRMWithinTypeTopTwoAccuracyGain{} [\PRMWithinTypeTopTwoAccuracyGainLow,
+\PRMWithinTypeTopTwoAccuracyGainHigh] percentage points, respectively.
 
 \input{generated/tab_screening.tex}
 

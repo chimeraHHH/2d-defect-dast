@@ -9,6 +9,7 @@ import pytest
 
 import scripts.prm_make_result_assets as result_assets
 from scripts.prm_make_result_assets import (
+    DESCRIPTOR_SELECTED_MODEL,
     READY_MARKER_CONTENT,
     comparison_status,
     effect_status,
@@ -148,11 +149,12 @@ def minimal_claims():
         "low_energy_recall": 0.6,
     }
     benchmark = {
-        "descriptor_model": "descriptor:lightgbm",
+        "descriptor_model": DESCRIPTOR_SELECTED_MODEL,
+        "descriptor_family_counts": {"lightgbm": 4, "hist_gradient_boosting": 1},
         "models": {
             "dart": metrics,
             "schnet": {**metrics, "mae": 0.6},
-            "descriptor:lightgbm": {**metrics, "mae": 0.8},
+            DESCRIPTOR_SELECTED_MODEL: {**metrics, "mae": 0.8},
         },
         "paired_comparisons": {
             comparator: {
@@ -163,7 +165,7 @@ def minimal_claims():
             }
             for comparator, delta in (
                 ("schnet", 0.1),
-                ("descriptor:lightgbm", 0.3),
+                (DESCRIPTOR_SELECTED_MODEL, 0.3),
             )
         },
     }
@@ -215,14 +217,18 @@ def minimal_claims():
         "materials": {
             "defect_type_preference": {
                 "accuracy": summary(0.8),
+                "accuracy_reference": screening_reference(0.6, 0.2),
                 "margin_mae_eV": summary(0.2),
                 "margin_spearman": 0.7,
                 "global_screening_regret_eV": summary(0.1),
                 "global_exact_site_accuracy": summary(0.4),
+                "global_exact_site_reference": screening_reference(0.2, 0.2),
             },
             "within_defect_type_site_selection": {
                 "exact_accuracy": summary(0.5),
+                "exact_accuracy_reference": screening_reference(0.25, 0.25),
                 "top2_accuracy": summary(0.7),
+                "top2_accuracy_reference": screening_reference(0.4, 0.3),
                 "screening_regret_eV": summary(0.08),
             },
             "error_heterogeneity": {
@@ -285,11 +291,19 @@ def summary(mean):
     return {"mean": mean, "ci_low": mean - 0.05, "ci_high": mean + 0.05, "n": 10}
 
 
+def screening_reference(mean, gain):
+    return {
+        "accuracy": summary(mean),
+        "model_minus_reference": summary(gain),
+    }
+
+
 def test_macro_rendering_uses_machine_values_without_placeholders():
     macros = render_macros(minimal_claims())
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
     assert r"\newcommand{\PRMSchNetMeanHostMAE}{0.800}" in macros
+    assert r"\newcommand{\PRMPreferenceReferenceAccuracy}{60.0}" in macros
     assert (
         r"\newcommand{\PRMSchNetMeanSampleSizeErrorSpearman}{0.200}"
         in macros
@@ -477,9 +491,22 @@ def contract_inputs():
             "selected_variant": "g111", "selection_data": "validation only",
         },
     }
-    descriptor_selection = {
-        regime: {"selected_family": "lightgbm"} for regime in regimes
-    }
+    descriptor_selection = {}
+    for regime in regimes:
+        split_ids = (
+            ["chemistry_block_g6x3d"]
+            if regime == "chemistry_block"
+            else [f"{regime}5_f{fold}" for fold in range(5)]
+        )
+        descriptor_selection[regime] = {
+            "selection_unit": "split",
+            "selected_model": DESCRIPTOR_SELECTED_MODEL,
+            "family_counts": {"lightgbm": len(split_ids)},
+            "split_selections": {
+                split_id: {"selected_family": "lightgbm"}
+                for split_id in split_ids
+            },
+        }
     comparison = {
         "schema_version": "prm_comparison_bundle_v1", "collector_git": clean,
         "data_sha256": "data",
@@ -557,12 +584,20 @@ def contract_inputs():
     pooled = []
     paired = []
     for regime in regimes:
-        for model in ("dart", "schnet", "descriptor:lightgbm", "descriptor:mean"):
+        for model in (
+            "dart",
+            "schnet",
+            DESCRIPTOR_SELECTED_MODEL,
+            "descriptor:mean",
+        ):
             pooled.append({"regime": regime, "model": model})
         paired.extend(
             [
                 {"regime": regime, "comparator": "schnet"},
-                {"regime": regime, "comparator": "descriptor:lightgbm"},
+                {
+                    "regime": regime,
+                    "comparator": DESCRIPTOR_SELECTED_MODEL,
+                },
             ]
         )
     return (

@@ -82,12 +82,17 @@ separately summarized by the uncertainty--error correlation
 in Fig.~\ref{fig:uq} makes explicit how much rejection performance remains
 unrecovered.
 
-The conformal guarantee depends on exchangeability between the calibration
-and test examples.  It is marginal rather than host-conditional or
-impurity-conditional, and it does not automatically extend to the grouped
-transfer regimes.  The ensemble spread should consequently be treated as a
-calibrated model-disagreement score for selective prediction, not as a complete
-physical uncertainty decomposition.
+The nominal conformal interpretation depends on a fixed modeling recipe and
+exchangeability between calibration and test examples.  It is marginal rather
+than host-conditional or impurity-conditional, and it does not automatically
+extend to the grouped transfer regimes.  Moreover, architecture development
+used different partitions of the same finite IMP2D corpus, so the dedicated UQ
+test rows are held out from ensemble fitting and calibration but not from the
+entire development process.  The observed coverage is therefore an internal
+empirical calibration result, not an unconditional outer-holdout guarantee.
+The ensemble spread should consequently be treated as a calibrated
+model-disagreement score for selective prediction, not as a complete physical
+uncertainty decomposition.
 
 %----------------------------------------------------------------------
 \subsection{Screening utility and interpretation boundary}
@@ -100,6 +105,11 @@ minima are ordered correctly, while exact-site accuracy and regret distinguish
 recovering the precise minimum from choosing a near-degenerate alternative.
 The within-class top-two result (\PRMWithinTypeTopTwoAccuracy\%) additionally
 measures whether a small follow-up queue retains the reference minimum.
+The majority-class and candidate-uniform controls show that these accuracies
+are not explained solely by class imbalance or by the number of available
+candidates; their paired cluster-bootstrap gains are reported in
+Table~\ref{tab:screening}.  They remain descriptive controls rather than
+separately trained screening policies.
 
 These are retrospective decisions against IMP2D labels.  They do not establish
 thermodynamic prevalence, kinetic accessibility, synthesis feasibility, or a

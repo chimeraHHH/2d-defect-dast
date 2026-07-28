@@ -66,13 +66,18 @@ combined with 4$d$ impurities form the validation block.  After the common
 audit exclusions, this partition contains 9,487 training, 372 validation, and
 365 test structures.
 
-Uncertainty quantification uses an independent random partition with 75\% for
+Uncertainty quantification uses a dedicated random partition with 75\% for
 training, 10\% for checkpoint selection, 5\% for calibration, and 10\% for
-final testing (assignment seed 62).  The calibration and test indices are not
-used to fit network parameters or select checkpoints.  All split files cover
-the full 10,641-row container through mutually disjoint train, validation,
-test, optional calibration, and exclusion sets; their SHA256 hashes are stored
-in every run manifest.
+internal testing (assignment seed 62).  Within this ensemble experiment, the
+calibration and test indices are not used to fit network parameters or select
+checkpoints, and test labels do not enter calibration.  These rows are not,
+however, an untouched outer holdout from the earlier architecture-development
+stage: different random factorial partitions of the same canonical IMP2D
+corpus placed many of them in training, validation, or test subsets.  The UQ
+results are therefore an internal calibration assessment of the selected
+recipe.  All split files cover the full 10,641-row container through mutually
+disjoint train, validation, test, optional calibration, and exclusion sets;
+their SHA256 hashes are stored in every run manifest.
 
 Figure~\ref{fig:protocol} summarizes the sequential data audit, canonical
 chemical coverage, target distribution, and fixed partition geometry.
@@ -226,8 +231,12 @@ regression, random forests, histogram gradient boosting, and
 LightGBM~\cite{ke2017lightgbm}.  These model families also permit direct
 comparison with earlier IMP2D descriptor studies~\cite{kesorn2024,
 elalouani2026}.  Hyperparameters within each family are selected by validation
-MAE only; the best descriptor family used in each reported regime is likewise
-chosen by mean validation MAE across folds.
+MAE only.  The learned descriptor family is then chosen independently inside
+every split by that split's validation MAE; pooled scores concatenate the
+corresponding foldwise selected test predictions.  Thus no held-out fold's
+test labels enter the family used to predict that fold.  The training-target
+mean predictor is reported separately and is not a candidate in family
+selection.
 
 Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
 channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA{} cutoff.
@@ -264,7 +273,7 @@ For the same reason, ``host held out'' and ``impurity held out'' refer
 specifically to IMP2D target supervision.
 
 %----------------------------------------------------------------------
-\subsection{Held-out uncertainty calibration and screening analysis}
+\subsection{Internal uncertainty calibration and screening analysis}
 \label{sec:uq_method}
 %----------------------------------------------------------------------
 
@@ -283,11 +292,14 @@ by Gaussian negative log likelihood; the other subset estimates finite-sample
 split-conformal quantiles of
 $|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$~\cite{angelopoulos2023,
 hu2022}.
-Under exchangeability, the resulting intervals have finite-sample marginal
-coverage at each prespecified level; this guarantee does not imply conditional
-coverage for every host or impurity group.  Test labels do not enter either
-calibration step, and test metrics are computed only after the scale, floor,
-and interval quantiles are fixed.
+Conditional on a fixed modeling recipe and exchangeability within this
+dedicated split, the resulting intervals have finite-sample marginal coverage
+at each prespecified level; this statement does not imply conditional coverage
+for every host or impurity group.  Because earlier architecture development
+used other partitions of the same corpus, the reported coverage is not an
+outer-holdout guarantee for a fully untouched dataset.  Test labels do not
+enter either calibration step, and test metrics are computed only after the
+scale, floor, and interval quantiles are fixed.
 
 For materials-facing analysis, the five host--impurity-pair folds yield one
 out-of-fold prediction per retained structure.  Within each host--impurity
@@ -297,5 +309,12 @@ report preference accuracy and screening regret.  Exact-site metrics require at
 least two candidate sites, whereas top-two accuracy requires at least three;
 reference minima within $10^{-8}$~eV are treated as tied, and tied
 adsorbate--interstitial pairs are excluded from binary preference accuracy.
+Accuracy is contextualized by two reference-free controls.  Incorporation
+class uses the empirical majority class among eligible decisions.  Exact-site
+accuracy uses the analytic expectation from choosing uniformly among the
+observed candidates, and top-two accuracy uses the corresponding uniformly
+sampled size-two subset; tied reference minima count as successful choices.
+Model-minus-reference intervals use the same host--impurity-pair cluster
+bootstrap as the model estimates.
 These are predictive associations within IMP2D, not causal mechanism
 assignments or external DFT validation.

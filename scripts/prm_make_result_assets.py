@@ -19,6 +19,7 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parent.parent
+DESCRIPTOR_SELECTED_MODEL = "descriptor:validation_selected"
 REGIME_ORDER = ("id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block")
 REGIME_LABELS = {
     "id_cv": "Random OOF",
@@ -409,7 +410,27 @@ def validate_contract(
     pooled_keys = {(row["regime"], row["model"]) for row in pooled_rows}
     descriptor_selection = comparison.get("descriptor_selection", {})
     for regime in REGIME_ORDER:
-        descriptor = f"descriptor:{descriptor_selection[regime]['selected_family']}"
+        selection = descriptor_selection[regime]
+        expected_descriptor_splits = (
+            {"chemistry_block_g6x3d"}
+            if regime == "chemistry_block"
+            else {f"{regime}5_f{fold}" for fold in range(5)}
+        )
+        if (
+            selection.get("selection_unit") != "split"
+            or selection.get("selected_model") != DESCRIPTOR_SELECTED_MODEL
+            or set(selection.get("split_selections", {}))
+            != expected_descriptor_splits
+            or sum(
+                int(count)
+                for count in selection.get("family_counts", {}).values()
+            )
+            != len(expected_descriptor_splits)
+        ):
+            raise ValueError(
+                f"descriptor family selection is not foldwise for {regime}"
+            )
+        descriptor = DESCRIPTOR_SELECTED_MODEL
         for model in ("dart", "schnet", descriptor, "descriptor:mean"):
             if (regime, model) not in pooled_keys:
                 raise ValueError(f"missing pooled metrics for {regime}/{model}")
@@ -492,6 +513,7 @@ def model_label(model: str) -> str:
         "descriptor:hist_gradient_boosting": "Histogram GB",
         "descriptor:random_forest": "Random forest",
         "descriptor:ridge": "Ridge",
+        DESCRIPTOR_SELECTED_MODEL: "Validation-selected descriptor",
     }
     return labels.get(model, model.replace("descriptor:", ""))
 
@@ -669,9 +691,8 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
 
     benchmarks: Dict[str, Any] = {}
     for regime in REGIME_ORDER:
-        descriptor_model = (
-            "descriptor:" + comparison["descriptor_selection"][regime]["selected_family"]
-        )
+        descriptor_selection = comparison["descriptor_selection"][regime]
+        descriptor_model = str(descriptor_selection["selected_model"])
         models = {}
         for model in ("dart", "schnet", descriptor_model, "descriptor:mean"):
             row = find_row(pooled, regime=regime, model=model)
@@ -699,6 +720,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
             }
         benchmarks[regime] = {
             "descriptor_model": descriptor_model,
+            "descriptor_family_counts": descriptor_selection["family_counts"],
             "models": models,
             "paired_comparisons": comparisons,
         }
@@ -812,6 +834,128 @@ def render_macros(claims: Mapping[str, Any]) -> str:
             macro_line("PRMWithinTypeExactAccuracy", percent_format(site["exact_accuracy"]["mean"])),
             macro_line("PRMWithinTypeTopTwoAccuracy", percent_format(site["top2_accuracy"]["mean"])),
             macro_line("PRMWithinTypeRegret", finite_format(site["screening_regret_eV"]["mean"])),
+            macro_line(
+                "PRMPreferenceReferenceAccuracy",
+                percent_format(
+                    preference["accuracy_reference"]["accuracy"]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMPreferenceGain",
+                percent_format(
+                    preference["accuracy_reference"][
+                        "model_minus_reference"
+                    ]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMPreferenceGainLow",
+                percent_format(
+                    preference["accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_low"]
+                ),
+            ),
+            macro_line(
+                "PRMPreferenceGainHigh",
+                percent_format(
+                    preference["accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_high"]
+                ),
+            ),
+            macro_line(
+                "PRMGlobalReferenceAccuracy",
+                percent_format(
+                    preference["global_exact_site_reference"]["accuracy"][
+                        "mean"
+                    ]
+                ),
+            ),
+            macro_line(
+                "PRMGlobalAccuracyGain",
+                percent_format(
+                    preference["global_exact_site_reference"][
+                        "model_minus_reference"
+                    ]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMGlobalAccuracyGainLow",
+                percent_format(
+                    preference["global_exact_site_reference"][
+                        "model_minus_reference"
+                    ]["ci_low"]
+                ),
+            ),
+            macro_line(
+                "PRMGlobalAccuracyGainHigh",
+                percent_format(
+                    preference["global_exact_site_reference"][
+                        "model_minus_reference"
+                    ]["ci_high"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeReferenceExactAccuracy",
+                percent_format(
+                    site["exact_accuracy_reference"]["accuracy"]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeExactAccuracyGain",
+                percent_format(
+                    site["exact_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeExactAccuracyGainLow",
+                percent_format(
+                    site["exact_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_low"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeExactAccuracyGainHigh",
+                percent_format(
+                    site["exact_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_high"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeReferenceTopTwoAccuracy",
+                percent_format(
+                    site["top2_accuracy_reference"]["accuracy"]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeTopTwoAccuracyGain",
+                percent_format(
+                    site["top2_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["mean"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeTopTwoAccuracyGainLow",
+                percent_format(
+                    site["top2_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_low"]
+                ),
+            ),
+            macro_line(
+                "PRMWithinTypeTopTwoAccuracyGainHigh",
+                percent_format(
+                    site["top2_accuracy_reference"][
+                        "model_minus_reference"
+                    ]["ci_high"]
+                ),
+            ),
         ]
     )
     sensitivity = claims["schnet_readout_sensitivity"]
@@ -1132,24 +1276,28 @@ def delta_cell(comparison: Mapping[str, Any]) -> str:
 
 def render_benchmark_table(claims: Mapping[str, Any]) -> str:
     rows = []
-    descriptor_names = set()
+    descriptor_families = set()
     for regime in REGIME_ORDER:
         benchmark = claims["benchmarks"][regime]
         descriptor = benchmark["descriptor_model"]
-        descriptor_names.add(model_label(descriptor))
+        descriptor_families.update(benchmark["descriptor_family_counts"])
         models = benchmark["models"]
         rows.append(
             f"{REGIME_LABELS[regime]} & {finite_format(models['dart']['mae'])} & "
             f"{finite_format(models['schnet']['mae'])} & {finite_format(models[descriptor]['mae'])} & "
             f"{delta_cell(benchmark['paired_comparisons']['schnet'])} & "
             f"{delta_cell(benchmark['paired_comparisons'][descriptor])} \\\\")
-    descriptor_note = ", ".join(sorted(descriptor_names))
+    descriptor_note = ", ".join(
+        model_label(f"descriptor:{family}")
+        for family in sorted(descriptor_families)
+    )
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
 \caption{{Pooled out-of-fold or single-block test MAE (eV). The descriptor
-column uses the family selected separately within each regime by validation
-MAE ({latex_escape(descriptor_note)} in the resulting selections). $\Delta$
+column selects a learned family independently within every split by that
+split's validation MAE ({latex_escape(descriptor_note)} were selected across
+the resulting folds). $\Delta$
 is comparator minus DART absolute error with a paired 95\% bootstrap interval
 using the regime-matched resampling unit; positive values favor DART.}}
 \label{{tab:benchmark}}
@@ -1207,8 +1355,10 @@ def render_uq_table(uq: Mapping[str, Any]) -> str:
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table}}[t]
-\caption{{Held-out split-conformal interval performance on the frozen test
-structures. Coverage is in percent and mean width is in eV.}}
+\caption{{Internal split-conformal interval performance on the dedicated test
+partition. These structures were excluded from ensemble fitting, checkpoint
+selection, and calibration, but not from the earlier architecture-development
+corpus. Coverage is in percent and mean width is in eV.}}
 \label{{tab:uq}}
 \centering
 \begin{{tabular}}{{cccc}}
@@ -1226,36 +1376,81 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
     preference = materials["defect_type_preference"]
     site = materials["within_defect_type_site_selection"]
     entries = (
-        (r"Incorporation-class preference accuracy (\%)", preference["accuracy"], True),
-        (r"Global exact-site accuracy (\%)", preference["global_exact_site_accuracy"], True),
-        ("Global screening regret (eV)", preference["global_screening_regret_eV"], False),
-        (r"Within-class exact-site accuracy (\%)", site["exact_accuracy"], True),
-        (r"Within-class top-2 accuracy (\%)", site["top2_accuracy"], True),
-        ("Within-class screening regret (eV)", site["screening_regret_eV"], False),
+        (
+            r"Incorporation-class preference accuracy (\%)",
+            preference["accuracy"],
+            preference["accuracy_reference"],
+            True,
+        ),
+        (
+            r"Global exact-site accuracy (\%)",
+            preference["global_exact_site_accuracy"],
+            preference["global_exact_site_reference"],
+            True,
+        ),
+        (
+            "Global screening regret (eV)",
+            preference["global_screening_regret_eV"],
+            None,
+            False,
+        ),
+        (
+            r"Within-class exact-site accuracy (\%)",
+            site["exact_accuracy"],
+            site["exact_accuracy_reference"],
+            True,
+        ),
+        (
+            r"Within-class top-2 accuracy (\%)",
+            site["top2_accuracy"],
+            site["top2_accuracy_reference"],
+            True,
+        ),
+        (
+            "Within-class screening regret (eV)",
+            site["screening_regret_eV"],
+            None,
+            False,
+        ),
     )
     rows = []
-    for label, summary, as_percent in entries:
+    for label, summary, reference, as_percent in entries:
         if as_percent:
             value = percent_format(summary["mean"])
             low = percent_format(summary["ci_low"])
             high = percent_format(summary["ci_high"])
+            reference_value = percent_format(reference["accuracy"]["mean"])
+            gain = reference["model_minus_reference"]
+            gain_text = (
+                f"{percent_format(gain['mean'])} "
+                f"[{percent_format(gain['ci_low'])}, "
+                f"{percent_format(gain['ci_high'])}]"
+            )
         else:
             value = finite_format(summary["mean"])
             low = finite_format(summary["ci_low"])
             high = finite_format(summary["ci_high"])
-        rows.append(f"{label} & {value} & [{low}, {high}] & {int(summary['n'])} \\\\")
+            reference_value = "--"
+            gain_text = "--"
+        rows.append(
+            f"{label} & {value} [{low}, {high}] & {reference_value} & "
+            f"{gain_text} & {int(summary['n'])} \\\\"
+        )
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
 \caption{{Out-of-fold screening metrics from host--impurity-pair folds.
 Intervals are 95\% nonparametric cluster-bootstrap intervals over
 host--impurity pairs; multiple within-class decisions from one pair remain
-together in every resample.}}
+together in every resample. The incorporation-class reference always predicts
+the empirical majority class; site references select uniformly over the
+observed candidate set, with ties retained. Accuracy gains are model minus
+reference in percentage points.}}
 \label{{tab:screening}}
 \centering
-\begin{{tabular}}{{lccc}}
+\begin{{tabular}}{{lcccc}}
 \toprule
-Metric & Mean & 95\% interval & $n$ \\
+Metric & Model [95\% interval] & Reference & Gain [95\% interval] & $n$ \\
 \midrule
 {body}
 \bottomrule
@@ -1413,7 +1608,7 @@ def plot_transfer(
         for regime in REGIME_ORDER:
             actual = model
             if model == "descriptor":
-                actual = "descriptor:" + comparison["descriptor_selection"][regime]["selected_family"]
+                actual = DESCRIPTOR_SELECTED_MODEL
             row = find_row(pooled_rows, regime=regime, model=actual)
             values.append(float(row["mae"]))
         axes[0].plot(x + offset, values, marker=marker, ls="none", ms=4.3, color=color, label=label)
@@ -1434,7 +1629,7 @@ def plot_transfer(
         for regime in REGIME_ORDER:
             comparator = model_kind
             if model_kind == "descriptor":
-                comparator = "descriptor:" + comparison["descriptor_selection"][regime]["selected_family"]
+                comparator = DESCRIPTOR_SELECTED_MODEL
             rows.append(find_row(paired_rows, regime=regime, comparator=comparator))
         means = np.asarray([row["mae_difference_comparator_minus_dart_eV"] for row in rows], dtype=float)
         lows = np.asarray([row["ci_low_eV"] for row in rows], dtype=float)

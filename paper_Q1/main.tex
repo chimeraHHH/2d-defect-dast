@@ -63,13 +63,14 @@ over periodic SchNet and validation-selected descriptor baselines in every
 regime.  A post-hoc control reduces SchNet's host-held-out error from
 \PRMSchNetAddHostMAE{} to \PRMSchNetMeanHostMAE\eV{} by replacing atomwise
 addition with mean pooling, but does not close the gap to the proposed model.
-On a separate held-out split, 90\% conformal intervals attain
+On a dedicated ensemble split, internal 90\% conformal intervals attain
 \PRMUQNinetyCoverage\% coverage at \PRMUQNinetyWidth\eV{} mean width.
 Pair-held-out predictions recover the preferred incorporation class with
-\PRMPreferenceAccuracy\% accuracy and incur \PRMGlobalRegret\eV{} mean global
-site-selection regret.  These results distinguish interpolation from bounded
-chemical transfer within IMP2D; external first-principles validation remains
-outside the present scope.
+\PRMPreferenceAccuracy\% accuracy, compared with a
+\PRMPreferenceReferenceAccuracy\% empirical-majority reference, and incur
+\PRMGlobalRegret\eV{} mean global site-selection regret.  These results
+distinguish interpolation from bounded chemical transfer within IMP2D;
+external first-principles validation remains outside the present scope.
 \else
 Machine-learned formation energies can accelerate impurity screening in
 two-dimensional materials, but random-split accuracy alone does not establish

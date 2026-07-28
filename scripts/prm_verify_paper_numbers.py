@@ -17,6 +17,7 @@ from scipy.stats import spearmanr
 
 
 ROOT = Path(__file__).resolve().parent.parent
+DESCRIPTOR_SELECTED_MODEL = "descriptor:validation_selected"
 REGIMES = ("id_cv", "pair_cv", "host_cv", "dopant_cv", "chemistry_block")
 REGIME_PREFIX = {
     "id_cv": "IdCv",
@@ -38,6 +39,7 @@ DISPLAY_FAMILY = {
     "mean": "Mean",
     "random_forest": "Random forest",
     "ridge": "Ridge",
+    DESCRIPTOR_SELECTED_MODEL: "Validation-selected descriptor",
 }
 
 
@@ -228,21 +230,31 @@ def load_comparison_predictions(
 
     descriptor_root = root / "artifacts/prm_results/descriptors/runs"
     for regime in REGIMES:
-        family = str(descriptor_selection[regime]["selected_family"])
-        for selected_family in (family, "mean"):
-            split_paths = []
-            for prediction_path in sorted(descriptor_root.glob("*/predictions.npz")):
-                split_id = prediction_path.parent.name
-                if regime_for_split(split_id) == regime:
-                    split_paths.append(prediction_path)
-            pooled[(regime, f"descriptor:{selected_family}")] = concatenate_folds(
-                [
-                    load_prediction_file(
-                        path, descriptor_family=selected_family
-                    )
-                    for path in split_paths
-                ]
+        split_paths = [
+            prediction_path
+            for prediction_path in sorted(
+                descriptor_root.glob("*/predictions.npz")
             )
+            if regime_for_split(prediction_path.parent.name) == regime
+        ]
+        split_selections = descriptor_selection[regime]["split_selections"]
+        pooled[(regime, DESCRIPTOR_SELECTED_MODEL)] = concatenate_folds(
+            [
+                load_prediction_file(
+                    path,
+                    descriptor_family=str(
+                        split_selections[path.parent.name]["selected_family"]
+                    ),
+                )
+                for path in split_paths
+            ]
+        )
+        pooled[(regime, "descriptor:mean")] = concatenate_folds(
+            [
+                load_prediction_file(path, descriptor_family="mean")
+                for path in split_paths
+            ]
+        )
     return pooled
 
 
@@ -517,9 +529,7 @@ def audit_comparison(
     for row in paired_rows:
         regime = row["regime"]
         comparator = row["comparator"]
-        descriptor = (
-            f"descriptor:{descriptor_selection[regime]['selected_family']}"
-        )
+        descriptor = DESCRIPTOR_SELECTED_MODEL
         comparator_order = ["schnet", descriptor, "descriptor:mean"]
         comparator_index = comparator_order.index(comparator)
         regime_index = REGIMES.index(regime)
@@ -899,6 +909,30 @@ def audit_materials(root: Path, audit: Audit) -> dict[str, Any]:
         "screening_regret_eV": cluster_bootstrap_rows(
             site_rows, "screening_regret_eV", seed=20263007
         ),
+        "preference_reference_accuracy": cluster_bootstrap_rows(
+            preference_rows, "majority_preference_correct", seed=20263008
+        ),
+        "preference_gain": cluster_bootstrap_rows(
+            preference_rows, "preference_gain_over_majority", seed=20263009
+        ),
+        "global_reference_accuracy": cluster_bootstrap_rows(
+            pair_rows, "global_uniform_exact_expectation", seed=20263010
+        ),
+        "global_gain": cluster_bootstrap_rows(
+            pair_rows, "global_exact_gain_over_uniform", seed=20263011
+        ),
+        "exact_reference_accuracy": cluster_bootstrap_rows(
+            site_rows, "uniform_exact_expectation", seed=20263012
+        ),
+        "exact_gain": cluster_bootstrap_rows(
+            site_rows, "exact_gain_over_uniform", seed=20263013
+        ),
+        "top2_reference_accuracy": cluster_bootstrap_rows(
+            top2_rows, "uniform_top2_expectation", seed=20263014
+        ),
+        "top2_gain": cluster_bootstrap_rows(
+            top2_rows, "top2_gain_over_uniform", seed=20263015
+        ),
         "margin_spearman": finite_spearman(
             [row["true_margin_eV"] for row in pair_rows],
             [row["predicted_margin_eV"] for row in pair_rows],
@@ -918,6 +952,30 @@ def audit_materials(root: Path, audit: Audit) -> dict[str, Any]:
         "exact_accuracy": within["exact_accuracy"],
         "top2_accuracy": within["top2_accuracy"],
         "screening_regret_eV": within["screening_regret_eV"],
+        "preference_reference_accuracy": preference["accuracy_reference"][
+            "accuracy"
+        ],
+        "preference_gain": preference["accuracy_reference"][
+            "model_minus_reference"
+        ],
+        "global_reference_accuracy": preference[
+            "global_exact_site_reference"
+        ]["accuracy"],
+        "global_gain": preference["global_exact_site_reference"][
+            "model_minus_reference"
+        ],
+        "exact_reference_accuracy": within["exact_accuracy_reference"][
+            "accuracy"
+        ],
+        "exact_gain": within["exact_accuracy_reference"][
+            "model_minus_reference"
+        ],
+        "top2_reference_accuracy": within["top2_accuracy_reference"][
+            "accuracy"
+        ],
+        "top2_gain": within["top2_accuracy_reference"][
+            "model_minus_reference"
+        ],
     }
     for metric, result in direct.items():
         if metric == "margin_spearman":
@@ -940,6 +998,24 @@ def audit_materials(root: Path, audit: Audit) -> dict[str, Any]:
                     stored_map[metric][field],
                     result[field],
                 )
+
+    class_counts: dict[str, int] = defaultdict(int)
+    for row in preference_rows:
+        class_counts[str(row["true_preference"])] += 1
+    majority_class = min(
+        class_counts, key=lambda label: (-class_counts[label], label)
+    )
+    reference = preference["accuracy_reference"]
+    audit.exact(
+        "materials preference majority class",
+        reference["majority_class"],
+        majority_class,
+    )
+    audit.exact(
+        "materials preference class counts",
+        reference["class_counts"],
+        dict(sorted(class_counts.items())),
+    )
 
     group_rows = numeric_rows(
         read_csv(root / "artifacts/prm_results/materials/group_errors.csv")
@@ -1161,7 +1237,6 @@ def build_expected_macros(
     }
     for regime in REGIMES:
         prefix = REGIME_PREFIX[regime]
-        family = str(descriptor_selection[regime]["selected_family"])
         expected.update(
             {
                 f"PRM{prefix}DARTMAE": (
@@ -1171,9 +1246,11 @@ def build_expected_macros(
                     f"{comparison[(regime, 'schnet')]['mae']:.3f}"
                 ),
                 f"PRM{prefix}DescriptorMAE": (
-                    f"{comparison[(regime, f'descriptor:{family}')]['mae']:.3f}"
+                    f"{comparison[(regime, DESCRIPTOR_SELECTED_MODEL)]['mae']:.3f}"
                 ),
-                f"PRM{prefix}DescriptorName": DISPLAY_FAMILY[family],
+                f"PRM{prefix}DescriptorName": DISPLAY_FAMILY[
+                    DESCRIPTOR_SELECTED_MODEL
+                ],
                 f"PRM{prefix}DARTLowEnergyMAE": (
                     f"{comparison[(regime, 'dart')]['low_energy_mae']:.3f}"
                 ),
@@ -1232,6 +1309,54 @@ def build_expected_macros(
             ),
             "PRMWithinTypeRegret": (
                 f"{materials['screening_regret_eV']['mean']:.3f}"
+            ),
+            "PRMPreferenceReferenceAccuracy": (
+                f"{100.0 * materials['preference_reference_accuracy']['mean']:.1f}"
+            ),
+            "PRMPreferenceGain": (
+                f"{100.0 * materials['preference_gain']['mean']:.1f}"
+            ),
+            "PRMPreferenceGainLow": (
+                f"{100.0 * materials['preference_gain']['ci_low']:.1f}"
+            ),
+            "PRMPreferenceGainHigh": (
+                f"{100.0 * materials['preference_gain']['ci_high']:.1f}"
+            ),
+            "PRMGlobalReferenceAccuracy": (
+                f"{100.0 * materials['global_reference_accuracy']['mean']:.1f}"
+            ),
+            "PRMGlobalAccuracyGain": (
+                f"{100.0 * materials['global_gain']['mean']:.1f}"
+            ),
+            "PRMGlobalAccuracyGainLow": (
+                f"{100.0 * materials['global_gain']['ci_low']:.1f}"
+            ),
+            "PRMGlobalAccuracyGainHigh": (
+                f"{100.0 * materials['global_gain']['ci_high']:.1f}"
+            ),
+            "PRMWithinTypeReferenceExactAccuracy": (
+                f"{100.0 * materials['exact_reference_accuracy']['mean']:.1f}"
+            ),
+            "PRMWithinTypeExactAccuracyGain": (
+                f"{100.0 * materials['exact_gain']['mean']:.1f}"
+            ),
+            "PRMWithinTypeExactAccuracyGainLow": (
+                f"{100.0 * materials['exact_gain']['ci_low']:.1f}"
+            ),
+            "PRMWithinTypeExactAccuracyGainHigh": (
+                f"{100.0 * materials['exact_gain']['ci_high']:.1f}"
+            ),
+            "PRMWithinTypeReferenceTopTwoAccuracy": (
+                f"{100.0 * materials['top2_reference_accuracy']['mean']:.1f}"
+            ),
+            "PRMWithinTypeTopTwoAccuracyGain": (
+                f"{100.0 * materials['top2_gain']['mean']:.1f}"
+            ),
+            "PRMWithinTypeTopTwoAccuracyGainLow": (
+                f"{100.0 * materials['top2_gain']['ci_low']:.1f}"
+            ),
+            "PRMWithinTypeTopTwoAccuracyGainHigh": (
+                f"{100.0 * materials['top2_gain']['ci_high']:.1f}"
             ),
             "PRMSchNetAddHostMAE": f"{sensitivity['add_mae']:.3f}",
             "PRMSchNetMeanHostMAE": f"{sensitivity['mean_mae']:.3f}",
@@ -1308,12 +1433,11 @@ def audit_macros_and_tables(
         root / "paper_Q1/generated/tab_applicability.tex"
     ).read_text()
     for regime in REGIMES:
-        family = str(descriptor_selection[regime]["selected_family"])
         dart = comparison[(regime, "dart")]
         schnet = comparison[(regime, "schnet")]
-        descriptor = comparison[(regime, f"descriptor:{family}")]
+        descriptor = comparison[(regime, DESCRIPTOR_SELECTED_MODEL)]
         schnet_pair = paired[(regime, "schnet")]
-        descriptor_pair = paired[(regime, f"descriptor:{family}")]
+        descriptor_pair = paired[(regime, DESCRIPTOR_SELECTED_MODEL)]
         row = (
             f"{REGIME_LABEL[regime]} & {dart['mae']:.3f} & "
             f"{schnet['mae']:.3f} & {descriptor['mae']:.3f} & "
@@ -1379,26 +1503,67 @@ def audit_macros_and_tables(
         root / "paper_Q1/generated/tab_screening.tex"
     ).read_text()
     screening_rows = [
-        ("Incorporation-class preference accuracy (\\%)",
-         materials["accuracy"], True),
-        ("Global exact-site accuracy (\\%)",
-         materials["global_exact_site_accuracy"], True),
-        ("Global screening regret (eV)",
-         materials["global_screening_regret_eV"], False),
-        ("Within-class exact-site accuracy (\\%)",
-         materials["exact_accuracy"], True),
-        ("Within-class top-2 accuracy (\\%)",
-         materials["top2_accuracy"], True),
-        ("Within-class screening regret (eV)",
-         materials["screening_regret_eV"], False),
+        (
+            "Incorporation-class preference accuracy (\\%)",
+            materials["accuracy"],
+            materials["preference_reference_accuracy"],
+            materials["preference_gain"],
+            True,
+        ),
+        (
+            "Global exact-site accuracy (\\%)",
+            materials["global_exact_site_accuracy"],
+            materials["global_reference_accuracy"],
+            materials["global_gain"],
+            True,
+        ),
+        (
+            "Global screening regret (eV)",
+            materials["global_screening_regret_eV"],
+            None,
+            None,
+            False,
+        ),
+        (
+            "Within-class exact-site accuracy (\\%)",
+            materials["exact_accuracy"],
+            materials["exact_reference_accuracy"],
+            materials["exact_gain"],
+            True,
+        ),
+        (
+            "Within-class top-2 accuracy (\\%)",
+            materials["top2_accuracy"],
+            materials["top2_reference_accuracy"],
+            materials["top2_gain"],
+            True,
+        ),
+        (
+            "Within-class screening regret (eV)",
+            materials["screening_regret_eV"],
+            None,
+            None,
+            False,
+        ),
     ]
-    for label, result, percent in screening_rows:
+    for label, result, reference, gain, percent in screening_rows:
         scale = 100.0 if percent else 1.0
         decimals = 1 if percent else 3
+        reference_text = (
+            f"{scale * reference['mean']:.{decimals}f}"
+            if reference is not None else "--"
+        )
+        gain_text = (
+            f"{scale * gain['mean']:.{decimals}f} "
+            f"[{scale * gain['ci_low']:.{decimals}f}, "
+            f"{scale * gain['ci_high']:.{decimals}f}]"
+            if gain is not None else "--"
+        )
         fragment = (
-            f"{label} & {scale * result['mean']:.{decimals}f} & "
+            f"{label} & {scale * result['mean']:.{decimals}f} "
             f"[{scale * result['ci_low']:.{decimals}f}, "
-            f"{scale * result['ci_high']:.{decimals}f}] & {result['n']}"
+            f"{scale * result['ci_high']:.{decimals}f}] & "
+            f"{reference_text} & {gain_text} & {result['n']}"
         )
         audit.contains(f"screening table row: {label}", screening_table, fragment)
         table_fragments += 1
