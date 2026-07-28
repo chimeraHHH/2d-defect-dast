@@ -416,6 +416,13 @@ def test_main_invalidates_stale_marker_before_loading_inputs(
     generated.mkdir(parents=True)
     stale = generated / "results_ready.tex"
     stale.write_text(READY_MARKER_CONTENT)
+    observed = {}
+
+    def clean_snapshot():
+        observed["marker_present_when_snapshotted"] = stale.exists()
+        return {"commit": "clean", "dirty": False, "status_porcelain": []}
+
+    monkeypatch.setattr(result_assets, "git_snapshot", clean_snapshot)
     monkeypatch.setattr(
         sys,
         "argv",
@@ -430,6 +437,7 @@ def test_main_invalidates_stale_marker_before_loading_inputs(
     with pytest.raises(FileNotFoundError):
         result_assets.main()
 
+    assert observed["marker_present_when_snapshotted"] is True
     assert not stale.exists()
 
 

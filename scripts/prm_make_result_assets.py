@@ -1727,6 +1727,9 @@ def main() -> None:
     result_root = args.result_root.resolve()
     protocol_dir = args.protocol_dir.resolve()
     paper_dir = args.paper_dir.resolve()
+    collector_git = git_snapshot()
+    if collector_git["dirty"]:
+        raise ValueError("paper assets must be generated from a clean worktree")
     invalidate_ready_marker(paper_dir / "generated")
     paths = input_paths(result_root, protocol_dir)
     inputs = load_inputs(paths)
@@ -1738,9 +1741,6 @@ def main() -> None:
     )
     claims = build_claims(inputs, selected)
     strict_json(claims)
-    collector_git = git_snapshot()
-    if collector_git["dirty"]:
-        raise ValueError("paper assets must be generated from a clean worktree")
     manifest = write_outputs(
         inputs, paths, claims, paper_dir, result_root, collector_git,
     )
