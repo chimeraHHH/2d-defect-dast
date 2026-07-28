@@ -38,7 +38,7 @@
 
 ## EXP-004: Generate materials-facing decision analysis
 
-- Status: ready to execute from the complete pair-held-out OOF predictions.
+- Status: complete in `artifacts/prm_results/materials/`.
 - Matrix row: E6.
 - Route: existing-result analysis after EXP-002.
 - Tier: main required.
