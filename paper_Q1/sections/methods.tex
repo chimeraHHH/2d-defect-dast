@@ -229,12 +229,13 @@ architecture are trained on the dedicated uncertainty split, following the
 deep-ensemble construction and its atomistic use as a model-credibility
 signal~\cite{lakshminarayanan2017,peterson2017}.  Ensemble mean and sample
 standard deviation provide the point prediction and a raw model-disagreement
-proxy.  The calibration partition is divided without labels by sorting sample
-indices and alternating rows.  One half fits a nonnegative scale and floor for
+proxy.  Samples are assigned to two calibration subsets by sorting their
+indices and alternating rows; this assignment rule does not use target labels.
+One subset fits a nonnegative scale and floor for
 \begin{equation}
  \sigma_i=\sqrt{(a s_i)^2+b^2}
 \end{equation}
-by Gaussian negative log likelihood; the other half estimates finite-sample
+by Gaussian negative log likelihood; the other subset estimates finite-sample
 split-conformal quantiles of
 $|E_{\mathrm f,i}-\hat E_{\mathrm f,i}|/\sigma_i$~\cite{angelopoulos2023,
 hu2022}.

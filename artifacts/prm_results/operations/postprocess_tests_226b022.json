@@ -1,0 +1,33 @@
+{
+  "checks": {
+    "clean_checkout": true,
+    "full_suite_passed": true,
+    "targeted_postprocess_suite_passed": true
+  },
+  "environment": {
+    "host": "WHUServer-L40S",
+    "python": "3.11.15",
+    "python_path": "/storage/ssd/metaiot_guest/yiminghua/prm_env/bin/python",
+    "pytest": "9.1.1"
+  },
+  "full_suite": {
+    "passed": 147,
+    "warnings": 2,
+    "warnings_scope": "PyTorch torch.jit.script deprecation"
+  },
+  "git_commit": "226b0221ef9eb781f4b3c12909804f6025c285f1",
+  "recorded_at": "2026-07-28T20:38:29+08:00",
+  "schema_version": "prm_postprocess_test_v1",
+  "status": "complete",
+  "targeted_suite": {
+    "passed": 44,
+    "test_files": [
+      "tests/test_collect_results.py",
+      "tests/test_uq_analysis.py",
+      "tests/test_materials_analysis.py",
+      "tests/test_result_assets.py",
+      "tests/test_csv_artifacts.py"
+    ]
+  },
+  "worktree": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/postprocess-226b022"
+}
