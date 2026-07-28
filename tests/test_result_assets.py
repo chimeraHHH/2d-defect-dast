@@ -22,6 +22,8 @@ from scripts.prm_make_result_assets import (
     render_factorial_narrative,
     render_factorial_table,
     render_macros,
+    render_schnet_readout_narrative,
+    render_schnet_readout_table,
     render_screening_table,
     render_transfer_narrative,
     render_uq_table,
@@ -239,6 +241,43 @@ def minimal_claims():
                 },
             },
         },
+        "schnet_readout_sensitivity": {
+            "analysis_role": "post_hoc_exploratory_robustness",
+            "intervention": {
+                "model_kwargs.readout": {"from": "add", "to": "mean"}
+            },
+            "add": {"n": 100, "mae": 1.0},
+            "mean": {"n": 100, "mae": 0.8},
+            "paired_host_cluster_bootstrap": {
+                "mae_difference_mean_minus_add_eV": -0.2,
+                "ci_low_eV": -0.3,
+                "ci_high_eV": -0.1,
+                "n": 100,
+            },
+            "fold_directional_consistency": {
+                "mean_better_folds": 4,
+                "n_folds": 5,
+            },
+            "sample_natoms_vs_absolute_error_spearman": {
+                "add": 0.4,
+                "mean": 0.2,
+            },
+            "host_median_natoms_vs_mae_spearman": {
+                "add": 0.3,
+                "mean": 0.1,
+            },
+            "fold_metrics": [
+                {
+                    "split_id": f"host_cv5_f{fold}",
+                    "n": 20,
+                    "add_mae_eV": 1.0,
+                    "mean_mae_eV": 0.8,
+                    "mean_minus_add_mae_eV": -0.2,
+                    "mean_better": True,
+                }
+                for fold in range(5)
+            ],
+        },
     }
 
 
@@ -250,6 +289,7 @@ def test_macro_rendering_uses_machine_values_without_placeholders():
     macros = render_macros(minimal_claims())
     assert r"\newcommand{\PRMSelectedVariant}{\texttt{g101}}" in macros
     assert r"\newcommand{\PRMIdCvDARTMAE}{0.500}" in macros
+    assert r"\newcommand{\PRMSchNetMeanHostMAE}{0.800}" in macros
     assert "TODO" not in macros
 
 
@@ -258,6 +298,7 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
 
     factorial = render_factorial_narrative(claims)
     transfer = render_transfer_narrative(claims)
+    readout = render_schnet_readout_narrative(claims)
     heterogeneity = render_error_heterogeneity_narrative(claims)
 
     assert "G$: $\\Delta=-0.200$" in factorial
@@ -269,6 +310,9 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
     assert "SchNet $\\Delta=+0.100$" in transfer
     assert "(inconclusive)" in transfer
     assert "(supports lower DART error)" in transfer
+    assert "from 1.000 to 0.800" in readout
+    assert "(supports lower error for mean pooling)" in readout
+    assert "4/5 folds" in readout
     assert "H\\_1" in heterogeneity
     assert "descriptive associations" in heterogeneity
 
@@ -291,6 +335,7 @@ def test_generated_table_body_rows_have_latex_terminators():
         render_applicability_table(claims),
         render_uq_table({"test": claims["uq"]}),
         render_screening_table(claims["materials"]),
+        render_schnet_readout_table(claims),
     )
     for table in tables:
         body = table.split(r"\midrule", 1)[1].split(r"\bottomrule", 1)[0].strip()
@@ -467,6 +512,32 @@ def contract_inputs():
             for fold in range(5)
         ],
     }
+    schnet_readout = {
+        "schema_version": "prm_schnet_readout_sensitivity_bundle_v1",
+        "collector_git": clean,
+        "data_sha256": "data",
+        "n_runs": {"add_reference": 15, "mean_sensitivity": 15},
+        "n_archived_runs": 15,
+        "archived_runs": [{}] * 15,
+    }
+    schnet_readout_summary = {
+        "analysis_role": "post_hoc_exploratory_robustness",
+        "intervention": {
+            "model_kwargs.readout": {"from": "add", "to": "mean"}
+        },
+        "fold_directional_consistency": {
+            "mean_better_folds": 3,
+            "n_folds": 5,
+        },
+        "paired_host_cluster_bootstrap": {"n": 10224},
+    }
+    schnet_readout_folds = [
+        {
+            "split_id": f"host_cv5_f{fold}",
+            "n": 2044 if fold == 4 else 2045,
+        }
+        for fold in range(5)
+    ]
     pooled = []
     paired = []
     for regime in regimes:
@@ -478,7 +549,10 @@ def contract_inputs():
                 {"regime": regime, "comparator": "descriptor:lightgbm"},
             ]
         )
-    return protocol, factorial, comparison, uq, materials, pooled, paired
+    return (
+        protocol, factorial, comparison, uq, materials, schnet_readout,
+        schnet_readout_summary, pooled, paired, schnet_readout_folds,
+    )
 
 
 def test_complete_result_contract_accepts_only_aligned_evidence():

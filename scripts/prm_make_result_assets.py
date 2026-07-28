@@ -67,6 +67,13 @@ RECORDED_OUTPUTS = {
         "site_selection": "site_selection",
         "group_errors": "group_errors",
     },
+    "schnet_readout": {
+        "summary": "schnet_readout_summary",
+        "run_metrics": "schnet_readout_run_metrics",
+        "fold_metrics": "schnet_readout_fold_metrics",
+        "host_metrics": "schnet_readout_host_metrics",
+        "predictions": "schnet_readout_predictions",
+    },
 }
 READY_MARKER_CONTENT = (
     "% Auto-generated after all canonical paper assets succeeded; do not edit.\n"
@@ -241,16 +248,25 @@ def validate_training_archive(
 def validate_contract(
     protocol: Mapping[str, Any], factorial: Mapping[str, Any],
     comparison: Mapping[str, Any], uq: Mapping[str, Any],
-    materials: Mapping[str, Any], pooled_rows: Sequence[Mapping[str, str]],
+    materials: Mapping[str, Any], schnet_readout: Mapping[str, Any],
+    schnet_readout_summary: Mapping[str, Any],
+    pooled_rows: Sequence[Mapping[str, str]],
     paired_rows: Sequence[Mapping[str, str]],
+    schnet_readout_fold_rows: Sequence[Mapping[str, str]],
 ) -> str:
     require_schema(factorial, "prm_factorial_bundle_v1", "factorial bundle")
     require_schema(comparison, "prm_comparison_bundle_v1", "comparison bundle")
     require_schema(uq, "prm_uq_results_v1", "UQ bundle")
     require_schema(materials, "prm_materials_analysis_v1", "materials bundle")
+    require_schema(
+        schnet_readout,
+        "prm_schnet_readout_sensitivity_bundle_v1",
+        "SchNet readout sensitivity bundle",
+    )
     for name, payload in (
         ("factorial bundle", factorial), ("comparison bundle", comparison),
         ("UQ bundle", uq), ("materials bundle", materials),
+        ("SchNet readout sensitivity bundle", schnet_readout),
     ):
         require_clean_collector(payload, name)
 
@@ -258,6 +274,7 @@ def validate_contract(
     observed_hashes = {
         str(factorial.get("data_sha256")), str(comparison.get("data_sha256")),
         str(uq.get("data_sha256")), str(materials.get("data_sha256")),
+        str(schnet_readout.get("data_sha256")),
     }
     if observed_hashes != {data_sha256}:
         raise ValueError(f"result bundles do not share the protocol data hash: {observed_hashes}")
@@ -318,6 +335,32 @@ def validate_contract(
             )
     if int(uq.get("n_members", -1)) != 5:
         raise ValueError("UQ bundle must contain five ensemble members")
+    if (
+        schnet_readout.get("n_runs")
+        != {"add_reference": 15, "mean_sensitivity": 15}
+        or int(schnet_readout.get("n_archived_runs", -1)) != 15
+        or not isinstance(schnet_readout.get("archived_runs"), list)
+        or len(schnet_readout["archived_runs"]) != 15
+    ):
+        raise ValueError("SchNet readout sensitivity lacks all 15 paired runs")
+    if (
+        schnet_readout_summary.get("analysis_role")
+        != "post_hoc_exploratory_robustness"
+        or schnet_readout_summary.get("intervention")
+        != {"model_kwargs.readout": {"from": "add", "to": "mean"}}
+    ):
+        raise ValueError("SchNet readout sensitivity role or intervention is invalid")
+    fold_ids = {
+        str(row.get("split_id")) for row in schnet_readout_fold_rows
+    }
+    directional = schnet_readout_summary.get("fold_directional_consistency", {})
+    if (
+        len(schnet_readout_fold_rows) != 5
+        or fold_ids != {f"host_cv5_f{fold}" for fold in range(5)}
+        or int(directional.get("n_folds", -1)) != 5
+        or int(directional.get("mean_better_folds", -1)) not in range(6)
+    ):
+        raise ValueError("SchNet readout sensitivity fold coverage is incomplete")
     uq_sources = uq.get("member_sources")
     if (
         not isinstance(uq_sources, list)
@@ -349,6 +392,19 @@ def validate_contract(
         raise ValueError("UQ test set does not match the frozen split")
     if int(materials.get("sample_oof", {}).get("n", -1)) != expected_modeling:
         raise ValueError("materials OOF predictions do not cover the canonical set")
+    if (
+        sum(int(row.get("n", -1)) for row in schnet_readout_fold_rows)
+        != expected_modeling
+        or int(
+            schnet_readout_summary.get(
+                "paired_host_cluster_bootstrap", {}
+            ).get("n", -1)
+        )
+        != expected_modeling
+    ):
+        raise ValueError(
+            "SchNet readout sensitivity does not cover the canonical set"
+        )
 
     pooled_keys = {(row["regime"], row["model"]) for row in pooled_rows}
     descriptor_selection = comparison.get("descriptor_selection", {})
@@ -494,6 +550,27 @@ def input_paths(result_root: Path, protocol_dir: Path) -> Dict[str, Path]:
         "pair_preferences": result_root / "materials/pair_preferences.csv",
         "site_selection": result_root / "materials/site_selection.csv",
         "group_errors": result_root / "materials/group_errors.csv",
+        "schnet_readout": (
+            result_root / "sensitivity/schnet_readout/manifest.json"
+        ),
+        "schnet_readout_summary": (
+            result_root / "sensitivity/schnet_readout/summary.json"
+        ),
+        "schnet_readout_run_metrics": (
+            result_root / "sensitivity/schnet_readout/run_metrics.csv"
+        ),
+        "schnet_readout_fold_metrics": (
+            result_root / "sensitivity/schnet_readout/fold_metrics.csv"
+        ),
+        "schnet_readout_host_metrics": (
+            result_root / "sensitivity/schnet_readout/host_metrics.csv"
+        ),
+        "schnet_readout_predictions": (
+            result_root / "sensitivity/schnet_readout/predictions.npz"
+        ),
+        "schnet_readout_config_manifest": (
+            ROOT / "configs/prm/sensitivity/schnet_mean_host/manifest.json"
+        ),
     }
 
 
@@ -514,8 +591,22 @@ def load_inputs(paths: Mapping[str, Path]) -> Dict[str, Any]:
         "pair_preferences": read_csv(paths["pair_preferences"]),
         "site_selection": read_csv(paths["site_selection"]),
         "group_errors": read_csv(paths["group_errors"]),
+        "schnet_readout": json.loads(paths["schnet_readout"].read_text()),
+        "schnet_readout_summary": json.loads(
+            paths["schnet_readout_summary"].read_text()
+        ),
+        "schnet_readout_fold_metrics": read_csv(
+            paths["schnet_readout_fold_metrics"]
+        ),
+        "schnet_readout_config_manifest": json.loads(
+            paths["schnet_readout_config_manifest"].read_text()
+        ),
     }
-    for name in ("protocol", "factorial", "comparison", "uq", "materials"):
+    for name in (
+        "protocol", "factorial", "comparison", "uq", "materials",
+        "schnet_readout", "schnet_readout_summary",
+        "schnet_readout_config_manifest",
+    ):
         strict_json(inputs[name])
     for name, expected in RECORDED_OUTPUTS.items():
         require_recorded_output_hashes(inputs[name], name, paths, expected)
@@ -541,6 +632,22 @@ def load_inputs(paths: Mapping[str, Path]) -> Dict[str, Any]:
         expected_count=5,
         expected_artifacts=standard_artifacts | {"calibration_predictions"},
     )
+    validate_training_archive(
+        inputs["schnet_readout"],
+        paths["schnet_readout"],
+        expected_count=15,
+        expected_artifacts=standard_artifacts,
+    )
+    if (
+        inputs["schnet_readout"].get("config_manifest", {}).get("sha256")
+        != file_sha256(paths["schnet_readout_config_manifest"])
+    ):
+        raise ValueError("SchNet readout configuration manifest hash mismatch")
+    if (
+        inputs["schnet_readout"].get("parent_comparison_manifest", {}).get("sha256")
+        != file_sha256(paths["comparison"])
+    ):
+        raise ValueError("SchNet readout parent comparison manifest hash mismatch")
     return inputs
 
 
@@ -551,6 +658,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
     paired = inputs["paired"]
     uq = inputs["uq"]
     materials = inputs["materials"]
+    schnet_readout = inputs["schnet_readout_summary"]
 
     effects: Dict[str, Any] = {}
     for split in ("validation", "test"):
@@ -596,7 +704,7 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
         }
 
     return {
-        "schema_version": "prm_paper_claims_v1",
+        "schema_version": "prm_paper_claims_v2",
         "selected_variant": selected_variant,
         "selection_data": "validation only",
         "factorial": {
@@ -612,6 +720,25 @@ def build_claims(inputs: Mapping[str, Any], selected_variant: str) -> Dict[str, 
             "within_defect_type_site_selection": materials["within_defect_type_site_selection"],
             "error_heterogeneity": materials["error_heterogeneity"],
             "interpretation_boundary": materials["interpretation_boundary"],
+        },
+        "schnet_readout_sensitivity": {
+            "analysis_role": schnet_readout["analysis_role"],
+            "intervention": schnet_readout["intervention"],
+            "add": schnet_readout["add"],
+            "mean": schnet_readout["mean"],
+            "paired_host_cluster_bootstrap": (
+                schnet_readout["paired_host_cluster_bootstrap"]
+            ),
+            "fold_directional_consistency": (
+                schnet_readout["fold_directional_consistency"]
+            ),
+            "sample_natoms_vs_absolute_error_spearman": (
+                schnet_readout["sample_natoms_vs_absolute_error_spearman"]
+            ),
+            "host_median_natoms_vs_mae_spearman": (
+                schnet_readout["host_median_natoms_vs_mae_spearman"]
+            ),
+            "fold_metrics": inputs["schnet_readout_fold_metrics"],
         },
     }
 
@@ -685,6 +812,43 @@ def render_macros(claims: Mapping[str, Any]) -> str:
             macro_line("PRMWithinTypeExactAccuracy", percent_format(site["exact_accuracy"]["mean"])),
             macro_line("PRMWithinTypeTopTwoAccuracy", percent_format(site["top2_accuracy"]["mean"])),
             macro_line("PRMWithinTypeRegret", finite_format(site["screening_regret_eV"]["mean"])),
+        ]
+    )
+    sensitivity = claims["schnet_readout_sensitivity"]
+    paired_readout = sensitivity["paired_host_cluster_bootstrap"]
+    lines.extend(
+        [
+            macro_line(
+                "PRMSchNetAddHostMAE",
+                finite_format(sensitivity["add"]["mae"]),
+            ),
+            macro_line(
+                "PRMSchNetMeanHostMAE",
+                finite_format(sensitivity["mean"]["mae"]),
+            ),
+            macro_line(
+                "PRMSchNetMeanMinusAddHostMAE",
+                finite_format(
+                    paired_readout["mae_difference_mean_minus_add_eV"],
+                    signed=True,
+                ),
+            ),
+            macro_line(
+                "PRMSchNetMeanMinusAddHostMAELow",
+                finite_format(paired_readout["ci_low_eV"], signed=True),
+            ),
+            macro_line(
+                "PRMSchNetMeanMinusAddHostMAEHigh",
+                finite_format(paired_readout["ci_high_eV"], signed=True),
+            ),
+            macro_line(
+                "PRMSchNetMeanBetterFolds",
+                str(
+                    sensitivity["fold_directional_consistency"][
+                        "mean_better_folds"
+                    ]
+                ),
+            ),
         ]
     )
     return "\n".join(lines) + "\n"
@@ -789,6 +953,36 @@ def render_transfer_narrative(claims: Mapping[str, Any]) -> str:
     )
 
 
+def render_schnet_readout_narrative(claims: Mapping[str, Any]) -> str:
+    sensitivity = claims["schnet_readout_sensitivity"]
+    paired = sensitivity["paired_host_cluster_bootstrap"]
+    status = effect_status(float(paired["ci_low_eV"]), float(paired["ci_high_eV"]))
+    status_text = {
+        "improves": "supports lower error for mean pooling",
+        "worsens": "supports higher error for mean pooling",
+        "inconclusive": "is inconclusive",
+    }
+    directional = sensitivity["fold_directional_consistency"]
+    return (
+        "% Auto-generated from the controlled SchNet readout sensitivity; "
+        "do not edit.\n"
+        "In a post-hoc host-CV sensitivity that changed only SchNet's graph "
+        "readout, replacing atomwise addition by mean pooling changed pooled "
+        rf"MAE from {finite_format(sensitivity['add']['mae'])} to "
+        rf"{finite_format(sensitivity['mean']['mae'])}~eV. "
+        "The paired host-cluster mean-minus-add absolute-error difference was "
+        rf"$\Delta={finite_format(paired['mae_difference_mean_minus_add_eV'], signed=True)}$ "
+        rf"[{finite_format(paired['ci_low_eV'], signed=True)}, "
+        rf"{finite_format(paired['ci_high_eV'], signed=True)}]~eV "
+        f"({status_text[status]}), and mean pooling had lower fold MAE in "
+        f"{int(directional['mean_better_folds'])}/"
+        f"{int(directional['n_folds'])} folds. "
+        "This bounded intervention tests sensitivity to graph readout; it does "
+        "not replace the prespecified additive-SchNet comparator or decompose "
+        "the remaining end-to-end DART--SchNet difference.\n"
+    )
+
+
 def render_error_heterogeneity_narrative(claims: Mapping[str, Any]) -> str:
     heterogeneity = claims["materials"]["error_heterogeneity"]
     host = heterogeneity["host"]
@@ -812,6 +1006,54 @@ def render_error_heterogeneity_narrative(claims: Mapping[str, Any]) -> str:
         "associations rather than evidence that sample count alone causes the "
         "observed errors.\n"
     )
+
+
+def render_schnet_readout_table(claims: Mapping[str, Any]) -> str:
+    sensitivity = claims["schnet_readout_sensitivity"]
+    rows = []
+    for row in sorted(
+        sensitivity["fold_metrics"], key=lambda item: item["split_id"]
+    ):
+        fold = int(str(row["split_id"]).rsplit("f", 1)[1]) + 1
+        rows.append(
+            f"Fold {fold} & {int(row['n'])} & "
+            f"{finite_format(float(row['add_mae_eV']))} & "
+            f"{finite_format(float(row['mean_mae_eV']))} & "
+            f"{finite_format(float(row['mean_minus_add_mae_eV']), signed=True)} "
+            r"\\"
+        )
+    paired = sensitivity["paired_host_cluster_bootstrap"]
+    rows.append(
+        r"\textbf{Pooled OOF} & "
+        f"{int(paired['n'])} & "
+        rf"\textbf{{{finite_format(sensitivity['add']['mae'])}}} & "
+        rf"\textbf{{{finite_format(sensitivity['mean']['mae'])}}} & "
+        rf"\textbf{{{finite_format(paired['mae_difference_mean_minus_add_eV'], signed=True)}}} "
+        r"\\"
+    )
+    body = "\n".join(rows)
+    interval = (
+        f"[{finite_format(paired['ci_low_eV'], signed=True)}, "
+        f"{finite_format(paired['ci_high_eV'], signed=True)}]"
+    )
+    return rf"""% Auto-generated; do not edit.
+\begin{{table*}}[t]
+\caption{{Post-hoc SchNet graph-readout sensitivity under the fixed
+host-held-out protocol. Each fold prediction averages seeds 342--344. The
+difference is mean-readout MAE minus additive-readout MAE, in eV. The pooled
+host-cluster bootstrap 95\% interval for this difference is {interval}~eV.
+The prespecified additive-readout result remains the main comparator.}}
+\label{{tab:schnet-readout}}
+\centering
+\begin{{tabular}}{{lrrrr}}
+\toprule
+Partition & $n$ & Add MAE & Mean MAE & Mean $-$ add \\
+\midrule
+{body}
+\bottomrule
+\end{{tabular}}
+\end{{table*}}
+"""
 
 
 def render_factorial_table(factorial: Mapping[str, Any]) -> str:
@@ -1405,6 +1647,9 @@ def write_outputs(
         "results_macros.tex": render_macros(claims),
         "results_factorial_narrative.tex": render_factorial_narrative(claims),
         "results_transfer_narrative.tex": render_transfer_narrative(claims),
+        "results_schnet_readout_narrative.tex": (
+            render_schnet_readout_narrative(claims)
+        ),
         "results_error_heterogeneity_narrative.tex": (
             render_error_heterogeneity_narrative(claims)
         ),
@@ -1413,6 +1658,7 @@ def write_outputs(
         "tab_applicability.tex": render_applicability_table(claims),
         "tab_uq.tex": render_uq_table(inputs["uq"]),
         "tab_screening.tex": render_screening_table(inputs["materials"]),
+        "tab_schnet_readout.tex": render_schnet_readout_table(claims),
     }
     for name, content in text_outputs.items():
         path = generated_dir / name
@@ -1450,7 +1696,7 @@ def write_outputs(
     output_hashes[repository_path(ready_path)] = text_sha256(READY_MARKER_CONTENT)
 
     manifest = {
-        "schema_version": "prm_paper_assets_v1",
+        "schema_version": "prm_paper_assets_v2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "collector_git": collector_git,
         "data_sha256": inputs["protocol"]["data_sha256"],
@@ -1486,7 +1732,9 @@ def main() -> None:
     inputs = load_inputs(paths)
     selected = validate_contract(
         inputs["protocol"], inputs["factorial"], inputs["comparison"],
-        inputs["uq"], inputs["materials"], inputs["pooled"], inputs["paired"],
+        inputs["uq"], inputs["materials"], inputs["schnet_readout"],
+        inputs["schnet_readout_summary"], inputs["pooled"], inputs["paired"],
+        inputs["schnet_readout_fold_metrics"],
     )
     claims = build_claims(inputs, selected)
     strict_json(claims)
