@@ -1614,9 +1614,13 @@ def audit_macros_and_tables(
     ).read_text()
     for term in ("G", "E", "P", "G:P", "E:P"):
         effect = factorial_direct["effects"]["validation"][term]
+        digits = 4 if (
+            effect["ci_low"] * effect["ci_high"] > 0.0
+            and min(abs(effect["ci_low"]), abs(effect["ci_high"])) < 0.0005
+        ) else 3
         fragment = (
-            f"$\\Delta={signed(effect['mean'])}$ "
-            f"[{signed(effect['ci_low'])}, {signed(effect['ci_high'])}]"
+            f"$\\Delta={effect['mean']:+.{digits}f}$ "
+            f"[{effect['ci_low']:+.{digits}f}, {effect['ci_high']:+.{digits}f}]"
         )
         audit.contains(
             f"factorial narrative effect: {term}", factorial_narrative, fragment
@@ -1733,7 +1737,7 @@ def audit_method_claims(
     audit.contains(
         "abstract modeling set",
         abstract,
-        f"{facts['modeling_rows']:,} provenance-audited IMP2D",
+        f"{facts['modeling_rows']:,} provenance-audited neutral IMP2D",
     )
     supplement = " ".join(
         (root / "paper_Q1/supplement.tex").read_text().split()

@@ -14,7 +14,7 @@
     "raw_rows": 17364,
     "source_filtered_rows": 10641
   },
-  "created_at": "2026-07-19T14:25:36.127716+00:00",
+  "created_at": "2026-08-09T11:34:13.681994+00:00",
   "inputs": {
     "data_audit": {
       "path": "artifacts/prm_protocol_v2/data_audit.json",
@@ -32,11 +32,11 @@
   "outputs": {
     "pdf": {
       "path": "paper_Q1/figures/fig_protocol_overview.pdf",
-      "sha256": "f8a2334511dd02481f7c0105f0432d56f5285a3490c4d8c41ef8a1d2a80fef34"
+      "sha256": "402f7d103760a2611b00dbfa8c99459fd2ac031dd9a9fceb5513fda4f76788f0"
     },
     "png": {
       "path": "paper_Q1/figures/fig_protocol_overview.png",
-      "sha256": "b3d7b5ddebca4fdf741d5dd7486f9ce18ef9eb614526ed037624bf9356f673a9"
+      "sha256": "eafd1134f0e29058ebe0abe660fdb6b08b6af12aa9fa7b375b55be43128d077f"
     }
   },
   "partition_profiles": [

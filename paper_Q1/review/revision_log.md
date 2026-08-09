@@ -272,7 +272,11 @@
   and added grayscale-redundant hatching/line styles to the affected figures.
 - Evidence: `paper_Q1/main.tex`, `paper_Q1/sections/`,
   `paper_Q1/supplement.tex`, and the rebuilt paper-facing assets.
-- Status: implementation complete; compilation, numeric audit, and visual QA
-  must pass before this revision is closed.
-- Blocks finalization: yes until those paper-only validation gates pass; no
-  scientific experiment is required.
+- Verification: 20 targeted paper-asset/protocol/audit tests pass; the
+  independent numerical audit again passes 1,331 of 1,331 checks; the rebuilt
+  13-page main PDF and 2-page Supplemental Material compile without undefined
+  references, overfull boxes, or float-package conflicts and pass page-by-page
+  visual inspection.
+- Status: complete.
+- Blocks finalization: no scientific blocker; author-controlled submission
+  metadata, licensing, and archival-release actions remain.

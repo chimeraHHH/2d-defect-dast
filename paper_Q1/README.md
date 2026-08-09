@@ -51,3 +51,10 @@ tectonic --keep-logs --keep-intermediates supplement.tex
 The remaining placeholders in `main.tex` are administrative: verified author
 order/affiliations, corresponding-author contact, funder wording, and the final
 tagged archival release identifier.
+
+For initial PRM submission, upload `main.pdf` as the manuscript and
+`supplement.pdf` as a separate Supplemental Material file. The tracked source
+archive is a reproducibility copy, not the initial manuscript upload. The draft
+cover letter and Supplemental Material description are `cover_letter.md` and
+`README.TXT`; bracketed author-controlled fields in the cover letter must be
+resolved before use.

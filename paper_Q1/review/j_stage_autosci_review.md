@@ -41,6 +41,14 @@ training, new baselines, GPU execution, or prospective DFT.
 - Recompile, rerun the independent numerical audit, and visually inspect all
   pages.
 
+## Validation result
+
+- Paper-only tests: 20 passed.
+- Independent numerical audit: 1,331 of 1,331 checks passed.
+- Compiled package: 13-page main manuscript and 2-page Supplemental Material.
+- Visual QA: every page inspected; no clipping, overlap, unreadable result
+  element, or grayscale-only ambiguity remains in the revised figures.
+
 ## Remaining author-controlled blockers
 
 - final author order, affiliations, corresponding author, email, ORCIDs, and

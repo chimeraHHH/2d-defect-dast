@@ -1,10 +1,10 @@
 {
   "collector_git": {
-    "commit": "288cefe61b58768a9f0da0741d4c2087a934ef31",
+    "commit": "39f2585e35cb5736dd1592979998d43c29efa880",
     "dirty": false,
     "status_porcelain": []
   },
-  "created_at": "2026-07-28T18:43:25.535123+00:00",
+  "created_at": "2026-08-09T11:34:08.791979+00:00",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
   "inputs": {
     "comparison": {
@@ -109,25 +109,25 @@
     }
   },
   "outputs": {
-    "paper_Q1/figures/fig_error_heterogeneity.pdf": "273d78462be8b40b0fc8adf99236e0c273aa69fa312bf8450df8908b3e6b769f",
+    "paper_Q1/figures/fig_error_heterogeneity.pdf": "a3705a524d370304c7ce85876c5875824478203723f059bae0d18a80654dbbc4",
     "paper_Q1/figures/fig_error_heterogeneity.png": "8f6b372c391a5303bbdeed5cf035fcbaee9ea15dc13325a7c7140236a71c4dcb",
-    "paper_Q1/figures/fig_factorial.pdf": "f14e0aa5bd72b2ede9e9bfb6f917aef25a3ee3d5a9c93fddb5b605f87b1cfc92",
+    "paper_Q1/figures/fig_factorial.pdf": "98fe12cfb40005e5bc864f1a2c3f288f010ac9894d29a600a7c750fcd1fa15cb",
     "paper_Q1/figures/fig_factorial.png": "2157a96a0f88939a08ffc81d382c54f2b6e5ec847a836a681aa170191f84d409",
-    "paper_Q1/figures/fig_screening.pdf": "6095519c2310387e9fb99e5ac26e69f55052f8407f52ba590c4546bc732f5e5c",
-    "paper_Q1/figures/fig_screening.png": "3ce3b25990b2c4cbf91cf636cfbcf5b7c70ee5b60c3c4d8c3caac35385aa1aec",
-    "paper_Q1/figures/fig_transfer.pdf": "873495e941cda8db6af309b36297c790dc8acb93ba5241eaa4dd913e39860e0c",
-    "paper_Q1/figures/fig_transfer.png": "cae57adef2b1e37a34aa9a8f04c168d5d511f5b2e14fad6e08a967e7a51163c1",
-    "paper_Q1/figures/fig_uq.pdf": "700b86cfdf25e5937e2e71d236d35c74a0042b56123130785e042b3401350209",
+    "paper_Q1/figures/fig_screening.pdf": "56f9f58e6e2d402aa51d8d7c36ab89d5207019ce328cd926e559ca9e2a3ab58b",
+    "paper_Q1/figures/fig_screening.png": "ea685f0a6300e45fcb70e22f236bece72933723e715f6be4d8da9428062a72f3",
+    "paper_Q1/figures/fig_transfer.pdf": "b6055de16ef563e1fd2929a130696b2230b05bba5452ac92ed427ad662402768",
+    "paper_Q1/figures/fig_transfer.png": "ac8fdac20b0280f6443f6efc22cc4774f99e3457697e052e021d6d03fc83e281",
+    "paper_Q1/figures/fig_uq.pdf": "957efe830effce361b58639d1d1fcf2608ee7195e630542331adf4856aaadd04",
     "paper_Q1/figures/fig_uq.png": "64dab31c1aecef44cfb0b4b0e51b69682a2ec394144ac7a717943c5d5bf64064",
     "paper_Q1/generated/claims.json": "e1dadc82cfd168e1f0e9ad14e5eb9dd735f766de652734d4f6f0737d285e089a",
     "paper_Q1/generated/results_error_heterogeneity_narrative.tex": "74e350f4403a688fa0aeec68c7cddc925bc71885f77bdf7dc250a77d667e7438",
-    "paper_Q1/generated/results_factorial_narrative.tex": "a1d30207dbbdbdc2f7d7a855f30c88bbdc8db5c2b82e541a99dee0a83f0aa017",
+    "paper_Q1/generated/results_factorial_narrative.tex": "91d63e839b6086c8424bdccc0b9327ef5c0cca53a7516601d104bb2e1073aea7",
     "paper_Q1/generated/results_macros.tex": "7b483a26e104a4b2e0460f70594c68e50cffe60027a9762f6551dc94939e7e90",
     "paper_Q1/generated/results_ready.tex": "1c9771a27939eae4b73003bc1f480c2737ced84cef15b272fc66de1a65f20824",
     "paper_Q1/generated/results_schnet_readout_narrative.tex": "035c122cb39fe43de8dbb625af1bd2d320496c058a51bb8b2f1378ae30a3fc7e",
-    "paper_Q1/generated/results_transfer_narrative.tex": "1dd689e6fe730f767d1800950fe79ccf50933598c47ac72bffb731f88d54f988",
+    "paper_Q1/generated/results_transfer_narrative.tex": "7c3f5310707de033483b9c249cb82175c19e0406c5b2edbe61a471a71e6f3fb2",
     "paper_Q1/generated/tab_applicability.tex": "d1476bb5a166a6eea090629a57a554147ac246d3ceab280c2be8ed94feea4d09",
-    "paper_Q1/generated/tab_benchmark.tex": "61135809d170c3bd8d1e3f478fcf659528c8dfe6623c2c39140eb09a74a20543",
+    "paper_Q1/generated/tab_benchmark.tex": "223e9f6a4bd3fa1599d70c0d5420d16e05abad0afcf336898166cfab47dbf81a",
     "paper_Q1/generated/tab_factorial.tex": "3346d43a697b1dc1060a658ad3d3e68278e51cb21faeb0b47292b0d20291da7d",
     "paper_Q1/generated/tab_schnet_readout.tex": "bebacfa7a3545db0b97841615d83a5a2fde0ff22648ed8dbb0de14f917e5c29a",
     "paper_Q1/generated/tab_screening.tex": "cc1e7cf92db9433240d6936317ee00cce8683fca210bc0ed67a7b62573bb80f5",

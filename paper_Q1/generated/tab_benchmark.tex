@@ -1,6 +1,7 @@
 % Auto-generated; do not edit.
 \begin{table*}[t]
-\caption{Pooled out-of-fold or single-block test MAE (eV). The descriptor
+\caption{Pooled out-of-fold or single-block test MAE (eV). SchNet-add denotes
+the prespecified periodic SchNet recipe with atomwise-additive readout. The descriptor
 column selects a learned family independently within every split by that
 split's validation MAE (Histogram GB, LightGBM were selected across
 the resulting folds). $\Delta$
@@ -10,7 +11,7 @@ using the regime-matched resampling unit; positive values favor DART.}
 \centering
 \begin{tabular}{lccc cc}
 \toprule
-Regime & DART & SchNet & Descriptor & $\Delta_{\rm SchNet}$ & $\Delta_{\rm desc.}$ \\
+Regime & DART & SchNet-add & Descriptor & $\Delta_{\rm SchNet-add}$ & $\Delta_{\rm desc.}$ \\
 \midrule
 Random OOF & 0.418 & 0.571 & 0.625 & +0.154 [+0.136, +0.174] & +0.208 [+0.194, +0.221] \\
 Pair OOF & 0.450 & 0.628 & 0.674 & +0.178 [+0.157, +0.202] & +0.224 [+0.207, +0.242] \\
