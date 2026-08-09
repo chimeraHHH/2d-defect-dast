@@ -1,0 +1,116 @@
+{
+  "catalog_version": "prm_j_stage_figures_v1",
+  "evidence_boundary": "Frozen E1-E9 evidence; no new experiment or numerical analysis",
+  "figures": [
+    {
+      "id": "main_fig_1",
+      "claim": "The selected g111 DART path combines a unique impurity marker, local pair/angle interactions, all-atom geometric self-attention, and a gated non-extensive readout.",
+      "generator": "scripts/prm_make_protocol_figure.py",
+      "inputs": [
+        "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
+        "src/models/crystal_v2.py",
+        "src/models/baseline.py"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_dart_architecture.pdf",
+        "paper_Q1/figures/fig_dart_architecture.png"
+      ],
+      "surface": "main",
+      "status": "pending_canonical_regeneration"
+    },
+    {
+      "id": "main_fig_2",
+      "claim": "The audited IMP2D evidence contains 10224 canonical structures and uses frozen, leakage-controlled evaluation partitions.",
+      "generator": "scripts/prm_make_protocol_figure.py",
+      "inputs": [
+        "artifacts/prm_protocol_v2/manifest.json",
+        "artifacts/prm_protocol_v2/data_audit.json",
+        "artifacts/prm_protocol_v2/samples.csv",
+        "artifacts/prm_protocol_v2/splits/"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_protocol_overview.pdf",
+        "paper_Q1/figures/fig_protocol_overview.png"
+      ],
+      "surface": "main",
+      "status": "retained_pending_sidecar_v3"
+    },
+    {
+      "id": "main_fig_3",
+      "claim": "Paired factorial evidence supports G and the composite P block but not an independent E main effect.",
+      "generator": "scripts/prm_make_result_assets.py",
+      "inputs": [
+        "artifacts/prm_results/factorial/bundle.json",
+        "artifacts/prm_results/factorial/variant_summary.csv",
+        "artifacts/prm_results/factorial/effects.csv"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_factorial.pdf",
+        "paper_Q1/figures/fig_factorial.png"
+      ],
+      "surface": "main",
+      "status": "pending_canonical_regeneration"
+    },
+    {
+      "id": "main_fig_4",
+      "claim": "Transfer error is axis dependent and paired error differences favor DART over the two evaluated comparator recipes in all five regimes.",
+      "generator": "scripts/prm_make_result_assets.py",
+      "inputs": [
+        "artifacts/prm_results/comparison/pooled_metrics.csv",
+        "artifacts/prm_results/comparison/paired_comparisons.csv"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_transfer.pdf",
+        "paper_Q1/figures/fig_transfer.png"
+      ],
+      "surface": "main",
+      "status": "pending_canonical_regeneration"
+    },
+    {
+      "id": "main_fig_5",
+      "claim": "Internal conformal coverage, interval width, and risk rejection jointly bound the uncertainty claim.",
+      "generator": "scripts/prm_make_result_assets.py",
+      "inputs": [
+        "artifacts/prm_results/uq/interval_calibration.csv",
+        "artifacts/prm_results/uq/risk_coverage.csv",
+        "artifacts/prm_results/uq/predictions.npz"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_uq.pdf",
+        "paper_Q1/figures/fig_uq.png"
+      ],
+      "surface": "main",
+      "status": "retained"
+    },
+    {
+      "id": "main_fig_6",
+      "claim": "Pair-held-out predictions retain retrospective decision utility within the audited IMP2D candidate sets.",
+      "generator": "scripts/prm_make_result_assets.py",
+      "inputs": [
+        "artifacts/prm_results/materials/pair_preferences.csv",
+        "artifacts/prm_results/materials/site_selection.csv"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_screening.pdf",
+        "paper_Q1/figures/fig_screening.png"
+      ],
+      "surface": "main",
+      "status": "retained"
+    },
+    {
+      "id": "supp_fig_s1",
+      "claim": "Pair-held-out error is descriptively heterogeneous across host, impurity, incorporation class, and site labels.",
+      "generator": "scripts/prm_make_result_assets.py",
+      "inputs": [
+        "artifacts/prm_results/materials/group_errors.csv",
+        "artifacts/prm_results/materials/summary.json"
+      ],
+      "outputs": [
+        "paper_Q1/figures/fig_error_heterogeneity.pdf",
+        "paper_Q1/figures/fig_error_heterogeneity.png"
+      ],
+      "surface": "supplement",
+      "status": "retained_reallocated"
+    }
+  ]
+}

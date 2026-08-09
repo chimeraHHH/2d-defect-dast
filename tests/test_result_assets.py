@@ -33,6 +33,7 @@ from scripts.prm_make_result_assets import (
     text_sha256,
     validate_contract,
     validate_training_archive,
+    variant_display_label,
     write_manifest_then_ready_marker,
     write_ready_marker,
 )
@@ -45,6 +46,16 @@ def test_directional_statuses_respect_interval_signs():
     assert comparison_status(0.1, 0.2) == "dart_better"
     assert comparison_status(-0.2, -0.1) == "comparator_better"
     assert comparison_status(-0.1, 0.2) == "inconclusive"
+
+
+def test_factorial_variant_labels_expose_enabled_modules():
+    assert variant_display_label("g000") == "Base"
+    assert variant_display_label("g001") == "P"
+    assert variant_display_label("g010") == "E"
+    assert variant_display_label("g100") == "G"
+    assert variant_display_label("g111") == "G+E+P"
+    with pytest.raises(ValueError):
+        variant_display_label("g12")
 
 
 def test_factorial_effect_claim_counts_direction_and_rejects_bad_repeats():

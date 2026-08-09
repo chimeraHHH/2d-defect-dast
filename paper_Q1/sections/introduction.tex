@@ -69,6 +69,35 @@ host--impurity block.  Architecture and descriptor choices use validation data
 only; screening conclusions use pair-held-out out-of-fold predictions; and
 uncertainty is evaluated on a separate internal calibration/test split.
 
+Figure~\ref{fig:architecture} provides the model roadmap used throughout the
+paper.  It separates the uniquely identified impurity, the local and global
+interaction paths, and the graph-level readout.  The figure shows the selected
+\texttt{g111} data path, whereas the paired factorial below tests which of its
+three optional modules have independent support.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_dart_architecture.pdf}
+\caption{Defect-Aware Radial Transformer (DART) architecture.
+  (a) Schematic periodic impurity graph.  Local pair and angle messages use a
+  5-\AA{} graph, whereas the global path receives the all-pairs minimum-image
+  distance matrix; the drawing is not a selected material.
+  (b) A fixed 128-dimensional ct-UAE vector and nine normalized elemental
+  attributes are projected to 128 channels.  A learned binary embedding marks
+  the unique impurity, and E adds four projected local descriptors only at
+  that node.
+  (c) Three P local blocks combine pre-normalization and scalar distance gating
+  before two four-head geometric Transformer blocks.  Their learned radial
+  bias uses 32 basis centers spanning 0--12~\AA; 12~\AA{} is the radial-grid
+  endpoint, not an attention cutoff.
+  (d) G fuses an atom-attention sum and a channelwise maximum with one
+  graph-dependent scalar gate before the scalar formation-energy head.
+  Validation MAE selected the all-enabled \texttt{g111} path; this selection
+  does not imply that E was independently beneficial or that the two changes
+  within P can be assigned separate effects.}
+\label{fig:architecture}
+\end{figure*}
+
 Three findings organize the paper.  First, paired evidence supports gated
 readout and the composite pre-normalized, distance-gated local block, but not an
 independent main effect of explicit environment enrichment.  Second, chemical

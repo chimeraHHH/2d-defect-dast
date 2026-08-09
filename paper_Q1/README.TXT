@@ -1,8 +1,9 @@
-Description: Supplemental Material for “Defect-aware graph transformer for
-impurity incorporation energies and axis-resolved chemical transfer in
-two-dimensional materials.” The file supplement.pdf reports the fixed DART and
-periodic SchNet learning recipes, optimization and seed specifications,
-descriptor-selection search, and the controlled post-hoc SchNet graph-readout
-sensitivity analysis with fold-resolved results and size--error diagnostics.
+Description: Supplemental Material for “Axis-resolved transfer of impurity
+formation energies in two-dimensional materials with a defect-aware graph
+transformer.” The file supplement.pdf reports the fixed DART and periodic
+SchNet learning recipes, optimization and seed specifications,
+descriptor-selection search, descriptive error heterogeneity, and the
+controlled post-hoc SchNet graph-readout sensitivity analysis with
+fold-resolved results and size--error diagnostics.
 
 File: supplement.pdf

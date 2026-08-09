@@ -16,9 +16,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 from ase.data import atomic_numbers
 from matplotlib.colors import BoundaryNorm, ListedColormap
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import Circle, FancyBboxPatch, Rectangle
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -32,7 +33,13 @@ COLORS = {
     "test": "#B64B4B",
     "adsorbate": "#2A6F97",
     "interstitial": "#C15B38",
+    "host_atom": "#6D8EA0",
+    "impurity_atom": "#C15B38",
 }
+
+SELECTED_CONFIG = ROOT / "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml"
+MODEL_SOURCE = ROOT / "src/models/crystal_v2.py"
+GLOBAL_BLOCK_SOURCE = ROOT / "src/models/baseline.py"
 
 
 def file_sha256(path: Path) -> str:
@@ -346,6 +353,282 @@ def draw_partition_profiles(axis: plt.Axes, profiles: Sequence[Mapping[str, Any]
     axis.set_title("Frozen evaluation partitions", loc="left", pad=12, fontsize=7.2)
 
 
+def architecture_box(
+    axis: plt.Axes,
+    xy: tuple[float, float],
+    width: float,
+    height: float,
+    title: str,
+    body: str = "",
+    *,
+    facecolor: str = "#F4F4F4",
+    edgecolor: str = COLORS["grid"],
+    title_color: str = COLORS["ink"],
+    fontsize: float = 5.3,
+) -> None:
+    box = FancyBboxPatch(
+        xy, width, height,
+        boxstyle="round,pad=0.010,rounding_size=0.018",
+        linewidth=0.65, edgecolor=edgecolor, facecolor=facecolor,
+    )
+    axis.add_patch(box)
+    x, y = xy
+    axis.text(
+        x + width / 2, y + height * (0.64 if body else 0.50), title,
+        ha="center", va="center", fontsize=fontsize, fontweight="bold",
+        color=title_color, linespacing=1.0,
+    )
+    if body:
+        axis.text(
+            x + width / 2, y + height * 0.27, body,
+            ha="center", va="center", fontsize=fontsize - 0.4,
+            color=COLORS["muted"], linespacing=1.0,
+        )
+
+
+def architecture_arrow(
+    axis: plt.Axes,
+    start: tuple[float, float],
+    end: tuple[float, float],
+    *,
+    color: str = COLORS["muted"],
+) -> None:
+    axis.annotate(
+        "", xy=end, xytext=start,
+        arrowprops={"arrowstyle": "-|>", "lw": 0.7, "color": color,
+                    "shrinkA": 0, "shrinkB": 0},
+    )
+
+
+def prepare_architecture_axis(axis: plt.Axes, panel: str, title: str) -> None:
+    axis.set_xlim(0, 1)
+    axis.set_ylim(0, 1)
+    axis.axis("off")
+    panel_label(axis, panel)
+    axis.set_title(title, loc="left", x=0.02, pad=5, fontsize=7.2)
+
+
+def draw_periodic_graph_schematic(axis: plt.Axes) -> None:
+    prepare_architecture_axis(axis, "(a)", "Periodic defect graph")
+    axis.add_patch(Rectangle(
+        (0.08, 0.29), 0.84, 0.59, fill=False, lw=0.75,
+        edgecolor=COLORS["muted"], linestyle=(0, (3, 2)),
+    ))
+    rows = []
+    for row in range(4):
+        y = 0.38 + row * 0.145
+        offset = 0.08 if row % 2 else 0.0
+        for column in range(5):
+            x = 0.18 + column * 0.16 + offset
+            if x < 0.90:
+                rows.append((x, y))
+    centre_index = min(
+        range(len(rows)),
+        key=lambda index: (rows[index][0] - 0.50) ** 2
+        + (rows[index][1] - 0.60) ** 2,
+    )
+    centre = rows[centre_index]
+    for index, first in enumerate(rows):
+        for second in rows[index + 1:]:
+            distance = float(np.hypot(first[0] - second[0], first[1] - second[1]))
+            if distance < 0.185:
+                axis.plot(
+                    [first[0], second[0]], [first[1], second[1]],
+                    color="#B7C5CC", lw=0.55, zorder=1,
+                )
+    axis.add_patch(Circle(
+        centre, 0.245, fill=False, lw=0.9,
+        edgecolor=COLORS["impurity_atom"], linestyle=(0, (3, 2)), zorder=0,
+    ))
+    for index, position in enumerate(rows):
+        is_impurity = index == centre_index
+        axis.add_patch(Circle(
+            position, 0.027 if not is_impurity else 0.038,
+            facecolor=(COLORS["impurity_atom"] if is_impurity else COLORS["host_atom"]),
+            edgecolor="white", lw=0.5, zorder=3,
+        ))
+    axis.annotate(
+        "unique impurity", xy=centre, xytext=(0.08, 0.92),
+        ha="left", va="center", fontsize=5.1, color=COLORS["impurity_atom"],
+        arrowprops={"arrowstyle": "->", "lw": 0.6,
+                    "color": COLORS["impurity_atom"]},
+    )
+    axis.text(
+        0.50, 0.25, "5 \u00c5 periodic pair/angle graph",
+        ha="center", va="center", fontsize=5.2, color=COLORS["ink"],
+    )
+    axis.text(
+        0.50, 0.13, "all-pairs minimum-image distances",
+        ha="center", va="center", fontsize=5.0, color=COLORS["muted"],
+    )
+    axis.text(
+        0.50, 0.05, "schematic; not a selected material",
+        ha="center", va="center", fontsize=4.5, color=COLORS["muted"],
+    )
+
+
+def draw_atom_encoding(axis: plt.Axes) -> None:
+    prepare_architecture_axis(axis, "(b)", "Atom encoding and E")
+    architecture_box(
+        axis, (0.04, 0.77), 0.42, 0.13, "Fixed ct-UAE", "128 features",
+        facecolor="#EDF3F6", edgecolor=COLORS["validation"],
+    )
+    architecture_box(
+        axis, (0.54, 0.77), 0.42, 0.13, "Element table", "9 normalized attributes",
+    )
+    architecture_arrow(axis, (0.25, 0.75), (0.43, 0.67))
+    architecture_arrow(axis, (0.75, 0.75), (0.57, 0.67))
+    architecture_box(
+        axis, (0.22, 0.56), 0.56, 0.11, "Linear 137 \u2192 128",
+        facecolor="#F4F4F4",
+    )
+    architecture_arrow(axis, (0.50, 0.55), (0.50, 0.48))
+    architecture_box(
+        axis, (0.08, 0.35), 0.84, 0.13,
+        "+ learned impurity-status embedding", "one compositionally unique node",
+        facecolor="#F9EEE9", edgecolor=COLORS["impurity_atom"],
+    )
+    architecture_arrow(axis, (0.50, 0.34), (0.50, 0.27))
+    architecture_box(
+        axis, (0.04, 0.07), 0.92, 0.20,
+        "E \u2014 defect-local enrichment",
+        "coordination; mean/max distance;\n"
+        "absolute electronegativity contrast;\n"
+        "projected and added only at the impurity",
+        facecolor="#FFF4DB", edgecolor=COLORS["calibration"], fontsize=4.9,
+    )
+
+
+def draw_interaction_stack(axis: plt.Axes) -> None:
+    prepare_architecture_axis(axis, "(c)", "Local and global context")
+    architecture_box(
+        axis, (0.05, 0.57), 0.90, 0.31,
+        "P \u00d7 3 \u2014 composite local block",
+        "Pre-LayerNorm; 32-distance-RBF filter;\n"
+        "scalar distance gate; 32-angle-RBF triplets;\n"
+        "sum aggregation and residual update (5 \u00c5 graph)",
+        facecolor="#EAF4EC", edgecolor="#3B7D5A", fontsize=5.2,
+    )
+    architecture_arrow(axis, (0.50, 0.55), (0.50, 0.47))
+    architecture_box(
+        axis, (0.05, 0.15), 0.90, 0.32,
+        "Geometric Transformer \u00d7 2",
+        "4-head all-atom self-attention; learned\n"
+        "per-head radial bias from minimum-image distance;\n"
+        "32 RBF centres spanning 0\u201312 \u00c5",
+        facecolor="#EDF3F6", edgecolor=COLORS["validation"], fontsize=5.2,
+    )
+    axis.text(
+        0.50, 0.06, "12 \u00c5 is the radial grid endpoint, not an attention cutoff",
+        ha="center", va="center", fontsize=4.5, color=COLORS["muted"],
+    )
+
+
+def draw_graph_readout(axis: plt.Axes) -> None:
+    prepare_architecture_axis(axis, "(d)", "G readout and prediction")
+    architecture_box(
+        axis, (0.04, 0.77), 0.43, 0.14,
+        "Atom-attention", "weighted sum", facecolor="#EDF3F6",
+        edgecolor=COLORS["validation"],
+    )
+    architecture_box(
+        axis, (0.53, 0.77), 0.43, 0.14,
+        "Channelwise", "maximum", facecolor="#F4F4F4",
+    )
+    architecture_arrow(axis, (0.25, 0.75), (0.43, 0.66))
+    architecture_arrow(axis, (0.75, 0.75), (0.57, 0.66))
+    architecture_box(
+        axis, (0.16, 0.52), 0.68, 0.14,
+        "G \u2014 scalar-gated fusion", "graph-dependent mixing weight",
+        facecolor="#E7F0F4", edgecolor=COLORS["validation"],
+    )
+    architecture_arrow(axis, (0.50, 0.51), (0.50, 0.43))
+    architecture_box(
+        axis, (0.18, 0.29), 0.64, 0.14,
+        "LayerNorm + MLP", "128 \u2192 128 \u2192 1",
+    )
+    architecture_arrow(axis, (0.50, 0.28), (0.50, 0.20))
+    architecture_box(
+        axis, (0.24, 0.07), 0.52, 0.13,
+        r"Formation energy $\hat E_{\mathrm{f}}$", facecolor="#F9EEE9",
+        edgecolor=COLORS["impurity_atom"], title_color=COLORS["impurity_atom"],
+    )
+
+
+def build_architecture_summary(
+    selected_config: Path = SELECTED_CONFIG,
+    model_source: Path = MODEL_SOURCE,
+    global_block_source: Path = GLOBAL_BLOCK_SOURCE,
+) -> Dict[str, Any]:
+    config = yaml.safe_load(selected_config.read_text())
+    kwargs = config["model_kwargs"]
+    required_flags = {
+        "use_gated_pooling": True,
+        "use_env_enrichment": True,
+        "use_prenorm_local": True,
+    }
+    for name, expected in required_flags.items():
+        if bool(kwargs.get(name)) is not expected:
+            raise ValueError(f"selected architecture requires {name}={expected}")
+    architecture = {
+        "selected_variant": "g111",
+        "selection_data": "validation only",
+        "atom_input_dimension": 128 + int(kwargs["atom_fea_len"]),
+        "ct_uae_dimension": 128,
+        "elemental_attribute_dimension": int(kwargs["atom_fea_len"]),
+        "hidden_dimension": int(kwargs["hidden_dim"]),
+        "local_layers": int(kwargs["n_local_layers"]),
+        "global_layers": int(kwargs["n_global_layers"]),
+        "attention_heads": int(kwargs["num_heads"]),
+        "local_graph_radius_A": float(kwargs["rcut_local"]),
+        "radial_bias_grid_endpoint_A": float(kwargs["dmax_global"]),
+        "radial_bias_grid_is_attention_cutoff": False,
+        "environment_features": [
+            "coordination_count", "mean_neighbor_distance",
+            "maximum_neighbor_distance", "absolute_electronegativity_contrast",
+        ],
+        "modules": {"G": True, "E": True, "P": True},
+    }
+    return {
+        "architecture": architecture,
+        "inputs": {
+            "selected_config": {
+                "path": repository_path(selected_config),
+                "sha256": file_sha256(selected_config),
+            },
+            "model_source": {
+                "path": repository_path(model_source),
+                "sha256": file_sha256(model_source),
+            },
+            "global_block_source": {
+                "path": repository_path(global_block_source),
+                "sha256": file_sha256(global_block_source),
+            },
+        },
+    }
+
+
+def make_architecture_figure(output_pdf: Path, output_png: Path | None) -> None:
+    configure_style()
+    figure, axes = plt.subplots(
+        1, 4, figsize=(7.05, 3.10),
+        gridspec_kw={"width_ratios": [1.02, 1.05, 1.17, 1.00]},
+    )
+    draw_periodic_graph_schematic(axes[0])
+    draw_atom_encoding(axes[1])
+    draw_interaction_stack(axes[2])
+    draw_graph_readout(axes[3])
+    figure.subplots_adjust(
+        left=0.035, right=0.992, bottom=0.045, top=0.90, wspace=0.20,
+    )
+    output_pdf.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(output_pdf)
+    if output_png is not None:
+        output_png.parent.mkdir(parents=True, exist_ok=True)
+        figure.savefig(output_png)
+    plt.close(figure)
+
+
 def build_summary(
     protocol_dir: Path,
 ) -> Tuple[Dict[str, Any], list[Mapping[str, Any]], Tuple[list[str], list[str], np.ndarray]]:
@@ -360,7 +643,7 @@ def build_summary(
     canonical = audit["duplicates"]["canonical_deduplication"]
     defect_counts = Counter(str(row["defecttype"]) for row in retained)
     summary = {
-        "schema_version": "prm_protocol_figure_v2",
+        "schema_version": "prm_protocol_figure_v3",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "inputs": {
             "protocol_manifest": {
@@ -393,7 +676,15 @@ def build_summary(
 
 
 def make_figure(
-    protocol_dir: Path, output_pdf: Path, output_png: Path | None, sidecar: Path,
+    protocol_dir: Path,
+    output_pdf: Path,
+    output_png: Path | None,
+    architecture_output_pdf: Path,
+    architecture_output_png: Path | None,
+    sidecar: Path,
+    selected_config: Path = SELECTED_CONFIG,
+    model_source: Path = MODEL_SOURCE,
+    global_block_source: Path = GLOBAL_BLOCK_SOURCE,
 ) -> Dict[str, Any]:
     configure_style()
     summary, samples, chemistry = build_summary(protocol_dir)
@@ -422,12 +713,30 @@ def make_figure(
         figure.savefig(output_png)
     plt.close(figure)
 
+    architecture_summary = build_architecture_summary(
+        selected_config, model_source, global_block_source,
+    )
+    make_architecture_figure(architecture_output_pdf, architecture_output_png)
+    summary["architecture"] = architecture_summary["architecture"]
+    summary["inputs"].update(architecture_summary["inputs"])
+
     summary["outputs"] = {
-        "pdf": {"path": repository_path(output_pdf), "sha256": file_sha256(output_pdf)},
+        "protocol_pdf": {
+            "path": repository_path(output_pdf), "sha256": file_sha256(output_pdf)
+        },
+        "architecture_pdf": {
+            "path": repository_path(architecture_output_pdf),
+            "sha256": file_sha256(architecture_output_pdf),
+        },
     }
     if output_png is not None:
-        summary["outputs"]["png"] = {
+        summary["outputs"]["protocol_png"] = {
             "path": repository_path(output_png), "sha256": file_sha256(output_png)
+        }
+    if architecture_output_png is not None:
+        summary["outputs"]["architecture_png"] = {
+            "path": repository_path(architecture_output_png),
+            "sha256": file_sha256(architecture_output_png),
         }
     sidecar.parent.mkdir(parents=True, exist_ok=True)
     sidecar.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
@@ -448,13 +757,38 @@ def main() -> None:
         default=ROOT / "paper_Q1/figures/fig_protocol_overview.png",
     )
     parser.add_argument(
+        "--architecture-output-pdf", type=Path,
+        default=ROOT / "paper_Q1/figures/fig_dart_architecture.pdf",
+    )
+    parser.add_argument(
+        "--architecture-output-png", type=Path,
+        default=ROOT / "paper_Q1/figures/fig_dart_architecture.png",
+    )
+    parser.add_argument(
+        "--selected-config", type=Path, default=SELECTED_CONFIG,
+    )
+    parser.add_argument(
+        "--model-source", type=Path, default=MODEL_SOURCE,
+    )
+    parser.add_argument(
+        "--global-block-source", type=Path, default=GLOBAL_BLOCK_SOURCE,
+    )
+    parser.add_argument(
         "--sidecar", type=Path,
         default=ROOT / "artifacts/prm_results/paper/protocol_figure.json",
     )
     args = parser.parse_args()
     summary = make_figure(
         args.protocol_dir.resolve(), args.output_pdf.resolve(),
-        args.output_png.resolve() if args.output_png else None, args.sidecar.resolve(),
+        args.output_png.resolve() if args.output_png else None,
+        args.architecture_output_pdf.resolve(),
+        (
+            args.architecture_output_png.resolve()
+            if args.architecture_output_png else None
+        ),
+        args.sidecar.resolve(),
+        args.selected_config.resolve(), args.model_source.resolve(),
+        args.global_block_source.resolve(),
     )
     print(json.dumps(summary["counts"], indent=2, sort_keys=True))
 

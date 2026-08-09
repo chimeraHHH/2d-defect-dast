@@ -18,8 +18,12 @@ Canonical inputs:
 - `../artifacts/prm_results/` for validated metrics and operation records.
 - `../configs/prm/` for the controlled training contract.
 
-Only `fig_protocol_overview.pdf` is present before result release. The
-remaining manuscript figures are created by
+The non-result architecture and protocol figures
+(`fig_dart_architecture.pdf` and `fig_protocol_overview.pdf`) are generated
+together by `../scripts/prm_make_protocol_figure.py`; their exact config,
+source, protocol inputs, and outputs are hash-bound in
+`../artifacts/prm_results/paper/protocol_figure.json`. The remaining manuscript
+figures are created by
 `../scripts/prm_make_result_assets.py` and must be declared in the canonical
 result manifest. Historical exploratory figures and their hard-coded
 generators remain available through Git history, not in the active submission

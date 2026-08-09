@@ -7,10 +7,10 @@
 
 Dear Editors,
 
-We submit the manuscript “Defect-aware graph transformer for impurity
-incorporation energies and axis-resolved chemical transfer in two-dimensional
-materials” for consideration as a Regular Article in *Physical Review
-Materials*. We suggest section M3-A, “Development of new methods for materials.”
+We submit the manuscript “Axis-resolved transfer of impurity formation energies
+in two-dimensional materials with a defect-aware graph transformer” for
+consideration as a Regular Article in *Physical Review Materials*. We suggest
+section M3-A, “Development of new methods for materials.”
 
 Machine-learned formation energies can accelerate impurity screening, but a
 random structure split does not establish how a surrogate behaves when host or

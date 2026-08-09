@@ -3,6 +3,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,
             linkcolor=blue!60!black,
@@ -10,12 +11,14 @@
             urlcolor=blue!70!black]{hyperref}
 
 \input{generated/results_macros.tex}
+\graphicspath{{figures/}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\Roman{table}}
 
 \begin{document}
 
-\title{Supplemental Material for ``Defect-aware graph transformer for impurity
-incorporation energies and axis-resolved chemical transfer in two-dimensional
-materials''}
+\title{Supplemental Material for ``Axis-resolved transfer of impurity formation
+energies in two-dimensional materials with a defect-aware graph transformer''}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
@@ -92,6 +95,23 @@ $L_2$ regularization 1, and row/column subsampling fractions 0.9.  A
 hyperparameter setting and then a learned family were selected independently
 inside each split by validation MAE; the training-target mean predictor was
 reported separately and never entered family selection.
+
+\section{Descriptive error heterogeneity}
+
+\input{generated/results_error_heterogeneity_narrative.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_error_heterogeneity.pdf}
+\caption{Error heterogeneity from DART host--impurity-pair-held-out
+  out-of-fold predictions.
+  (a,b) Host- and impurity-group MAE versus the number of retained structures;
+  labels mark the three largest group MAEs and $\rho_s$ is the descriptive
+  Spearman association.
+  (c) MAE by incorporation class and source site label.  These summaries were
+  not used for architecture, hyperparameter, or model selection.}
+\label{fig:supp_error_heterogeneity}
+\end{figure}
 
 \clearpage
 \section{Post-hoc SchNet graph-readout sensitivity}

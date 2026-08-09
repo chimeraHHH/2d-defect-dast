@@ -1,4 +1,29 @@
 {
+  "architecture": {
+    "atom_input_dimension": 137,
+    "attention_heads": 4,
+    "ct_uae_dimension": 128,
+    "elemental_attribute_dimension": 9,
+    "environment_features": [
+      "coordination_count",
+      "mean_neighbor_distance",
+      "maximum_neighbor_distance",
+      "absolute_electronegativity_contrast"
+    ],
+    "global_layers": 2,
+    "hidden_dimension": 128,
+    "local_graph_radius_A": 5.0,
+    "local_layers": 3,
+    "modules": {
+      "E": true,
+      "G": true,
+      "P": true
+    },
+    "radial_bias_grid_endpoint_A": 12.0,
+    "radial_bias_grid_is_attention_cutoff": false,
+    "selected_variant": "g111",
+    "selection_data": "validation only"
+  },
   "counts": {
     "ambiguous_identity_exclusions": 349,
     "canonical_rows": 10224,
@@ -14,11 +39,19 @@
     "raw_rows": 17364,
     "source_filtered_rows": 10641
   },
-  "created_at": "2026-08-09T11:34:13.681994+00:00",
+  "created_at": "2026-08-09T12:17:42.563783+00:00",
   "inputs": {
     "data_audit": {
       "path": "artifacts/prm_protocol_v2/data_audit.json",
       "sha256": "d2d537e93bd363252b60cd76ee13b73967450e9fd8d53bd20b215fb40f110bc0"
+    },
+    "global_block_source": {
+      "path": "src/models/baseline.py",
+      "sha256": "ad5627537082bbf09c77faceb0d7ac2e4d859f7f5c8fc02c2651d673ea1256e3"
+    },
+    "model_source": {
+      "path": "src/models/crystal_v2.py",
+      "sha256": "c044074250aa52e9f82289083e8c10736cb4bac1a823be72ce6df103c116487e"
     },
     "protocol_manifest": {
       "path": "artifacts/prm_protocol_v2/manifest.json",
@@ -27,14 +60,26 @@
     "sample_table": {
       "path": "artifacts/prm_protocol_v2/samples.csv",
       "sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168"
+    },
+    "selected_config": {
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
+      "sha256": "db34ecf5ca9a43f315a98ffd929e4119e9befe53c91bc177404f02bfafe3d61d"
     }
   },
   "outputs": {
-    "pdf": {
-      "path": "paper_Q1/figures/fig_protocol_overview.pdf",
-      "sha256": "402f7d103760a2611b00dbfa8c99459fd2ac031dd9a9fceb5513fda4f76788f0"
+    "architecture_pdf": {
+      "path": "paper_Q1/figures/fig_dart_architecture.pdf",
+      "sha256": "7281926e01cd18859c02dd54f348c33e63499da6a75bfef92d8e59575d5376d0"
     },
-    "png": {
+    "architecture_png": {
+      "path": "paper_Q1/figures/fig_dart_architecture.png",
+      "sha256": "71b5665461f7e0ce2314222b3f680e960f12bc1af68a94a9236c0ec267fafc88"
+    },
+    "protocol_pdf": {
+      "path": "paper_Q1/figures/fig_protocol_overview.pdf",
+      "sha256": "01dde44dba226f5e517adbd3acfce1ea1e4f44d15dd8bd5b2207516caeaf6651"
+    },
+    "protocol_png": {
       "path": "paper_Q1/figures/fig_protocol_overview.png",
       "sha256": "eafd1134f0e29058ebe0abe660fdb6b08b6af12aa9fa7b375b55be43128d077f"
     }
@@ -97,5 +142,5 @@
       "val": 1022
     }
   ],
-  "schema_version": "prm_protocol_figure_v2"
+  "schema_version": "prm_protocol_figure_v3"
 }

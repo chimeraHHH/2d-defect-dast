@@ -66,13 +66,15 @@ complete intervals.
 \centering
 \includegraphics[width=\textwidth]{fig_transfer.pdf}
 \caption{Interpolation and chemical-transfer evaluation.
-  (a) Pooled test MAE for DART, the prespecified additive-readout periodic
-  SchNet recipe, a descriptor family selected independently inside each split
-  using its validation data, and a
-  training-target mean predictor.
-  (b) Paired differences in absolute error relative to DART with 95\%
+  (a) DART pooled test MAE across the five frozen regimes; the dashed line
+  marks random out-of-fold MAE and is a visual reference rather than a
+  statistical equivalence threshold.
+  (b) Paired differences in absolute error for the prespecified
+  additive-readout periodic SchNet recipe and the split-local
+  validation-selected descriptor relative to DART.  Intervals are 95\%
   bootstrap intervals using the regime-matched resampling units defined in
-  Sec.~\ref{sec:evaluation}.  Positive values favor DART.}
+  Sec.~\ref{sec:evaluation}; the broken axis isolates the large host-held-out
+  SchNet contrast.  Positive values favor DART.}
 \label{fig:transfer}
 \end{figure*}
 
@@ -87,25 +89,10 @@ architecture or hyperparameter selection.
 
 \input{generated/tab_applicability.tex}
 
-%----------------------------------------------------------------------
-\subsection{Descriptive error heterogeneity}
-\label{sec:error_heterogeneity}
-%----------------------------------------------------------------------
-
-\input{generated/results_error_heterogeneity_narrative.tex}
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_error_heterogeneity.pdf}
-\caption{Error heterogeneity from DART host--impurity-pair-held-out
-  out-of-fold predictions.
-  (a,b) Host- and impurity-group MAE versus the number of retained structures;
-  labels mark the three largest group MAEs and $\rho_s$ is the descriptive
-  Spearman association.
-  (c) MAE by incorporation class and source site label.  These summaries were
-  not used for architecture, hyperparameter, or model selection.}
-\label{fig:error_heterogeneity}
-\end{figure*}
+Host-, impurity-, incorporation-class-, and site-level errors remained
+heterogeneous.  The complete descriptive analysis is reported in Supplemental
+Fig.~S1~\cite{supplemental}; none of these groups entered architecture,
+hyperparameter, or model selection.
 
 %----------------------------------------------------------------------
 \subsection{Internal uncertainty and selective prediction}

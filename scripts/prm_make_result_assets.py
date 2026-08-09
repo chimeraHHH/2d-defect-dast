@@ -36,6 +36,10 @@ REGIME_MACROS = {
     "chemistry_block": "ChemistryBlock",
 }
 TERM_ORDER = ("G", "E", "P", "G:E", "G:P", "E:P", "G:E:P")
+TERM_LABELS = {
+    "G": "G", "E": "E", "P": "P",
+    "G:E": "G\u00d7E", "G:P": "G\u00d7P", "E:P": "E\u00d7P", "G:E:P": "G\u00d7E\u00d7P",
+}
 COLORS = {
     "dart": "#2A6F97",
     "schnet": "#C15B38",
@@ -80,6 +84,16 @@ READY_MARKER_CONTENT = (
     "% Auto-generated after all canonical paper assets succeeded; do not edit.\n"
     "\\def\\PRMResultAssetsReady{1}\n"
 )
+
+
+def variant_display_label(variant: str) -> str:
+    if not isinstance(variant, str) or not variant.startswith("g") or len(variant) != 4:
+        raise ValueError(f"invalid factorial variant {variant!r}")
+    bits = variant[1:]
+    if any(bit not in {"0", "1"} for bit in bits):
+        raise ValueError(f"invalid factorial variant {variant!r}")
+    enabled = [name for name, bit in zip(("G", "E", "P"), bits) if bit == "1"]
+    return "+".join(enabled) if enabled else "Base"
 
 
 def file_sha256(path: Path) -> str:
@@ -1557,7 +1571,12 @@ def plot_factorial(factorial: Mapping[str, Any], output_pdf: Path) -> list[Path]
             x + offset, means, yerr=np.vstack([means - lows, highs - means]),
             fmt=marker, ms=4.0, lw=0.9, capsize=2.0, color=color, label=label, zorder=2,
         )
-    axes[0].set_xticks(x, [row["variant"] for row in variants], rotation=45, ha="right")
+    axes[0].set_xticks(
+        x,
+        [variant_display_label(str(row["variant"])) for row in variants],
+        rotation=38,
+        ha="right",
+    )
     axes[0].set_ylabel("MAE (eV)")
     axes[0].set_title("Paired factorial variants", loc="left", pad=5)
     axes[0].legend(frameon=False, loc="best")
@@ -1582,7 +1601,7 @@ def plot_factorial(factorial: Mapping[str, Any], output_pdf: Path) -> list[Path]
             fmt=marker, ms=4.0, lw=0.9, capsize=2.0, color=color, label=label,
         )
     axes[1].axvline(0.0, color=COLORS["ink"], lw=0.7)
-    axes[1].set_yticks(y, TERM_ORDER)
+    axes[1].set_yticks(y, [TERM_LABELS[term] for term in TERM_ORDER])
     axes[1].invert_yaxis()
     axes[1].set_xlabel(r"Factorial effect on MAE (eV)")
     axes[1].set_title("Orthogonal effects", loc="left", pad=5)
@@ -1600,60 +1619,123 @@ def plot_transfer(
     paired_rows: Sequence[Mapping[str, str]], output_pdf: Path,
 ) -> list[Path]:
     configure_style()
-    figure, axes = plt.subplots(1, 2, figsize=(7.05, 2.65), gridspec_kw={"width_ratios": [1.05, 0.95]})
-    x = np.arange(len(REGIME_ORDER))
-    model_specs = (
-        ("dart", -0.24, COLORS["dart"], "o", "DART"),
-        ("schnet", -0.08, COLORS["schnet"], "s", "SchNet-add"),
-        ("descriptor", 0.08, COLORS["descriptor"], "D", "Selected descriptor"),
-        ("descriptor:mean", 0.24, COLORS["mean"], "^", "Mean predictor"),
+    figure = plt.figure(figsize=(7.05, 2.72))
+    outer_grid = figure.add_gridspec(
+        1, 2, width_ratios=(1.02, 1.68), wspace=0.31,
+        left=0.105, right=0.985, bottom=0.235, top=0.84,
     )
-    for model, offset, color, marker, label in model_specs:
-        values = []
-        for regime in REGIME_ORDER:
-            actual = model
-            if model == "descriptor":
-                actual = DESCRIPTOR_SELECTED_MODEL
-            row = find_row(pooled_rows, regime=regime, model=actual)
-            values.append(float(row["mae"]))
-        axes[0].plot(x + offset, values, marker=marker, ls="none", ms=4.3, color=color, label=label)
-    axes[0].set_xticks(x, [REGIME_LABELS[regime] for regime in REGIME_ORDER], rotation=25, ha="right")
-    axes[0].set_ylabel("Pooled test MAE (eV)")
-    axes[0].set_title("Interpolation and chemical transfer", loc="left", pad=5)
-    axes[0].legend(frameon=False, ncol=2, loc="upper left")
-    axes[0].grid(axis="y", color=COLORS["grid"], lw=0.45)
-    axes[0].spines[["top", "right"]].set_visible(False)
-    panel_label(axes[0], "(a)")
+    delta_grid = outer_grid[0, 1].subgridspec(
+        1, 2, width_ratios=(1.20, 0.43), wspace=0.08,
+    )
+    axis_profile = figure.add_subplot(outer_grid[0, 0])
+    axis_delta = figure.add_subplot(delta_grid[0, 0])
+    axis_delta_far = figure.add_subplot(delta_grid[0, 1], sharey=axis_delta)
 
     y = np.arange(len(REGIME_ORDER))
-    for offset, model_kind, color, marker, label in (
+    dart_values = np.asarray([
+        float(find_row(pooled_rows, regime=regime, model="dart")["mae"])
+        for regime in REGIME_ORDER
+    ])
+    axis_profile.hlines(
+        y, 0.0, dart_values, color=COLORS["grid"], lw=1.0, zorder=1,
+    )
+    axis_profile.scatter(
+        dart_values, y, s=24, marker="o", color=COLORS["dart"],
+        edgecolors="white", linewidths=0.5, zorder=2,
+    )
+    for y_value, mae in zip(y, dart_values):
+        label_left = mae < dart_values[0] - 0.01
+        axis_profile.text(
+            mae - 0.025 if label_left else mae + 0.025,
+            y_value,
+            f"{mae:.3f}",
+            ha="right" if label_left else "left",
+            va="center", fontsize=5.5, color=COLORS["ink"],
+        )
+    axis_profile.axvline(
+        dart_values[0], color=COLORS["dart"], lw=0.7, ls=(0, (3, 2)), zorder=0,
+    )
+    axis_profile.set_yticks(y, [REGIME_LABELS[regime] for regime in REGIME_ORDER])
+    axis_profile.invert_yaxis()
+    axis_profile.set_xlim(0.0, 1.16)
+    axis_profile.set_xlabel("DART pooled test MAE (eV)")
+    axis_profile.set_title("DART error across transfer regimes", loc="left", pad=5)
+    axis_profile.grid(axis="x", color=COLORS["grid"], lw=0.45, zorder=0)
+    axis_profile.spines[["top", "right", "left"]].set_visible(False)
+    axis_profile.tick_params(axis="y", length=0)
+    panel_label(axis_profile, "(a)")
+
+    contrast_specs = (
         (-0.10, "schnet", COLORS["schnet"], "s", "SchNet-add - DART"),
         (0.10, "descriptor", COLORS["descriptor"], "D", "Descriptor - DART"),
-    ):
+    )
+    host_schnet = None
+    for offset, model_kind, color, marker, label in contrast_specs:
         rows = []
         for regime in REGIME_ORDER:
-            comparator = model_kind
-            if model_kind == "descriptor":
-                comparator = DESCRIPTOR_SELECTED_MODEL
+            comparator = (
+                DESCRIPTOR_SELECTED_MODEL if model_kind == "descriptor" else model_kind
+            )
             rows.append(find_row(paired_rows, regime=regime, comparator=comparator))
-        means = np.asarray([row["mae_difference_comparator_minus_dart_eV"] for row in rows], dtype=float)
+        means = np.asarray(
+            [row["mae_difference_comparator_minus_dart_eV"] for row in rows],
+            dtype=float,
+        )
         lows = np.asarray([row["ci_low_eV"] for row in rows], dtype=float)
         highs = np.asarray([row["ci_high_eV"] for row in rows], dtype=float)
-        axes[1].errorbar(
-            means, y + offset, xerr=np.vstack([means - lows, highs - means]),
-            fmt=marker, ms=4.0, lw=0.9, capsize=2.0, color=color, label=label,
+        local = means < 2.0
+        axis_delta.errorbar(
+            means[local], (y + offset)[local],
+            xerr=np.vstack([means[local] - lows[local], highs[local] - means[local]]),
+            fmt=marker, ms=4.2, lw=0.9, capsize=2.0, color=color, label=label,
+            zorder=2,
         )
-    axes[1].axvline(0.0, color=COLORS["ink"], lw=0.7)
-    axes[1].set_yticks(y, [REGIME_LABELS[regime] for regime in REGIME_ORDER])
-    axes[1].invert_yaxis()
-    axes[1].set_xlabel(r"Paired $\Delta$MAE (comparator - DART, eV)")
-    axes[1].set_title("Paired regime-matched contrasts", loc="left", pad=5)
-    axes[1].legend(frameon=False, loc="best")
-    axes[1].grid(axis="x", color=COLORS["grid"], lw=0.45)
-    axes[1].spines[["top", "right", "left"]].set_visible(False)
-    axes[1].tick_params(axis="y", length=0)
-    panel_label(axes[1], "(b)")
-    figure.tight_layout(w_pad=2.0)
+        far = ~local
+        if np.any(far):
+            axis_delta_far.errorbar(
+                means[far], (y + offset)[far],
+                xerr=np.vstack([means[far] - lows[far], highs[far] - means[far]]),
+                fmt=marker, ms=4.2, lw=0.9, capsize=2.0, color=color, zorder=2,
+            )
+            far_index = int(np.flatnonzero(far)[0])
+            host_schnet = (means[far_index], lows[far_index], highs[far_index], y[far_index] + offset)
+
+    axis_delta.axvline(0.0, color=COLORS["ink"], lw=0.7)
+    axis_delta.set_xlim(-0.05, 1.18)
+    axis_delta_far.set_xlim(2.75, 9.65)
+    axis_delta.set_xticks([0.0, 0.4, 0.8, 1.2])
+    axis_delta_far.set_xticks([3, 6, 9])
+    axis_delta.set_yticks(y, [REGIME_LABELS[regime] for regime in REGIME_ORDER])
+    axis_delta.invert_yaxis()
+    axis_delta.set_title("Paired comparator-minus-DART contrasts", loc="left", pad=5)
+    axis_delta.legend(frameon=False, loc="lower right")
+    for axis in (axis_delta, axis_delta_far):
+        axis.grid(axis="x", color=COLORS["grid"], lw=0.45, zorder=0)
+        axis.spines[["top", "right", "left"]].set_visible(False)
+        axis.tick_params(axis="y", length=0)
+    axis_delta_far.tick_params(axis="y", left=False, labelleft=False)
+    axis_delta_far.spines["left"].set_visible(False)
+    if host_schnet is not None:
+        mean, low, high, y_value = host_schnet
+        axis_delta_far.text(
+            mean, y_value - 0.24, f"{mean:.2f} [{low:.2f}, {high:.2f}]",
+            ha="center", va="bottom", fontsize=5.0, color=COLORS["schnet"],
+        )
+
+    break_size = 0.035
+    axis_delta.plot(
+        (1 - break_size, 1 + break_size), (-break_size, +break_size),
+        transform=axis_delta.transAxes, color=COLORS["ink"], clip_on=False, lw=0.8,
+    )
+    axis_delta_far.plot(
+        (-break_size, +break_size), (-break_size, +break_size),
+        transform=axis_delta_far.transAxes, color=COLORS["ink"], clip_on=False, lw=0.8,
+    )
+    panel_label(axis_delta, "(b)")
+    figure.text(
+        0.745, 0.055, r"Paired $\Delta$MAE (comparator - DART, eV)",
+        ha="center", va="center", fontsize=7.5,
+    )
     return save_figure(figure, output_pdf)
 
 
