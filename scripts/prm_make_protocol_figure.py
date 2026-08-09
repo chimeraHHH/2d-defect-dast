@@ -40,6 +40,8 @@ COLORS = {
 SELECTED_CONFIG = ROOT / "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml"
 MODEL_SOURCE = ROOT / "src/models/crystal_v2.py"
 GLOBAL_BLOCK_SOURCE = ROOT / "src/models/baseline.py"
+GRAPH_SOURCE = ROOT / "src/graph.py"
+GENERATOR_SOURCE = Path(__file__).resolve()
 
 
 def file_sha256(path: Path) -> str:
@@ -381,7 +383,7 @@ def architecture_box(
     if body:
         axis.text(
             x + width / 2, y + height * 0.27, body,
-            ha="center", va="center", fontsize=fontsize - 0.4,
+            ha="center", va="center", fontsize=max(fontsize - 0.2, 5.0),
             color=COLORS["muted"], linespacing=1.0,
         )
 
@@ -463,7 +465,7 @@ def draw_periodic_graph_schematic(axis: plt.Axes) -> None:
     )
     axis.text(
         0.50, 0.05, "schematic; not a selected material",
-        ha="center", va="center", fontsize=4.5, color=COLORS["muted"],
+        ha="center", va="center", fontsize=5.0, color=COLORS["muted"],
     )
 
 
@@ -495,7 +497,7 @@ def draw_atom_encoding(axis: plt.Axes) -> None:
         "coordination; mean/max distance;\n"
         "absolute electronegativity contrast;\n"
         "projected and added only at the impurity",
-        facecolor="#FFF4DB", edgecolor=COLORS["calibration"], fontsize=4.9,
+        facecolor="#FFF4DB", edgecolor=COLORS["calibration"], fontsize=5.1,
     )
 
 
@@ -520,7 +522,7 @@ def draw_interaction_stack(axis: plt.Axes) -> None:
     )
     axis.text(
         0.50, 0.06, "12 \u00c5 is the radial grid endpoint, not an attention cutoff",
-        ha="center", va="center", fontsize=4.5, color=COLORS["muted"],
+        ha="center", va="center", fontsize=5.0, color=COLORS["muted"],
     )
 
 
@@ -559,6 +561,7 @@ def build_architecture_summary(
     selected_config: Path = SELECTED_CONFIG,
     model_source: Path = MODEL_SOURCE,
     global_block_source: Path = GLOBAL_BLOCK_SOURCE,
+    graph_source: Path = GRAPH_SOURCE,
 ) -> Dict[str, Any]:
     config = yaml.safe_load(selected_config.read_text())
     kwargs = config["model_kwargs"]
@@ -603,6 +606,10 @@ def build_architecture_summary(
             "global_block_source": {
                 "path": repository_path(global_block_source),
                 "sha256": file_sha256(global_block_source),
+            },
+            "graph_source": {
+                "path": repository_path(graph_source),
+                "sha256": file_sha256(graph_source),
             },
         },
     }
@@ -655,6 +662,10 @@ def build_summary(
             "sample_table": {
                 "path": repository_path(sample_path), "sha256": file_sha256(sample_path)
             },
+            "figure_generator": {
+                "path": repository_path(GENERATOR_SOURCE),
+                "sha256": file_sha256(GENERATOR_SOURCE),
+            },
         },
         "counts": {
             "raw_rows": audit["formation_energy_provenance"]["raw_database_audit"]["filter_replay"]["raw_rows"],
@@ -685,6 +696,7 @@ def make_figure(
     selected_config: Path = SELECTED_CONFIG,
     model_source: Path = MODEL_SOURCE,
     global_block_source: Path = GLOBAL_BLOCK_SOURCE,
+    graph_source: Path = GRAPH_SOURCE,
 ) -> Dict[str, Any]:
     configure_style()
     summary, samples, chemistry = build_summary(protocol_dir)
@@ -714,7 +726,7 @@ def make_figure(
     plt.close(figure)
 
     architecture_summary = build_architecture_summary(
-        selected_config, model_source, global_block_source,
+        selected_config, model_source, global_block_source, graph_source,
     )
     make_architecture_figure(architecture_output_pdf, architecture_output_png)
     summary["architecture"] = architecture_summary["architecture"]
@@ -774,6 +786,9 @@ def main() -> None:
         "--global-block-source", type=Path, default=GLOBAL_BLOCK_SOURCE,
     )
     parser.add_argument(
+        "--graph-source", type=Path, default=GRAPH_SOURCE,
+    )
+    parser.add_argument(
         "--sidecar", type=Path,
         default=ROOT / "artifacts/prm_results/paper/protocol_figure.json",
     )
@@ -789,6 +804,7 @@ def main() -> None:
         args.sidecar.resolve(),
         args.selected_config.resolve(), args.model_source.resolve(),
         args.global_block_source.resolve(),
+        args.graph_source.resolve(),
     )
     print(json.dumps(summary["counts"], indent=2, sort_keys=True))
 

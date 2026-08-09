@@ -1,10 +1,10 @@
 {
   "collector_git": {
-    "commit": "39f2585e35cb5736dd1592979998d43c29efa880",
+    "commit": "da099c057757684799e3926b112576271af07d0f",
     "dirty": false,
     "status_porcelain": []
   },
-  "created_at": "2026-08-09T11:34:08.791979+00:00",
+  "created_at": "2026-08-09T12:19:20.133188+00:00",
   "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
   "inputs": {
     "comparison": {
@@ -109,15 +109,15 @@
     }
   },
   "outputs": {
-    "paper_Q1/figures/fig_error_heterogeneity.pdf": "a3705a524d370304c7ce85876c5875824478203723f059bae0d18a80654dbbc4",
+    "paper_Q1/figures/fig_error_heterogeneity.pdf": "75048cca5997cef9a267c470390de947f82263c3725764eebfbeb724eec2b168",
     "paper_Q1/figures/fig_error_heterogeneity.png": "8f6b372c391a5303bbdeed5cf035fcbaee9ea15dc13325a7c7140236a71c4dcb",
-    "paper_Q1/figures/fig_factorial.pdf": "98fe12cfb40005e5bc864f1a2c3f288f010ac9894d29a600a7c750fcd1fa15cb",
-    "paper_Q1/figures/fig_factorial.png": "2157a96a0f88939a08ffc81d382c54f2b6e5ec847a836a681aa170191f84d409",
-    "paper_Q1/figures/fig_screening.pdf": "56f9f58e6e2d402aa51d8d7c36ab89d5207019ce328cd926e559ca9e2a3ab58b",
+    "paper_Q1/figures/fig_factorial.pdf": "b93ec93c94f2493feea851ee3e973fea6afe74b411acde3d4b7168314d7b62fd",
+    "paper_Q1/figures/fig_factorial.png": "4323b515b642306cd86f019e9dae88622f4cd3fa35ca1287ee332595c7d38a28",
+    "paper_Q1/figures/fig_screening.pdf": "134664852bf14578ef8ed3d54d8a26835be4f58fb5fc6071c5db48f87e1ca0b0",
     "paper_Q1/figures/fig_screening.png": "ea685f0a6300e45fcb70e22f236bece72933723e715f6be4d8da9428062a72f3",
-    "paper_Q1/figures/fig_transfer.pdf": "b6055de16ef563e1fd2929a130696b2230b05bba5452ac92ed427ad662402768",
-    "paper_Q1/figures/fig_transfer.png": "ac8fdac20b0280f6443f6efc22cc4774f99e3457697e052e021d6d03fc83e281",
-    "paper_Q1/figures/fig_uq.pdf": "957efe830effce361b58639d1d1fcf2608ee7195e630542331adf4856aaadd04",
+    "paper_Q1/figures/fig_transfer.pdf": "3ac48e647d79d279cdeb5220117663b91c04f10ac3509d03f102312f45d94fca",
+    "paper_Q1/figures/fig_transfer.png": "752169bf585ee30f98a307fcf299cd83cbb29da8a330b3698c4d5d52ec9ac128",
+    "paper_Q1/figures/fig_uq.pdf": "2430af02c512ad2f70263a71db76c98194694fa5474aa6cf3fe347b718e30649",
     "paper_Q1/figures/fig_uq.png": "64dab31c1aecef44cfb0b4b0e51b69682a2ec394144ac7a717943c5d5bf64064",
     "paper_Q1/generated/claims.json": "e1dadc82cfd168e1f0e9ad14e5eb9dd735f766de652734d4f6f0737d285e089a",
     "paper_Q1/generated/results_error_heterogeneity_narrative.tex": "74e350f4403a688fa0aeec68c7cddc925bc71885f77bdf7dc250a77d667e7438",

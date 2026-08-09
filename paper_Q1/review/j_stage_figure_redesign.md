@@ -110,7 +110,8 @@ factorial -> transfer -> UQ -> screening argument.
 - **Statistics:** none; this is a code- and config-bound schematic.
 - **Source data:** `configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml`,
   `src/models/crystal_v2.py`, and `src/models/baseline.py`, all hashed in the
-  protocol-figure sidecar.
+  protocol-figure sidecar together with `src/graph.py` and the figure
+  generator itself.
 - **Image integrity:** panel (a) is labelled schematic and is not presented as
   a real IMP2D structure.
 - **Reviewer risks:** 12 angstrom is a radial-bias grid endpoint, not an
@@ -172,3 +173,17 @@ factorial -> transfer -> UQ -> screening argument.
 4. The protocol sidecar hashes both Fig. 1 and Fig. 2 and their exact inputs.
 5. Main-text figure order is architecture -> protocol -> factorial -> transfer
    -> UQ -> screening; Supplemental Fig. S1 contains descriptive heterogeneity.
+
+## Execution record
+
+- Canonical result assets were regenerated from clean commit `da099c0`; the
+  result manifest records `dirty: false`.
+- The protocol sidecar uses schema v3 and hashes the selected config, model,
+  global block, graph construction, figure generator, protocol inputs, and all
+  PDF/PNG outputs.
+- Twenty targeted protocol/result-asset tests passed.
+- The independent numeric audit passed 1,331 of 1,331 checks.
+- The rebuilt 13-page main PDF and 3-page Supplemental Material have no
+  undefined references, overfull boxes, clipping, or unembedded fonts.
+- All seven paper-facing figures passed direct render inspection and grayscale
+  inspection.  No scientific calculation or model run was performed.

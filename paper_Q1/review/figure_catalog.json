@@ -1,6 +1,14 @@
 {
   "catalog_version": "prm_j_stage_figures_v1",
   "evidence_boundary": "Frozen E1-E9 evidence; no new experiment or numerical analysis",
+  "qa": {
+    "figure_render_review": "pass",
+    "grayscale_review": "pass",
+    "main_pdf_pages": 13,
+    "supplement_pdf_pages": 3,
+    "numeric_audit": "1331/1331 checks passed",
+    "targeted_tests": "20/20 passed"
+  },
   "figures": [
     {
       "id": "main_fig_1",
@@ -9,14 +17,16 @@
       "inputs": [
         "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
         "src/models/crystal_v2.py",
-        "src/models/baseline.py"
+        "src/models/baseline.py",
+        "src/graph.py",
+        "scripts/prm_make_protocol_figure.py"
       ],
       "outputs": [
         "paper_Q1/figures/fig_dart_architecture.pdf",
         "paper_Q1/figures/fig_dart_architecture.png"
       ],
       "surface": "main",
-      "status": "pending_canonical_regeneration"
+      "status": "qa_passed"
     },
     {
       "id": "main_fig_2",
@@ -33,7 +43,7 @@
         "paper_Q1/figures/fig_protocol_overview.png"
       ],
       "surface": "main",
-      "status": "retained_pending_sidecar_v3"
+      "status": "qa_passed"
     },
     {
       "id": "main_fig_3",
@@ -49,7 +59,7 @@
         "paper_Q1/figures/fig_factorial.png"
       ],
       "surface": "main",
-      "status": "pending_canonical_regeneration"
+      "status": "qa_passed"
     },
     {
       "id": "main_fig_4",
@@ -64,7 +74,7 @@
         "paper_Q1/figures/fig_transfer.png"
       ],
       "surface": "main",
-      "status": "pending_canonical_regeneration"
+      "status": "qa_passed"
     },
     {
       "id": "main_fig_5",
@@ -80,7 +90,7 @@
         "paper_Q1/figures/fig_uq.png"
       ],
       "surface": "main",
-      "status": "retained"
+      "status": "qa_passed_retained"
     },
     {
       "id": "main_fig_6",
@@ -95,7 +105,7 @@
         "paper_Q1/figures/fig_screening.png"
       ],
       "surface": "main",
-      "status": "retained"
+      "status": "qa_passed_retained"
     },
     {
       "id": "supp_fig_s1",
@@ -110,7 +120,7 @@
         "paper_Q1/figures/fig_error_heterogeneity.png"
       ],
       "surface": "supplement",
-      "status": "retained_reallocated"
+      "status": "qa_passed_reallocated"
     }
   ]
 }

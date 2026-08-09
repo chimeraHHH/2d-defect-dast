@@ -280,3 +280,27 @@
 - Status: complete.
 - Blocks finalization: no scientific blocker; author-controlled submission
   metadata, licensing, and archival-release actions remain.
+
+### REV-022: Journal-calibrated figure program and final J-stage rewrite
+
+- Severity: major presentation and evidence-architecture issue.
+- Fix type: PRM/PRB/PRL figure survey, vector figure generation, manuscript
+  restructuring, and render-level QA; no new experiment or model run.
+- Change: added a config- and source-bound DART architecture figure; replaced
+  code-only factorial labels with readable G/E/P combinations; rebuilt the
+  transfer figure around axis-resolved DART error and paired comparator
+  contrasts with an explicit broken axis; moved descriptive error heterogeneity
+  to Supplemental Fig. S1; narrowed the title to impurity formation energies;
+  and aligned the Introduction, Methods, Results, captions, cover letter, and
+  Supplemental Material description with the new six-figure sequence.
+- Evidence: `paper_Q1/review/j_stage_figure_redesign.md`,
+  `paper_Q1/review/figure_catalog.json`,
+  `artifacts/prm_results/paper/protocol_figure.json`, and
+  `artifacts/prm_results/paper/result_assets.json`.
+- Verification: 20 targeted tests pass; the numeric audit passes 1,331 of
+  1,331 checks; the 13-page main PDF and 3-page Supplemental Material compile
+  without undefined references, overfull boxes, clipping, or unembedded fonts;
+  every paper-facing figure passes direct and grayscale render inspection.
+- Status: complete.
+- Blocks finalization: no scientific blocker; author-controlled byline,
+  funding, licensing, and archival-release metadata remain.

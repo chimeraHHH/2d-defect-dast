@@ -30,6 +30,9 @@ def test_protocol_figure_summary_matches_canonical_audit():
     assert summary["inputs"]["data_audit"]["path"] == (
         "artifacts/prm_protocol_v2/data_audit.json"
     )
+    assert summary["inputs"]["figure_generator"]["path"] == (
+        "scripts/prm_make_protocol_figure.py"
+    )
 
 
 def test_partition_profiles_cover_every_retained_sample():
@@ -66,3 +69,4 @@ def test_architecture_summary_matches_promoted_g111_config():
     assert architecture["radial_bias_grid_is_attention_cutoff"] is False
     assert architecture["modules"] == {"G": True, "E": True, "P": True}
     assert len(architecture["environment_features"]) == 4
+    assert summary["inputs"]["graph_source"]["path"] == "src/graph.py"
