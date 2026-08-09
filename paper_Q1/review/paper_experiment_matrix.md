@@ -21,7 +21,7 @@ Status date: 2026-07-29
 | C1: the reported modeling set is reconstructable and leakage controlled under the declared audits | E1 | completed and written |
 | C2: selected architectural effects are supported or inconclusive under paired repeats | E2 | completed and written |
 | C3: interpolation and chemical-transfer behavior differ across held-out axes and evaluated comparators | E3, E4, E8 | completed, written, and independently reviewed |
-| C4: internal ensemble uncertainty supports a bounded selective-prediction policy on the dedicated split | E5 | completed, written, and independently reviewed |
+| C4: internal ensemble uncertainty characterizes bounded selective-prediction behavior on the dedicated split | E5 | completed, written, and independently reviewed |
 | C5: pair-held-out predictions exceed trivial decision references and have measurable screening utility and regret within IMP2D | E4, E6 | completed, written, and independently reviewed |
 | C6: the SchNet host-held-out result is interpreted at the complete-recipe rather than backbone-only level | E4, E9 | completed, written, and independently reviewed |
 

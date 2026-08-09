@@ -317,13 +317,16 @@ def draw_partition_profiles(axis: plt.Axes, profiles: Sequence[Mapping[str, Any]
     left = np.zeros(len(profiles), dtype=float)
     names = ("train", "val", "calibration", "test")
     display = {"train": "Train", "val": "Validation", "calibration": "Calibration", "test": "Test"}
+    hatches = {"train": "", "val": "///", "calibration": "xx", "test": "..."}
     for name in names:
         fractions = np.asarray(
             [float(profile[name]) / float(profile["total"]) for profile in profiles]
         )
         axis.barh(
-            y, fractions, left=left, height=0.66, color=COLORS["validation" if name == "val" else name],
-            edgecolor="white", linewidth=0.35, label=display[name],
+            y, fractions, left=left, height=0.66,
+            color=COLORS["validation" if name == "val" else name],
+            edgecolor=COLORS["ink"], linewidth=0.35, hatch=hatches[name],
+            label=display[name],
         )
         left += fractions
     axis.set_yticks(y, labels)

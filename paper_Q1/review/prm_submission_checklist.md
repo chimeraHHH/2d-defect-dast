@@ -20,6 +20,9 @@ Verified against the APS author pages on 2026-07-28:
 
 - [x] State the question, relation to prior work, evaluation protocol, and
       limitations for a broad materials audience.
+- [x] Complete the J-stage narrative-convergence pass around the three durable
+      claims: paired module evidence, axis-resolved transfer, and bounded
+      retrospective screening utility.
 - [x] Populate all result-gated sections from canonical bundles.
 - [x] Inspect all figure labels for readability without relying on color alone.
 - [x] Supply Supplemental Material as a separate file and cite it from the main
@@ -63,8 +66,9 @@ Verified against the APS author pages on 2026-07-28:
       byline and release metadata remain administrative substitutions.
 - [x] Complete LaTeX source, bibliography, Supplemental Material, and all
       figure files.
-- [ ] Cover letter summarizing context, key findings, PRM fit, and relevant
-      submission history.
+- [x] Draft cover letter summarizing context, key findings, and PRM fit.
+- [ ] Replace the draft cover letter's author-supplied placeholders for
+      submission history, conflicts, release metadata, and correspondence.
 - [ ] Optional suggested/excluded referees, supplied by the authors rather than
       inferred.
 - [ ] Copy the final Data Availability Statement into the APS submission form.

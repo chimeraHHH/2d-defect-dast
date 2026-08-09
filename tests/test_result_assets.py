@@ -325,7 +325,7 @@ def test_result_narratives_preserve_direction_and_inconclusive_status():
     assert "No prespecified interaction contrast" in factorial
     assert "$G$ 5/5" in factorial
     assert "descriptive uncertainty summaries" in factorial
-    assert "SchNet $\\Delta=+0.100$" in transfer
+    assert "SchNet-add $\\Delta=+0.100$" in transfer
     assert "(inconclusive)" in transfer
     assert "(supports lower DART error)" in transfer
     assert "from 1.000 to 0.800" in readout

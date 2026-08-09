@@ -7,9 +7,14 @@
 \label{sec:factorial_results}
 %----------------------------------------------------------------------
 
-The complete paired factorial is reported in Table~\ref{tab:factorial} and
-Fig.~\ref{fig:factorial}.  Validation MAE selected variant
-\PRMSelectedVariant, with a mean of
+The validation-only rule selected the all-enabled \PRMSelectedVariant{} variant.
+Paired contrasts consistently favored gated readout and the composite
+pre-normalized, distance-gated local block, whereas the independent main effect
+of environment enrichment was inconclusive.  Selection of the all-enabled
+variant therefore does not imply that every enabled module was independently
+beneficial.  The complete paired factorial is reported in
+Table~\ref{tab:factorial} and Fig.~\ref{fig:factorial}.  Its selected validation
+MAE had a mean of
 \PRMSelectedValidationMAE\eV{} (95\% bootstrap interval
 [\PRMSelectedValidationMAELow, \PRMSelectedValidationMAEHigh]\eV{}) across
 the five paired repeats.  Its locked test MAE was
@@ -43,17 +48,17 @@ source of an effect.
 \label{sec:transfer_results}
 %----------------------------------------------------------------------
 
-Using the promoted architecture, pooled DART test MAEs were
-\PRMIdCvDARTMAE\eV{} for random out-of-fold prediction,
-\PRMPairCvDARTMAE\eV{} when host--impurity pairs were held out,
-\PRMHostCvDARTMAE\eV{} for held-out hosts,
-\PRMDopantCvDARTMAE\eV{} for held-out impurities, and
-\PRMChemistryBlockDARTMAE\eV{} for the predefined chemistry block.
-Table~\ref{tab:benchmark} compares the aligned DART, periodic SchNet, and
-validation-selected descriptor predictions.  The paired intervals, rather
-than unpaired differences between aggregate scores, determine whether a
-directional model difference is supported.
-\input{generated/results_transfer_narrative.tex}
+Chemical transfer was strongly axis dependent.  Pair-held-out MAE
+(\PRMPairCvDARTMAE\eV{}) remained close to random out-of-fold MAE
+(\PRMIdCvDARTMAE\eV{}), whereas withholding complete hosts or impurities
+increased MAE to \PRMHostCvDARTMAE{} and \PRMDopantCvDARTMAE\eV{},
+respectively.  The predefined chemistry block had MAE
+\PRMChemistryBlockDARTMAE\eV{} but samples a different target distribution and
+is not a monotonic measure of extrapolation difficulty.  Across all five
+regimes, paired absolute-error differences favored the selected DART recipe over
+the prespecified additive-readout periodic SchNet recipe and the split-local
+validation-selected descriptor controls.  Table~\ref{tab:benchmark} reports the
+complete intervals.
 
 \input{generated/tab_benchmark.tex}
 
@@ -144,7 +149,8 @@ fully untouched external corpus.
 
 The host--impurity-pair folds provide one out-of-fold prediction for every
 retained structure.  Across pairs containing both incorporation classes, DART
-recovered the lower-energy class with
+retrospectively identified the lower-energy class among the retained IMP2D
+candidates with
 \PRMPreferenceAccuracy\% accuracy; the predicted and reference class margins
 had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
 \PRMPreferenceMarginMAE\eV{}.  Selecting one configuration globally gave
@@ -153,7 +159,7 @@ had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
 top-two site accuracies were \PRMWithinTypeExactAccuracy\% and
 \PRMWithinTypeTopTwoAccuracy\%, respectively, with mean regret
 \PRMWithinTypeRegret\eV{}.
-The corresponding empirical-majority or candidate-uniform reference
+The corresponding non-trained empirical-majority or candidate-uniform reference
 accuracies were \PRMPreferenceReferenceAccuracy\%,
 \PRMGlobalReferenceAccuracy\%, \PRMWithinTypeReferenceExactAccuracy\%, and
 \PRMWithinTypeReferenceTopTwoAccuracy\%.  Model-minus-reference gains were

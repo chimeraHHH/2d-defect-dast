@@ -2,25 +2,29 @@
 
 \ifprmresultsready
 
-We established a provenance-audited evaluation of a defect-aware graph model
-for neutral impurity incorporation energies in two-dimensional materials.  A
-paired $2^3$ experiment selected \PRMSelectedVariant{} using validation data
-only, after which the same architecture was evaluated on random, pair-, host-,
-impurity-, and chemistry-block partitions against split-aligned SchNet and
-descriptor baselines.  The corresponding DART MAEs were
-\PRMIdCvDARTMAE, \PRMPairCvDARTMAE, \PRMHostCvDARTMAE,
-\PRMDopantCvDARTMAE, and \PRMChemistryBlockDARTMAE\eV{}.
+The main result of this study is not a single random-split score, but an
+axis-resolved account of what a defect-energy surrogate learns and where it
+fails.  In the validation-locked factorial, gated readout and the composite
+pre-normalized, distance-gated local block reduced error consistently, whereas
+the independent effect of explicit environment enrichment was inconclusive.
+The selected DART recipe outperformed the evaluated SchNet and descriptor
+controls across the frozen partitions, although these comparisons do not
+isolate a backbone-only advantage.
 
-On a dedicated ensemble split, internal 90\% conformal intervals achieved
-\PRMUQNinetyCoverage\% empirical marginal coverage at mean width
-\PRMUQNinetyWidth\eV{}.  Pair-held-out predictions recovered the preferred
-incorporation class with \PRMPreferenceAccuracy\% accuracy versus a
-\PRMPreferenceReferenceAccuracy\% empirical-majority reference and incurred
-mean global site-selection regret \PRMGlobalRegret\eV{}.  Together, these
-results define both the predictive utility and the observable failure modes of
-the surrogate within IMP2D.  They do not constitute prospective
-first-principles validation, an untouched outer UQ evaluation, or evidence for
-materials outside the audited chemical domain.
+Chemical transfer within IMP2D depended strongly on the held-out axis.
+Host--impurity-pair error remained close to random out-of-fold error, whereas
+withholding complete hosts or impurities approximately doubled the MAE.
+Nevertheless, pair-held-out predictions retrospectively identified the
+lower-energy incorporation class among retained IMP2D candidates with
+\PRMPreferenceAccuracy\% accuracy and incurred \PRMGlobalRegret\eV{} mean
+global site-selection regret.  Internal uncertainty ranked prediction risk, but
+its empirical coverage and interval width do not support conditional,
+chemically shifted, or external reliability guarantees.
+
+DART therefore provides a useful, provenance-audited surrogate for
+retrospective screening within the neutral IMP2D domain.  Prospective
+first-principles validation and transfer beyond that domain remain open tests
+rather than claims of the present work.
 
 \else
 

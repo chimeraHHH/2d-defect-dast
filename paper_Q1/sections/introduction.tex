@@ -28,6 +28,12 @@ materially affect the reported error.  These developments motivate
 architectures that expose the impurity site while retaining both local
 coordination and longer-range periodic context.
 
+Existing IMP2D studies establish descriptor baselines and sensitivity to data
+engineering, but they do not jointly isolate defect-aware architectural choices
+under paired repeats, separate transfer along host, impurity, and
+host--impurity axes, and connect out-of-fold energy errors to screening
+decisions.
+
 Benchmark accuracy, however, does not by itself define a useful materials
 model.  A random structure split can place closely related host--impurity
 chemistries, or even numerically equivalent structures, on both sides of the
@@ -47,34 +53,28 @@ surrogate should therefore be judged by its transfer partitions, uncertainty
 calibration, and decision-level screening consequences rather than by one
 random-split error.
 
-This work asks three connected questions.  First, do defect-centered readout,
-explicit local-environment features, and a distance-gated local interaction
-block provide reproducible improvements when tested as a complete paired
-factorial rather than as sequential additions?  Second, how does the selected
-model compare with periodic SchNet and validation-tuned descriptor baselines
-when hosts, impurities, host--impurity pairs, or a compositional block are held
-out?  Third, can a separately calibrated ensemble support selective prediction
-and recover the preferred incorporation class or lowest-energy site with low
-screening regret?
+This study tests a single thesis: impurity-energy surrogates should be designed
+and evaluated around the localized defect, and their value should be judged by
+chemistry-held-out decisions rather than by a random-split score alone.  We ask
+which defect-aware modules have reproducible paired effects, how prediction
+error changes when a host, impurity, or their combination is absent from IMP2D
+target supervision, and whether the resulting out-of-fold predictions remain
+useful for screening.
 
-To answer these questions, we construct a fully auditable protocol around the
-IMP2D source database.  We replay the source filter and formation-energy
-formula, remove rows whose raw energy components cannot be reconstructed,
-exclude same-element structures for which the relaxed database cannot assign
-a permutation-invariant impurity node,
-merge duplicate structures with both coordinate and invariant-distance
-fingerprints, and publish immutable split definitions.  The resulting 10,224
-structure modeling set is evaluated through a paired $2^3$ architecture
-experiment, random and chemistry-grouped cross-validation, and a predefined
-host--impurity matrix holdout.  Architecture and descriptor choices use
-validation data only, with descriptor families chosen independently inside
-each evaluation split.  A distinct calibration partition is used for variance
-scaling and split-conformal intervals, and all materials-facing conclusions
-are computed from out-of-fold predictions.
+We first reconstruct the IMP2D target provenance, remove structures without a
+permutation-invariant impurity identity, control numerical redundancy, and
+freeze all evaluation partitions.  We then evaluate DART through a paired
+factorial, random and chemistry-grouped cross-validation, and a predefined
+host--impurity block.  Architecture and descriptor choices use validation data
+only; screening conclusions use pair-held-out out-of-fold predictions; and
+uncertainty is evaluated on a separate internal calibration/test split.
 
-The intended contribution is consequently broader than a new point estimate
-on a familiar random split.  It is a test of which defect-aware modules are
-supported by paired evidence, where chemical transfer fails, and how that
-failure should constrain use of the surrogate.  No external first-principles
-test set is used; the scope is the accuracy, transferability, calibration, and
-screening utility that can be established from the audited IMP2D evidence.
+Three findings organize the paper.  First, paired evidence supports gated
+readout and the composite pre-normalized, distance-gated local block, but not an
+independent main effect of explicit environment enrichment.  Second, chemical
+transfer is axis dependent: unseen host--impurity pairs remain close to
+interpolation, whereas unseen hosts or impurities cause substantially larger
+errors.  Third, pair-held-out predictions retain useful decision-level accuracy
+and low regret, while internal uncertainty estimates remain too limited to
+support universal reliability claims.  All conclusions are restricted to the
+audited neutral adsorbate and interstitial evidence in IMP2D.

@@ -4,8 +4,8 @@ Audit date: 2026-07-29
 
 ## DOI integrity
 
-All 21 DOI-bearing records in `references.bib` were queried against Crossref
-and the DOI resolver. Twenty resolved to metadata consistent with the local
+All 21 cited DOI-bearing records in `references.bib` were queried against
+Crossref and the DOI resolver. Twenty resolved to metadata consistent with the local
 title and authors. The record previously keyed as `definet2025` did not:
 
 - Claimed DOI: `10.1021/acs.chemmater.4c02907`

@@ -3,7 +3,6 @@
 \usepackage{amsmath,amssymb}
 \usepackage{array}
 \usepackage{booktabs}
-\usepackage{float}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,
             linkcolor=blue!60!black,
@@ -14,8 +13,8 @@
 
 \begin{document}
 
-\title{Supplemental Material for ``Defect-aware graph learning of impurity
-incorporation energetics and chemical transferability in two-dimensional
+\title{Supplemental Material for ``Defect-aware graph transformer for impurity
+incorporation energies and axis-resolved chemical transfer in two-dimensional
 materials''}
 
 \author{Yiming Hua}
@@ -33,7 +32,7 @@ run, including split and seed, is archived under \path{configs/prm/}; the
 corresponding run manifests bind those configurations to checkpoints,
 predictions, environments, and output hashes.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \caption{Fixed settings for the promoted DART model and the prespecified
 periodic SchNet comparator.  Settings not shown as different were shared.}
 \label{tab:reproducibility}
@@ -44,7 +43,7 @@ periodic SchNet comparator.  Settings not shown as different were shared.}
   >{\raggedright\arraybackslash}p{0.36\textwidth}
   >{\raggedright\arraybackslash}p{0.36\textwidth}}
 \toprule
-Setting & DART (\texttt{g111}) & Periodic SchNet \\
+Setting & DART (\texttt{g111}) & Periodic SchNet (additive readout) \\
 \midrule
 Atomic input &
 Fixed 128-dimensional ct-UAE vector, nine tabulated elemental attributes, and

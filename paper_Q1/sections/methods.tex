@@ -104,7 +104,12 @@ chemical coverage, target distribution, and fixed partition geometry.
 %----------------------------------------------------------------------
 
 Each periodic supercell is represented by an atomistic graph.  We refer to the
-resulting model as the Defect-Aware Radial Transformer (DART).  The initial
+resulting model as the Defect-Aware Radial Transformer (DART).  DART is
+organized around the locality and non-extensivity of impurity incorporation.  A
+uniquely identified impurity node exposes the defect center, short-range message
+passing represents its coordination environment, periodic radial attention
+supplies longer-range host context, and graph-level readout maps the combined
+representation to one formation energy.  The initial
 node representation concatenates a fixed 128-dimensional ct-UAE elemental
 vector with nine elemental attributes: group, period, Pauling
 electronegativity, covalent and van der Waals radii, a group-based valence
@@ -189,7 +194,9 @@ records, and that all 65 IMP2D impurity elements occur somewhere in the
 source-task structures.  Formula overlap does not establish structural
 identity, but it means that the grouped partitions withhold IMP2D
 formation-energy supervision rather than all prior source-task exposure to the
-same reduced host formula or impurity element.
+same reduced host formula or impurity element.  Accordingly, ``host held out''
+and ``impurity held out'' denote absence from IMP2D target supervision, not
+absence from the JARVIS source-task chemistry.
 
 The resulting checkpoint contributes its nine-feature input-projection block
 and bias together with all 51 shape-matched V1 local-message tensors.  The 128
@@ -238,7 +245,8 @@ test labels enter the family used to predict that fold.  The training-target
 mean predictor is reported separately and is not a candidate in family
 selection.
 
-Second, a periodic SchNet comparator~\cite{schutt2018} uses 128 hidden
+Second, the prespecified additive-readout periodic SchNet recipe~\cite{schutt2018}
+uses 128 hidden
 channels, six interaction blocks, 50 Gaussian functions, and a 5~\AA{} cutoff.
 Its prespecified graph prediction sums learned atomwise scalar contributions,
 following the additive energy readout of the original SchNet formulation.
@@ -268,9 +276,6 @@ and the mean-minus-add difference in absolute error was assigned a 95\%
 percentile interval from 20,000 host-cluster bootstrap samples.  This
 exploratory control does not replace the additive-readout SchNet result in the
 main benchmark.
-
-For the same reason, ``host held out'' and ``impurity held out'' refer
-specifically to IMP2D target supervision.
 
 %----------------------------------------------------------------------
 \subsection{Internal uncertainty calibration and screening analysis}
@@ -309,11 +314,12 @@ report preference accuracy and screening regret.  Exact-site metrics require at
 least two candidate sites, whereas top-two accuracy requires at least three;
 reference minima within $10^{-8}$~eV are treated as tied, and tied
 adsorbate--interstitial pairs are excluded from binary preference accuracy.
-Accuracy is contextualized by two reference-free controls.  Incorporation
-class uses the empirical majority class among eligible decisions.  Exact-site
-accuracy uses the analytic expectation from choosing uniformly among the
-observed candidates, and top-two accuracy uses the corresponding uniformly
-sampled size-two subset; tied reference minima count as successful choices.
+Accuracy is contextualized by two non-trained descriptive decision references
+defined over the eligible evaluation decisions.  Incorporation class uses the
+empirical majority class among eligible IMP2D labels.  Exact-site accuracy uses
+the analytic expectation from choosing uniformly among the observed candidates,
+and top-two accuracy uses the corresponding uniformly sampled size-two subset;
+tied reference minima count as successful choices.
 Model-minus-reference intervals use the same host--impurity-pair cluster
 bootstrap as the model estimates.
 These are predictive associations within IMP2D, not causal mechanism

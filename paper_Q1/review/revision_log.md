@@ -255,3 +255,24 @@
 - Status: complete. Only author-supplied metadata and archival-release actions
   remain.
 - Blocks finalization: no scientific blocker; administrative blockers remain.
+
+### REV-021: J-stage narrative convergence and submission accessibility
+
+- Severity: major presentation and claim-boundary issue.
+- Fix type: writing, terminology, figure accessibility, and submission-package
+  preparation; no new experiment or model run.
+- Change: reorganized the title, abstract, introduction, transfer results, and
+  conclusion around three durable findings: paired G/P support with an
+  inconclusive independent E effect; axis-resolved chemical transfer; and
+  bounded retrospective screening with internal-only uncertainty evidence.
+  Replaced broad transferability and preferred-class language, identified the
+  prespecified SchNet comparator as an additive-readout learning recipe, and
+  corrected the non-trained decision-reference terminology.  Removed the
+  REVTeX/float-package conflict, repaired the Supplemental Material citation,
+  and added grayscale-redundant hatching/line styles to the affected figures.
+- Evidence: `paper_Q1/main.tex`, `paper_Q1/sections/`,
+  `paper_Q1/supplement.tex`, and the rebuilt paper-facing assets.
+- Status: implementation complete; compilation, numeric audit, and visual QA
+  must pass before this revision is closed.
+- Blocks finalization: yes until those paper-only validation gates pass; no
+  scientific experiment is required.

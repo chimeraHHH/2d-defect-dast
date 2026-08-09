@@ -508,7 +508,7 @@ def factorial_effect_claim(
 
 def model_label(model: str) -> str:
     labels = {
-        "dart": "DART", "schnet": "SchNet", "descriptor:mean": "Mean",
+        "dart": "DART", "schnet": "SchNet-add", "descriptor:mean": "Mean",
         "descriptor:lightgbm": "LightGBM",
         "descriptor:hist_gradient_boosting": "Histogram GB",
         "descriptor:random_forest": "Random forest",
@@ -1040,10 +1040,14 @@ def render_factorial_narrative(claims: Mapping[str, Any]) -> str:
 
     def entry(term: str) -> str:
         effect = effects[term]
+        digits = 4 if (
+            effect["status"] != "inconclusive"
+            and min(abs(effect["ci_low_eV"]), abs(effect["ci_high_eV"])) < 0.0005
+        ) else 3
         return (
-            rf"${term}$: $\Delta={finite_format(effect['mean_eV'], signed=True)}$ "
-            rf"[{finite_format(effect['ci_low_eV'], signed=True)}, "
-            rf"{finite_format(effect['ci_high_eV'], signed=True)}]~eV "
+            rf"${term}$: $\Delta={finite_format(effect['mean_eV'], digits, signed=True)}$ "
+            rf"[{finite_format(effect['ci_low_eV'], digits, signed=True)}, "
+            rf"{finite_format(effect['ci_high_eV'], digits, signed=True)}]~eV "
             rf"({status_text[effect['status']]})"
         )
 
@@ -1107,7 +1111,7 @@ def render_transfer_narrative(claims: Mapping[str, Any]) -> str:
         descriptor = benchmark["descriptor_model"]
         entries = []
         for comparator, label in (
-            ("schnet", "SchNet"),
+            ("schnet", model_label("schnet")),
             (descriptor, model_label(descriptor)),
         ):
             comparison = benchmark["paired_comparisons"][comparator]
@@ -1294,7 +1298,8 @@ def render_benchmark_table(claims: Mapping[str, Any]) -> str:
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
-\caption{{Pooled out-of-fold or single-block test MAE (eV). The descriptor
+\caption{{Pooled out-of-fold or single-block test MAE (eV). SchNet-add denotes
+the prespecified periodic SchNet recipe with atomwise-additive readout. The descriptor
 column selects a learned family independently within every split by that
 split's validation MAE ({latex_escape(descriptor_note)} were selected across
 the resulting folds). $\Delta$
@@ -1304,7 +1309,7 @@ using the regime-matched resampling unit; positive values favor DART.}}
 \centering
 \begin{{tabular}}{{lccc cc}}
 \toprule
-Regime & DART & SchNet & Descriptor & $\Delta_{{\rm SchNet}}$ & $\Delta_{{\rm desc.}}$ \\
+Regime & DART & SchNet-add & Descriptor & $\Delta_{{\rm SchNet-add}}$ & $\Delta_{{\rm desc.}}$ \\
 \midrule
 {body}
 \bottomrule
@@ -1599,7 +1604,7 @@ def plot_transfer(
     x = np.arange(len(REGIME_ORDER))
     model_specs = (
         ("dart", -0.24, COLORS["dart"], "o", "DART"),
-        ("schnet", -0.08, COLORS["schnet"], "s", "SchNet"),
+        ("schnet", -0.08, COLORS["schnet"], "s", "SchNet-add"),
         ("descriptor", 0.08, COLORS["descriptor"], "D", "Selected descriptor"),
         ("descriptor:mean", 0.24, COLORS["mean"], "^", "Mean predictor"),
     )
@@ -1622,7 +1627,7 @@ def plot_transfer(
 
     y = np.arange(len(REGIME_ORDER))
     for offset, model_kind, color, marker, label in (
-        (-0.10, "schnet", COLORS["schnet"], "s", "SchNet - DART"),
+        (-0.10, "schnet", COLORS["schnet"], "s", "SchNet-add - DART"),
         (0.10, "descriptor", COLORS["descriptor"], "D", "Descriptor - DART"),
     ):
         rows = []
@@ -1812,12 +1817,15 @@ def plot_screening(
 
     global_regret = [float(row["global_screening_regret_eV"]) for row in pair_rows]
     site_regret = [float(row["screening_regret_eV"]) for row in site_rows]
-    for values, color, label in (
-        (global_regret, COLORS["test"], "Global site"),
-        (site_regret, COLORS["descriptor"], "Within class"),
+    for values, color, linestyle, label in (
+        (global_regret, COLORS["test"], "-", "Global site"),
+        (site_regret, COLORS["descriptor"], "--", "Within class"),
     ):
         x, y = empirical_cdf(values)
-        axes[1].step(x, y, where="post", color=color, label=label)
+        axes[1].step(
+            x, y, where="post", color=color, linestyle=linestyle,
+            linewidth=1.1, label=label,
+        )
     axes[1].set_xlabel("Screening regret (eV)")
     axes[1].set_xscale("symlog", linthresh=0.05, linscale=0.8)
     axes[1].set_xticks([0.0, 0.1, 1.0, 10.0], ["0", "0.1", "1", "10"])

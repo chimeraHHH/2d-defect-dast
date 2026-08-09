@@ -38,8 +38,8 @@
 
 \begin{document}
 
-\title{Defect-aware graph learning of impurity incorporation energetics and
-chemical transferability in two-dimensional materials}
+\title{Defect-aware graph transformer for impurity incorporation energies and
+axis-resolved chemical transfer in two-dimensional materials}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
@@ -50,31 +50,32 @@ chemical transferability in two-dimensional materials}
 \begin{abstract}
 \ifprmresultsready
 Machine-learned formation energies can accelerate impurity screening in
-two-dimensional materials, but random splits do not establish chemical
-transferability or a reliable deployment domain.  We develop a defect-aware
-graph transformer and evaluate it on 10,224 provenance-audited IMP2D
-structures.  A paired $2^3$ factorial selects the architecture using validation
-data only.  Its mean absolute errors are \PRMIdCvDARTMAE\eV{} for random
-out-of-fold prediction and \PRMPairCvDARTMAE, \PRMHostCvDARTMAE,
-\PRMDopantCvDARTMAE, and \PRMChemistryBlockDARTMAE\eV{} when
-host--impurity pairs, hosts, impurities, and a predefined chemistry block are
-held out, respectively.  Paired bootstrap intervals favor the proposed model
-over periodic SchNet and validation-selected descriptor baselines in every
-regime.  A post-hoc control reduces SchNet's host-held-out error from
-\PRMSchNetAddHostMAE{} to \PRMSchNetMeanHostMAE\eV{} by replacing atomwise
-addition with mean pooling, but does not close the gap to the proposed model.
-On a dedicated ensemble split, internal 90\% conformal intervals attain
-\PRMUQNinetyCoverage\% coverage at \PRMUQNinetyWidth\eV{} mean width.
-Pair-held-out predictions recover the preferred incorporation class with
-\PRMPreferenceAccuracy\% accuracy, compared with a
-\PRMPreferenceReferenceAccuracy\% empirical-majority reference, and incur
-\PRMGlobalRegret\eV{} mean global site-selection regret.  These results
-distinguish interpolation from bounded chemical transfer within IMP2D;
-external first-principles validation remains outside the present scope.
+two-dimensional materials, but random-split accuracy does not show how a model
+behaves when chemical identities are absent from target supervision.  We
+develop the Defect-Aware Radial Transformer (DART) and evaluate it on 10,224
+provenance-audited neutral IMP2D structures.  In a paired $2^3$ factorial,
+gated readout and the composite pre-normalized, distance-gated local block
+consistently reduced validation mean absolute error (MAE), whereas the
+independent main effect of explicit environment enrichment was inconclusive; a
+fixed validation-only rule selected the all-enabled variant.  Pair-held-out MAE
+(\PRMPairCvDARTMAE\eV{}) remained close to random out-of-fold MAE
+(\PRMIdCvDARTMAE\eV{}), whereas withholding complete hosts or impurities
+increased MAE to \PRMHostCvDARTMAE{} and \PRMDopantCvDARTMAE\eV{},
+respectively.  The selected DART learning recipe had lower paired absolute
+error than the prespecified additive-readout periodic SchNet recipe and
+split-local validation-selected descriptor baselines in all five evaluation
+regimes.  Pair-held-out predictions retrospectively identified the lower-energy
+incorporation class among retained IMP2D candidates with
+\PRMPreferenceAccuracy\% accuracy and incurred \PRMGlobalRegret\eV{} mean
+global site-selection regret.  At a nominal 90\% level, conformal intervals on
+a separate internal ensemble split yielded \PRMUQNinetyCoverage\% empirical
+marginal coverage at \PRMUQNinetyWidth\eV{} mean width.  These results define a
+bounded screening domain within IMP2D; they do not establish prospective
+performance outside the audited database.
 \else
 Machine-learned formation energies can accelerate impurity screening in
 two-dimensional materials, but random-split accuracy alone does not establish
-chemical transferability or a reliable deployment domain.  We define a
+axis-resolved chemical transfer or a reliable deployment domain.  We define a
 provenance-audited, leakage-controlled evaluation of a defect-aware graph
 transformer on IMP2D.  Numerical claims are withheld until all prespecified
 non-DFT analyses and paper assets pass their provenance checks.
