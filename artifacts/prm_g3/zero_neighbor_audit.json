@@ -1,0 +1,48 @@
+{
+  "schema_version": "prm_g3_zero_neighbor_audit_v1",
+  "created_at": "2026-08-10",
+  "claim_type": "computed",
+  "evidence_tier": "diagnostic_input_only",
+  "main_text_eligible": false,
+  "server_alias": "server:WHUServer-L40S",
+  "server_run_commit": "5a730ce361469c4358a05df275dafb311462031b",
+  "inputs": {
+    "cleaned_dataset_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+    "raw_database_sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4",
+    "protocol": "artifacts/prm_protocol_v2",
+    "canonical_rows": 10224
+  },
+  "failure_trigger": {
+    "stage": "exploratory descriptor extraction before any joined table or outcome model",
+    "first_sample_index": 748,
+    "exception": "unique impurity has no model-edge neighbors within 5 Angstrom"
+  },
+  "population_audit": {
+    "zero_defect_center_graph_edge_rows": 14,
+    "zero_raw_host_only_neighbor_rows": 14,
+    "adsorbate_rows": 13,
+    "interstitial_rows": 1,
+    "sample_indices": [748, 1344, 2465, 2912, 3218, 3384, 3558, 3588, 4164, 4538, 6519, 7916, 9956, 10623],
+    "raw_row_ids": [1096, 1966, 3614, 4542, 5400, 5844, 6334, 6417, 7662, 8255, 11311, 13325, 16619, 17573]
+  },
+  "legacy_oof_batch_audit": {
+    "env_zero_neighbor_mode": "legacy_batch_dependent_v0",
+    "batch_size": 64,
+    "batch_order_source": "original indices arrays in each archived test_predictions.npz; each must exactly equal its hash-bound split test list",
+    "trainer_test_shuffle": false,
+    "trainer_source_sha256": "36aad2cb073d3a694f4b686d6587910855311fd899dc5e020ce6ad6fcba25c0d",
+    "model_source_sha256": "c044074250aa52e9f82289083e8c10736cb4bac1a823be72ce6df103c116487e",
+    "regimes": ["pair", "host", "dopant"],
+    "sample_regime_contexts": 42,
+    "contexts_with_at_least_one_other_defect_center_edge": 42,
+    "minimum_positive_defect_edge_rows_in_context": 8,
+    "minimum_total_defect_center_edges_in_context": 102,
+    "model_numeric_input_for_empty_neighborhood": "[0, 0, 0, abs(encoded impurity electronegativity)]"
+  },
+  "canonical_boundary": {
+    "required_env_zero_neighbor_mode": "zero_residual_v1",
+    "empty_neighborhood_residual": "[0, 0, 0, 0]",
+    "legacy_mode_accepted_for_canonical": false
+  },
+  "interpretation": "This audit only establishes the input and batch branch needed to repair extraction. It contains no model-error association and cannot support manuscript claims."
+}

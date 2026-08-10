@@ -3,6 +3,15 @@
   "frozen_at": "2026-08-10",
   "milestone": "J-R3-physics-error-map",
   "authorization": "G3 approved; G2 not approved",
+  "amendments": [
+    {
+      "id": "A1-zero-defect-neighbor-semantics",
+      "frozen_at": "2026-08-10 before any successful G3 extraction or outcome modeling",
+      "trigger": "the first exploratory extraction stopped at sample_index 748 because the prior extractor incorrectly rejected an empty impurity-centered 5 Angstrom graph neighborhood",
+      "input_only_audit": "server-side scan of the hash-frozen graph and raw database found 14 of 10,224 rows with zero impurity-centered graph edges and zero raw host-only neighbors; no error association or statistical result was inspected",
+      "resolution": "separate tier-specific effective E scalars from physically undefined empty-set summaries, verify the legacy batch branch, retain every zero-neighbor row through frozen flagged imputation and a nuisance indicator, and require corrected canonical zero-residual lineage"
+    }
+  ],
   "evidence_boundary": {
     "default_tier": "exploratory",
     "canonical_requires": [
@@ -11,6 +20,9 @@
       "a hash-verified prm_g1c_pretraining_receipt_v1 and corrected asset SHA-256",
       "repaired permutation-invariant triplets",
       "verified exact minimum-image distances",
+      "env_zero_neighbor_mode=zero_residual_v1 in the G2 acceptance, every source run, and every source run config.model_kwargs",
+      "model_recipe_sha256 recomputed from canonical JSON of each embedded config.model_kwargs",
+      "model_source_sha256 equal to both the G1-accepted model source and src/models/crystal_v2.py at the G2 code commit",
       "complete repaired pair-, host-, and impurity-OOF predictions"
     ],
     "legacy_model_status": "legacy_order_sensitive_graph",
@@ -26,6 +38,7 @@
     "require_head_reachable_from_fetched_remote_branch": true,
     "versioned_output_only": "analysis writes a write-once analysis_started.json attempt lock and refuses any existing attempt lock or coverage/effect/block/family/figure/analysis-manifest output; partial runs require a new output directory",
     "required_packages": ["numpy", "scipy", "ase", "torch"],
+    "oof_inference_batch_size": 64,
     "prohibited_new_shared_environment_installs": true
   },
   "inputs": {
@@ -48,6 +61,12 @@
     "exploratory_host_impurity_seeds": [242, 243, 244],
     "canonical_pair_seed": 242,
     "canonical_host_impurity_seeds": [242, 243, 244],
+    "exploratory_env_zero_neighbor_mode": "legacy_batch_dependent_v0",
+    "exploratory_oof_inference_batch_size": 64,
+    "exploratory_zero_neighbor_sample_indices": [748, 1344, 2465, 2912, 3218, 3384, 3558, 3588, 4164, 4538, 6519, 7916, 9956, 10623],
+    "exploratory_zero_neighbor_batch_evidence": "all 14 rows are in active LocalEnvEnrichment batches in pair, host, and dopant OOF inference (42 of 42 contexts); batches are reconstructed from each archived prediction NPZ's original indices, which must exactly equal the hash-bound split test order; the hash-frozen legacy trainer uses test shuffle=False; each context must retain at least one positive defect-edge row and a positive total defect-edge count",
+    "canonical_env_zero_neighbor_mode": "zero_residual_v1",
+    "canonical_model_recipe_hash": "SHA-256 of UTF-8 json.dumps(config.model_kwargs, sort_keys=True, separators=(',', ':'), ensure_ascii=True, allow_nan=False)",
     "join_key": ["sample_index", "raw_row_id"],
     "required_population": 10224
   },
@@ -76,9 +95,9 @@
     "cutoff_A": 5.0,
     "e_module_aligned": [
       "cn_5A",
-      "neighbor_distance_mean_A",
-      "neighbor_distance_max_A",
-      "local_abs_electronegativity_contrast"
+      "e_module_effective_mean_distance_A",
+      "e_module_effective_max_distance_A",
+      "e_module_effective_abs_electronegativity_contrast"
     ],
     "independent_geometry": [
       "smooth_cn_5A",
@@ -88,6 +107,8 @@
       "abs_log_extension_factor"
     ],
     "chemistry": [
+      "e_module_effective_abs_electronegativity_contrast",
+      "local_abs_electronegativity_contrast",
       "local_signed_covalent_radius_mismatch_A",
       "local_abs_covalent_radius_mismatch_A",
       "local_signed_electronegativity_mismatch",
@@ -95,6 +116,11 @@
       "local_abs_valence_mismatch"
     ],
     "audit_only_model_edge_semantics": [
+      "model_edge_zero_defect_neighbor_5A",
+      "e_module_oof_batch_activation_verified",
+      "e_module_zero_neighbor_semantics_verified",
+      "neighbor_distance_mean_A",
+      "neighbor_distance_max_A",
       "model_edge_periodic_impurity_self_image_count_5A",
       "host_only_cn_5A",
       "host_only_neighbor_distance_mean_A",
@@ -118,9 +144,11 @@
       "model_edge_neighbor_set": "directly read from edge_index/edge_dist in the exact source graph dataset used by the corresponding prediction (frozen legacy cleaned pickle for exploratory output; hash-verified G1 repaired graph pickle for canonical output), centered on the unique impurity; zero-displacement self interaction is absent, while nonzero periodic impurity self-images (i == j with nonzero lattice shift) are retained exactly as consumed by DefectEnvironmentEnrichment",
       "physical_host_neighbor_set": "directed ASE raw-database neighbor-list entries centered on the unique impurity at cutoff 5.0 Angstrom with neighbor atom index different from the impurity index; distinct periodic images of host atoms remain separate entries",
       "cn_5A": "number of members of model_edge_neighbor_set",
-      "neighbor_distance_mean_A": "arithmetic mean of d over model_edge_neighbor_set",
-      "neighbor_distance_max_A": "maximum d over model_edge_neighbor_set",
-      "local_abs_electronegativity_contrast": "absolute impurity-minus-neighbor mean contrast of column 2 of the hash-frozen model atom-feature table over model_edge_neighbor_set; this is the exact scale consumed by DefectEnvironmentEnrichment, not raw Pauling units",
+      "e_module_nonempty_effective_scalars": "when model_edge_neighbor_set is nonempty, e_module_effective_mean_distance_A and e_module_effective_max_distance_A are its arithmetic mean and maximum distance, and e_module_effective_abs_electronegativity_contrast is the absolute impurity-minus-neighbor mean contrast of atom_features_ref.pth column 2; these are the pre-normalization scalars that survive the residual mask",
+      "legacy_empty_inputs": "for exploratory legacy_batch_dependent_v0 only, an empty model_edge_neighbor_set receives [cn, mean, max, encoded-EN contrast] = [0, 0, 0, abs(encoded impurity EN)] exactly when another defect-centered edge in the same OOF test batch prevents LocalEnvEnrichment's batch-level early return; every such pair/host/dopant batch is reconstructed from the archived NPZ index order after exact split-order, split-hash, prediction-hash, trainer-source-hash, and test-shuffle=False lineage checks; failure is fatal",
+      "canonical_empty_inputs": "canonical G2 must bind zero_residual_v1 at both run/acceptance top level and config.model_kwargs; G3 recomputes model_recipe_sha256 from embedded kwargs and binds model_source_sha256 to G1 and the G2 commit; the empty-neighborhood E residual is [0, 0, 0, 0] independent of batch composition; missing or legacy mode is rejected",
+      "physical_empty_set_rule": "neighbor_distance_mean_A, neighbor_distance_max_A, host-only distance mean/max/std, clearance, and host-neighbor chemistry summaries are NaN for an empty corresponding set; zero Angstrom is never reported as a physical mean or maximum",
+      "local_abs_electronegativity_contrast": "absolute raw-table impurity-minus-host-neighbor mean electronegativity mismatch; NaN when the physical host neighbor set is empty",
       "model_edge_periodic_impurity_self_image_count_5A": "number of model_edge_neighbor_set entries whose neighbor atom index equals the impurity index; audit-only and never silently removed",
       "host_only_cn_5A": "number of members of physical_host_neighbor_set; audit-only",
       "raw_graph_edge_audit": "for impurity-centered entries, archive raw-minus-graph count, neighbor-index multiset equality, and the maximum absolute distance difference after deterministic sorting when topology matches; these audit quantities are not substituted for graph-native E features",
@@ -138,6 +166,14 @@
       "below_0.90": "exclude",
       "0.90_to_below_0.95": "supplement_only",
       "at_least_0.95": "main_text_eligible only when overall, adsorbate, and interstitial coverage each meet the threshold"
+    },
+    "zero_neighbor_analysis_rule": {
+      "population": "the input-only audit found 14 rows: 13 adsorbates and 1 interstitial",
+      "physical_features": ["neighbor_distance_std_A", "postrelaxation_min_clearance_A", "local_abs_electronegativity_contrast", "local_signed_covalent_radius_mismatch_A", "local_abs_covalent_radius_mismatch_A", "local_signed_electronegativity_mismatch", "local_signed_valence_mismatch", "local_abs_valence_mismatch"],
+      "imputation": "only for a flagged zero-neighbor row, an undefined eligible physical feature is replaced in the analysis matrix by the finite median among nonzero-neighbor rows of the same incorporation class; source CSV values remain NaN",
+      "indicator": "an unscaled model_edge_zero_defect_neighbor_5A nuisance main effect is added to every primary, fold, XF, nuisance-control, and bootstrap fit; adjusted profiles set it to zero",
+      "ledger": "analysis_row_ledger.csv contains all 10,224 rows, every imputed feature, remaining missingness, and inclusion status; any zero-neighbor row still excluded after the frozen rule aborts analysis",
+      "claim_boundary": "the 14-row zero-neighbor stratum is descriptive only and cannot support a class-specific physical effect claim"
     }
   },
   "host_taxonomy": {
@@ -158,7 +194,7 @@
     "outcome": "log(absolute_pair_oof_error_eV + 0.05)",
     "estimator": "Huber M-estimator after weighted alternating projection of crossed host, impurity, and pair-fold fixed effects",
     "not_called": "mixed-effects model",
-    "continuous_scaling": "median-centered and divided by IQR on finite analysis rows",
+    "continuous_scaling": "median-centered and divided by IQR on the frozen analysis matrix; the zero-neighbor nuisance indicator is unscaled",
     "terms": [
       "incorporation class",
       "all main-text-eligible E-module-aligned geometry features, including cn_5A, mean distance, and maximum distance",
@@ -167,9 +203,10 @@
       "all main-text-eligible chemistry features",
       "feature by incorporation-class interactions"
     ],
+    "zero_neighbor_nuisance": "unscaled binary main effect only; no interaction or standalone paper claim",
     "joint_tests": ["geometry block", "chemistry block"],
     "individual_contrast": "adjusted 10th-to-90th percentile contrast within each incorporation class",
-    "back_transform": "for each class, set all continuous non-focal terms to their class median, set the focal term to its class q10 or q90, marginalize host/impurity/fold effects under the final Huber-IRLS weighted zero-sum constraint, predict eta = final_IRLS_weighted_mean(y) + beta dot (profile - final_IRLS_weighted_mean(design)), and return max(exp(eta)-0.05, 0); the eV contrast is high minus low and the percent contrast divides by max(low, 0.05)",
+    "back_transform": "for each class, set all continuous non-focal terms to their class median, set the zero-neighbor nuisance indicator to zero, set the focal term to its class q10 or q90, marginalize host/impurity/fold effects under the final Huber-IRLS weighted zero-sum constraint, predict eta = final_IRLS_weighted_mean(y) + beta dot (profile - final_IRLS_weighted_mean(design)), and return max(exp(eta)-0.05, 0); the eV contrast is high minus low and the percent contrast divides by max(low, 0.05)",
     "signed_residual": "bias diagnostic only",
     "cluster": "host-impurity pair",
     "bootstrap_draws": 2000,

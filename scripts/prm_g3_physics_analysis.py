@@ -54,6 +54,15 @@ RDF_EDGES_A = np.linspace(0.0, RDF_CUTOFF_A, 13)
 HUBER_DELTA = 1.345
 PROFILE_GRID_POINTS = 41
 ADJUSTED_PROFILE_FEATURES = ("cn_5A", "postrelaxation_min_clearance_A")
+OOF_INFERENCE_BATCH_SIZE = 64
+LEGACY_ENV_ZERO_NEIGHBOR_MODE = "legacy_batch_dependent_v0"
+CANONICAL_ENV_ZERO_NEIGHBOR_MODE = "zero_residual_v1"
+LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES = (
+    748, 1344, 2465, 2912, 3218, 3384, 3558, 3588, 4164, 4538, 6519,
+    7916, 9956, 10623,
+)
+LEGACY_TRAINER_SOURCE_SHA256 = "36aad2cb073d3a694f4b686d6587910855311fd899dc5e020ce6ad6fcba25c0d"
+LEGACY_MODEL_SOURCE_SHA256 = "c044074250aa52e9f82289083e8c10736cb4bac1a823be72ce6df103c116487e"
 CANONICAL_PREDICTION_SEEDS = {
     "pair": {242}, "host": {242, 243, 244}, "dopant": {242, 243, 244},
 }
@@ -84,10 +93,17 @@ IMPURITY_SERIES = {
 }
 
 E_ALIGNED_GEOMETRY = (
-    "cn_5A", "neighbor_distance_mean_A", "neighbor_distance_max_A",
+    "cn_5A", "e_module_effective_mean_distance_A", "e_module_effective_max_distance_A",
 )
-E_MODULE_ALIGNED = E_ALIGNED_GEOMETRY + ("local_abs_electronegativity_contrast",)
+E_MODULE_ALIGNED = E_ALIGNED_GEOMETRY + (
+    "e_module_effective_abs_electronegativity_contrast",
+)
 MODEL_EDGE_AUDIT_FEATURES = (
+    "model_edge_zero_defect_neighbor_5A",
+    "e_module_oof_batch_activation_verified",
+    "e_module_zero_neighbor_semantics_verified",
+    "neighbor_distance_mean_A",
+    "neighbor_distance_max_A",
     "model_edge_periodic_impurity_self_image_count_5A",
     "host_only_cn_5A",
     "host_only_neighbor_distance_mean_A",
@@ -102,6 +118,7 @@ INDEPENDENT_GEOMETRY = (
     "abs_log_extension_factor",
 )
 CHEMISTRY_FEATURES = (
+    "e_module_effective_abs_electronegativity_contrast",
     "local_abs_electronegativity_contrast",
     "local_signed_covalent_radius_mismatch_A",
     "local_abs_covalent_radius_mismatch_A",
@@ -110,6 +127,16 @@ CHEMISTRY_FEATURES = (
     "local_abs_valence_mismatch",
 )
 PRIMARY_FEATURES = E_ALIGNED_GEOMETRY + INDEPENDENT_GEOMETRY + CHEMISTRY_FEATURES
+ZERO_NEIGHBOR_UNDEFINED_PRIMARY_FEATURES = (
+    "neighbor_distance_std_A",
+    "postrelaxation_min_clearance_A",
+    "local_abs_electronegativity_contrast",
+    "local_signed_covalent_radius_mismatch_A",
+    "local_abs_covalent_radius_mismatch_A",
+    "local_signed_electronegativity_mismatch",
+    "local_signed_valence_mismatch",
+    "local_abs_valence_mismatch",
+)
 SENSITIVITY_CONTROLS = (
     "natoms", "cell_area_A2", "host_slab_thickness_A",
     "train_host_support", "train_impurity_support", "abs_target_eV", "abs_conv2",
@@ -141,6 +168,33 @@ def file_sha256(path: Path, block_size: int = 8 * 1024 * 1024) -> str:
         for block in iter(lambda: handle.read(block_size), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def canonical_json_sha256(value: Any) -> str:
+    """Hash one JSON value with a path- and whitespace-independent encoding."""
+    encoded = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+@functools.lru_cache(maxsize=32)
+def git_file_sha256(commit: str, repository_path: str) -> str:
+    """Hash the exact source blob used by a commit, not the current worktree."""
+    if (
+        len(commit) != 40
+        or repository_path.startswith("/")
+        or ".." in Path(repository_path).parts
+    ):
+        raise ValueError("invalid commit/source identity")
+    result = subprocess.run(
+        ["git", "show", f"{commit}:{repository_path}"], cwd=ROOT,
+        capture_output=True, check=False,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"cannot resolve {repository_path} at G2 commit")
+    return hashlib.sha256(result.stdout).hexdigest()
 
 
 def git_snapshot() -> dict[str, Any]:
@@ -250,6 +304,52 @@ def validate_canonical_initialization_fields(
         raise ValueError("canonical G2 initialization lineage fields changed")
 
 
+def require_canonical_env_zero_neighbor_mode(
+    acceptance: Mapping[str, Any],
+) -> str:
+    mode = str(acceptance.get("env_zero_neighbor_mode", ""))
+    if mode != CANONICAL_ENV_ZERO_NEIGHBOR_MODE:
+        raise ValueError(
+            "canonical G2 must bind env_zero_neighbor_mode=zero_residual_v1"
+        )
+    return mode
+
+
+def validate_canonical_run_model_contract(
+    run_manifest: Mapping[str, Any], expected_recipe_sha256: str,
+    expected_model_source_sha256: str,
+) -> None:
+    """Bind the declared mode to the kwargs actually passed to the model."""
+    config = run_manifest.get("config")
+    model_kwargs = config.get("model_kwargs") if isinstance(config, Mapping) else None
+    if not isinstance(model_kwargs, Mapping):
+        raise ValueError("canonical G2 run lacks embedded config.model_kwargs")
+    if (
+        run_manifest.get("env_zero_neighbor_mode")
+        != CANONICAL_ENV_ZERO_NEIGHBOR_MODE
+        or model_kwargs.get("env_zero_neighbor_mode")
+        != CANONICAL_ENV_ZERO_NEIGHBOR_MODE
+    ):
+        raise ValueError(
+            "canonical G2 top-level and embedded zero-neighbor modes must both "
+            "equal zero_residual_v1"
+        )
+    if (
+        config.get("model") != "v2"
+        or model_kwargs.get("use_env_enrichment") is not True
+    ):
+        raise ValueError("canonical G2 run does not instantiate the frozen DART E module")
+    recomputed_recipe_sha256 = canonical_json_sha256(model_kwargs)
+    if (
+        run_manifest.get("model_recipe_scope") != "config.model_kwargs"
+        or run_manifest.get("model_recipe_sha256") != expected_recipe_sha256
+        or recomputed_recipe_sha256 != expected_recipe_sha256
+    ):
+        raise ValueError("canonical G2 model recipe is not the hash of embedded model_kwargs")
+    if run_manifest.get("model_source_sha256") != expected_model_source_sha256:
+        raise ValueError("canonical G2 run model source differs from accepted source")
+
+
 def pushed_ancestor(ancestor: str, descendant: str) -> bool:
     ancestry = subprocess.run(
         ["git", "merge-base", "--is-ancestor", ancestor, descendant],
@@ -311,6 +411,202 @@ def graph_samples_from_blob(
                 "not all 10,641 canonical-container rows carry the repaired builder version"
             )
     return graph_samples
+
+
+def defect_center_edge_counts(
+    graph_samples: Sequence[Mapping[str, Any]],
+    rows: Sequence[Mapping[str, Any]],
+) -> dict[int, int]:
+    """Count directed graph edges centered on each unique impurity atom."""
+    from ase.data import atomic_numbers
+
+    output: dict[int, int] = {}
+    for row in rows:
+        index = int(row["sample_index"])
+        sample = graph_samples[index]
+        numbers = np.asarray(sample.get("numbers"), dtype=int)
+        dopant_z = int(atomic_numbers[str(row["dopant"])])
+        candidates = np.flatnonzero(numbers == dopant_z)
+        if len(candidates) != 1:
+            raise ValueError(
+                f"graph row {index} has {len(candidates)} atoms matching the impurity"
+            )
+        edge_index = np.asarray(sample.get("edge_index"), dtype=int)
+        if edge_index.ndim != 2 or edge_index.shape[0] != 2:
+            raise ValueError(f"graph row {index} has invalid edge_index")
+        output[index] = int(np.count_nonzero(edge_index[0] == int(candidates[0])))
+    return output
+
+
+def validate_zero_neighbor_oof_batch_activation(
+    defect_edge_counts: Mapping[int, int],
+    test_order_by_regime: Mapping[str, Mapping[int, Sequence[int]]],
+    batch_size: int = OOF_INFERENCE_BATCH_SIZE,
+) -> dict[int, dict[str, dict[str, int]]]:
+    """Verify legacy E enrichment in the archived NPZ inference order."""
+    if batch_size != OOF_INFERENCE_BATCH_SIZE:
+        raise ValueError("legacy zero-neighbor semantics require frozen OOF batch_size=64")
+    indices = set(int(index) for index in defect_edge_counts)
+    zero_indices = {
+        int(index) for index, count in defect_edge_counts.items() if int(count) == 0
+    }
+    audit: dict[int, dict[str, dict[str, int]]] = {
+        index: {} for index in sorted(zero_indices)
+    }
+    for regime in ("pair", "host", "dopant"):
+        folds = test_order_by_regime.get(regime, {})
+        if set(folds) != set(range(5)):
+            raise ValueError(f"{regime} lacks five archived OOF test orders")
+        observed: list[int] = []
+        for fold in range(5):
+            partition = [int(index) for index in folds[fold]]
+            if len(partition) != len(set(partition)):
+                raise ValueError(f"{regime} fold {fold} archived order has duplicates")
+            observed.extend(partition)
+            for start in range(0, len(partition), batch_size):
+                batch = partition[start:start + batch_size]
+                zero_members = [index for index in batch if index in zero_indices]
+                if not zero_members:
+                    continue
+                positive_rows = sum(int(defect_edge_counts[index]) > 0 for index in batch)
+                total_edges = sum(int(defect_edge_counts[index]) for index in batch)
+                if positive_rows == 0 or total_edges == 0:
+                    raise RuntimeError(
+                        "legacy OOF batch contains only zero-defect-neighbor rows; "
+                        "LocalEnvEnrichment would early-return instead of applying its scatter sentinel"
+                    )
+                for index in zero_members:
+                    audit[index][regime] = {
+                        "fold": fold,
+                        "batch_start": start,
+                        "batch_size": len(batch),
+                        "positive_defect_edge_rows": positive_rows,
+                        "total_defect_center_edges": total_edges,
+                    }
+        if len(observed) != len(set(observed)) or set(observed) != indices:
+            raise ValueError(f"{regime} archived OOF orders differ from graph population")
+    if any(set(per_regime) != {"pair", "host", "dopant"} for per_regime in audit.values()):
+        raise RuntimeError("zero-neighbor sample lacks a complete three-regime OOF batch audit")
+    return audit
+
+
+def e_module_effective_scalars(
+    distances: np.ndarray, neighbor_atomic_numbers: np.ndarray,
+    dopant_atomic_number: int, model_en: np.ndarray,
+    zero_neighbor_mode: str,
+) -> dict[str, float]:
+    """Mirror the four E scalars after the frozen zero-residual mask."""
+    values = np.asarray(distances, dtype=float)
+    neighbor_z = np.asarray(neighbor_atomic_numbers, dtype=int)
+    if len(values) != len(neighbor_z):
+        raise ValueError("E-module distance/neighbor arrays do not align")
+    if len(values):
+        en_contrast = abs(
+            float(model_en[dopant_atomic_number])
+            - float(np.mean(model_en[neighbor_z]))
+        )
+        return {
+            "cn_5A": float(len(values)),
+            "e_module_effective_mean_distance_A": float(np.mean(values)),
+            "e_module_effective_max_distance_A": float(np.max(values)),
+            "e_module_effective_abs_electronegativity_contrast": en_contrast,
+        }
+    if zero_neighbor_mode == LEGACY_ENV_ZERO_NEIGHBOR_MODE:
+        en_contrast = abs(float(model_en[dopant_atomic_number]))
+    elif zero_neighbor_mode == CANONICAL_ENV_ZERO_NEIGHBOR_MODE:
+        en_contrast = 0.0
+    else:
+        raise ValueError(f"unsupported env_zero_neighbor_mode: {zero_neighbor_mode}")
+    return {
+        "cn_5A": 0.0,
+        "e_module_effective_mean_distance_A": 0.0,
+        "e_module_effective_max_distance_A": 0.0,
+        "e_module_effective_abs_electronegativity_contrast": en_contrast,
+    }
+
+
+def prepare_primary_analysis_rows(
+    rows: Sequence[Mapping[str, Any]], eligible_features: Sequence[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, dict[str, float]]]:
+    """Retain zero-neighbor rows via frozen, flagged physical-feature imputation."""
+    medians: dict[str, dict[str, float]] = {}
+    for class_name in ("adsorbate", "interstitial"):
+        medians[class_name] = {}
+        class_rows = [row for row in rows if str(row["defecttype"]) == class_name]
+        for feature in ZERO_NEIGHBOR_UNDEFINED_PRIMARY_FEATURES:
+            if feature not in eligible_features:
+                continue
+            finite = np.asarray([
+                finite_float(row.get(feature)) for row in class_rows
+                if int(finite_float(row.get("model_edge_zero_defect_neighbor_5A"))) == 0
+                and math.isfinite(finite_float(row.get(feature)))
+            ], dtype=float)
+            if len(finite) == 0:
+                raise RuntimeError(
+                    f"no finite nonzero-neighbor {class_name} reference for {feature}"
+                )
+            medians[class_name][feature] = float(np.median(finite))
+
+    complete: list[dict[str, Any]] = []
+    ledger: list[dict[str, Any]] = []
+    zero_excluded: list[int] = []
+    for row in rows:
+        index = int(row["sample_index"])
+        class_name = str(row["defecttype"])
+        zero_neighbor = int(
+            finite_float(row.get("model_edge_zero_defect_neighbor_5A")) == 1.0
+        )
+        values = {feature: finite_float(row.get(feature)) for feature in eligible_features}
+        imputed: list[str] = []
+        for feature, value in list(values.items()):
+            if (
+                not math.isfinite(value)
+                and zero_neighbor == 1
+                and feature in ZERO_NEIGHBOR_UNDEFINED_PRIMARY_FEATURES
+            ):
+                values[feature] = medians[class_name][feature]
+                imputed.append(feature)
+        missing = sorted(
+            feature for feature, value in values.items() if not math.isfinite(value)
+        )
+        outcome_finite = math.isfinite(finite_float(row.get("pair_absolute_error_eV")))
+        included = outcome_finite and not missing
+        if included:
+            complete.append({**row, **values})
+        elif zero_neighbor:
+            zero_excluded.append(index)
+        ledger.append({
+            "evidence_tier": row.get("evidence_tier", ""),
+            "evidence_label": row.get("evidence_label", ""),
+            "sample_index": index,
+            "raw_row_id": int(row["raw_row_id"]),
+            "defecttype": class_name,
+            "env_zero_neighbor_mode": row.get("env_zero_neighbor_mode", ""),
+            "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
+            "model_edge_zero_defect_neighbor_5A": zero_neighbor,
+            "e_module_oof_batch_activation_verified": int(
+                finite_float(row.get("e_module_oof_batch_activation_verified")) == 1.0
+            ),
+            "legacy_zero_neighbor_oof_batch_evidence": row.get(
+                "legacy_zero_neighbor_oof_batch_evidence", ""
+            ),
+            "legacy_zero_neighbor_min_positive_defect_edge_rows": row.get(
+                "legacy_zero_neighbor_min_positive_defect_edge_rows", ""
+            ),
+            "legacy_zero_neighbor_min_total_defect_center_edges": row.get(
+                "legacy_zero_neighbor_min_total_defect_center_edges", ""
+            ),
+            "zero_neighbor_imputed_features": "|".join(sorted(imputed)),
+            "remaining_missing_features": "|".join(missing),
+            "outcome_finite": int(outcome_finite),
+            "primary_analysis_included": int(included),
+        })
+    if zero_excluded:
+        raise RuntimeError(
+            "zero-neighbor rows remain excluded after frozen imputation: "
+            + ",".join(str(index) for index in zero_excluded)
+        )
+    return complete, ledger, medians
 
 
 def finite_float(value: Any) -> float:
@@ -478,10 +774,16 @@ def load_prediction_archive(
         indices = np.asarray(archive["indices"], dtype=np.int64)
         preds = np.asarray(archive["preds"], dtype=float)
         targets = np.asarray(archive["targets"], dtype=float)
-    order = np.argsort(indices)
-    indices, preds, targets = indices[order], preds[order], targets[order]
-    if indices.tolist() != sorted(int(i) for i in expected_indices):
-        raise ValueError(f"prediction/test split index mismatch: {path}")
+    if (
+        indices.ndim != 1
+        or preds.shape != indices.shape
+        or targets.shape != indices.shape
+        or len(set(indices.tolist())) != len(indices)
+    ):
+        raise ValueError(f"prediction arrays are not aligned one-dimensional rows: {path}")
+    expected_order = [int(index) for index in expected_indices]
+    if indices.tolist() != expected_order:
+        raise ValueError(f"prediction order differs from frozen test split: {path}")
     expected_targets = np.asarray([target_by_index[int(i)] for i in indices])
     if not np.allclose(targets, expected_targets, rtol=0.0, atol=1e-5):
         raise ValueError(f"prediction target mismatch: {path}")
@@ -504,6 +806,7 @@ def canonical_prediction_specs(
     for key, value in required.items():
         if acceptance.get(key) != value:
             raise ValueError(f"canonical G2 acceptance mismatch for {key}")
+    require_canonical_env_zero_neighbor_mode(acceptance)
     g1 = acceptance.get("g1", {})
     rebuild_spec = g1.get("repaired_dataset_receipt", {})
     final_spec = g1.get("acceptance_receipt", {})
@@ -543,6 +846,9 @@ def canonical_prediction_specs(
         or g1_payload.get("status") != "accepted"
         or g1_payload.get("graph_builder_version") != "exact_mic_invariant_triplets_v1"
         or g1_payload.get("source_data_sha256") != EXPECTED_DATA_SHA256
+        or g1_payload.get("env_zero_neighbor_mode")
+        != CANONICAL_ENV_ZERO_NEIGHBOR_MODE
+        or len(str(g1_payload.get("model_source_sha256", ""))) != 64
         or g1_payload.get("repaired_dataset_receipt_sha256") != str(rebuild_spec["sha256"])
         or g1_payload.get("repaired_dataset_sha256") != rebuild_payload["output"]["sha256"]
         or not g1_payload.get("property_tests_passed")
@@ -582,17 +888,27 @@ def canonical_prediction_specs(
         raise ValueError("canonical G2 repaired graph dataset hash mismatch")
     code_commit = str(acceptance.get("code_commit", ""))
     recipe_sha256 = str(acceptance.get("model_recipe_sha256", ""))
+    recipe_scope = str(acceptance.get("model_recipe_scope", ""))
+    model_source_sha256 = str(acceptance.get("model_source_sha256", ""))
     lineage_sha256 = str(acceptance.get("pretrained_asset_lineage_sha256", ""))
     accepted_asset_spec = acceptance.get("pretrained_asset", {})
     accepted_asset_sha256 = str(accepted_asset_spec.get("sha256", ""))
     if (
         len(code_commit) != 40
         or len(recipe_sha256) != 64
+        or recipe_scope != "config.model_kwargs"
+        or len(model_source_sha256) != 64
         or len(lineage_sha256) != 64
         or len(accepted_asset_sha256) != 64
     ):
         raise ValueError("canonical G2 acceptance lacks code/recipe/pretraining-lineage identity")
     validate_canonical_initialization_fields(acceptance, corrected_asset_sha256)
+    if (
+        model_source_sha256 != g1_payload["model_source_sha256"]
+        or model_source_sha256
+        != git_file_sha256(code_commit, "src/models/crystal_v2.py")
+    ):
+        raise ValueError("G2 model source is not the G1-accepted source at its code commit")
     accepted_asset_path = resolve_contract_path(accepted_asset_spec.get("path", ""))
     if (
         not accepted_asset_spec.get("path")
@@ -663,14 +979,17 @@ def canonical_prediction_specs(
                     or run_manifest.get("split_sha256") != split_sha256
                     or run_manifest.get("split_counts") != split_payload["counts"]
                     or int(run_manifest.get("seed", -1)) != entry_seed
+                    or int(run_manifest.get("config", {}).get("batch_size", -1))
+                    != OOF_INFERENCE_BATCH_SIZE
                 ):
                     raise ValueError("G2 source run is incomplete or dirty")
+                validate_canonical_run_model_contract(
+                    run_manifest, recipe_sha256, model_source_sha256,
+                )
                 if run_manifest.get("git", {}).get("commit") != code_commit:
                     raise ValueError("G2 source run commit mismatch")
                 if run_manifest.get("data", {}).get("data_sha256") != repaired["graph_dataset_sha256"]:
                     raise ValueError("G2 source run repaired-data mismatch")
-                if run_manifest.get("model_recipe_sha256") != recipe_sha256:
-                    raise ValueError("G2 source run model-recipe mismatch")
                 if run_manifest.get("graph_builder_version") != g1_payload["graph_builder_version"]:
                     raise ValueError("G2 source run graph-builder mismatch")
                 if run_manifest.get("atom_feature_table_sha256") != EXPECTED_ATOM_FEATURE_SHA256:
@@ -691,36 +1010,83 @@ def canonical_prediction_specs(
 
 
 def exploratory_prediction_specs(
-    prediction_root: Path,
+    prediction_root: Path, protocol_dir: Path,
 ) -> dict[str, dict[int, list[dict[str, Any]]]]:
     seeds = {"pair": (242,), "host": (242, 243, 244), "dopant": (242, 243, 244)}
     specs: dict[str, dict[int, list[dict[str, Any]]]] = {}
     for regime in seeds:
         specs[regime] = {}
         for fold in range(5):
-            specs[regime][fold] = [
-                {
-                    "path": prediction_root / f"{regime}_cv5_f{fold}" / f"seed{seed}" / "test_predictions.npz",
-                    "sha256": None,
-                    "seed": seed,
+            split_id = f"{regime}_cv5_f{fold}"
+            split_path = protocol_dir / "splits" / f"{split_id}.json"
+            split = load_split(protocol_dir, split_id)
+            split_sha256 = file_sha256(split_path)
+            active_split_counts = {
+                name: int(split["counts"][name])
+                for name in ("train", "val", "test")
+            }
+            specs[regime][fold] = []
+            for seed in seeds[regime]:
+                run_dir = prediction_root / f"{regime}_cv5_f{fold}" / f"seed{seed}"
+                run_manifest = json.loads((run_dir / "run_manifest.json").read_text())
+                trainer_commit = str(run_manifest.get("git", {}).get("commit", ""))
+                command_basenames = {
+                    Path(str(value)).name for value in run_manifest.get("command", [])
                 }
-                for seed in seeds[regime]
-            ]
+                if (
+                    run_manifest.get("schema_version") != "prm_run_manifest_v1"
+                    or run_manifest.get("status") != "complete"
+                    or run_manifest.get("git", {}).get("dirty") is not False
+                    or int(run_manifest.get("seed", -1)) != seed
+                    or int(run_manifest.get("config", {}).get("batch_size", -1))
+                    != OOF_INFERENCE_BATCH_SIZE
+                    or run_manifest.get("config", {}).get("model_kwargs", {}).get(
+                        "use_env_enrichment"
+                    ) is not True
+                    or run_manifest.get("split", {}).get("split_id") != split_id
+                    or run_manifest.get("split", {}).get("sha256") != split_sha256
+                    or run_manifest.get("split", {}).get("counts")
+                    != active_split_counts
+                    or "train_enhanced.py" not in command_basenames
+                    or git_file_sha256(trainer_commit, "src/train_enhanced.py")
+                    != LEGACY_TRAINER_SOURCE_SHA256
+                    or git_file_sha256(trainer_commit, "src/models/crystal_v2.py")
+                    != LEGACY_MODEL_SOURCE_SHA256
+                ):
+                    raise ValueError(
+                        "legacy exploratory OOF source changed its split/order/trainer/E-module contract"
+                    )
+                prediction_path = run_dir / "test_predictions.npz"
+                prediction_sha256 = str(
+                    run_manifest.get("output_sha256", {}).get("test_predictions", "")
+                )
+                if len(prediction_sha256) != 64:
+                    raise ValueError("legacy exploratory manifest lacks prediction hash")
+                specs[regime][fold].append({
+                    "path": prediction_path,
+                    "sha256": prediction_sha256,
+                    "seed": seed,
+                })
     return specs
 
 
 def load_all_oof_predictions(
     specs: Mapping[str, Mapping[int, Sequence[Mapping[str, Any]]]],
     protocol_dir: Path, target_by_index: Mapping[int, float],
-) -> tuple[dict[str, dict[int, float]], list[dict[str, Any]]]:
+) -> tuple[
+    dict[str, dict[int, float]], list[dict[str, Any]],
+    dict[str, dict[int, list[int]]],
+]:
     all_predictions: dict[str, dict[int, float]] = {}
     sources: list[dict[str, Any]] = []
+    test_orders: dict[str, dict[int, list[int]]] = {}
     for regime in ("pair", "host", "dopant"):
         pooled: dict[int, float] = {}
+        test_orders[regime] = {}
         for fold in range(5):
             split_id = f"{regime}_cv5_f{fold}"
             split = load_split(protocol_dir, split_id)
-            expected_indices = sorted(int(i) for i in split["test"])
+            expected_indices = [int(i) for i in split["test"]]
             seed_predictions = []
             reference_indices: np.ndarray | None = None
             for spec in specs[regime][fold]:
@@ -741,9 +1107,13 @@ def load_all_oof_predictions(
                         "seed": int(spec["seed"]),
                         "path_alias": f"prediction_sources/{regime}/fold{fold}/seed{int(spec['seed'])}",
                         "sha256": observed_hash,
+                        "test_index_order_sha256": canonical_json_sha256(
+                            indices.tolist()
+                        ),
                     }
                 )
             assert reference_indices is not None
+            test_orders[regime][fold] = reference_indices.tolist()
             mean_prediction = np.mean(np.stack(seed_predictions), axis=0)
             for index, value in zip(reference_indices, mean_prediction):
                 if int(index) in pooled:
@@ -752,7 +1122,7 @@ def load_all_oof_predictions(
         if set(pooled) != set(target_by_index):
             raise ValueError(f"{regime} OOF does not cover the canonical population")
         all_predictions[regime] = pooled
-    return all_predictions, sources
+    return all_predictions, sources, test_orders
 
 
 @functools.lru_cache(maxsize=1)
@@ -784,6 +1154,7 @@ def load_raw_element_tables() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.nd
 
 def local_structure_descriptors(
     atoms: Any, dopant: str, graph_sample: Mapping[str, Any],
+    zero_neighbor_mode: str = LEGACY_ENV_ZERO_NEIGHBOR_MODE,
 ) -> dict[str, float]:
     from ase.data import atomic_numbers
     from ase.neighborlist import neighbor_list
@@ -813,11 +1184,9 @@ def local_structure_descriptors(
     model_local = model_i == defect
     model_neighbor_indices = model_j[model_local]
     model_d = model_distances[model_local]
-    if len(model_d) == 0:
-        raise ValueError("unique impurity has no model-edge neighbors within 5 Angstrom")
     model_neighbor_z = numbers[model_neighbor_indices]
-    model_en_contrast = abs(
-        float(model_en[dopant_z]) - float(np.mean(model_en[model_neighbor_z]))
+    e_module_inputs = e_module_effective_scalars(
+        model_d, model_neighbor_z, dopant_z, model_en, zero_neighbor_mode,
     )
 
     # Physical descriptors are intentionally recomputed from the raw ASE
@@ -833,17 +1202,29 @@ def local_structure_descriptors(
     host_only_local = raw_model_local & (physical_j != defect)
     neighbor_indices = physical_j[host_only_local]
     d = physical_distances[host_only_local]
-    if len(d) == 0:
-        raise ValueError("unique impurity has no host-only neighbors within 5 Angstrom")
     neighbor_z = numbers[neighbor_indices]
     r_imp, en_imp, val_imp = radius[dopant_z], electronegativity[dopant_z], valence[dopant_z]
     r_neigh, en_neigh, val_neigh = radius[neighbor_z], electronegativity[neighbor_z], valence[neighbor_z]
-    signed_r = r_imp - float(np.mean(r_neigh)) if np.isfinite(r_imp) and np.isfinite(r_neigh).all() else float("nan")
-    signed_en = en_imp - float(np.mean(en_neigh)) if np.isfinite(en_imp) and np.isfinite(en_neigh).all() else float("nan")
-    signed_val = val_imp - float(np.mean(val_neigh)) if np.isfinite(val_imp) and np.isfinite(val_neigh).all() else float("nan")
+    has_host_neighbors = len(d) > 0
+    signed_r = (
+        r_imp - float(np.mean(r_neigh))
+        if has_host_neighbors and np.isfinite(r_imp) and np.isfinite(r_neigh).all()
+        else float("nan")
+    )
+    signed_en = (
+        en_imp - float(np.mean(en_neigh))
+        if has_host_neighbors and np.isfinite(en_imp) and np.isfinite(en_neigh).all()
+        else float("nan")
+    )
+    signed_val = (
+        val_imp - float(np.mean(val_neigh))
+        if has_host_neighbors and np.isfinite(val_imp) and np.isfinite(val_neigh).all()
+        else float("nan")
+    )
     clearance = (
         float(np.min(d - r_imp - r_neigh))
-        if np.isfinite(r_imp) and np.isfinite(r_neigh).all() else float("nan")
+        if has_host_neighbors and np.isfinite(r_imp) and np.isfinite(r_neigh).all()
+        else float("nan")
     )
 
     host_mask = np.ones(len(numbers), dtype=bool)
@@ -890,23 +1271,35 @@ def local_structure_descriptors(
     )
 
     result = {
-        "cn_5A": float(len(model_d)),
-        "neighbor_distance_mean_A": float(np.mean(model_d)),
-        "neighbor_distance_max_A": float(np.max(model_d)),
-        "local_abs_electronegativity_contrast": model_en_contrast,
+        **e_module_inputs,
+        "env_zero_neighbor_mode": zero_neighbor_mode,
+        "model_edge_zero_defect_neighbor_5A": float(len(model_d) == 0),
+        "neighbor_distance_mean_A": (
+            float(np.mean(model_d)) if len(model_d) else float("nan")
+        ),
+        "neighbor_distance_max_A": (
+            float(np.max(model_d)) if len(model_d) else float("nan")
+        ),
+        "local_abs_electronegativity_contrast": abs(signed_en),
         "model_edge_periodic_impurity_self_image_count_5A": float(
             np.count_nonzero(model_neighbor_indices == defect)
         ),
         "host_only_cn_5A": float(len(d)),
-        "host_only_neighbor_distance_mean_A": float(np.mean(d)),
-        "host_only_neighbor_distance_max_A": float(np.max(d)),
+        "host_only_neighbor_distance_mean_A": (
+            float(np.mean(d)) if len(d) else float("nan")
+        ),
+        "host_only_neighbor_distance_max_A": (
+            float(np.max(d)) if len(d) else float("nan")
+        ),
         "raw_graph_defect_edge_count_delta_5A": float(
             len(raw_neighbor_indices) - len(model_neighbor_indices)
         ),
         "raw_graph_defect_edge_topology_match_5A": float(edge_topology_match),
         "raw_graph_defect_edge_distance_max_abs_delta_A": raw_graph_max_delta,
         "smooth_cn_5A": float(np.sum(0.5 * (np.cos(np.pi * d / FEATURE_CUTOFF_A) + 1.0))),
-        "neighbor_distance_std_A": float(np.std(d, ddof=0)),
+        "neighbor_distance_std_A": (
+            float(np.std(d, ddof=0)) if len(d) else float("nan")
+        ),
         "postrelaxation_min_clearance_A": clearance,
         "local_signed_covalent_radius_mismatch_A": signed_r,
         "local_abs_covalent_radius_mismatch_A": abs(signed_r),
@@ -943,11 +1336,13 @@ def build_joined_rows(
     pair_fold: Mapping[int, int],
     host_fold: Mapping[int, int],
     dopant_fold: Mapping[int, int],
+    test_order_by_regime: Mapping[str, Mapping[int, Sequence[int]]],
     pair_support: Mapping[int, tuple[int, int]],
     predictions: Mapping[str, Mapping[int, float]],
     evidence_tier: str,
     evidence_label: str,
     model_status: str,
+    zero_neighbor_mode: str,
     report_progress: bool = True,
 ) -> tuple[list[dict[str, Any]], int]:
     """Reconstruct the complete joined table from immutable source objects."""
@@ -961,6 +1356,26 @@ def build_joined_rows(
     graph_samples = graph_samples_from_blob(
         graph_blob, required_graph_builder_version,
     )
+    defect_counts = defect_center_edge_counts(graph_samples, rows)
+    if zero_neighbor_mode == LEGACY_ENV_ZERO_NEIGHBOR_MODE:
+        observed_zero_indices = tuple(sorted(
+            index for index, count in defect_counts.items() if count == 0
+        ))
+        if observed_zero_indices != LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES:
+            raise RuntimeError(
+                "legacy frozen graph zero-neighbor population changed: "
+                f"expected {LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES}, "
+                f"observed {observed_zero_indices}"
+            )
+        zero_batch_audit = validate_zero_neighbor_oof_batch_activation(
+            defect_counts, test_order_by_regime,
+        )
+    elif zero_neighbor_mode == CANONICAL_ENV_ZERO_NEIGHBOR_MODE:
+        zero_batch_audit = {
+            index: {} for index, count in defect_counts.items() if count == 0
+        }
+    else:
+        raise ValueError(f"unsupported env_zero_neighbor_mode: {zero_neighbor_mode}")
 
     database = connect(str(raw_db))
     joined: list[dict[str, Any]] = []
@@ -984,7 +1399,31 @@ def build_joined_rows(
         if abs(float(raw_row.get("eform")) - float(sample["target_eV"])) > 1e-10:
             raise ValueError(f"raw/protocol target mismatch for sample {index}")
         descriptor = local_structure_descriptors(
-            raw_row.toatoms(), str(sample["dopant"]), graph_sample
+            raw_row.toatoms(), str(sample["dopant"]), graph_sample,
+            zero_neighbor_mode=zero_neighbor_mode,
+        )
+        zero_neighbor = defect_counts[index] == 0
+        batch_semantics_verified = (
+            not zero_neighbor
+            or zero_neighbor_mode == CANONICAL_ENV_ZERO_NEIGHBOR_MODE
+            or set(zero_batch_audit[index]) == {"pair", "host", "dopant"}
+        )
+        if not batch_semantics_verified:
+            raise RuntimeError(f"unverified E-module zero-neighbor semantics for sample {index}")
+        legacy_batch_details = (
+            zero_batch_audit[index]
+            if zero_neighbor and zero_neighbor_mode == LEGACY_ENV_ZERO_NEIGHBOR_MODE
+            else {}
+        )
+        legacy_batch_evidence = "|".join(
+            (
+                f"{regime}:f{legacy_batch_details[regime]['fold']}:"
+                f"n{legacy_batch_details[regime]['batch_size']}:"
+                f"positive{legacy_batch_details[regime]['positive_defect_edge_rows']}:"
+                f"edges{legacy_batch_details[regime]['total_defect_center_edges']}"
+            )
+            for regime in ("pair", "host", "dopant")
+            if regime in legacy_batch_details
         )
         depth = finite_float(raw_row.get("depth"))
         extension_factor = finite_float(raw_row.get("extension_factor"))
@@ -1062,6 +1501,27 @@ def build_joined_rows(
                 "en2": en2,
                 "impurity_period": int(PERIOD[z]),
                 "impurity_group": int(GROUP[z]),
+                "e_module_oof_batch_activation_verified": int(
+                    batch_semantics_verified
+                ),
+                "e_module_zero_neighbor_semantics_verified": int(
+                    batch_semantics_verified
+                ),
+                "legacy_zero_neighbor_oof_batch_evidence": legacy_batch_evidence,
+                "legacy_zero_neighbor_min_positive_defect_edge_rows": (
+                    min(
+                        detail["positive_defect_edge_rows"]
+                        for detail in legacy_batch_details.values()
+                    )
+                    if legacy_batch_details else ""
+                ),
+                "legacy_zero_neighbor_min_total_defect_center_edges": (
+                    min(
+                        detail["total_defect_center_edges"]
+                        for detail in legacy_batch_details.values()
+                    )
+                    if legacy_batch_details else ""
+                ),
                 **descriptor,
             }
         )
@@ -1135,17 +1595,21 @@ def extract(args: argparse.Namespace) -> None:
             acceptance["repaired_dataset"]["graph_dataset_sha256"]
         )
         required_graph_builder_version = "exact_mic_invariant_triplets_v1"
+        zero_neighbor_mode = str(acceptance["env_zero_neighbor_mode"])
     else:
         if args.model_status != "legacy_order_sensitive_graph":
             raise ValueError("exploratory legacy G3 requires legacy_order_sensitive_graph")
-        specs = exploratory_prediction_specs(Path(args.prediction_root))
+        specs = exploratory_prediction_specs(Path(args.prediction_root), protocol_dir)
         acceptance = None
         acceptance_hash = None
         evidence_label = LEGACY_WATERMARK
         graph_data_path = data_path
         graph_data_sha256 = EXPECTED_DATA_SHA256
         required_graph_builder_version = None
-    predictions, prediction_sources = load_all_oof_predictions(specs, protocol_dir, target_by_index)
+        zero_neighbor_mode = LEGACY_ENV_ZERO_NEIGHBOR_MODE
+    predictions, prediction_sources, prediction_test_orders = load_all_oof_predictions(
+        specs, protocol_dir, target_by_index,
+    )
 
     output_dir = Path(args.output_dir).resolve()
     try:
@@ -1167,11 +1631,13 @@ def extract(args: argparse.Namespace) -> None:
         pair_fold=pair_fold,
         host_fold=host_fold,
         dopant_fold=dopant_fold,
+        test_order_by_regime=prediction_test_orders,
         pair_support=pair_support,
         predictions=predictions,
         evidence_tier=args.evidence_tier,
         evidence_label=evidence_label,
         model_status=args.model_status,
+        zero_neighbor_mode=zero_neighbor_mode,
     )
 
     fields = list(joined[0])
@@ -1226,6 +1692,39 @@ def extract(args: argparse.Namespace) -> None:
                 ),
                 default=None,
             ),
+            "zero_defect_neighbor_rows_5A": sum(
+                int(float(row["model_edge_zero_defect_neighbor_5A"]) == 1.0)
+                for row in joined
+            ),
+            "zero_neighbor_semantics_verified_rows": sum(
+                int(float(row["e_module_zero_neighbor_semantics_verified"]) == 1.0)
+                for row in joined
+                if float(row["model_edge_zero_defect_neighbor_5A"]) == 1.0
+            ),
+            "legacy_zero_neighbor_oof_batch_contexts_verified": (
+                sum(
+                    len(str(row["legacy_zero_neighbor_oof_batch_evidence"]).split("|"))
+                    for row in joined
+                    if float(row["model_edge_zero_defect_neighbor_5A"]) == 1.0
+                )
+                if args.evidence_tier == "exploratory" else 0
+            ),
+            "legacy_zero_neighbor_min_positive_defect_edge_rows": (
+                min(
+                    int(row["legacy_zero_neighbor_min_positive_defect_edge_rows"])
+                    for row in joined
+                    if float(row["model_edge_zero_defect_neighbor_5A"]) == 1.0
+                )
+                if args.evidence_tier == "exploratory" else None
+            ),
+            "legacy_zero_neighbor_min_total_defect_center_edges": (
+                min(
+                    int(row["legacy_zero_neighbor_min_total_defect_center_edges"])
+                    for row in joined
+                    if float(row["model_edge_zero_defect_neighbor_5A"]) == 1.0
+                )
+                if args.evidence_tier == "exploratory" else None
+            ),
         },
         "descriptor_contract": {
             "cutoff_A": FEATURE_CUTOFF_A,
@@ -1237,6 +1736,27 @@ def extract(args: argparse.Namespace) -> None:
                 "host-only subset used for smooth coordination, clearance, and chemistry"
             ),
             "atom_feature_table_sha256": EXPECTED_ATOM_FEATURE_SHA256,
+            "env_zero_neighbor_mode": zero_neighbor_mode,
+            "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
+            "legacy_zero_neighbor_sample_indices": (
+                list(LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES)
+                if args.evidence_tier == "exploratory" else None
+            ),
+            "legacy_batch_order_source": (
+                "hash-bound archived test_predictions.npz indices; exact split test order"
+                if args.evidence_tier == "exploratory" else None
+            ),
+            "legacy_trainer_test_shuffle": (
+                False if args.evidence_tier == "exploratory" else None
+            ),
+            "legacy_trainer_source_sha256": (
+                LEGACY_TRAINER_SOURCE_SHA256
+                if args.evidence_tier == "exploratory" else None
+            ),
+            "legacy_model_source_sha256": (
+                LEGACY_MODEL_SOURCE_SHA256
+                if args.evidence_tier == "exploratory" else None
+            ),
             "source": "paper_Q1/review/g3_preregistration.json",
         },
         "outputs": {
@@ -1256,6 +1776,8 @@ def extract(args: argparse.Namespace) -> None:
                 "state": "extracted_not_analyzed",
                 "evidence_tier": args.evidence_tier,
                 "evidence_label": evidence_label,
+                "env_zero_neighbor_mode": zero_neighbor_mode,
+                "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
                 "canonical_main_text_eligible": False,
                 "reason": "analysis gate has not run" if args.evidence_tier == "canonical" else LEGACY_WATERMARK,
             }
@@ -2112,7 +2634,7 @@ def analyze(args: argparse.Namespace) -> None:
     else:
         raise ValueError("formal G3 output must remain outside the repository")
     analysis_outputs = (
-        "coverage.csv", "effect_estimates.csv", "block_tests.csv",
+        "coverage.csv", "analysis_row_ledger.csv", "effect_estimates.csv", "block_tests.csv",
         "family_mae.csv", "physical_figure_data.csv", "analysis_started.json",
         "novelty_rows.csv", "novelty_analysis.json", "case_eligible_pool.csv",
         "case_selection.csv", "case_selection_summary.json",
@@ -2187,13 +2709,19 @@ def analyze(args: argparse.Namespace) -> None:
         raise ValueError("invalid extraction tier/label/model trust triple")
     if args.evidence_tier != evidence_tier or args.model_status != model_status:
         raise ValueError("analyze CLI tier/model must exactly match extraction")
+    expected_zero_mode = (
+        LEGACY_ENV_ZERO_NEIGHBOR_MODE
+        if evidence_tier == "exploratory"
+        else CANONICAL_ENV_ZERO_NEIGHBOR_MODE
+    )
     for row in rows_raw:
         if (
             row.get("evidence_tier") != evidence_tier
             or row.get("evidence_label") != evidence_label
             or row.get("model_status") != model_status
+            or row.get("env_zero_neighbor_mode") != expected_zero_mode
         ):
-            raise ValueError("joined row violates the extraction trust triple")
+            raise ValueError("joined row violates the extraction trust/mode contract")
     if evidence_tier == "canonical":
         if not args.g2_acceptance or not args.data_path or not args.raw_db:
             raise ValueError(
@@ -2223,7 +2751,7 @@ def analyze(args: argparse.Namespace) -> None:
             != canonical_acceptance["repaired_dataset"]["graph_dataset_sha256"]
         ):
             raise ValueError("canonical extraction graph dataset differs from G2 acceptance")
-        canonical_predictions, canonical_sources = load_all_oof_predictions(
+        canonical_predictions, canonical_sources, canonical_test_orders = load_all_oof_predictions(
             canonical_specs, protocol_dir, target_by_index
         )
         if canonical_sources != extraction["inputs"].get("prediction_sources"):
@@ -2241,11 +2769,15 @@ def analyze(args: argparse.Namespace) -> None:
             pair_fold=pair_fold,
             host_fold=host_fold,
             dopant_fold=dopant_fold,
+            test_order_by_regime=canonical_test_orders,
             pair_support=pair_support,
             predictions=canonical_predictions,
             evidence_tier=evidence_tier,
             evidence_label=evidence_label,
             model_status=model_status,
+            zero_neighbor_mode=str(
+                canonical_acceptance["env_zero_neighbor_mode"]
+            ),
         )
         assert_joined_rows_equal(rows_raw, reconstructed_rows)
         if reconstructed_depth_mismatches != extraction.get("population", {}).get(
@@ -2258,6 +2790,8 @@ def analyze(args: argparse.Namespace) -> None:
         "created_at": utc_now(),
         "evidence_tier": evidence_tier,
         "evidence_label": evidence_label,
+        "env_zero_neighbor_mode": expected_zero_mode,
+        "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
         "git_commit": runtime["git"]["commit"],
         "extraction_manifest_sha256": file_sha256(extraction_manifest_path),
         "bootstrap_draws": 2000,
@@ -2274,12 +2808,9 @@ def analyze(args: argparse.Namespace) -> None:
         raise RuntimeError("the four E-module-aligned features lack class-stratified coverage")
     profile_features = eligible_adjusted_profile_features(eligible_features)
 
-    complete = []
-    for row in rows_raw:
-        values = {name: finite_float(row.get(name)) for name in eligible_features}
-        required = [finite_float(row.get("pair_absolute_error_eV")), *values.values()]
-        if all(math.isfinite(value) for value in required):
-            complete.append({**row, **values})
+    complete, analysis_row_ledger, zero_neighbor_imputation_medians = (
+        prepare_primary_analysis_rows(rows_raw, eligible_features)
+    )
     if len(complete) < int(0.90 * EXPECTED_N):
         raise RuntimeError("complete-case primary analysis coverage is below 90 percent")
 
@@ -2287,6 +2818,13 @@ def analyze(args: argparse.Namespace) -> None:
     defecttype = np.asarray([row["defecttype"] for row in complete])
     numeric = {name: np.asarray([float(row[name]) for row in complete]) for name in eligible_features}
     design, design_names, scaling = build_design(numeric, defecttype, eligible_features)
+    zero_neighbor_indicator = np.asarray([
+        finite_float(row["model_edge_zero_defect_neighbor_5A"]) for row in complete
+    ], dtype=float)
+    if not set(np.unique(zero_neighbor_indicator)).issubset({0.0, 1.0}):
+        raise RuntimeError("zero-neighbor nuisance indicator is not binary")
+    design = np.column_stack([design, zero_neighbor_indicator])
+    design_names.append("nuisance:model_edge_zero_defect_neighbor_5A")
     groups = [
         group_codes([row["host"] for row in complete]),
         group_codes([row["dopant"] for row in complete]),
@@ -2311,16 +2849,23 @@ def analyze(args: argparse.Namespace) -> None:
         for class_name in ("adsorbate", "interstitial")
     }
 
+    def analysis_profile(
+        class_name: str, feature: str, value: float,
+    ) -> np.ndarray:
+        base = profile_design(
+            eligible_features, scaling, class_medians,
+            class_name, feature, value,
+        )
+        # Profiles describe the continuous nonempty-neighbor stratum.  The
+        # rare zero-neighbor rows remain in the fit through this nuisance term.
+        return np.concatenate([base, np.asarray([0.0])])
+
     point_effects: dict[tuple[str, str], dict[str, float]] = {}
     for class_name in ("adsorbate", "interstitial"):
         for feature in eligible_features:
             low_value, high_value = quantiles[class_name][feature]
-            low_profile = profile_design(
-                eligible_features, scaling, class_medians, class_name, feature, low_value,
-            )
-            high_profile = profile_design(
-                eligible_features, scaling, class_medians, class_name, feature, high_value,
-            )
+            low_profile = analysis_profile(class_name, feature, low_value)
+            high_profile = analysis_profile(class_name, feature, high_value)
             low, high, contrast, percent = backtransformed_contrast(fit, low_profile, high_profile)
             point_effects[(class_name, feature)] = {
                 "q10": low_value, "q90": high_value,
@@ -2335,10 +2880,7 @@ def analyze(args: argparse.Namespace) -> None:
             q10, q90 = quantiles[class_name][feature]
             values = np.linspace(q10, q90, PROFILE_GRID_POINTS)
             designs = [
-                profile_design(
-                    eligible_features, scaling, class_medians,
-                    class_name, feature, float(value),
-                )
+                analysis_profile(class_name, feature, float(value))
                 for value in values
             ]
             key = (class_name, feature)
@@ -2368,12 +2910,8 @@ def analyze(args: argparse.Namespace) -> None:
         for key in bootstrap:
             class_name, feature = key
             low_value, high_value = quantiles[class_name][feature]
-            low_profile = profile_design(
-                eligible_features, scaling, class_medians, class_name, feature, low_value,
-            )
-            high_profile = profile_design(
-                eligible_features, scaling, class_medians, class_name, feature, high_value,
-            )
+            low_profile = analysis_profile(class_name, feature, low_value)
+            high_profile = analysis_profile(class_name, feature, high_value)
             bootstrap[key].append(backtransformed_contrast(draw_fit, low_profile, high_profile)[2])
         for key, grid in profile_design_grid.items():
             profile_bootstrap[key].append([
@@ -2390,8 +2928,8 @@ def analyze(args: argparse.Namespace) -> None:
         for key in fold_signs:
             class_name, feature = key
             q10, q90 = quantiles[class_name][feature]
-            low_profile = profile_design(eligible_features, scaling, class_medians, class_name, feature, q10)
-            high_profile = profile_design(eligible_features, scaling, class_medians, class_name, feature, q90)
+            low_profile = analysis_profile(class_name, feature, q10)
+            high_profile = analysis_profile(class_name, feature, q90)
             contrast = backtransformed_contrast(fold_fit, low_profile, high_profile)[2]
             fold_signs[key].append(int(np.sign(contrast)))
 
@@ -2407,8 +2945,8 @@ def analyze(args: argparse.Namespace) -> None:
     for key in point_effects:
         class_name, feature = key
         q10, q90 = quantiles[class_name][feature]
-        low_profile = profile_design(eligible_features, scaling, class_medians, class_name, feature, q10)
-        high_profile = profile_design(eligible_features, scaling, class_medians, class_name, feature, q90)
+        low_profile = analysis_profile(class_name, feature, q10)
+        high_profile = analysis_profile(class_name, feature, q90)
         sensitivity_sign[key] = int(np.sign(backtransformed_contrast(xf_fit, low_profile, high_profile)[2]))
 
     eligible_controls = [
@@ -2448,11 +2986,11 @@ def analyze(args: argparse.Namespace) -> None:
         class_name, feature = key
         q10, q90 = quantiles[class_name][feature]
         low_profile = np.concatenate([
-            profile_design(eligible_features, scaling, class_medians, class_name, feature, q10),
+            analysis_profile(class_name, feature, q10),
             control_reference,
         ])
         high_profile = np.concatenate([
-            profile_design(eligible_features, scaling, class_medians, class_name, feature, q90),
+            analysis_profile(class_name, feature, q90),
             control_reference,
         ])
         nuisance_sign[key] = int(np.sign(
@@ -2579,6 +3117,11 @@ def analyze(args: argparse.Namespace) -> None:
     )
 
     write_csv(run_dir / "coverage.csv", coverage, list(coverage[0]))
+    write_csv(
+        run_dir / "analysis_row_ledger.csv",
+        analysis_row_ledger,
+        list(analysis_row_ledger[0]),
+    )
     write_csv(run_dir / "effect_estimates.csv", effects, list(effects[0]))
     write_csv(run_dir / "block_tests.csv", block_rows, list(block_rows[0]))
     write_csv(run_dir / "family_mae.csv", family_rows, list(family_rows[0]))
@@ -2591,6 +3134,9 @@ def analyze(args: argparse.Namespace) -> None:
             "raw_row_id": int(row["raw_row_id"]),
             "defecttype": row["defecttype"],
             "pair_absolute_error_eV": finite_float(row["pair_absolute_error_eV"]),
+            "model_edge_zero_defect_neighbor_5A": int(
+                finite_float(row["model_edge_zero_defect_neighbor_5A"])
+            ),
         }
         for feature in ("cn_5A", "postrelaxation_min_clearance_A"):
             figure_rows.append({
@@ -2641,7 +3187,7 @@ def analyze(args: argparse.Namespace) -> None:
 
     outputs = {}
     for name in (
-        "coverage.csv", "effect_estimates.csv", "block_tests.csv",
+        "coverage.csv", "analysis_row_ledger.csv", "effect_estimates.csv", "block_tests.csv",
         "family_mae.csv", "physical_figure_data.csv", "analysis_started.json",
         "novelty_rows.csv", "novelty_analysis.json", "case_eligible_pool.csv",
         "case_selection.csv", "case_selection_summary.json",
@@ -2652,11 +3198,25 @@ def analyze(args: argparse.Namespace) -> None:
         "created_at": utc_now(),
         "evidence_tier": evidence_tier,
         "evidence_label": evidence_label,
+        "env_zero_neighbor_mode": expected_zero_mode,
+        "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
         "runtime": runtime,
         "extraction_manifest_sha256": file_sha256(extraction_manifest_path),
         "joined_descriptors_sha256": file_sha256(joined_path),
         "analysis": {
             "n_complete": len(complete),
+            "n_primary_excluded": EXPECTED_N - len(complete),
+            "n_zero_neighbor_rows": sum(
+                int(row["model_edge_zero_defect_neighbor_5A"]) == 1
+                for row in analysis_row_ledger
+            ),
+            "n_zero_neighbor_rows_retained": sum(
+                int(row["model_edge_zero_defect_neighbor_5A"]) == 1
+                and int(row["primary_analysis_included"]) == 1
+                for row in analysis_row_ledger
+            ),
+            "zero_neighbor_imputation_medians": zero_neighbor_imputation_medians,
+            "zero_neighbor_nuisance": "unscaled binary main-effect adjustment; profile reference=0",
             "eligible_features": eligible_features,
             "excluded_or_sm_features": [feature for feature in PRIMARY_FEATURES if feature not in eligible_features],
             "estimator": "Huber IRLS with within-iteration crossed fixed-effect projection",
@@ -2690,6 +3250,8 @@ def analyze(args: argparse.Namespace) -> None:
         "state": "exploratory_analysis_complete" if evidence_tier == "exploratory" else "canonical_analysis_complete",
         "evidence_tier": evidence_tier,
         "evidence_label": evidence_label,
+        "env_zero_neighbor_mode": expected_zero_mode,
+        "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
         "canonical_provenance_verified": evidence_tier == "canonical",
         "canonical_analysis_complete": evidence_tier == "canonical",
         "canonical_main_text_eligible": canonical_main_text_claim_eligible(

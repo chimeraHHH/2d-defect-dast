@@ -23,6 +23,34 @@ to author discretion. The acceptance must additionally bind the actual
 `prm_g1c_pretraining_receipt_v1`, its corrected initialization asset, and the
 `corrected_pretrain` arm used by every G2 run.
 
+### Frozen amendment A1: empty defect neighborhoods
+
+The first exploratory extraction stopped before writing a joined table or
+fitting any outcome model because the extractor rejected an empty
+impurity-centred 5 Å neighborhood at `sample_index=748`. A server-side,
+input-only scan of the frozen graph and raw database then found 14 such rows
+among 10,224 (13 adsorbates and one interstitial); all 14 also have zero raw
+host-only neighbors. The sample ledger is frozen in
+`artifacts/prm_g3/zero_neighbor_audit.json`. No error association or other G3
+statistical result was inspected before this amendment.
+
+The legacy model mode is `legacy_batch_dependent_v0`. With inference
+`batch_size=64`, an empty-neighborhood defect receives the pre-normalization E
+vector `[0,0,0,|encoded chi_impurity|]` only when some defect-centred edge in
+the same batch prevents the module's batch-level early return. The audit found
+that condition in every pair-, host-, and impurity-OOF test batch containing
+each of the 14 rows. Extraction now recomputes those batches and fails closed
+from each archived prediction NPZ's original index order, which must exactly
+match its hash-bound split test order. The legacy trainer source is hash-bound
+to the commit whose test loader uses `shuffle=False`; a source, split, order,
+or batch-size change is fatal. Future canonical G2 evidence must bind
+`env_zero_neighbor_mode=zero_residual_v1` both at the acceptance/run top level
+and in every run's actual `config.model_kwargs`. G3 recomputes the model-recipe
+hash from those embedded kwargs and binds the model source to the G1-accepted
+hash and the exact G2 commit. Under that corrected mode an empty-neighborhood E residual is exactly
+`[0,0,0,0]`, independent of batch composition; canonical evidence may not
+reuse the legacy electronegativity residual.
+
 ## Frozen inputs and execution
 
 All extraction and statistics run on `WHUServer-L40S` from a clean pushed
@@ -74,19 +102,24 @@ For a canonical `analyze` command, the immutable protocol, all accepted OOF
 archives, the raw database, and every descriptor are loaded again and the
 complete joined table is reconstructed and compared field by field. A CSV and
 its external manifest cannot jointly self-certify canonical evidence.
+`analysis_row_ledger.csv` records inclusion and missingness for all 10,224
+rows; no complete-case exclusion is hidden.
 
 ## P1: local geometry and chemistry
 
-The four E-aligned quantities are read from the actual graph sample consumed
+The four E-aligned effective scalars are reconstructed from the actual graph sample consumed
 by the corresponding prediction: the frozen legacy cleaned pickle for the
 exploratory tier and the receipt-bound repaired G1 pickle for the canonical
 tier. They use every directed impurity-centred graph entry, including nonzero
 periodic impurity self-images retained when `i == j`; only the zero-displacement
-self interaction is absent. Coordination, mean distance, and maximum distance
-use that exact edge multiset. The electronegativity
+self interaction is absent. For nonempty neighborhoods, coordination, encoded
+mean distance, and encoded maximum distance use that exact edge multiset. The encoded electronegativity
 contrast uses column 2 of the hash-frozen `atom_features_ref.pth`, the same
 encoded scale consumed by `DefectEnvironmentEnrichment`, rather than claiming
-raw Pauling units. The extraction archives the count of periodic impurity
+raw Pauling units. Empty neighborhoods follow the tier-specific modes frozen
+in amendment A1. Tier-specific zero residuals are stored only in explicitly
+named `e_module_effective_*` fields. Physical distance means and maxima over an empty
+set remain `NaN`; zero Angstrom is never invented. The extraction archives the count of periodic impurity
 self-images and independently recomputes the raw-database neighbor multiset.
 Raw-minus-graph edge count, topology agreement, and maximum distance delta
 when the topology agrees are audit columns; raw edges are never substituted
@@ -102,8 +135,17 @@ void radius. Smooth coordination is `sum[0.5(cos(pi d/5)+1)]` and clearance is
 come from the run-time ASE table; raw Pauling electronegativity and group
 tables come from `src/features.py` at the pinned commit. For physical
 mismatches, zero-placeholder raw electronegativities and nonfinite radii are
-missing, never imputed. Valence follows group for groups 1--12 and `group-10`
+missing, never generally imputed. Valence follows group for groups 1--12 and `group-10`
 for groups 13--18.
+
+For the 14 flagged empty-neighborhood rows only, undefined eligible physical
+distance/clearance/mismatch fields are replaced in the analysis matrix by the
+finite median among nonempty-neighborhood rows of the same incorporation
+class. The source descriptor CSV remains `NaN`. Every fit also includes an
+unscaled zero-neighbor nuisance main effect, while adjusted profiles set that
+indicator to zero. Any one of the 14 rows still excluded after this frozen
+rule aborts the analysis. Because only one interstitial is in this stratum,
+the stratum is descriptive and cannot support a class-specific physical claim.
 
 The chemistry block contains signed and absolute local mismatches in covalent
 radius, electronegativity, and valence count. The outcome is
@@ -148,7 +190,8 @@ each impurity fold's training rows using radius, electronegativity, valence,
 period, and group. Within each fold, descriptors are first averaged over rows
 of each unique identity. Missing novelty descriptors alone are imputed with
 the training-identity median and accompanied by an explicit missingness
-indicator; this P3-only rule does not alter P1's no-imputation rule. Augmented
+indicator; this P3-only rule is separate from P1's narrowly scoped A1
+zero-neighbor amendment. Augmented
 columns with zero training IQR are removed, retained columns use training
 median/IQR scaling, and PCA plus nearest-neighbor references never see their
 corresponding test partition.
@@ -200,3 +243,58 @@ keeps raw XF observations; `abs(log XF)` is not inverted to a fictitious
 single raw-XF profile. The pipeline does not itself admit a panel to the
 manuscript. Legacy output carries an explicit watermark and must remain outside
 `paper_Q1/sections` and paper-facing figure directories.
+
+## Frozen amendment A2 (2026-08-10): W2/W3 mechanism extensions
+
+Frozen before any A2 outcome was computed or viewed, on legacy or repaired
+predictions. A2 adds the two bounded mechanism extensions defined in
+`reviewer_revision_plan_2026-08-10_v2.md`; it changes no P0--P4 definition and
+inherits every A1 rule for the 14 zero-neighbor rows. A2 requires a scoped
+extension of `scripts/prm_g3_physics_analysis.py` and its JSON contract; that
+extension must land in a pushed commit before any A2 outcome is computed. A2
+outcomes carry the same tier rules as all other G3 outputs: exploratory
+watermark on legacy OOF, canonical only under an accepted
+`prm_g2_acceptance_v1`.
+
+### A2-W2: training-support arm for the host-versus-impurity gap
+
+The P3 gap regression gains one frozen covariate, the **support gap**,
+measured strictly inside each fold's training partition: for a host-OOF row,
+`log1p` of the count of training rows sharing its impurity element; for an
+impurity-OOF row, `log1p` of the count of training rows sharing its host;
+support gap is the host-side value minus the impurity-side value, aligned by
+the same sample-matched pairing already used for the error gap. The verdict
+"consistent with structural-motif shift" now additionally requires that the
+novelty-gap slope's lower 95% bootstrap bound remain positive **after** the
+support-gap covariate is included. If the association survives only without
+the support covariate, the frozen verdict is "training-support asymmetry not
+excluded", which is reported as a non-isolated cause, never as mechanism
+support.
+
+### A2-W3: incorporation-class attenuation ladder
+
+Using the P1 primary robust model on `log(abs_error + 0.05)` over pair-OOF
+rows:
+
+- **M0**: incorporation-class indicator plus the frozen P1 controls (atom
+  count, cell/supercell, training support, target magnitude, fold), without
+  the geometry/chemistry block;
+- **M1**: M0 plus the full frozen P1 geometry/chemistry block.
+
+Report the class coefficient in M0 and M1 and the attenuation
+`1 - beta1/beta0`, each with 95% intervals from the same 2,000
+host-impurity-pair bootstrap draws. Attenuation is defined only when the M0
+class interval excludes zero; otherwise the class gap itself is reported as
+"not established" and W3 stops.
+
+Frozen interpretation ladder:
+
+- "accounted for by the measured local environment": the M1 class interval
+  includes zero and the attenuation point estimate is at least 0.5;
+- "partially accounted for": the attenuation lower 95% bound is positive, the
+  point estimate is at least 0.25, and the M1 interval excludes zero;
+- otherwise: "the interstitial penalty is not explained by the available
+  descriptors".
+
+Either positive verdict additionally requires the same attenuation sign in at
+least four of five pair folds. No causal wording is permitted at any rung.

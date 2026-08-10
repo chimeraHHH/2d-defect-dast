@@ -7,7 +7,8 @@
       "required_rows": 10224,
       "trust_columns": ["evidence_tier", "evidence_label", "model_status", "sample_index", "raw_row_id"],
       "prediction_columns": ["pair_prediction_eV", "pair_residual_eV", "pair_absolute_error_eV", "host_prediction_eV", "host_absolute_error_eV", "dopant_prediction_eV", "dopant_absolute_error_eV"],
-      "edge_semantics_audit_columns": ["model_edge_periodic_impurity_self_image_count_5A", "host_only_cn_5A", "host_only_neighbor_distance_mean_A", "host_only_neighbor_distance_max_A", "raw_graph_defect_edge_count_delta_5A", "raw_graph_defect_edge_topology_match_5A", "raw_graph_defect_edge_distance_max_abs_delta_A"],
+      "edge_semantics_audit_columns": ["env_zero_neighbor_mode", "model_edge_zero_defect_neighbor_5A", "e_module_oof_batch_activation_verified", "e_module_zero_neighbor_semantics_verified", "legacy_zero_neighbor_oof_batch_evidence", "legacy_zero_neighbor_min_positive_defect_edge_rows", "legacy_zero_neighbor_min_total_defect_center_edges", "neighbor_distance_mean_A", "neighbor_distance_max_A", "model_edge_periodic_impurity_self_image_count_5A", "host_only_cn_5A", "host_only_neighbor_distance_mean_A", "host_only_neighbor_distance_max_A", "raw_graph_defect_edge_count_delta_5A", "raw_graph_defect_edge_topology_match_5A", "raw_graph_defect_edge_distance_max_abs_delta_A"],
+      "exact_e_effective_scalar_columns": ["cn_5A", "e_module_effective_mean_distance_A", "e_module_effective_max_distance_A", "e_module_effective_abs_electronegativity_contrast"],
       "descriptor_contract": "paper_Q1/review/g3_preregistration.json"
     },
     "extraction_manifest.json": {"schema_version": "prm_g3_extraction_manifest_v1"},
@@ -15,6 +16,7 @@
   },
   "analyze_outputs": {
     "coverage.csv": "overall and class-stratified finite coverage plus eligibility gate",
+    "analysis_row_ledger.csv": "all 10,224 rows with env zero-neighbor mode, frozen batch_size=64, per-regime batch-active evidence reconstructed from hash-bound archived NPZ index order for exactly the 14 frozen legacy zero-neighbor rows (42 contexts), explicitly imputed zero-neighbor physical features, remaining missingness, and primary inclusion status",
     "effect_estimates.csv": "class-specific q10-to-q90 back-transformed contrasts, pair-bootstrap intervals, BH q, fold/XF/nuisance stability, and paper gate",
     "block_tests.csv": "geometry and chemistry joint Wald tests using pair-bootstrap coefficient covariance",
     "family_mae.csv": "sample-weighted and identity-macro MAE with identity bootstrap",
@@ -27,6 +29,9 @@
     "analysis_started.json": {"schema_version": "prm_g3_analysis_started_v1", "role": "write-once attempt lock; a failed attempt requires a new versioned directory"},
     "analysis_manifest.json": {"schema_version": "prm_g3_analysis_manifest_v1", "canonical_requirement": "full field-by-field reconstruction from hash-verified protocol, raw database, accepted OOF archives, and descriptor code"},
     "status.json": {"canonical_provenance_verified": "trust state separate from claim-specific gates", "canonical_main_text_eligible": "true only if at least one preregistered P1/P3/P4 claim gate passes"}
+  },
+  "diagnostic_artifacts": {
+    "zero_neighbor_audit.json": "input-only server audit of the 14 empty defect neighborhoods and all 42 legacy OOF batch contexts; not manuscript evidence"
   },
   "legacy_watermark": "EXPLORATORY — LEGACY GRAPH; NOT FOR MANUSCRIPT"
 }

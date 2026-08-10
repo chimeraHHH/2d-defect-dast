@@ -13,28 +13,37 @@ import numpy as np
 
 from scripts.prm_g3_physics_analysis import (
     ADJUSTED_PROFILE_FEATURES,
+    CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
     DOPANT_TO_SERIES,
     EXPECTED_ATOM_FEATURE_SHA256,
     HOST_TO_FAMILY,
+    LEGACY_ENV_ZERO_NEIGHBOR_MODE,
+    LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES,
     PROFILE_GRID_POINTS,
     alternating_projection,
     assert_joined_rows_equal,
     backtransformed_contrast,
     benjamini_hochberg,
     build_design,
+    canonical_json_sha256,
     canonical_main_text_claim_eligible,
+    e_module_effective_scalars,
     eligible_adjusted_profile_features,
     fit_huber_fixed_effects,
     fit_identity_novelty,
     graph_samples_from_blob,
     local_structure_descriptors,
     p3_positive_claim_gate,
+    prepare_primary_analysis_rows,
     profile_design,
     pushed_ancestor,
+    require_canonical_env_zero_neighbor_mode,
     target_decile,
     run_p4_case_selection,
     validate_canonical_initialization_fields,
+    validate_canonical_run_model_contract,
     validate_canonical_seed_entries,
+    validate_zero_neighbor_oof_batch_activation,
     weighted_quantile,
 )
 
@@ -96,6 +105,12 @@ class StatisticalPrimitiveTest(unittest.TestCase):
 
 
 class DescriptorSemanticsTest(unittest.TestCase):
+    def test_legacy_zero_neighbor_population_is_frozen_before_outcome_analysis(self) -> None:
+        self.assertEqual(len(LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES), 14)
+        self.assertEqual(len(set(LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES)), 14)
+        self.assertEqual(tuple(sorted(LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES)),
+                         LEGACY_ZERO_NEIGHBOR_SAMPLE_INDICES)
+
     def test_model_edge_features_retain_periodic_impurity_self_images(self) -> None:
         from ase import Atoms
 
@@ -116,6 +131,172 @@ class DescriptorSemanticsTest(unittest.TestCase):
             descriptor["host_only_cn_5A"]
             + descriptor["model_edge_periodic_impurity_self_image_count_5A"],
         )
+
+    def test_zero_neighbor_numeric_branch_matches_model_modes(self) -> None:
+        encoded_en = np.asarray([0.0, 0.25, 0.75])
+        legacy = e_module_effective_scalars(
+            np.asarray([]), np.asarray([], dtype=int), 1, encoded_en,
+            LEGACY_ENV_ZERO_NEIGHBOR_MODE,
+        )
+        canonical = e_module_effective_scalars(
+            np.asarray([]), np.asarray([], dtype=int), 1, encoded_en,
+            CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
+        )
+        self.assertEqual(
+            [legacy[key] for key in (
+                "cn_5A", "e_module_effective_mean_distance_A",
+                "e_module_effective_max_distance_A",
+                "e_module_effective_abs_electronegativity_contrast",
+            )],
+            [0.0, 0.0, 0.0, 0.25],
+        )
+        self.assertEqual(
+            canonical["e_module_effective_abs_electronegativity_contrast"], 0.0,
+        )
+
+    def test_actual_module_constants_and_zero_neighbor_residual_modes(self) -> None:
+        import torch
+        from src.models.crystal_v2 import (
+            ENV_ZERO_NEIGHBOR_CORRECTED,
+            ENV_ZERO_NEIGHBOR_LEGACY,
+            LocalEnvEnrichment,
+        )
+
+        self.assertEqual(ENV_ZERO_NEIGHBOR_LEGACY, LEGACY_ENV_ZERO_NEIGHBOR_MODE)
+        self.assertEqual(
+            ENV_ZERO_NEIGHBOR_CORRECTED, CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
+        )
+
+        legacy = LocalEnvEnrichment(
+            hidden_dim=8, zero_neighbor_mode=ENV_ZERO_NEIGHBOR_LEGACY,
+        )
+        corrected = LocalEnvEnrichment(
+            hidden_dim=8, zero_neighbor_mode=ENV_ZERO_NEIGHBOR_CORRECTED,
+        )
+        for module in (legacy, corrected):
+            with torch.no_grad():
+                for parameter in module.parameters():
+                    parameter.zero_()
+                module.proj[-1].bias.fill_(1.0)
+        captured: list[torch.Tensor] = []
+        handle = legacy.proj[0].register_forward_pre_hook(
+            lambda _module, inputs: captured.append(inputs[0].detach().clone())
+        )
+        inputs = {
+            "h": torch.zeros(2, 1, 8),
+            "defect_mask": torch.ones(2, 1, dtype=torch.long),
+            # Sample 0 has no outgoing edge; sample 1 has one.  This prevents
+            # the historical batch-level early return while leaving sample 0
+            # on the exact empty-neighbour branch.
+            "edge_index_flat": torch.tensor([[1], [1]], dtype=torch.long),
+            "edge_dist_flat": torch.tensor([2.0]),
+            "flat_defect_mask": torch.ones(2, dtype=torch.long),
+            "flat_en": torch.tensor([0.25, 0.75]),
+            "flat_indices": torch.tensor([0, 1], dtype=torch.long),
+            "num_atoms_list": [1, 1],
+        }
+        try:
+            with torch.no_grad():
+                legacy_output = legacy(**inputs)
+                corrected_output = corrected(**inputs)
+        finally:
+            handle.remove()
+        self.assertEqual(len(captured), 1)
+        np.testing.assert_allclose(
+            captured[0][0, 0].numpy(), [0.0, 0.0, 0.0, 0.25], atol=1e-7,
+        )
+        np.testing.assert_allclose(legacy_output[:, 0].numpy(), 1.0, atol=1e-7)
+        np.testing.assert_allclose(corrected_output[0, 0].numpy(), 0.0, atol=1e-7)
+        np.testing.assert_allclose(corrected_output[1, 0].numpy(), 1.0, atol=1e-7)
+
+    def test_isolated_impurity_keeps_physical_distances_undefined(self) -> None:
+        from ase import Atoms
+        from src.graph import build_graph
+
+        atoms = Atoms(
+            symbols=["Li", "H"], positions=[[0, 0, 0], [10, 0, 0]],
+            cell=[30, 30, 30], pbc=False,
+        )
+        descriptor = local_structure_descriptors(
+            atoms, "Li", build_graph(atoms), LEGACY_ENV_ZERO_NEIGHBOR_MODE,
+        )
+        self.assertEqual(descriptor["model_edge_zero_defect_neighbor_5A"], 1.0)
+        self.assertEqual(descriptor["e_module_effective_mean_distance_A"], 0.0)
+        self.assertTrue(np.isnan(descriptor["neighbor_distance_mean_A"]))
+        self.assertTrue(np.isnan(descriptor["neighbor_distance_max_A"]))
+        self.assertTrue(np.isnan(descriptor["postrelaxation_min_clearance_A"]))
+
+    def test_zero_neighbor_oof_batch_activation_is_fail_closed(self) -> None:
+        test_orders = {
+            regime: {0: [0, 1, 2], 1: [], 2: [], 3: [], 4: []}
+            for regime in ("pair", "host", "dopant")
+        }
+        audit = validate_zero_neighbor_oof_batch_activation(
+            {0: 0, 1: 4, 2: 0}, test_orders,
+        )
+        self.assertEqual(set(audit[0]), {"pair", "host", "dopant"})
+        self.assertGreater(audit[2]["pair"]["total_defect_center_edges"], 0)
+        isolated_orders = {
+            regime: {0: [0], 1: [], 2: [], 3: [], 4: []}
+            for regime in ("pair", "host", "dopant")
+        }
+        with self.assertRaisesRegex(RuntimeError, "early-return"):
+            validate_zero_neighbor_oof_batch_activation({0: 0}, isolated_orders)
+
+        # Index 64 would form an inactive singleton if the code silently
+        # sorted by sample index.  The archived order puts it in the first,
+        # active 64-row batch and must therefore be preserved exactly.
+        counts = {index: 1 for index in range(65)}
+        counts[64] = 0
+        archived = [64, *range(63)]
+        archived.append(63)
+        order_sensitive = {
+            regime: {0: archived, 1: [], 2: [], 3: [], 4: []}
+            for regime in ("pair", "host", "dopant")
+        }
+        order_audit = validate_zero_neighbor_oof_batch_activation(
+            counts, order_sensitive,
+        )
+        self.assertEqual(order_audit[64]["pair"]["batch_start"], 0)
+
+    def test_zero_neighbor_physical_imputation_is_flagged_and_retained(self) -> None:
+        rows = [
+            {
+                "evidence_tier": "exploratory", "evidence_label": "test",
+                "sample_index": 0, "raw_row_id": 1, "defecttype": "adsorbate",
+                "model_edge_zero_defect_neighbor_5A": 0,
+                "postrelaxation_min_clearance_A": 0.4,
+                "pair_absolute_error_eV": 0.1,
+            },
+            {
+                "evidence_tier": "exploratory", "evidence_label": "test",
+                "sample_index": 1, "raw_row_id": 2, "defecttype": "adsorbate",
+                "model_edge_zero_defect_neighbor_5A": 1,
+                "postrelaxation_min_clearance_A": float("nan"),
+                "pair_absolute_error_eV": 0.2,
+            },
+            {
+                "evidence_tier": "exploratory", "evidence_label": "test",
+                "sample_index": 2, "raw_row_id": 3, "defecttype": "interstitial",
+                "model_edge_zero_defect_neighbor_5A": 0,
+                "postrelaxation_min_clearance_A": 0.8,
+                "pair_absolute_error_eV": 0.3,
+            },
+        ]
+        complete, ledger, medians = prepare_primary_analysis_rows(
+            rows, ["postrelaxation_min_clearance_A"],
+        )
+        self.assertEqual(len(complete), 3)
+        self.assertEqual(complete[1]["postrelaxation_min_clearance_A"], 0.4)
+        self.assertEqual(
+            ledger[1]["zero_neighbor_imputed_features"],
+            "postrelaxation_min_clearance_A",
+        )
+        self.assertEqual(medians["adsorbate"]["postrelaxation_min_clearance_A"], 0.4)
+
+        invalid = [{**rows[1], "abs_log_extension_factor": float("nan")}]
+        with self.assertRaisesRegex(RuntimeError, "remain excluded"):
+            prepare_primary_analysis_rows(invalid, ["abs_log_extension_factor"])
 
 
 class CanonicalTrustContractTest(unittest.TestCase):
@@ -169,6 +350,47 @@ class CanonicalTrustContractTest(unittest.TestCase):
             invalid = {**valid, **patch}
             with self.assertRaisesRegex(ValueError, "initialization lineage"):
                 validate_canonical_initialization_fields(invalid, asset_sha)
+
+    def test_canonical_zero_neighbor_mode_is_mandatory(self) -> None:
+        self.assertEqual(
+            require_canonical_env_zero_neighbor_mode({
+                "env_zero_neighbor_mode": "zero_residual_v1",
+            }),
+            "zero_residual_v1",
+        )
+        for payload in ({}, {"env_zero_neighbor_mode": "legacy_batch_dependent_v0"}):
+            with self.assertRaisesRegex(ValueError, "zero_residual_v1"):
+                require_canonical_env_zero_neighbor_mode(payload)
+
+    def test_canonical_run_rejects_embedded_legacy_or_missing_mode(self) -> None:
+        source_sha = "a" * 64
+        kwargs = {
+            "use_env_enrichment": True,
+            "env_zero_neighbor_mode": CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
+        }
+        recipe_sha = canonical_json_sha256(kwargs)
+        manifest = {
+            "env_zero_neighbor_mode": CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
+            "model_recipe_scope": "config.model_kwargs",
+            "model_recipe_sha256": recipe_sha,
+            "model_source_sha256": source_sha,
+            "config": {"model": "v2", "model_kwargs": kwargs},
+        }
+        validate_canonical_run_model_contract(manifest, recipe_sha, source_sha)
+        for embedded_mode in (LEGACY_ENV_ZERO_NEIGHBOR_MODE, None):
+            invalid_kwargs = dict(kwargs)
+            if embedded_mode is None:
+                invalid_kwargs.pop("env_zero_neighbor_mode")
+            else:
+                invalid_kwargs["env_zero_neighbor_mode"] = embedded_mode
+            invalid = {
+                **manifest,
+                "config": {"model": "v2", "model_kwargs": invalid_kwargs},
+            }
+            with self.assertRaisesRegex(ValueError, "embedded zero-neighbor modes"):
+                validate_canonical_run_model_contract(
+                    invalid, recipe_sha, source_sha,
+                )
 
     @mock.patch("scripts.prm_g3_physics_analysis.subprocess.run")
     def test_g2_commit_requires_ancestry_and_pushed_remote(self, run: mock.Mock) -> None:
