@@ -2,6 +2,7 @@
   "schema_version": "prm_autofigure_edit_manifest_v1",
   "captured_at": "2026-08-09T23:20:09+08:00",
   "paper_repository_commit": "7bd7905f60513fc4f9bb9a7bfe0dd8cd9c08c5b1",
+  "paper_asset_regeneration_source_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5",
   "workflow": {
     "mode": "editor_only",
     "classification": "presentation_derivative",
@@ -82,16 +83,21 @@
       "canonical_scientific_source": {
         "pdf": {
           "path": "paper_Q1/figures/fig_factorial.pdf",
-          "sha256": "b93ec93c94f2493feea851ee3e973fea6afe74b411acde3d4b7168314d7b62fd"
+          "sha256": "4c91b36837680bd2c66f16112654b74bf0b2922ad50c12c029841613d35c143d"
         },
         "png": {
           "path": "paper_Q1/figures/fig_factorial.png",
-          "sha256": "4323b515b642306cd86f019e9dae88622f4cd3fa35ca1287ee332595c7d38a28"
+          "sha256": "f54e8a4c7e2ce1608e94f21e98a80e46513cca43bc0c2570c409df98ae899b87"
         },
         "factorial_bundle": {
           "path": "artifacts/prm_results/factorial/bundle.json",
           "sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e"
         }
+      },
+      "editor_input_scientific_source_snapshot": {
+        "pdf_sha256": "b93ec93c94f2493feea851ee3e973fea6afe74b411acde3d4b7168314d7b62fd",
+        "png_sha256": "4323b515b642306cd86f019e9dae88622f4cd3fa35ca1287ee332595c7d38a28",
+        "note": "The editor-only derivative was compared with this immutable pre-regeneration snapshot. The current canonical plot was independently regenerated from the same frozen factorial bundle on source commit ccf41e3 and passed the 1346-check numeric audit."
       },
       "ui_import_source": {
         "tool_relative_path": "web/staging/fig_factorial_editable.svg",
@@ -156,8 +162,8 @@
     "pdf_font_and_raster_qa": "pass",
     "publication_scale_visual_qa": "pass",
     "latex_integration": "pass_12_page_main_and_7_page_supplement_pdfs",
-    "numeric_audit_after_integration": "pending_rerun_after_J-R1_relabel_and_restructure",
-    "targeted_tests_after_integration": "pending_server_verification",
-    "local_milestone_commit": "pending"
+    "numeric_audit_after_integration": "pass_1346_checks_0_failures_sha256_b63cb1eaf14074acf8f7ac6eebf6bc0282baf7334805fda8debaf44ac29bc2c2",
+    "targeted_tests_after_integration": "not_run_server_environment_missing_pytest",
+    "local_milestone_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5"
   }
 }

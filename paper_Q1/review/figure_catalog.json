@@ -9,7 +9,13 @@
     "supplement_figure_count": 4,
     "main_pdf_render_qa": "pass_with_known_raster_wording_advisory",
     "supplement_render_qa": "pass",
-    "numeric_audit": "pending rerun after reranking-label regeneration"
+    "numeric_audit": {
+      "status": "pass",
+      "checks": 1346,
+      "failures": 0,
+      "sha256": "b63cb1eaf14074acf8f7ac6eebf6bc0282baf7334805fda8debaf44ac29bc2c2",
+      "source_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5"
+    }
   },
   "main_figures": [
     {
@@ -65,7 +71,7 @@
         "artifacts/prm_results/materials/pair_preferences.csv",
         "artifacts/prm_results/materials/site_selection.csv"
       ],
-      "status": "server_regeneration_pending_for_reranking_labels"
+      "status": "server_regenerated_reranking_labels_verified"
     }
   ],
   "supplement_figures": [

@@ -97,10 +97,13 @@ Official sources:
 - [x] Rebuild `main.pdf` and `supplement.pdf` after the PRB prose revision.
 - [x] Confirm no missing citations/references, overfull boxes, clipped figures,
       or unembedded fonts.
-- [ ] Rerun the independent numerical audit and targeted paper tests on the
-      pushed J-R1 source after server-side figure-label regeneration.
-- [ ] Record the final PDF hashes and 12-page main/7-page Supplemental counts
-      after that verified rebuild.
+- [x] Rerun the independent numerical audit on the pushed J-R1 source after
+      server-side figure-label regeneration: 1346 checks, 0 failures.
+- [ ] Run the targeted paper test modules in an accepted server environment;
+      the frozen server Python lacks `pytest`, so these tests were not run.
+- [x] Record the verified rebuild: 12-page main PDF
+      (`4aa3d11...35c275`) and 7-page Supplemental PDF
+      (`ac1e5dba...8ba82`).
 - [x] Author approval was given for scoped G1/G3 and figure/prose milestone
       commits and pushes; release and journal upload remain unapproved.
 - [ ] Exclude or regenerate the stale `main_latex729.zip`; it contains the

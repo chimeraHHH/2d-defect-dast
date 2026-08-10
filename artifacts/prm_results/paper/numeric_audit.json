@@ -5,7 +5,7 @@
   },
   "checks": {
     "failures": [],
-    "n_checks": 1331,
+    "n_checks": 1346,
     "n_failures": 0
   },
   "direct_recomputations": {
@@ -122,6 +122,24 @@
         "std": 0.593460204389616
       },
       "heterogeneity": {
+        "defecttype": {
+          "adsorbate": {
+            "axis": "defecttype",
+            "bias_eV": -0.00809271162117144,
+            "group": "adsorbate",
+            "mae_eV": 0.321553431797995,
+            "n": 6925.0,
+            "rmse_eV": 0.725433565303393
+          },
+          "interstitial": {
+            "axis": "defecttype",
+            "bias_eV": -0.0881085224922552,
+            "group": "interstitial",
+            "mae_eV": 0.718905256677966,
+            "n": 3299.0,
+            "rmse_eV": 1.29800415692328
+          }
+        },
         "dopant": {
           "spearman": -0.000633949099553211,
           "worst": {
@@ -220,6 +238,16 @@
       "overlap_impurities": 65,
       "overlap_records": 69,
       "overlap_reduced_formulas": 25,
+      "pair_constituent_exceptions": [
+        {
+          "dopant": "Na",
+          "host": "Ti2CO2",
+          "sample_index": 3411,
+          "split_id": "pair_cv5_f4"
+        }
+      ],
+      "pair_constituent_seen_count": 10223,
+      "pair_test_count": 10224,
       "pretraining_records": 19902,
       "raw_component_exclusions": 4,
       "raw_rows": 17364,
@@ -321,9 +349,9 @@
     }
   },
   "latex_contract": {
-    "defined_macros": 85,
+    "defined_macros": 87,
     "table_rows_checked": 34,
-    "used_macros": 52
+    "used_macros": 55
   },
   "schema_version": "prm_paper_numeric_audit_v1",
   "scope_notes": [

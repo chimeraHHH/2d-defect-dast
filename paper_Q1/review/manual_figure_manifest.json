@@ -55,9 +55,9 @@
   ],
   "compiled_pdf": {
     "path": "paper_Q1/main.pdf",
-    "sha256": null,
+    "sha256": "4aa3d11cbc3330acb52cd1bcc7a66415b274e0ed2b3935fede02bd52a635c275",
     "pages": 12,
-    "status": "final hash pending reranking-label regeneration and rebuild",
+    "status": "rebuilt after server-side reranking-label regeneration",
     "placement": {
       "main_fig_1": 3,
       "main_fig_2": 3,
@@ -71,8 +71,15 @@
     "advisory": "Main Figure 2 remains identifiable in grayscale through spatial position and labels, although its red/green color contrast is reduced."
   },
   "frozen_verification": {
-    "numeric_audit": "pending rerun after J-R1 source and figure-label changes",
-    "targeted_tests": "pending server verification",
+    "numeric_audit": {
+      "status": "pass",
+      "checks": 1346,
+      "failures": 0,
+      "artifact": "artifacts/prm_results/paper/numeric_audit.json",
+      "sha256": "b63cb1eaf14074acf8f7ac6eebf6bc0282baf7334805fda8debaf44ac29bc2c2",
+      "source_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5"
+    },
+    "targeted_tests": "not run: the frozen GPU-server Python environment does not provide pytest",
     "new_scientific_run": false
   }
 }
