@@ -2504,14 +2504,21 @@ def verify_pilot(
         )
     ):
         raise ValueError(f"{arm} actual training manifest/history gate failed")
+    # The pilot runner launches ``python -m src.train_enhanced``; under -m,
+    # sys.argv[0] is the module's file path, so the trainer-recorded command
+    # is [executable, .../src/train_enhanced.py, --config, <path>, --device,
+    # cuda].  Exactly six tokens guarantees the frozen full run took no extra
+    # flags; the script and config paths must resolve to the collector's own
+    # worktree files, whose contents are separately hash-bound.
     command = manifest.get("command")
     if (
         not isinstance(command, list)
-        or len(command) < 7
-        or command[-6:] != [
-            "-m", "src.train_enhanced", "--config",
-            str(config_path), "--device", "cuda",
-        ]
+        or len(command) != 6
+        or Path(str(command[1])).resolve()
+        != (ROOT / "src" / "train_enhanced.py").resolve()
+        or command[2] != "--config"
+        or Path(str(command[3])).resolve() != Path(config_path).resolve()
+        or command[4:] != ["--device", "cuda"]
     ):
         raise ValueError(f"{arm} trainer command is not the frozen full run")
     if not all(
