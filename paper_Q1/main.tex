@@ -1,4 +1,4 @@
-\documentclass[aps,prmaterials,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
+\documentclass[aps,prb,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -32,53 +32,58 @@
 \IfFileExists{generated/results_ready.tex}{%
   \prmresultsreadytrue
   \input{generated/results_macros.tex}%
+  \input{prb_context_macros.tex}%
 }{%
   \prmresultsreadyfalse
 }
 
 \begin{document}
 
-\title{Axis-resolved transfer of impurity formation energies in
-two-dimensional materials with a defect-aware graph transformer}
+\title{Learning impurity incorporation energetics across host and impurity
+chemistry in two-dimensional materials with a defect-aware graph Transformer}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
-% TODO: add other authors
+% Author-controlled submission blocker: insert the verified full author list,
+% affiliations, corresponding-author email, and ORCIDs.
 
 \date{\today}
 
 \begin{abstract}
 \ifprmresultsready
-Machine-learned formation energies can accelerate impurity screening in
-two-dimensional materials, but random-split accuracy does not show how a model
-behaves when chemical identities are absent from target supervision.  We
-develop the Defect-Aware Radial Transformer (DART) and evaluate it on 10,224
-provenance-audited neutral IMP2D structures.  In a paired $2^3$ factorial,
-gated readout and the composite pre-normalized, distance-gated local block
-consistently reduced validation mean absolute error (MAE), whereas the
-independent main effect of explicit environment enrichment was inconclusive; a
-fixed validation-only rule selected the all-enabled variant.  Pair-held-out MAE
-(\PRMPairCvDARTMAE\eV{}) remained close to random out-of-fold MAE
-(\PRMIdCvDARTMAE\eV{}), whereas withholding complete hosts or impurities
-increased MAE to \PRMHostCvDARTMAE{} and \PRMDopantCvDARTMAE\eV{},
-respectively.  The selected DART learning recipe had lower paired absolute
-error than the prespecified additive-readout periodic SchNet recipe and
-split-local validation-selected descriptor baselines in all five evaluation
-regimes.  Pair-held-out predictions retrospectively identified the lower-energy
-incorporation class among retained IMP2D candidates with
-\PRMPreferenceAccuracy\% accuracy and incurred \PRMGlobalRegret\eV{} mean
-global site-selection regret.  At a nominal 90\% level, conformal intervals on
-a separate internal ensemble split yielded \PRMUQNinetyCoverage\% empirical
-marginal coverage at \PRMUQNinetyWidth\eV{} mean width.  These results define a
-bounded screening domain within IMP2D; they do not establish prospective
-performance outside the audited database.
+We study retrospective estimation and reranking of impurity formation energies
+for available DFT-relaxed candidate geometries in two-dimensional materials.
+In IMP2D, each relaxed geometry and its reference energy are products of the
+same completed DFT workflow; this task therefore evaluates
+database-conditioned prediction rather than replacing candidate generation or
+relaxation.  Random structure splits nevertheless conceal how errors change
+with chemical novelty.  We develop the Defect-Aware Radial Transformer
+(DART) and evaluate it on a curated set of 10,224 neutral structures from the
+Impurities in Two-Dimensional Materials (IMP2D) database.  Across five paired
+repeats, a $2^3$ factorial showed small error reductions from gated graph
+readout and the pre-normalized, distance-gated local block, whereas the
+independent effect of explicit environment enrichment remained inconclusive.
+For pair-held-out structures, all but one test structure had both its host and
+impurity represented elsewhere in training; the mean absolute error was
+\PRMPairCvDARTMAE\eV{}, compared with \PRMIdCvDARTMAE\eV{} under random
+cross-validation.  Withholding every structure
+of a host or impurity increased the error to \PRMHostCvDARTMAE\eV{} and
+\PRMDopantCvDARTMAE\eV{}, respectively.  Incorporation geometry formed another
+applicability axis: pair-held-out interstitial structures had
+\PRMPairInterstitialMAE\eV{} error, more than twice the
+\PRMPairAdsorbateMAE\eV{} error for adsorbates.  For candidates sharing a host
+and impurity, pair-held-out predictions selected the lower-energy incorporation
+class with \PRMPreferenceAccuracy\% accuracy and
+\PRMGlobalRegret\eV{} mean site-selection regret.  Thus, within IMP2D,
+pair-held-out transfer almost entirely recombines familiar constituents and is
+substantially easier than transfer to a new constituent, while interstitial
+incorporation remains the more difficult energy-prediction regime.
 \else
-Machine-learned formation energies can accelerate impurity screening in
-two-dimensional materials, but random-split accuracy alone does not establish
-axis-resolved transfer or a reliable deployment domain.  We define a
-provenance-audited, leakage-controlled evaluation of a defect-aware graph
-transformer on IMP2D.  Numerical claims are withheld until all prespecified
-non-DFT analyses and paper assets pass their provenance checks.
+We study how impurity formation-energy prediction changes across host,
+impurity, and incorporation-geometry axes in two-dimensional materials.  The
+analysis uses a defect-aware graph Transformer and a curated subset
+of IMP2D; numerical results are available only when the corresponding audited
+result bundle is present.
 \fi
 \end{abstract}
 
@@ -114,22 +119,25 @@ non-DFT analyses and paper assets pass their provenance checks.
 %----------------------------------------------------------------------
 \input{sections/conclusion}
 
-\section*{Data and code availability}
-The source IMP2D data are available as version 2 of the Interstitial and
-Adsorbate Structure Database~\cite{imp2d_dataset2022}; their construction is
-described in Ref.~\cite{imp2d2023}.  The exact sample audit, immutable split
-definitions, resolved experiment configurations, analysis scripts, and
-machine-readable result bundles for this study are available at
-the current review-stage branch,
-\url{https://github.com/chimeraHHH/2d-defect-dast/tree/prm-revision}.  A
-release-specific commit, formal software/data citation, and archival identifier
-will replace this provisional branch link before submission.
-
 \begin{acknowledgments}
 This work was supported by the National College Students Innovation and
 Entrepreneurship Training Program (Key Support Area Project).
 Computations were performed on an NVIDIA L40S cluster at Wuhan University.
+OpenAI Codex (GPT-5, accessed August 2026) assisted with implementation and
+debugging of analysis and verification scripts, manuscript restructuring,
+language revision, and consistency checks.  The authors directed these uses,
+reviewed the AI-assisted code and analyses, and verified the manuscript against
+the archived results, source code, and cited literature.  No AI tool generated
+or modified the IMP2D reference labels, and the authors take responsibility for
+the final manuscript.
 \end{acknowledgments}
+
+\section*{Data availability}
+The source data are available as version 2 of the Interstitial and Adsorbate
+Structure Database~\cite{imp2d_dataset2022}; their construction is described in
+Ref.~\cite{imp2d2023}.  The sample audit, split definitions, resolved
+configurations, analysis code, and machine-readable results used in this study
+are available in the project repository~\cite{dart_repository2026}.
 
 \bibliography{references}
 

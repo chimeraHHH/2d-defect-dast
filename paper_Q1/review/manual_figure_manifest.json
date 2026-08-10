@@ -1,0 +1,78 @@
+{
+  "schema_version": "prm_manual_figure_manifest_v1",
+  "captured_on": "2026-08-10",
+  "stage": "J",
+  "evidence_boundary": "Presentation-only manuscript integration; no experiment, inference, model selection, or numerical analysis was run",
+  "assets": [
+    {
+      "id": "main_fig_1",
+      "source_basename": "figure1_manual.png",
+      "source_sha256": "faa8486b8a8179727d74a8e84ae118d165cea052b711a6cbfbd3b670a528a63c",
+      "paper_path": "paper_Q1/figures/figure1_manual.png",
+      "paper_sha256": "faa8486b8a8179727d74a8e84ae118d165cea052b711a6cbfbd3b670a528a63c",
+      "pixel_sha256_rgba": "6be22c37e390305704af1f71eb5c2b0f1bdbde30625c2f67a2c5b90408b32fe0",
+      "pixel_dimensions": [7680, 4320],
+      "dpi": [300, 300],
+      "pixel_exact_to_source": true,
+      "presentation_operation": "LaTeX trim and clip only; source pixels unchanged",
+      "latex_file": "paper_Q1/sections/introduction.tex",
+      "latex_label": "fig:architecture",
+      "formal_figure_number": 1,
+      "caption_guard": "The caption corrects the additive 128-channel impurity-status embedding, distinguishes the 12-Angstrom radial-grid endpoint from a cutoff, and limits screening to retrospective class-wise candidate minima."
+    },
+    {
+      "id": "main_fig_2",
+      "source_basename": "figure2_manual.png",
+      "source_sha256": "635f3e549897868c6a57457eecc7b6a596b6c678aaba838ec7ad63583498e7ec",
+      "paper_path": "paper_Q1/figures/figure2_manual.png",
+      "paper_sha256": "e0aa02e82e9ea26dd22e201ae7006511891c65e9ca4fca4faa6b838bb1b238e9",
+      "pixel_sha256_rgba": "392737359572fbd9718123cd3303299cfb8f98d9045e02dd69e840d9362d4c9a",
+      "pixel_dimensions": [3398, 1248],
+      "dpi": [300, 300],
+      "pixel_exact_to_source": true,
+      "presentation_operation": "DPI metadata normalized to 300; pixels unchanged",
+      "latex_file": "paper_Q1/sections/methods.tex",
+      "latex_label": "fig:incorporation_classes",
+      "formal_figure_number": 2,
+      "caption_guard": "Red and green impurities are alternative single-impurity configurations overlaid in a representative WSe2-like host, not simultaneous defects or exhaustive site definitions."
+    },
+    {
+      "id": "main_fig_3",
+      "source_basename": "figure3_manual.png",
+      "source_sha256": "bda219f893a7db0cf0551063e9801fce4a9083b596f748c96cee770f05c5c142",
+      "paper_path": "paper_Q1/figures/figure3_manual.png",
+      "paper_sha256": "e403bfd1210e09cfae19f4b8a1aa8acf7d1fe56394597d06df7f090c98585376",
+      "pixel_sha256_rgba": "aafff33b667631143ee09c965e5d473006cde912da6b1024b518eb665aad2a5e",
+      "pixel_dimensions": [2832, 1504],
+      "dpi": [300, 300],
+      "pixel_exact_to_source": true,
+      "presentation_operation": "DPI metadata normalized to 300; pixels unchanged",
+      "latex_file": "paper_Q1/sections/methods.tex",
+      "latex_label": "fig:environment_enrichment",
+      "formal_figure_number": 3,
+      "caption_guard": "The four-component descriptor is normalized, projected to 128 channels, and added only at the impurity node; the displayed N=3 neighborhood is schematic."
+    }
+  ],
+  "compiled_pdf": {
+    "path": "paper_Q1/main.pdf",
+    "sha256": null,
+    "pages": 12,
+    "status": "final hash pending reranking-label regeneration and rebuild",
+    "placement": {
+      "main_fig_1": 3,
+      "main_fig_2": 3,
+      "main_fig_3": 5
+    }
+  },
+  "visual_qa": {
+    "color": "pass",
+    "grayscale": "pass_with_advisory",
+    "clipping": "none",
+    "advisory": "Main Figure 2 remains identifiable in grayscale through spatial position and labels, although its red/green color contrast is reduced."
+  },
+  "frozen_verification": {
+    "numeric_audit": "pending rerun after J-R1 source and figure-label changes",
+    "targeted_tests": "pending server verification",
+    "new_scientific_run": false
+  }
+}

@@ -3,40 +3,26 @@
 \ifprmresultsready
 
 %----------------------------------------------------------------------
-\subsection{Validation-locked architecture selection}
+\subsection{Effects of defect-aware model components}
 \label{sec:factorial_results}
 %----------------------------------------------------------------------
 
-The validation-only rule selected the all-enabled \PRMSelectedVariant{} variant.
-Paired contrasts consistently favored gated readout and the composite
+Validation MAE selected the all-enabled \PRMSelectedVariant{} variant.  Paired
+contrasts resolved lower errors for gated readout and the composite
 pre-normalized, distance-gated local block, whereas the independent main effect
-of environment enrichment was inconclusive.  Selection of the all-enabled
-variant therefore does not imply that every enabled module was independently
-beneficial.  The complete paired factorial is reported in
-Table~\ref{tab:factorial} and Fig.~\ref{fig:factorial}.  Its selected validation
-MAE had a mean of
+of environment enrichment was inconclusive.  The complete factorial is
+reported in Table~\ref{tab:factorial}, with its paired-effect visualization in
+Supplemental Fig.~S2~\cite{supplemental}.  The selected
+variant had mean validation MAE
 \PRMSelectedValidationMAE\eV{} (95\% bootstrap interval
 [\PRMSelectedValidationMAELow, \PRMSelectedValidationMAEHigh]\eV{}) across
-the five paired repeats.  Its locked test MAE was
+the five paired repeats and test MAE
 \PRMSelectedTestMAE\eV{} [\PRMSelectedTestMAELow,
-\PRMSelectedTestMAEHigh]\eV{}.  The test values were exposed only after the
-selection rule had fixed the promoted architecture.
+\PRMSelectedTestMAEHigh]\eV{}.
 
 \input{generated/tab_factorial.tex}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_factorial.pdf}
-\caption{Paired architecture experiment.
-  (a) Validation and locked-test MAE for all eight G/E/P variants; shading
-  marks the validation-selected variant.
-  (b) Orthogonal main effects and interactions on validation and locked-test
-  MAE, with 95\% bootstrap intervals over paired repeats.  Negative effects
-  reduce MAE.}
-\label{fig:factorial}
-\end{figure*}
-
-The orthogonal contrasts separate evidence for the three prespecified modules
+The orthogonal contrasts separate evidence for the three modules
 from variation between random partitions.  Because P jointly changes
 normalization placement and distance gating, its contrast supports or rejects
 that composite block only; it does not identify either subchange as the causal
@@ -48,17 +34,19 @@ source of an effect.
 \label{sec:transfer_results}
 %----------------------------------------------------------------------
 
-Chemical transfer was strongly axis dependent.  Pair-held-out MAE
-(\PRMPairCvDARTMAE\eV{}) remained close to random out-of-fold MAE
-(\PRMIdCvDARTMAE\eV{}), whereas withholding complete hosts or impurities
-increased MAE to \PRMHostCvDARTMAE{} and \PRMDopantCvDARTMAE\eV{},
-respectively.  The predefined chemistry block had MAE
+Chemical transfer was strongly axis dependent.  Mean absolute error was
+\PRMPairCvDARTMAE\eV{} when complete host--impurity pairs were withheld, versus
+\PRMIdCvDARTMAE\eV{} under random cross-validation.  Withholding complete hosts
+or impurities increased MAE to \PRMHostCvDARTMAE\eV{} and
+\PRMDopantCvDARTMAE\eV{}, respectively.  The predefined chemistry block had MAE
 \PRMChemistryBlockDARTMAE\eV{} but samples a different target distribution and
-is not a monotonic measure of extrapolation difficulty.  Across all five
-regimes, paired absolute-error differences favored the selected DART recipe over
-the prespecified additive-readout periodic SchNet recipe and the split-local
-validation-selected descriptor controls.  Table~\ref{tab:benchmark} reports the
-complete intervals.
+should therefore be interpreted separately rather than placed on a monotonic
+extrapolation scale.  Across all five regimes, paired absolute-error differences
+favored DART over both the descriptor model selected by validation MAE within
+each split and the additive-readout SchNet baseline.
+Figure~\ref{fig:transfer} places the five transfer regimes and their paired
+comparator contrasts on a common visual scale; Table~\ref{tab:benchmark}
+reports the complete intervals.
 
 \input{generated/tab_benchmark.tex}
 
@@ -66,19 +54,18 @@ complete intervals.
 \centering
 \includegraphics[width=\textwidth]{fig_transfer.pdf}
 \caption{Interpolation and chemical-transfer evaluation.
-  (a) DART pooled test MAE across the five frozen regimes; the dashed line
-  marks random out-of-fold MAE and is a visual reference rather than a
-  statistical equivalence threshold.
-  (b) Paired differences in absolute error for the prespecified
-  additive-readout periodic SchNet recipe and the split-local
-  validation-selected descriptor relative to DART.  Intervals are 95\%
+  (a) DART pooled test MAE across the five evaluation regimes; the dashed line
+  marks random out-of-fold MAE.
+  (b) Paired differences in absolute error for the additive-readout SchNet
+  baseline and the descriptor model selected separately by validation MAE in
+  each split, relative to DART.  Intervals are 95\%
   bootstrap intervals using the regime-matched resampling units defined in
   Sec.~\ref{sec:evaluation}; the broken axis isolates the large host-held-out
   SchNet contrast.  Positive values favor DART.}
 \label{fig:transfer}
 \end{figure*}
 
-Aggregate MAE can hide failures in chemically sparse or screening-relevant
+Aggregate MAE can hide failures in chemically sparse or reranking-relevant
 subsets.  Table~\ref{tab:applicability} therefore reports equal-weight host and
 impurity macro errors together with performance on nonpositive formation
 energies and the lowest-energy decile.  For example, on pair-held-out
@@ -89,55 +76,44 @@ architecture or hyperparameter selection.
 
 \input{generated/tab_applicability.tex}
 
-Host-, impurity-, incorporation-class-, and site-level errors remained
-heterogeneous.  The complete descriptive analysis is reported in Supplemental
-Fig.~S1~\cite{supplemental}; none of these groups entered architecture,
-hyperparameter, or model selection.
+Incorporation geometry introduced an additional asymmetry.  Under
+pair-held-out prediction, interstitial structures had MAE
+\PRMPairInterstitialMAE\eV{}, compared with \PRMPairAdsorbateMAE\eV{} for
+adsorbates.  Host-, impurity-, and site-resolved errors were also heterogeneous;
+the complete descriptive analysis is reported in Supplemental
+Fig.~S4~\cite{supplemental}.
 
 %----------------------------------------------------------------------
 \subsection{Internal uncertainty and selective prediction}
 \label{sec:uq_results}
 %----------------------------------------------------------------------
 
-On the dedicated uncertainty test partition, which was excluded from ensemble
-fitting, checkpoint selection, and calibration but not from earlier
-architecture development on other partitions of the same corpus, the
-five-member ensemble had MAE \PRMUQTestMAE\eV{}, Gaussian negative log
+On the internal ensemble test partition, the five-member ensemble had MAE
+\PRMUQTestMAE\eV{}, Gaussian negative log
 likelihood \PRMUQNLL, and mean Gaussian CRPS \PRMUQCRPS\eV{}.  The Spearman
 correlation between calibrated standard deviation and absolute error was
 \PRMUQErrorSpearman.  The risk--coverage curve had AURC \PRMUQAURC\eV{} and
 excess AURC \PRMUQExcessAURC\eV{} relative to oracle error ordering.
 
-\input{generated/tab_uq.tex}
-
 At 90\% nominal coverage, the split-conformal interval covered
 \PRMUQNinetyCoverage\% of test structures with mean width
-\PRMUQNinetyWidth\eV{}.  Table~\ref{tab:uq} reports all prespecified nominal
-levels.  These are internal empirical marginal-coverage results; they do not
-establish conditional coverage for every host or impurity or performance on a
-fully untouched external corpus.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_uq.pdf}
-\caption{Internal uncertainty evaluation on the dedicated ensemble split.
-  (a) Nominal versus observed split-conformal coverage; annotations give mean
-  interval widths.
-  (b) MAE risk as increasingly uncertain predictions are rejected, compared
-  with oracle ordering by realized error.
-  (c) Calibrated standard deviation versus absolute error on the dedicated
-  test partition.}
-\label{fig:uq}
-\end{figure*}
+\PRMUQNinetyWidth\eV{}.  Supplemental Table~SII and
+Fig.~S3~\cite{supplemental} report all evaluated nominal levels, the
+risk--coverage curve, and the error--uncertainty relation.  These values measure
+empirical marginal coverage within the internal ensemble split, not
+calibration under a chemically shifted distribution.
 
 %----------------------------------------------------------------------
-\subsection{Out-of-fold screening decisions within IMP2D}
-\label{sec:screening_results}
+\subsection{Retrospective out-of-fold reranking within IMP2D}
+\label{sec:reranking_results}
 %----------------------------------------------------------------------
 
 The host--impurity-pair folds provide one out-of-fold prediction for every
-retained structure.  Across pairs containing both incorporation classes, DART
-retrospectively identified the lower-energy class among the retained IMP2D
+retained structure.  Both the input geometries and reference energies come
+from the completed IMP2D DFT workflow, so the following comparisons are
+retrospective rather than a substitute for relaxation.  Across pairs
+containing both incorporation classes, DART
+identified the lower-energy class among the retained, DFT-relaxed IMP2D
 candidates with
 \PRMPreferenceAccuracy\% accuracy; the predicted and reference class margins
 had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
@@ -147,10 +123,11 @@ had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
 top-two site accuracies were \PRMWithinTypeExactAccuracy\% and
 \PRMWithinTypeTopTwoAccuracy\%, respectively, with mean regret
 \PRMWithinTypeRegret\eV{}.
-The corresponding non-trained empirical-majority or candidate-uniform reference
-accuracies were \PRMPreferenceReferenceAccuracy\%,
-\PRMGlobalReferenceAccuracy\%, \PRMWithinTypeReferenceExactAccuracy\%, and
-\PRMWithinTypeReferenceTopTwoAccuracy\%.  Model-minus-reference gains were
+The corresponding descriptive reference accuracies were
+\PRMPreferenceReferenceAccuracy\%, \PRMGlobalReferenceAccuracy\%,
+\PRMWithinTypeReferenceExactAccuracy\%, and
+\PRMWithinTypeReferenceTopTwoAccuracy\%, respectively.  Relative to these
+references, DART improved accuracy by
 \PRMPreferenceGain{} [\PRMPreferenceGainLow, \PRMPreferenceGainHigh],
 \PRMGlobalAccuracyGain{} [\PRMGlobalAccuracyGainLow,
 \PRMGlobalAccuracyGainHigh], \PRMWithinTypeExactAccuracyGain{}
@@ -158,24 +135,28 @@ accuracies were \PRMPreferenceReferenceAccuracy\%,
 \PRMWithinTypeTopTwoAccuracyGain{} [\PRMWithinTypeTopTwoAccuracyGainLow,
 \PRMWithinTypeTopTwoAccuracyGainHigh] percentage points, respectively.
 
-\input{generated/tab_screening.tex}
+Complete decision metrics and clustered intervals are reported in
+Supplemental Table~SIII~\cite{supplemental}.  Figure~\ref{fig:reranking}
+shows the class-margin agreement, the distribution of reranking regret, and
+the clustered decision-accuracy intervals.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_screening.pdf}
-\caption{Screening analysis from pair-held-out predictions.
+\caption{Retrospective reranking of available DFT-relaxed IMP2D geometries
+  using pair-held-out predictions.
   (a) Predicted versus reference preference margins between adsorbate and
   interstitial configurations.
-  (b) Empirical cumulative distributions of global and within-class screening
+  (b) Empirical cumulative distributions of global and within-class reranking
   regret.
   (c) Host--impurity-pair cluster-bootstrap intervals for incorporation-class,
   exact-site, and top-two decision accuracy.}
-\label{fig:screening}
+\label{fig:reranking}
 \end{figure*}
 
 \else
 
-\noindent\textit{Numerical results are withheld in this draft pending
-completion of the prespecified non-DFT evaluation.}
+\noindent\textit{Numerical results are unavailable because the audited result
+bundle is not present.}
 
 \fi

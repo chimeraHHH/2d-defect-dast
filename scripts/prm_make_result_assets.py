@@ -1408,7 +1408,7 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
             True,
         ),
         (
-            "Global screening regret (eV)",
+            "Global reranking regret (eV)",
             preference["global_screening_regret_eV"],
             None,
             False,
@@ -1426,7 +1426,7 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
             True,
         ),
         (
-            "Within-class screening regret (eV)",
+            "Within-class reranking regret (eV)",
             site["screening_regret_eV"],
             None,
             False,
@@ -1458,7 +1458,7 @@ def render_screening_table(materials: Mapping[str, Any]) -> str:
     body = "\n".join(rows)
     return rf"""% Auto-generated; do not edit.
 \begin{{table*}}[t]
-\caption{{Out-of-fold screening metrics from host--impurity-pair folds.
+\caption{{Retrospective out-of-fold reranking metrics from host--impurity-pair folds.
 Intervals are 95\% nonparametric cluster-bootstrap intervals over
 host--impurity pairs; multiple within-class decisions from one pair remain
 together in every resample. The incorporation-class reference always predicts
@@ -1908,7 +1908,7 @@ def plot_screening(
             x, y, where="post", color=color, linestyle=linestyle,
             linewidth=1.1, label=label,
         )
-    axes[1].set_xlabel("Screening regret (eV)")
+    axes[1].set_xlabel("Reranking regret (eV)")
     axes[1].set_xscale("symlog", linthresh=0.05, linscale=0.8)
     axes[1].set_xticks([0.0, 0.1, 1.0, 10.0], ["0", "0.1", "1", "10"])
     axes[1].set_ylabel("Cumulative fraction")
@@ -1937,7 +1937,7 @@ def plot_screening(
     axes[2].invert_yaxis()
     axes[2].set_xlim(0, 1)
     axes[2].set_xlabel("Accuracy")
-    axes[2].set_title("Screening accuracy", loc="left", pad=5)
+    axes[2].set_title("Reranking accuracy", loc="left", pad=5)
     axes[2].grid(axis="x", color=COLORS["grid"], lw=0.45)
     axes[2].spines[["top", "right", "left"]].set_visible(False)
     axes[2].tick_params(axis="y", length=0)

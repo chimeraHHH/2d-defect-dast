@@ -474,9 +474,15 @@ def test_main_invalidates_stale_marker_before_loading_inputs(
     assert not stale.exists()
 
 
-def test_manuscript_uses_only_macros_emitted_by_result_generator():
+def test_manuscript_uses_only_generated_or_verified_context_macros():
     definitions = set(
         re.findall(r"\\newcommand\{\\(PRM[A-Za-z]+)\}", render_macros(minimal_claims()))
+    )
+    context_macros = (
+        Path(__file__).resolve().parents[1] / "paper_Q1/prb_context_macros.tex"
+    ).read_text()
+    definitions.update(
+        re.findall(r"\\newcommand\{\\(PRM[A-Za-z]+)\}", context_macros)
     )
     paper_root = Path(__file__).resolve().parents[1] / "paper_Q1/sections"
     manuscript = "\n".join(

@@ -19,16 +19,16 @@ For the architecture factorial, each effect is evaluated as the difference
 between the average metric at positive and negative levels of the associated
 orthogonal contrast within each paired repeat.  Ninety-five-percent intervals
 are obtained by nonparametric bootstrap over the five repeat-level contrasts.
-Because only five paired repeats were prespecified, the intervals are
+Because only five paired repeats were used, the intervals are
 accompanied by repeat-level sign consistency and interpreted as descriptive
 uncertainty summaries rather than large-sample hypothesis tests.
 For model comparisons on aligned out-of-fold predictions, we use 10,000 paired
 bootstrap resamples.  The resampling unit matches the held-out unit: individual
 structures for random cross-validation, complete hosts for host-held-out
 evaluation, complete impurities for impurity-held-out evaluation, and
-host--impurity pairs for pair-held-out and compositional-block evaluation.
+host--impurity pairs for pair-held-out and chemistry-block evaluation.
 Within each resampled chemical unit all associated structures remain together.
-Screening intervals use 20,000 host--impurity-pair cluster-bootstrap
+Reranking intervals use 20,000 host--impurity-pair cluster-bootstrap
 resamples.  Adsorbate and interstitial site decisions from the same pair remain
 together, while point estimates average all eligible decision sets.
 An interval excluding zero is treated as evidence for a directional difference;
@@ -42,7 +42,8 @@ risk--coverage curve (AURC) is accompanied by its excess over oracle
 ordering~\cite{elyaniv2010}.
 All calibration choices use only the dedicated calibration partition.
 
-No new first-principles calculations are used as external validation in this
-study.  Predictive and screening claims rely exclusively on the canonical
-IMP2D targets; an independently generated, target-matched external test set is
-outside the present scope.
+All energy estimates and reranking metrics are retrospective against the
+retained IMP2D targets and conditioned on geometries produced by the same DFT
+workflow as the reference energies.  The study does not evaluate an
+independently generated, target-matched first-principles test set or claim to
+replace candidate generation and relaxation.

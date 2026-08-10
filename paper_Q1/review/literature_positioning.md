@@ -2,6 +2,8 @@
 
 Audit date: 2026-07-29
 
+PRB redirection delta audit: 2026-08-10
+
 ## DOI integrity
 
 All 21 cited DOI-bearing records in `references.bib` were queried against
@@ -54,3 +56,24 @@ the combination of:
 
 Claims remain limited to the audited IMP2D evidence. No external DFT
 calculation is represented as validation.
+
+## PRB physics-context delta
+
+The PRB revision adds two established physics references rather than new model
+comparators:
+
+- Freysoldt et al., *First-principles calculations for point defects in
+  solids*, Reviews of Modern Physics 86, 253 (2014),
+  `10.1103/RevModPhys.86.253`, for the defect-formation-energy reference-state
+  framework.
+- Komsa and Krasheninnikov, *Native defects in bulk and monolayer MoS2 from
+  first principles*, Physical Review B 91, 125304 (2015),
+  `10.1103/PhysRevB.91.125304`, for the structural and energetic distinction
+  between bulk and monolayer defect environments.
+
+Their titles, authors, venues, volumes, pages/article numbers, years, and DOIs
+were verified against Crossref records on 2026-08-10. The IMP2D article and its
+Supplementary Note 3 were also checked directly: the source convention uses
+the energy of the dopant element's relaxed crystalline phase as the chemical
+potential. This supports the expanded definition following Eq. (1); it does
+not add a new computed result.

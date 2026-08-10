@@ -1,126 +1,114 @@
 {
-  "catalog_version": "prm_j_stage_figures_v1",
-  "evidence_boundary": "Frozen E1-E9 evidence; no new experiment or numerical analysis",
-  "qa": {
-    "figure_render_review": "pass",
-    "grayscale_review": "pass",
-    "main_pdf_pages": 13,
-    "supplement_pdf_pages": 3,
-    "numeric_audit": "1331/1331 checks passed",
-    "targeted_tests": "20/20 passed"
+  "catalog_version": "prb_jr1_figures_v4",
+  "updated_on": "2026-08-10",
+  "evidence_boundary": "Main and Supplemental figures use the frozen E1-E9 legacy-graph evidence. G3 is reserved but absent until repaired OOF evidence passes its gate.",
+  "rendered_package": {
+    "main_pdf_pages": 12,
+    "supplement_pdf_pages": 7,
+    "main_figure_count": 5,
+    "supplement_figure_count": 4,
+    "main_pdf_render_qa": "pass_with_known_raster_wording_advisory",
+    "supplement_render_qa": "pass",
+    "numeric_audit": "pending rerun after reranking-label regeneration"
   },
-  "figures": [
+  "main_figures": [
     {
+      "number": 1,
       "id": "main_fig_1",
-      "claim": "The selected g111 DART path combines a unique impurity marker, local pair/angle interactions, all-atom geometric self-attention, and a gated non-extensive readout.",
-      "generator": "scripts/prm_make_protocol_figure.py",
-      "inputs": [
-        "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
-        "src/models/crystal_v2.py",
-        "src/models/baseline.py",
-        "src/graph.py",
-        "scripts/prm_make_protocol_figure.py"
-      ],
-      "outputs": [
-        "paper_Q1/figures/fig_dart_architecture.pdf",
-        "paper_Q1/figures/fig_dart_architecture.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed"
+      "label": "fig:architecture",
+      "role": "DART architecture and bounded retrospective decision path",
+      "source": "paper_Q1/figures/figure1_manual.png",
+      "provenance": "paper_Q1/review/manual_figure_manifest.json",
+      "status": "integrated_pixels_unchanged",
+      "advisory": "Raster labels retain legacy screening/application wording and two method ambiguities; the caption supplies the approved scientific guard. Source-level author revision remains preferable."
     },
     {
+      "number": 2,
       "id": "main_fig_2",
-      "claim": "The audited IMP2D evidence contains 10224 canonical structures and uses frozen, leakage-controlled evaluation partitions.",
-      "generator": "scripts/prm_make_protocol_figure.py",
-      "inputs": [
-        "artifacts/prm_protocol_v2/manifest.json",
-        "artifacts/prm_protocol_v2/data_audit.json",
-        "artifacts/prm_protocol_v2/samples.csv",
-        "artifacts/prm_protocol_v2/splits/"
-      ],
-      "outputs": [
-        "paper_Q1/figures/fig_protocol_overview.pdf",
-        "paper_Q1/figures/fig_protocol_overview.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed"
+      "label": "fig:incorporation_classes",
+      "role": "Alternative adsorbate and interstitial single-impurity configurations",
+      "source": "paper_Q1/figures/figure2_manual.png",
+      "provenance": "paper_Q1/review/manual_figure_manifest.json",
+      "status": "integrated_pixels_unchanged",
+      "advisory": "Creator/license attestation and a color-independent source marker remain author-controlled submission gates."
     },
     {
+      "number": 3,
       "id": "main_fig_3",
-      "claim": "Paired factorial evidence supports G and the composite P block but not an independent E main effect.",
-      "generator": "scripts/prm_make_result_assets.py",
-      "inputs": [
-        "artifacts/prm_results/factorial/bundle.json",
-        "artifacts/prm_results/factorial/variant_summary.csv",
-        "artifacts/prm_results/factorial/effects.csv"
-      ],
-      "outputs": [
-        "paper_Q1/figures/fig_factorial.pdf",
-        "paper_Q1/figures/fig_factorial.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed"
+      "label": "fig:environment_enrichment",
+      "role": "Four projected defect-environment enrichment quantities",
+      "source": "paper_Q1/figures/figure3_manual.png",
+      "provenance": "paper_Q1/review/manual_figure_manifest.json",
+      "status": "integrated_pixels_unchanged"
     },
     {
+      "number": 4,
       "id": "main_fig_4",
-      "claim": "Transfer error is axis dependent and paired error differences favor DART over the two evaluated comparator recipes in all five regimes.",
+      "label": "fig:transfer",
+      "role": "Axis-resolved transfer and paired comparator contrasts",
+      "source": "paper_Q1/figures/fig_transfer.pdf",
       "generator": "scripts/prm_make_result_assets.py",
-      "inputs": [
+      "evidence": [
         "artifacts/prm_results/comparison/pooled_metrics.csv",
         "artifacts/prm_results/comparison/paired_comparisons.csv"
       ],
-      "outputs": [
-        "paper_Q1/figures/fig_transfer.pdf",
-        "paper_Q1/figures/fig_transfer.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed"
+      "status": "legacy_graph_evidence_retained"
     },
     {
+      "number": 5,
       "id": "main_fig_5",
-      "claim": "Internal conformal coverage, interval width, and risk rejection jointly bound the uncertainty claim.",
+      "label": "fig:reranking",
+      "role": "Retrospective class and site reranking of available DFT-relaxed IMP2D candidates",
+      "source": "paper_Q1/figures/fig_screening.pdf",
       "generator": "scripts/prm_make_result_assets.py",
-      "inputs": [
-        "artifacts/prm_results/uq/interval_calibration.csv",
-        "artifacts/prm_results/uq/risk_coverage.csv",
-        "artifacts/prm_results/uq/predictions.npz"
-      ],
-      "outputs": [
-        "paper_Q1/figures/fig_uq.pdf",
-        "paper_Q1/figures/fig_uq.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed_retained"
-    },
-    {
-      "id": "main_fig_6",
-      "claim": "Pair-held-out predictions retain retrospective decision utility within the audited IMP2D candidate sets.",
-      "generator": "scripts/prm_make_result_assets.py",
-      "inputs": [
+      "evidence": [
         "artifacts/prm_results/materials/pair_preferences.csv",
         "artifacts/prm_results/materials/site_selection.csv"
       ],
-      "outputs": [
-        "paper_Q1/figures/fig_screening.pdf",
-        "paper_Q1/figures/fig_screening.png"
-      ],
-      "surface": "main",
-      "status": "qa_passed_retained"
+      "status": "server_regeneration_pending_for_reranking_labels"
+    }
+  ],
+  "supplement_figures": [
+    {
+      "number": "S1",
+      "id": "supp_fig_s1",
+      "role": "Data provenance and fixed evaluation protocol",
+      "source": "paper_Q1/figures/fig_protocol_overview.pdf",
+      "generator": "scripts/prm_make_protocol_figure.py",
+      "status": "retained"
     },
     {
-      "id": "supp_fig_s1",
-      "claim": "Pair-held-out error is descriptively heterogeneous across host, impurity, incorporation class, and site labels.",
+      "number": "S2",
+      "id": "supp_fig_s2",
+      "role": "Paired architecture factorial",
+      "source": "paper_Q1/figures/fig_factorial_autofigure_v1.pdf",
+      "generator": "scripts/prm_make_result_assets.py plus AutoFigure-Edit editor-only presentation derivative",
+      "provenance": "paper_Q1/review/autofigure_edit_manifest.json",
+      "status": "reallocated_from_main"
+    },
+    {
+      "number": "S3",
+      "id": "supp_fig_s3",
+      "role": "Internal uncertainty and selective prediction",
+      "source": "paper_Q1/figures/fig_uq.pdf",
       "generator": "scripts/prm_make_result_assets.py",
-      "inputs": [
-        "artifacts/prm_results/materials/group_errors.csv",
-        "artifacts/prm_results/materials/summary.json"
-      ],
-      "outputs": [
-        "paper_Q1/figures/fig_error_heterogeneity.pdf",
-        "paper_Q1/figures/fig_error_heterogeneity.png"
-      ],
-      "surface": "supplement",
-      "status": "qa_passed_reallocated"
+      "status": "reallocated_from_main"
+    },
+    {
+      "number": "S4",
+      "id": "supp_fig_s4",
+      "role": "Legacy descriptive error heterogeneity",
+      "source": "paper_Q1/figures/fig_error_heterogeneity.pdf",
+      "generator": "scripts/prm_make_result_assets.py",
+      "status": "supplement_only_and_superseded_if_canonical_g3_passes"
     }
-  ]
+  ],
+  "reserved_g3_figure": {
+    "target_main_position": 5,
+    "working_id": "g3_physical_error_map",
+    "contract": "paper_Q1/review/visual-composer/visual-contract.md",
+    "preregistration": "paper_Q1/review/g3_preregistration.json",
+    "status": "not_rendered_not_cited",
+    "admission_gate": "accepted repaired-model pair OOF plus G3 numeric, figure-sidecar, and render QA"
+  }
 }

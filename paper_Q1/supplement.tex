@@ -1,4 +1,4 @@
-\documentclass[aps,prmaterials,onecolumn,superscriptaddress,floatfix]{revtex4-2}
+\documentclass[aps,prb,onecolumn,superscriptaddress,floatfix]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{array}
@@ -17,70 +17,116 @@
 
 \begin{document}
 
-\title{Supplemental Material for ``Axis-resolved transfer of impurity formation
-energies in two-dimensional materials with a defect-aware graph transformer''}
+\title{Supplemental Material for ``Learning impurity incorporation energetics
+across host and impurity chemistry in two-dimensional materials with a
+defect-aware graph Transformer''}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
+% Keep the final author list and affiliations identical to the main manuscript.
 
 \date{\today}
 
 \maketitle
 
+\section{Data audit and fixed evaluation partitions}
+
+The retained modeling set is obtained through a sequential source audit,
+target-provenance check, unique-impurity requirement, and duplicate-control
+procedure.  Figure~\ref{fig:supp_protocol} summarizes those exclusions, the
+formation-energy distribution, chemical coverage, and the fixed evaluation
+partitions used throughout the study.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
+\caption{Data provenance and evaluation protocol. (a) Sequential source
+filtering, raw-energy reconstruction audit, impurity-identity audit, and
+structure canonicalization. The final set excludes four rows with zero
+sentinels in a raw energy component, 349 rows without a unique impurity atom,
+and 64 redundant structures. (b) Formation-energy distributions for the two
+incorporation classes in the retained set. (c) Number of structures for each
+of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
+(d) Train, validation, calibration, and test fractions for each evaluation
+regime. Bars for fivefold protocols show fold averages. All regimes cover the
+same 10,224 retained structures; the common 417-row exclusion set is omitted
+from the bars.}
+\label{fig:supp_protocol}
+\end{figure}
+
+\clearpage
+\section{Architecture factorial visualization}
+
+The paired architecture experiment is tabulated in the main text.  The
+corresponding visual comparison is retained here so that the main-text figure
+sequence can emphasize chemical transfer and materials-physics analysis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_factorial_autofigure_v1.pdf}
+\caption{Paired architecture experiment. (a) Validation and test MAE for all
+eight G/E/P variants; shading marks the validation-selected variant. (b)
+Orthogonal main effects and interactions on validation and test MAE, with 95\%
+bootstrap intervals over paired repeats. Negative effects reduce MAE.}
+\label{fig:supp_factorial}
+\end{figure}
+
+\clearpage
 \section{Reproducibility specification}
 
 Table~\ref{tab:reproducibility} records the fixed model and optimization
-settings used in the formal comparison.  The resolved configuration for every
+settings used in the main comparison.  The resolved configuration for every
 run, including split and seed, is archived under \path{configs/prm/}; the
 corresponding run manifests bind those configurations to checkpoints,
 predictions, environments, and output hashes.
 
 \begin{table}[htbp]
-\caption{Fixed settings for the promoted DART model and the prespecified
+\caption{Fixed settings for the selected DART model and the predefined
 periodic SchNet comparator.  Settings not shown as different were shared.}
 \label{tab:reproducibility}
 \centering
 \small
-\begin{tabular}{
-  >{\raggedright\arraybackslash}p{0.19\textwidth}
-  >{\raggedright\arraybackslash}p{0.36\textwidth}
-  >{\raggedright\arraybackslash}p{0.36\textwidth}}
+\newcommand{\settingcell}[1]{\parbox[t]{0.19\textwidth}{\raggedright #1}}
+\newcommand{\modelcell}[1]{\parbox[t]{0.36\textwidth}{\raggedright #1}}
+\newcommand{\sharedcell}[1]{\parbox[t]{0.74\textwidth}{\raggedright #1}}
+\begin{tabular}{lll}
 \toprule
-Setting & DART (\texttt{g111}) & Periodic SchNet (additive readout) \\
+\settingcell{Setting} & \modelcell{DART (\texttt{g111})} &
+\modelcell{Periodic SchNet (additive readout)} \\
 \midrule
-Atomic input &
-Fixed 128-dimensional ct-UAE vector, nine tabulated elemental attributes, and
-a learned unique-impurity flag &
-Learned atomic-number embedding \\
-Interaction stack &
-Three 5-\AA{} local layers with 32 radial and 32 angular functions, followed
-by two four-head geometric Transformer blocks with 12-\AA{} radial bias &
-Six 5-\AA{} interaction blocks with 50 Gaussian functions \\
-Hidden width and readout &
-128 channels; gated fusion of an atom-attention sum and channelwise maximum &
-128 channels and filters; atomwise additive scalar readout \\
-Trainable parameters &
-820,558 &
-455,937 \\
-Optimization &
-AdamW, batch size 64 &
-AdamW, batch size 32 \\
-Shared schedule &
-\multicolumn{2}{p{0.74\textwidth}}{150 epochs; MAE objective; learning rate
+\settingcell{Atomic input} &
+\modelcell{Fixed 128-dimensional ct-UAE vector, nine tabulated elemental
+attributes, and a learned 128-channel impurity-status embedding} &
+\modelcell{Learned atomic-number embedding} \\
+\settingcell{Interaction stack} &
+\modelcell{Three 5-\AA{} local layers with 32 radial and 32 angular functions,
+followed by two four-head geometric Transformer blocks with 32 radial-bias
+centers over 0--12~\AA{} and all-atom attention} &
+\modelcell{Six 5-\AA{} interaction blocks with 50 Gaussian functions} \\
+\settingcell{Hidden width and readout} &
+\modelcell{128 channels; gated fusion of an atom-attention sum and channelwise
+maximum} &
+\modelcell{128 channels and filters; atomwise additive scalar readout} \\
+\settingcell{Trainable parameters} & \modelcell{820,558} &
+\modelcell{455,937} \\
+\settingcell{Optimization} & \modelcell{AdamW, batch size 64} &
+\modelcell{AdamW, batch size 32} \\
+\settingcell{Shared schedule} &
+\multicolumn{2}{l}{\sharedcell{150 epochs; MAE objective; learning rate
 $5\times10^{-5}$ to $5\times10^{-4}$ over a ten-epoch linear warmup, then
-cosine decay to $10^{-6}$; weight decay $10^{-4}$; gradient clipping at 5.} \\
-Shared sampling and regularization &
-\multicolumn{2}{p{0.74\textwidth}}{Training-target standardization;
+cosine decay to $10^{-6}$; weight decay $10^{-4}$; gradient clipping at 5.}} \\
+\settingcell{Shared sampling and regularization} &
+\multicolumn{2}{l}{\sharedcell{Training-target standardization;
 host-balanced sampling of 200 structures per host per epoch; 0.03-eV Gaussian
 target noise; no coordinate or strain augmentation.  DART additionally uses
-0.1 dropout.} \\
+0.1 dropout.}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Factorial assignment seeds were 42--46 with paired model seeds 142--146.
 Transfer runs used DART seeds 242--244 and SchNet seeds 342--344, with one
-prespecified seed per fold for random and host--impurity-pair cross-validation
+fixed seed per fold for random and host--impurity-pair cross-validation
 and three seeds per split for host, impurity, and chemistry-block evaluation.
 The dedicated DART uncertainty ensemble used seeds 442--446.
 
@@ -97,6 +143,76 @@ inside each split by validation MAE; the training-target mean predictor was
 reported separately and never entered family selection.
 
 \clearpage
+\section{Internal uncertainty and selective prediction}
+
+The internal ensemble analysis uses a dedicated calibration/test partition
+drawn from the retained IMP2D population.  Its intervals therefore assess
+marginal calibration inside that population rather than calibration under an
+explicit host or impurity shift.
+
+% Values mirror generated/tab_uq.tex; the local table controls float order.
+\begin{table}[h!]
+\caption{Internal split-conformal interval performance on the dedicated test
+partition. These structures were excluded from ensemble fitting, checkpoint
+selection, and calibration, but not from the earlier architecture-development
+corpus. Coverage is in percent and mean width is in eV.}
+\label{tab:uq}
+\centering
+\begin{tabular}{cccc}
+\toprule
+Nominal & Observed & Mean width & Quantile \\
+\midrule
+50 & 52.0 & 0.336 & 0.270 \\
+80 & 78.3 & 0.752 & 0.604 \\
+90 & 87.2 & 1.141 & 0.917 \\
+95 & 93.7 & 1.847 & 1.484 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_uq.pdf}
+\caption{Internal uncertainty evaluation on the dedicated ensemble test
+split. (a) Nominal versus observed split-conformal coverage; annotations give
+mean interval widths. (b) MAE risk as increasingly uncertain predictions are
+rejected, compared with oracle ordering by realized error. (c) Calibrated
+standard deviation versus absolute error on the dedicated test partition.}
+\label{fig:supp_uq}
+\end{figure}
+
+\clearpage
+\section{Retrospective reranking metrics}
+
+These metrics compare predictions and reference energies over available
+DFT-relaxed IMP2D geometries.  The geometries and reference energies were
+produced by the same completed DFT workflow, so the analysis does not replace
+candidate generation or relaxation.
+
+% Values mirror generated/tab_screening.tex; terminology and float order are
+% controlled locally without altering any number.
+\begin{table}[h!]
+\caption{Retrospective out-of-fold reranking metrics from host--impurity-pair
+folds. Intervals are 95\% nonparametric cluster-bootstrap intervals over
+host--impurity pairs. Accuracy gains are model minus reference in percentage
+points.}
+\label{tab:reranking}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Metric & Model [95\% interval] & Reference & Gain [95\% interval] & $n$ \\
+\midrule
+Incorporation-class preference accuracy (\%) & 91.0 [89.7, 92.4] & 66.2 & 24.8 [22.4, 27.2] & 1730 \\
+Global exact-site accuracy (\%) & 69.5 [67.3, 71.7] & 23.4 & 46.1 [44.0, 48.3] & 1730 \\
+Global reranking regret (eV) & 0.139 [0.113, 0.169] & -- & -- & 1730 \\
+Within-class exact-site accuracy (\%) & 73.6 [72.0, 75.1] & 37.1 & 36.5 [35.0, 38.0] & 3140 \\
+Within-class top-2 accuracy (\%) & 91.4 [90.2, 92.6] & 62.1 & 29.2 [28.0, 30.4] & 2145 \\
+Within-class reranking regret (eV) & 0.103 [0.087, 0.121] & -- & -- & 3140 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
 \section{Descriptive error heterogeneity}
 
 \input{generated/results_error_heterogeneity_narrative.tex}
@@ -104,7 +220,7 @@ reported separately and never entered family selection.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig_error_heterogeneity.pdf}
-\caption{Error heterogeneity from DART host--impurity-pair-held-out
+\caption{Error heterogeneity from DART pair-held-out
   out-of-fold predictions.
   (a,b) Host- and impurity-group MAE versus the number of retained structures;
   labels mark the three largest group MAEs and $\rho_s$ is the descriptive
@@ -117,17 +233,19 @@ reported separately and never entered family selection.
 \clearpage
 \section{Post-hoc SchNet graph-readout sensitivity}
 
-The prespecified periodic SchNet comparator follows the original
+The predefined periodic SchNet comparator follows the original
 energy-oriented construction~\cite{schutt2018}: its learned atomwise scalar
-contributions are summed to produce the graph prediction.  Defect formation
-energy is instead localized and non-extensive with respect to supercell atom
-count, and prior atomistic studies show that graph pooling can materially
-affect localized or intensive quantum-property prediction
-~\cite{buterez2023pooling}.  We therefore performed one bounded post-hoc
+contributions are summed to produce the graph prediction.  The present defect
+formation energy is non-extensive with respect to host atom count, and prior
+atomistic studies show that graph pooling can materially affect intensive or
+localized quantum-property prediction~\cite{buterez2023pooling}.  Because the
+target may still contain long-range host response, this comparison tests the
+specific SchNet readout rather than assuming strict spatial locality.  We
+therefore performed one bounded post-hoc
 sensitivity analysis after completing the main comparison.
 
 The intervention changed only the graph readout from atomwise addition to mean
-pooling.  It retained all five immutable host-held-out folds, seeds 342--344,
+pooling.  It retained all five predefined host-held-out folds, seeds 342--344,
 the SchNet interaction stack, learned atomic-number input, optimizer, learning
 rate schedule, host-balanced sampler, target normalization, target-noise
 stream, gradient clipping, and 150-epoch budget.  Predictions were averaged
@@ -148,7 +266,7 @@ from \PRMSchNetAddHostSizeErrorSpearman{} to
 consistent with a size-sensitive additive readout, but atom count covaries with
 host chemistry and therefore does not identify a standalone causal mechanism.
 The intervention establishes that readout choice contributes to the extreme
-additive-SchNet error; it neither replaces the prespecified main comparator nor
+additive-SchNet error; it neither replaces the predefined main comparator nor
 attributes the remaining DART--SchNet difference to a single component.
 
 \bibliography{references}

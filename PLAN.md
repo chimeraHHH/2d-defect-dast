@@ -1,11 +1,42 @@
-# PRM revision plan
+# PRB revision plan
+
+## Current AutoSci stage
+
+The project has entered the user-authorized J-R1/G1 correctness gate and the
+J-R3/G3 analysis-build gate.  The completed E1--E9 record remains frozen.  G1
+is authorized for the bounded permutation/MIC diagnostic, the invariant graph
+repair, property tests, and one repaired-fold pilot.  Its source-task lineage
+is now part of the same correctness gate: the frozen JARVIS subset must be
+rebuilt without changing membership, a corrected pretraining checkpoint must
+be versioned and hash-bound, and the legacy-initialization, no-pretraining, and
+corrected-pretraining arms must remain distinguishable.  G3 is authorized for
+pre-registration, implementation, and server-side exploratory analysis on the
+frozen current OOF predictions.  Until G2 is separately authorized and produces
+complete repaired-model OOF predictions, every old-OOF G3 result is explicitly
+exploratory and is prohibited from supporting a canonical manuscript claim.
+
+The user also authorized claim-bounded prose and figure restructuring for PRB.
+This includes replacing unsupported cost-saving language with retrospective
+energy estimation or reranking of available DFT-relaxed geometries, revising
+the evidence order, and reserving a main-text physical-analysis figure without
+inventing results.  G2 full OOF reruns, new DFT, a prospective geometry campaign,
+release, and submission remain unapproved transitions under manual control.
 
 ## Objective
 
-Revise the Q1 manuscript into a reproducible *Physical Review Materials*
-Regular Article about impurity-incorporation energetics and applicability
-domains in two-dimensional materials. New DFT calculations and claims of
-prospective DFT validation are explicitly out of scope.
+Decide whether to (A) repair the graph representation, regenerate the core OOF
+evidence, and build a physics-first *Physical Review B* Regular Article, or (B)
+retain a strictly retrospective IMP2D benchmark and retarget it. New DFT is not
+part of the active route and remains a separately authorized optional gate.
+
+The controlling reviewer-response artifacts are:
+
+- `paper_Q1/review/reviewer_comment_matrix_2026-08-10.md`;
+- `paper_Q1/review/reviewer_revision_plan_2026-08-10.md`.
+
+The minimum truthful task description is “retrospective energy estimation or
+reranking of available DFT-relaxed geometries.” General DFT-acceleration claims
+remain prohibited unless a later target-matched early-snapshot campaign passes.
 
 ## Scientific mainline
 
@@ -47,13 +78,16 @@ uncertainty identifies a useful selective-prediction domain.
 4. Run host/dopant/block transfer experiments with the selected architecture.
 5. Run calibrated ensemble UQ, selective prediction and materials analyses.
 6. Generate paper-facing tables and figures from canonical result bundles.
-7. Rewrite Q1 as the PRM manuscript, compile it, and perform a skeptical audit.
+7. Rewrite Q1 for PRB, compile it, and perform a skeptical scientific and
+   submission audit.
 
 ## Controlled execution sequence
 
-All formal commands run from a clean, commit-pinned worktree with
-`/storage/ssd/metaiot_guest/yiminghua/prm_env/bin/python`.  GPU 2 is excluded
-from every queue.
+All formal commands run on the `WHUServer-L40S` server profile from a clean,
+commit-pinned worktree.  The private server profile exports `PRM_PYTHON`,
+`PRM_DATASET_PATH`, `PRM_RAW_DB_PATH`, and `PRM_RUN_ROOT`; public contracts bind
+their content hashes and stable aliases, not account-specific absolute paths.
+GPU 2 is excluded from every queue.
 
 1. Allow `factorial-v4-indexed` to reach 40 complete runs with no failed or
    stopped jobs.  Validate every run against its versioned YAML, 150-epoch
@@ -61,7 +95,7 @@ from every queue.
    output hashes.
 2. From a separate clean collector worktree, run
    `scripts.prm_collect_factorial` against
-   `/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2`.  Commit the archived
+   `$PRM_RUN_ROOT`.  Commit the archived
    numerical evidence, factorial contrasts, and validation-only
    `selection.json` before generating any selected-model configuration.
 3. Run `scripts.prm_promote_selected` from the committed selection.  It must
@@ -141,14 +175,34 @@ result identifies readout as an important part of the complete-recipe gap but
 does not isolate a backbone-only effect. The prespecified additive SchNet
 remains the main comparator.
 
-Fail-closed asset generation validates 23 paper outputs. An independent audit
+The following paragraph records the **pre-J-R1 paper snapshot** and is retained
+only as historical provenance. Fail-closed asset generation validated 23 paper outputs. An independent audit
 directly reaggregates archived predictions, reproduces all paper-facing
 bootstrap analyses including screening references, verifies every LaTeX macro
-and generated table row, and passes 1,331 checks with no failures; its report is
-`artifacts/prm_results/paper/numeric_audit.json`. The populated main manuscript
-and separate Supplemental Material include exact reproducibility settings,
-compile without undefined references or overfull boxes, and have passed
-page-by-page visual QA. The final skeptical review finds no remaining non-DFT
-scientific blocker under the current claims. Administrative release work
-remains blocked on verified author/contact/funder metadata and a
-rights-holder-approved code/data license.
+and generated table row. The PRB J-stage audit extends this verifier to the
+pair-held-out constituent exception and passes 1,346 checks with no failures.
+The then-current 13-page main manuscript and 3-page Supplemental Material compiled
+without undefined references or overfull boxes and have passed page-by-page
+layout QA. Submission is nevertheless NO-GO: the DART graph builder retains the
+first 32 ordered neighbor pairs at each center, so exact atom-permutation
+robustness is not established, and the global radial bias uses componentwise
+fractional wrapping rather than a guaranteed shortest image in oblique cells.
+The manuscript disclosed both facts. J-R1 now implements the user-approved
+diagnostic and invariant rebuild, but the historical numerical evidence remains
+legacy-graph evidence until G2 is separately authorized and completed.
+
+The active reconstructed package is 12 main-text pages with five main figures
+and 7 Supplemental pages with four Supplemental figures. Its numeric audit,
+final hashes, and graph-correctness acceptance remain pending server execution.
+Author metadata, figure provenance, licensing, and the public archival release
+are additional submission blockers.
+
+The historical JARVIS checkpoint is also legacy evidence.  Its source graph
+builder placed the triplet center in a column not consumed as the center by the
+local layer, selected a bounded neighbor subset in a stored-order-dependent
+way, and used nonperiodic Cartesian pair distances for three-dimensional
+periodic crystals.  A repaired IMP2D graph combined with that checkpoint is a
+legacy-initialization sensitivity arm, not an end-to-end corrected model.  G1C
+must reconstruct the hash-frozen 19,902-record source subset, rerun the original
+pretraining recipe on the repaired graph, and issue dataset/checkpoint receipts
+before any later G2 run can satisfy the corrected-lineage gate.

@@ -2,108 +2,80 @@
 
 Point defects and incorporated impurity atoms can alter carrier density,
 localized electronic states, magnetism, and catalytic activity in
-two-dimensional (2D) materials.  Formation energy is therefore a central
-quantity in computational defect screening: for a specified host, impurity
-reservoir, charge state, and structural configuration, it ranks the energetic
-cost of incorporation.  Exhaustive first-principles evaluation remains
-expensive because the search space grows across host chemistry, impurity
-identity, incorporation class, and symmetry-distinct site.
+two-dimensional (2D) materials.  Their formation energies compare a relaxed
+defective structure with a pristine host and an atomic reservoir, and therefore
+depend on both the local defect environment and the surrounding chemical
+reference state~\cite{freysoldt2014}.  Defect structures and energetics can
+differ between bulk and monolayer hosts~\cite{komsa2015}, while the accessible
+surface and internal voids introduce distinct adsorbate and interstitial
+incorporation geometries~\cite{imp2d2023}.  Systematic first-principles surveys
+remain demanding because the search space grows across host chemistry,
+impurity identity, incorporation class, and symmetry-distinct site.  Once such
+a survey exists, a separate question is whether learned representations can
+organize its energy landscape and expose where transfer across chemistry or
+incorporation geometry fails.
 
 The IMP2D database provides a systematic first-principles survey of neutral
 adsorbate and interstitial impurities in 2D hosts~\cite{imp2d2023}.  Its scale
-makes supervised surrogates possible, and graph neural networks are natural
+makes supervised energy estimation possible, and graph neural networks are natural
 models because they operate directly on periodic atomic structures.  ALIGNN
 demonstrated the value of joint bond and angle representations for crystalline
 properties~\cite{alignn2021}, while SchNet established continuous-filter
 message passing from interatomic distances~\cite{schutt2018}.  Defect-specific
-learning has subsequently developed along several complementary directions.
+learning has developed along several complementary directions.
 Bulk defect energetics have been treated with defect graph networks,
 semiconductor graph models, persistent-homology features, and charge-aware
 predictors~\cite{witman2023,rahman2024,fang2025,kiyohara2025}.  For 2D
-systems, sparse defect representations have
-been evaluated on the 2DMD data, whereas tree and descriptor models have been
-applied directly to IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  The two
-IMP2D studies show in particular that data representation and model selection
-materially affect the reported error.  These developments motivate
-architectures that expose the impurity site while retaining both local
-coordination and longer-range periodic context.
+systems, sparse defect representations have been evaluated on the 2DMD data,
+whereas tree and descriptor models have been applied directly to
+IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  These studies establish
+descriptor baselines for IMP2D and show that representation and data
+preparation materially affect reported errors.  They also motivate
+architectures that expose the impurity site while retaining local coordination
+and longer-range periodic context.  A random
+structure split, however, can place closely related host--impurity chemistries
+or numerically equivalent structures on both sides of the train--test boundary,
+leading to optimistic estimates~\cite{li2024mdhit}.  It also conflates two
+physically different questions: combining a known host with a known impurity in
+a previously unseen pair, and predicting a host or impurity absent from all
+target supervision.  Materials models are known to degrade when test chemistry
+differs from training chemistry~\cite{omee2024,li2025ood}, but this distinction
+has not been resolved for impurity incorporation energies in IMP2D.  The role of
+incorporation geometry---adsorbate versus interstitial---is likewise hidden by
+one pooled error.
 
-Existing IMP2D studies establish descriptor baselines and sensitivity to data
-engineering, but they do not jointly isolate defect-aware architectural choices
-under paired repeats, separate transfer along host, impurity, and
-host--impurity axes, and connect out-of-fold energy errors to screening
-decisions.
-
-Benchmark accuracy, however, does not by itself define a useful materials
-model.  A random structure split can place closely related host--impurity
-chemistries, or even numerically equivalent structures, on both sides of the
-train--test boundary, a known source of optimistic materials-learning
-estimates~\cite{li2024mdhit}.  It also does not answer whether a model transfers
-to an unseen host or impurity, whether a reported architectural gain survives
-paired repeats, or whether prediction uncertainty identifies a subset on which
-screening risk is acceptably low.  Structure-based out-of-distribution studies
-have emphasized that materials models can degrade sharply when test chemistry
-differs from training chemistry~\cite{omee2024,li2025ood}.  For defect screening,
-host and impurity axes must therefore be separated explicitly.
-Uncertainty studies in atomistic machine learning have likewise shown that
-ensemble disagreement can provide a useful credibility signal, while
-calibration and out-of-domain reliability remain distinct
-requirements~\cite{peterson2017,hu2022,grasselli2025}.  A defect-screening
-surrogate should therefore be judged by its transfer partitions, uncertainty
-calibration, and decision-level screening consequences rather than by one
-random-split error.
-
-This study tests a single thesis: impurity-energy surrogates should be designed
-and evaluated around the localized defect, and their value should be judged by
-chemistry-held-out decisions rather than by a random-split score alone.  We ask
-which defect-aware modules have reproducible paired effects, how prediction
-error changes when a host, impurity, or their combination is absent from IMP2D
-target supervision, and whether the resulting out-of-fold predictions remain
-useful for screening.
-
-We first reconstruct the IMP2D target provenance, remove structures without a
-permutation-invariant impurity identity, control numerical redundancy, and
-freeze all evaluation partitions.  We then evaluate DART through a paired
-factorial, random and chemistry-grouped cross-validation, and a predefined
-host--impurity block.  Architecture and descriptor choices use validation data
-only; screening conclusions use pair-held-out out-of-fold predictions; and
-uncertainty is evaluated on a separate internal calibration/test split.
-
-Figure~\ref{fig:architecture} provides the model roadmap used throughout the
-paper.  It separates the uniquely identified impurity, the local and global
-interaction paths, and the graph-level readout.  The figure shows the selected
-\texttt{g111} data path, whereas the paired factorial below tests which of its
-three optional modules have independent support.
+Here we develop the Defect-Aware Radial Transformer (DART), an
+impurity-centered graph model that combines defect-local message passing,
+radial-bias self-attention, and graph readout for a non-extensive
+formation-energy target [Fig.~\ref{fig:architecture}].  A paired $2^3$
+factorial quantifies module effects, after which grouped tests distinguish
+transfer to unseen host--impurity pairs from transfer to hosts or impurities
+absent from IMP2D target supervision.  Retrospective reranking metrics are
+computed from pair-held-out predictions for existing DFT-relaxed candidates.
+Because those geometries and their reference energies come from the same
+completed DFT workflow, this analysis does not replace structure generation or
+relaxation.  A separate ensemble experiment assesses internal uncertainty calibration and selective
+prediction~\cite{peterson2017,hu2022,grasselli2025}.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_dart_architecture.pdf}
-\caption{Defect-Aware Radial Transformer (DART) architecture.
-  (a) Schematic periodic impurity graph.  Local pair and angle messages use a
-  5-\AA{} graph, whereas the global path receives the all-pairs minimum-image
-  distance matrix; the drawing is not a selected material.
-  (b) A fixed 128-dimensional ct-UAE vector and nine normalized elemental
-  attributes are projected to 128 channels.  A learned binary embedding marks
-  the unique impurity, and E adds four projected local descriptors only at
-  that node.
-  (c) Three P local blocks combine pre-normalization and scalar distance gating
-  before two four-head geometric Transformer blocks.  Their learned radial
-  bias uses 32 basis centers spanning 0--12~\AA; 12~\AA{} is the radial-grid
-  endpoint, not an attention cutoff.
-  (d) G fuses an atom-attention sum and a channelwise maximum with one
-  graph-dependent scalar gate before the scalar formation-energy head.
-  Validation MAE selected the all-enabled \texttt{g111} path; this selection
-  does not imply that E was independently beneficial or that the two changes
-  within P can be assigned separate effects.}
+\includegraphics[width=\textwidth,trim=67bp 190bp 37bp 151bp,clip]
+  {figure1_manual.png}
+\caption{Architecture of the Defect-Aware Radial Transformer (DART).
+  (a) Feature initialization of the atomistic graph. A fixed
+  128-dimensional ct-UAE vector and nine normalized elemental attributes are
+  concatenated and projected from 137 to 128 channels, after which a learned
+  binary impurity-status embedding marks the unique impurity node. (b) The
+  DART backbone adds four projected defect-environment descriptors only at
+  that node before three 5-\AA{} pre-normalized, distance-gated local blocks
+  and two four-head geometric Transformer blocks. The radial bias uses 32 basis
+  functions spanning 0--12~\AA{}, while attention connects all valid atoms.
+  (c) A graph-dependent scalar gate
+  fuses an atom-attention weighted sum and a channelwise maximum before a
+  $128\rightarrow128\rightarrow1$ head predicts the formation energy of each
+  structure. For each host--impurity pair, retrospective incorporation-class reranking
+  compares the minimum predicted energy among retained adsorbate candidates
+  with the corresponding minimum among interstitial candidates; the displayed
+  ordering is illustrative.}
 \label{fig:architecture}
 \end{figure*}
-
-Three findings organize the paper.  First, paired evidence supports gated
-readout and the composite pre-normalized, distance-gated local block, but not an
-independent main effect of explicit environment enrichment.  Second, chemical
-transfer is axis dependent: unseen host--impurity pairs remain close to
-interpolation, whereas unseen hosts or impurities cause substantially larger
-errors.  Third, pair-held-out predictions retain useful decision-level accuracy
-and low regret, while internal uncertainty estimates remain too limited to
-support universal reliability claims.  All conclusions are restricted to the
-audited neutral adsorbate and interstitial evidence in IMP2D.

@@ -1,5 +1,9 @@
 # Final skeptical review
 
+> Historical PRM-stage record (2026-07-29). It is superseded for current
+> decisions by `j_stage_autosci_review.md` and the 2026-08-10 PRB full review in
+> `paper_Q1/ccfa-review-reports/`.
+
 Review date: 2026-07-29
 
 ## Review basis

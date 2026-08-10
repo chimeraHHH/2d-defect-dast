@@ -77,16 +77,18 @@ paper needs an auditable architecture visual, the main transfer claim needs one
 uncompressed hero figure, and purely descriptive heterogeneity belongs in the
 Supplemental Material unless it establishes a new mechanism.
 
-## Locked six-figure program
+## Current eight-figure program
 
 | Main figure | Scientific job | Action |
 |---|---|---|
-| Fig. 1 | Explain the verified `g111` DART data path | Add an independent vector architecture figure before the first numerical result |
-| Fig. 2 | Establish provenance, target range, chemistry coverage, and frozen partitions | Retain the protocol overview |
-| Fig. 3 | Show paired G/E/P evidence and interactions | Retain the factorial result; replace code-only x labels with readable module combinations |
-| Fig. 4 | Establish axis-dependent transfer and regime-matched comparator gains | Redesign as the hero figure; expose DART regime errors and use a broken axis for the SchNet host outlier |
-| Fig. 5 | Bound internal calibration and selective prediction | Retain coverage, risk--coverage, and uncertainty--error discrimination |
-| Fig. 6 | Convert pair-held-out regression into retrospective screening decisions | Retain preference margins, regret, and decision accuracy |
+| Fig. 1 | Explain the verified `g111` DART data path and bounded retrospective screening | Use the user-supplied architecture schematic with a scientifically corrective caption |
+| Fig. 2 | Distinguish representative adsorbate and interstitial structures | Add the user-supplied overlaid single-impurity schematic in Methods A |
+| Fig. 3 | Establish provenance, target range, chemistry coverage, and frozen partitions | Retain the protocol overview |
+| Fig. 4 | Explain the four-feature E branch at the impurity node | Add the user-supplied environment-enrichment schematic in Methods C |
+| Fig. 5 | Show paired G/E/P evidence and interactions | Retain the AutoFigure editor-only factorial derivative |
+| Fig. 6 | Establish axis-dependent transfer and regime-matched comparator gains | Retain the axis-resolved hero figure and explicit broken axis |
+| Fig. 7 | Bound internal calibration and selective prediction | Retain coverage, risk--coverage, and uncertainty--error discrimination |
+| Fig. 8 | Convert pair-held-out regression into retrospective screening decisions | Retain preference margins, regret, and decision accuracy |
 
 The former main-text error-heterogeneity figure becomes Supplemental Fig. S1.
 The main text keeps one boundary sentence and no longer interrupts the
@@ -99,26 +101,48 @@ factorial -> transfer -> UQ -> screening argument.
 - **Conclusion:** the selected recipe joins a uniquely identified impurity,
   5-angstrom local interactions, all-atom geometric self-attention, and a
   non-extensive graph readout.
-- **Archetype:** four-panel method schematic.
-- **Target/output:** PRM two-column figure; vector PDF plus 300-dpi PNG preview.
-- **Backend/final size:** Python/matplotlib; 183 mm wide.
-- **Panel map:** (a) periodic defect graph; (b) 137-to-128 atom encoding and E;
-  (c) three P blocks and two four-head Transformer blocks; (d) G readout and
-  scalar formation-energy head.
+- **Archetype:** three-panel method schematic.
+- **Target/output:** user-supplied 300-dpi raster PNG, placed at two-column
+  width with non-destructive LaTeX whitespace trimming.
+- **Panel map:** (a) feature initialization; (b) E, local P blocks, and
+  geometric Transformer backbone; (c) G readout, per-structure energy, and
+  retrospective class-wise screening.
 - **Evidence hierarchy:** promoted `g111` config first; model and graph source
   code second; historical development comments are not evidence.
 - **Statistics:** none; this is a code- and config-bound schematic.
-- **Source data:** `configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml`,
-  `src/models/crystal_v2.py`, and `src/models/baseline.py`, all hashed in the
-  protocol-figure sidecar together with `src/graph.py` and the figure
-  generator itself.
-- **Image integrity:** panel (a) is labelled schematic and is not presented as
-  a real IMP2D structure.
+- **Source evidence:** `configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml`,
+  `src/models/crystal_v2.py`, `src/models/baseline.py`, and `src/graph.py`.
+  Asset and pixel hashes are recorded in
+  `paper_Q1/review/manual_figure_manifest.json`.
+- **Image integrity:** the raster is a schematic with baked-in text; the
+  caption, rather than the artwork, carries the final scientific qualifiers.
 - **Reviewer risks:** 12 angstrom is a radial-bias grid endpoint, not an
   attention cutoff; G does not prove that attention selects the impurity; E is
   not independently supported; P is a composite intervention.
 
-### Fig. 3 -- paired factorial
+### Fig. 2 -- representative incorporation classes
+
+- **Conclusion:** the adsorbate and interstitial views are alternative neutral
+  single-impurity configurations, not simultaneous defects.
+- **Archetype:** overlaid top/side structural schematic in a representative
+  WSe$_2$-like host.
+- **Target/output:** user-supplied raster PNG at two-column width.
+- **Reviewer risk:** Top-W and hollow are examples rather than exhaustive site
+  definitions; color is supplemented by position and labels but remains less
+  distinct in grayscale.
+
+### Fig. 4 -- defect-environment enrichment
+
+- **Conclusion:** E forms four impurity-centered quantities on the 5-\AA{}
+  graph, normalizes and projects them to 128 channels, and adds the result only
+  to the impurity-node representation.
+- **Archetype:** single-column local-neighborhood schematic.
+- **Target/output:** user-supplied raster PNG at column width.
+- **Reviewer risk:** the displayed $N=3$ neighborhood is schematic and the
+  implementation adds a projected descriptor rather than concatenating raw
+  quantities.
+
+### Fig. 5 -- paired factorial
 
 - **Conclusion:** G and P have supported validation effects, E is
   inconclusive, and the selected all-enabled recipe follows a validation-only
@@ -131,7 +155,7 @@ factorial -> transfer -> UQ -> screening argument.
 - **Reviewer risk:** `G+E+P` selection must not be described as proof that all
   three modules are independently beneficial.
 
-### Fig. 4 -- axis-resolved transfer
+### Fig. 6 -- axis-resolved transfer
 
 - **Conclusion:** pair-held-out error remains near random out-of-fold error,
   while complete host or impurity holdout is harder; DART has lower paired
@@ -170,9 +194,12 @@ factorial -> transfer -> UQ -> screening argument.
 2. Both PDFs compile without undefined references, clipping, or overfull boxes.
 3. Every figure is inspected at final 183-mm width and remains distinguishable
    in grayscale through labels, marker shape, line style, or hatch.
-4. The protocol sidecar hashes both Fig. 1 and Fig. 2 and their exact inputs.
-5. Main-text figure order is architecture -> protocol -> factorial -> transfer
-   -> UQ -> screening; Supplemental Fig. S1 contains descriptive heterogeneity.
+4. The manual-figure manifest binds Figures 1, 2, and 4 to their paper assets,
+   pixel hashes, captions, labels, and source comparisons; the protocol and
+   result sidecars continue to bind quantitative figures.
+5. Main-text figure order is architecture -> incorporation classes -> protocol
+   -> environment enrichment -> factorial -> transfer -> UQ -> screening;
+   Supplemental Fig. S1 contains descriptive heterogeneity.
 
 ## Execution record
 
@@ -185,5 +212,6 @@ factorial -> transfer -> UQ -> screening argument.
 - The independent numeric audit passed 1,331 of 1,331 checks.
 - The rebuilt 13-page main PDF and 3-page Supplemental Material have no
   undefined references, overfull boxes, clipping, or unembedded fonts.
-- All seven paper-facing figures passed direct render inspection and grayscale
-  inspection.  No scientific calculation or model run was performed.
+- All nine paper-facing figures passed direct render inspection and grayscale
+  inspection, with a documented grayscale advisory for Main Figure 2.  No
+  scientific calculation or model run was performed.

@@ -1,44 +1,53 @@
-# Cover letter draft — Physical Review Materials
+# Cover letter draft — Physical Review B
 
 > Author action required before submission: replace every bracketed field,
-> verify the final title, and remove this note.
+> verify the final title and journal section, and remove this note.
 
 [DATE]
 
 Dear Editors,
 
-We submit the manuscript “Axis-resolved transfer of impurity formation energies
-in two-dimensional materials with a defect-aware graph transformer” for
-consideration as a Regular Article in *Physical Review Materials*. We suggest
-section M3-A, “Development of new methods for materials.”
+We submit the manuscript “Learning impurity incorporation energetics across
+host and impurity chemistry in two-dimensional materials with a defect-aware
+graph Transformer” for consideration as a Regular Article in *Physical Review
+B*. We suggest B15(4), “Surface physics, nanoscale physics, low-dimensional
+systems,” as the primary section and B1(1), “Structure, structural phase
+transitions, mechanical properties, defects,” as a secondary section.
 
-Machine-learned formation energies can accelerate impurity screening, but a
-random structure split does not establish how a surrogate behaves when host or
-impurity chemistry is absent from target supervision. We therefore combine a
-Defect-Aware Radial Transformer (DART) with a provenance-audited,
-leakage-controlled evaluation of 10,224 neutral IMP2D structures.
+Formation-energy models are often assessed with random structure splits, even
+though retrospective database analysis spans chemically distinct forms of transfer. Our
+study resolves those forms for 10,224 neutral impurity structures from IMP2D.
+Except for one singleton-host structure, its pair-held-out folds recombine
+hosts and impurities represented elsewhere in training and are much easier
+than transfer to a host or impurity absent from target supervision. Under the
+same pair-held-out evaluation, interstitial incorporation energies are more
+difficult to predict than adsorbate energies. These observations define a chemically and geometrically
+resolved applicability domain for energy estimation in two-dimensional
+materials.
 
-The manuscript makes three main contributions. First, a paired $2^3$
-factorial distinguishes architectural components that have reproducible effects
-from those whose independent effects are inconclusive. Second, frozen
-host--impurity-pair, host, impurity, and chemistry-block partitions show that
-transfer is strongly axis dependent rather than captured by one random-split
-score. Third, out-of-fold predictions are evaluated at the decision level using
-incorporation-class accuracy and site-selection regret, alongside an explicitly
-internal uncertainty-calibration analysis.
+The Defect-Aware Radial Transformer (DART) supplies the modeling framework. A
+paired factorial isolates small, repeat-consistent contributions from gated
+graph readout and a composite local interaction block. A controlled SchNet
+readout analysis further connects model design to the target physics: atomwise
+addition, natural for extensive total energies, contributes to the large
+host-held-out error for this evaluated recipe. Finally,
+pair-held-out predictions recover the lower-energy incorporation
+class with 91.0% accuracy and quantify site-selection regret.
 
-The work fits *Physical Review Materials* because it presents a computational
-method and a controlled evaluation protocol for defect energetics in
-two-dimensional materials. Its claims are deliberately bounded: the comparison
-is among the evaluated learning recipes, the screening analysis is retrospective
-within IMP2D, and no prospective external first-principles validation is
-claimed. The complete numerical record has passed an independent audit of
-1,331 checks with no failures.
+The claims are deliberately tied to the available evidence. Energy estimation
+and reranking are retrospective and conditional on the DFT-relaxed candidate
+geometries released by IMP2D. Because those geometries and their reference
+energies arise from the same completed DFT workflow, the model does not replace
+structure generation or relaxation or claim to reduce their cost.
+Uncertainty results are reported as internal calibration rather than a
+guarantee under chemical shift. No new external first-principles validation or
+prospective materials discovery is claimed.
 
 [AUTHOR CONFIRM: This manuscript is original, is not under consideration
 elsewhere, and its submission history with Physical Review is as follows: ...]
 
-[AUTHOR INSERT: final data/software release, persistent identifier, and license.]
+[AUTHOR INSERT: final public data/software release, persistent identifier,
+license, and repository citation.]
 
 [AUTHOR CONFIRM: conflict-of-interest statement.]
 

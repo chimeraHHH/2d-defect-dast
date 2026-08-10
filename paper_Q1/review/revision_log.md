@@ -304,3 +304,104 @@
 - Status: complete.
 - Blocks finalization: no scientific blocker; author-controlled byline,
   funding, licensing, and archival-release metadata remain.
+
+### REV-023: AutoFigure editor-only presentation pass
+
+- Severity: presentation refinement; no change to scientific evidence.
+- Fix type: local AutoFigure-Edit SVG editing, provenance binding, and
+  render-level QA; no model generation, experiment, inference, or numerical
+  analysis.
+- Change: created separate presentation derivatives for the DART architecture
+  and factorial figures.  Figure 1 gains stronger panel-title hierarchy, an
+  in-box wrap for “9 normalized attributes,” and SVG accessibility metadata.
+  Figure 3 removes the duplicated left-panel legend and retains the complete
+  upper-right key.  Canonical scientific-source PDF/PNG files remain intact.
+- Guard: the Figure 1 derivative preserves all 91 paths exactly.  After the
+  allowlisted removal of `legend_1`, Figure 3 preserves every remaining path,
+  use, rectangle, text item, data point, interval, axis, and label exactly.
+  Both promoted SVG candidates contain live text and zero raster images.
+- Evidence: `paper_Q1/review/autofigure_edit_contract.md`,
+  `paper_Q1/review/autofigure_edit_manifest.json`, and
+  `paper_Q1/review/figure_catalog.json`.
+- Verification: the 13-page main PDF compiles without undefined references or
+  overfull boxes; embedded-font and raster checks pass; the frozen numerical
+  audit passes 1,331 of 1,331 checks; 22 targeted protocol/result-asset/paper
+  tests pass; final-size pages 3 and 8 pass visual inspection.
+- Status: integrated and QA-passed; local milestone commit remains under user
+  control.
+- Blocks finalization: no scientific blocker.  The generative AutoFigure chain
+  remains intentionally blocked pending credentials, local segmentation/model
+  assets, and explicit authorization for any remote transmission.
+
+### REV-024: User-supplied schematic integration
+
+- Severity: presentation and method-communication revision; no change to the
+  frozen scientific evidence.
+- Fix type: manual raster-asset integration, scientifically bounded captions,
+  LaTeX placement, provenance capture, and render-level QA; no experiment,
+  inference, model selection, or numerical analysis.
+- Change: replaced the former Main Figure 1 architecture presentation with
+  `figure1_manual.png`; inserted `figure2_manual.png` after the first Methods A
+  definition of the two incorporation classes; and inserted
+  `figure3_manual.png` after the G/E/P module description in Methods C.  Natural
+  source order assigns these assets Main Figures 1, 2, and 4, respectively;
+  the protocol overview remains Main Figure 3 and the four quantitative main
+  figures become Figures 5--8.
+- Scientific guards: the captions state that the impurity-status embedding is
+  added after the 137-to-128 projection, 12~\AA{} is a radial-grid endpoint
+  rather than an attention cutoff, class screening compares retained
+  class-wise candidate minima, the two colored impurities in Figure 2 are
+  alternative rather than simultaneous configurations, and the E descriptor
+  is normalized, projected, and added only to the impurity node.
+- Provenance: `paper_Q1/review/manual_figure_manifest.json` records source and
+  paper hashes, pixel hashes, dimensions, DPI metadata, LaTeX labels, formal
+  numbers, and pixel-exact source comparisons.  The three manuscript PNGs are
+  explicitly allowlisted in `.gitignore` so a later user-controlled milestone
+  commit cannot silently omit them.
+- Verification: the rebuilt main paper remains 13 pages and compiles without
+  undefined references, overfull boxes, or clipped figures.  Pages containing
+  Figures 1--4 pass color and grayscale inspection; Figure 2 has a documented
+  grayscale advisory because position and labels carry part of its redundant
+  encoding.  The frozen numerical audit passes 1,331 of 1,331 checks and all
+  22 targeted protocol/result-asset/paper-number tests pass.
+- Status: integrated and QA-passed; local milestone commit and push remain
+  under user control.
+- Blocks finalization: no scientific blocker.  The raster artwork contains
+  baked-in text, so correcting source-image wording and adopting a
+  colorblind-redundant Figure 2 encoding remain advisable before camera-ready
+  production.
+
+### REV-025: AutoSci PRB redirection, physics-first rewrite, and red-team gate
+
+- Severity: target-journal revision plus newly identified scientific blocker;
+  no change to frozen model predictions or reference data.
+- Fix type: PRB requirements audit, full scientific/writing review,
+  evidence-bounded prose revision, executable claim audit, and final-size PDF
+  inspection. No training, inference, DFT, or GPU work was performed.
+- Change: migrated the manuscript and Supplemental Material to the PRB REVTeX
+  option; rewrote the title, abstract, Introduction, Discussion, Conclusion,
+  cover letter, DAS, and checklist around chemical-axis transfer and
+  incorporation-geometry asymmetry; defined the IMP2D chemical-potential
+  convention; promoted the 0.719/0.322 eV class-specific errors; narrowed
+  screening to existing relaxed candidates; and added current APS AI-use
+  disclosures.
+- Integrity corrections: the pair-held-out narrative now records the single
+  `Ti2CO2|Na` singleton-host exception. Methods and Discussion disclose that
+  the angle branch retains the first 32 ordered neighbor pairs and that the
+  global radial bias uses componentwise fractional wrapping rather than a
+  guaranteed shortest image in oblique cells. Strict atom-permutation
+  robustness and minimum-image claims were withdrawn.
+- Evidence: the independent numerical audit now checks the 10,223/10,224
+  pair-constituent statement and passes 1,346 of 1,346 checks; 22 targeted
+  protocol/result/paper tests pass.
+- Build: the 13-page main PDF and 3-page Supplemental Material compile without
+  overfull boxes, unresolved citations/references, fatal errors, or unembedded
+  fonts. All 16 pages were inspected; no overlap, clipping, broken glyph, or
+  unreadable equation/table was found.
+- Decision: PRB submission remains NO-GO. The order-sensitive triplet cap is a
+  model-level risk that prose cannot repair; the user must choose a targeted
+  permutation-sensitivity gate, an invariant rebuild with a new evidence
+  milestone, or stop/retarget. Figure-source corrections, provenance, author
+  metadata, licensing, and the archival release also remain open.
+- Control: no commit, push, release, or upload was performed; progress remains
+  under manual user control.

@@ -1,4 +1,7 @@
-# Physical Review Materials submission checklist
+# Physical Review Materials submission checklist (superseded)
+
+This checklist is retained as revision history. The active target-journal gate
+is `prb_submission_checklist.md`.
 
 Verified against the APS author pages on 2026-07-28:
 

@@ -48,6 +48,11 @@ A8CA35F0B827306D4263B8A0329CFA09.gif
 *.png
 *.jpg
 
+# User-supplied manuscript schematics required by the LaTeX source
+!paper_Q1/figures/figure1_manual.png
+!paper_Q1/figures/figure2_manual.png
+!paper_Q1/figures/figure3_manual.png
+
 .venv/
 __pycache__/
 *.pyc

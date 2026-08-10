@@ -1062,6 +1062,32 @@ def audit_materials(root: Path, audit: Audit) -> dict[str, Any]:
             summary["error_heterogeneity"][axis]["worst_groups"][0]["group"],
             worst["group"],
         )
+    defecttype = {
+        str(row["group"]): row
+        for row in group_rows
+        if row["axis"] == "defecttype"
+    }
+    stored_defecttype = {
+        str(row["group"]): row
+        for row in summary["error_heterogeneity"]["defecttype"]
+    }
+    audit.exact(
+        "materials incorporation-class groups",
+        sorted(stored_defecttype),
+        sorted(defecttype),
+    )
+    for label, row in defecttype.items():
+        audit.exact(
+            f"materials incorporation-class count: {label}",
+            stored_defecttype[label]["n"],
+            int(row["n"]),
+        )
+        audit.close(
+            f"materials incorporation-class MAE: {label}",
+            stored_defecttype[label]["mae_eV"],
+            float(row["mae_eV"]),
+        )
+    heterogeneity["defecttype"] = defecttype
     direct["heterogeneity"] = heterogeneity
     return direct
 
@@ -1422,10 +1448,36 @@ def audit_macros_and_tables(
     materials: Mapping[str, Any],
     sensitivity: Mapping[str, Any],
 ) -> dict[str, int]:
-    macros = parse_macros(root / "paper_Q1/generated/results_macros.tex")
-    audit.exact("macro name set", sorted(macros), sorted(expected_macros))
+    result_macros = parse_macros(root / "paper_Q1/generated/results_macros.tex")
+    audit.exact(
+        "result macro name set", sorted(result_macros), sorted(expected_macros)
+    )
     for name, expected in expected_macros.items():
-        audit.exact(f"macro value: {name}", macros.get(name), expected)
+        audit.exact(f"result macro value: {name}", result_macros.get(name), expected)
+
+    defecttype = materials["heterogeneity"]["defecttype"]
+    expected_context_macros = {
+        "PRMPairAdsorbateMAE": f"{defecttype['adsorbate']['mae_eV']:.3f}",
+        "PRMPairInterstitialMAE": (
+            f"{defecttype['interstitial']['mae_eV']:.3f}"
+        ),
+    }
+    context_macros = parse_macros(root / "paper_Q1/prb_context_macros.tex")
+    audit.exact(
+        "PRB context macro name set",
+        sorted(context_macros),
+        sorted(expected_context_macros),
+    )
+    for name, expected in expected_context_macros.items():
+        audit.exact(
+            f"PRB context macro value: {name}", context_macros.get(name), expected
+        )
+    audit.exact(
+        "macro namespaces are disjoint",
+        sorted(set(result_macros) & set(context_macros)),
+        [],
+    )
+    macros = {**result_macros, **context_macros}
 
     manuscript_files = [
         root / "paper_Q1/main.tex",
@@ -1538,7 +1590,7 @@ def audit_macros_and_tables(
             True,
         ),
         (
-            "Global screening regret (eV)",
+            "Global reranking regret (eV)",
             materials["global_screening_regret_eV"],
             None,
             None,
@@ -1559,7 +1611,7 @@ def audit_macros_and_tables(
             True,
         ),
         (
-            "Within-class screening regret (eV)",
+            "Within-class reranking regret (eV)",
             materials["screening_regret_eV"],
             None,
             None,
@@ -1674,6 +1726,33 @@ def audit_method_claims(
         (root / "artifacts/prm_results/comparison/runs/baselines/schnet")
         .glob("**/run_manifest.json")
     )
+    samples = load_samples(root / "artifacts/prm_protocol_v2/samples.csv")
+    pair_test_count = 0
+    pair_constituent_seen_count = 0
+    pair_constituent_exceptions: list[dict[str, Any]] = []
+    for split_path in sorted(
+        (root / "artifacts/prm_protocol_v2/splits").glob("pair_cv5_f*.json")
+    ):
+        split = read_json(split_path)
+        train_hosts = {samples[index]["host"] for index in split["train"]}
+        train_dopants = {samples[index]["dopant"] for index in split["train"]}
+        for index in split["test"]:
+            pair_test_count += 1
+            sample = samples[index]
+            if (
+                sample["host"] in train_hosts
+                and sample["dopant"] in train_dopants
+            ):
+                pair_constituent_seen_count += 1
+            else:
+                pair_constituent_exceptions.append(
+                    {
+                        "split_id": split["split_id"],
+                        "sample_index": index,
+                        "host": sample["host"],
+                        "dopant": sample["dopant"],
+                    }
+                )
     facts = {
         "raw_rows": filters["raw_rows"],
         "unconverged": filters["not_converged"],
@@ -1703,6 +1782,9 @@ def audit_method_claims(
         ],
         "dart_parameters": read_json(dart_manifest)["metrics"]["n_params"],
         "schnet_parameters": read_json(schnet_manifest)["metrics"]["n_params"],
+        "pair_test_count": pair_test_count,
+        "pair_constituent_seen_count": pair_constituent_seen_count,
+        "pair_constituent_exceptions": pair_constituent_exceptions,
     }
     methods = " ".join(
         (root / "paper_Q1/sections/methods.tex").read_text().split()
@@ -1714,6 +1796,13 @@ def audit_method_claims(
         f"{facts['outside_abs_20_eV']} rows with",
         f"leaving {facts['source_filtered_rows']:,} structures",
         f"In {facts['ambiguous_identity_exclusions']} rows",
+        (
+            f"Of these cases, "
+            f"{data_audit['defect_identity']['ambiguous_counts']['defecttype']['interstitial']} "
+            "are interstitial and "
+            f"{data_audit['defect_identity']['ambiguous_counts']['defecttype']['adsorbate']} "
+            "are adsorbate"
+        ),
         f"contain {facts['duplicate_exclusions']} redundant rows",
         f"contains {facts['modeling_rows']:,} structures",
         (
@@ -1730,6 +1819,10 @@ def audit_method_claims(
         f"all {facts['overlap_impurities']} IMP2D impurity elements",
         f"{facts['dart_parameters']:,} trainable parameters",
         f"with {facts['schnet_parameters']:,} for SchNet",
+        (
+            f"other {facts['pair_constituent_seen_count']:,} pair-held-out test "
+            "structures"
+        ),
     ]
     for index, fragment in enumerate(expected_fragments):
         audit.contains(f"method claim {index + 1}", methods, fragment)
@@ -1737,7 +1830,34 @@ def audit_method_claims(
     audit.contains(
         "abstract modeling set",
         abstract,
-        f"{facts['modeling_rows']:,} provenance-audited neutral IMP2D",
+        f"curated set of {facts['modeling_rows']:,} neutral structures",
+    )
+    audit.contains(
+        "abstract pair constituent exception",
+        abstract,
+        "all but one test structure",
+    )
+    audit.exact(
+        "pair-held-out test population",
+        facts["pair_test_count"],
+        facts["modeling_rows"],
+    )
+    audit.exact(
+        "pair-held-out constituent-seen population",
+        facts["pair_constituent_seen_count"],
+        facts["modeling_rows"] - 1,
+    )
+    audit.exact(
+        "pair-held-out constituent exception",
+        facts["pair_constituent_exceptions"],
+        [
+            {
+                "split_id": "pair_cv5_f4",
+                "sample_index": 3411,
+                "host": "Ti2CO2",
+                "dopant": "Na",
+            }
+        ],
     )
     supplement = " ".join(
         (root / "paper_Q1/supplement.tex").read_text().split()
