@@ -1797,9 +1797,33 @@ def verify_g1a(
         "distance_scope": "10,224 protocol-canonical rows",
         "full_container_rows_audited": EXPECTED_CONTAINER_ROWS,
     }
+    summary_roundtrip = summary.get("checkpoint_roundtrip")
+    if not isinstance(summary_roundtrip, Mapping) or set(summary_roundtrip) != set(
+        expected_roundtrip
+    ):
+        raise ValueError(
+            "G1A checkpoint roundtrip mapping fields differ from recomputation"
+        )
+    # stored_graph_eV summarizes live-inference noise: the collector's own
+    # re-inference is a fresh nondeterministic CUDA draw, so its quantiles
+    # can only agree with the diagnostic's record to the measured noise
+    # scale.  Both maxima are separately hard-gated below.  The identity
+    # block is recomputed from the archived arrays and stays deterministic.
     require_close_payload(
-        summary.get("checkpoint_roundtrip"), expected_roundtrip,
-        "G1A checkpoint roundtrip", atol=1.0e-10,
+        summary_roundtrip.get("stored_graph_eV"),
+        expected_roundtrip["stored_graph_eV"],
+        "G1A checkpoint roundtrip.stored_graph_eV",
+        atol=PREDICTION_ROUNDTRIP_ATOL_EV,
+    )
+    require_close_payload(
+        summary_roundtrip.get("raw_identity_rebuild_eV"),
+        expected_roundtrip["raw_identity_rebuild_eV"],
+        "G1A checkpoint roundtrip.raw_identity_rebuild_eV", atol=1.0e-10,
+    )
+    require_close_payload(
+        summary_roundtrip.get("hard_max_eV"),
+        expected_roundtrip["hard_max_eV"],
+        "G1A checkpoint roundtrip.hard_max_eV", atol=1.0e-10,
     )
     require_close_payload(
         summary.get("legacy_under_permutations"), expected_legacy,
