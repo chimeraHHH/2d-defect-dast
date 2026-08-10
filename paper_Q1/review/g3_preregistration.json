@@ -1,0 +1,243 @@
+{
+  "schema_version": "prm_g3_preregistration_v1",
+  "frozen_at": "2026-08-10",
+  "milestone": "J-R3-physics-error-map",
+  "authorization": "G3 approved; G2 not approved",
+  "evidence_boundary": {
+    "default_tier": "exploratory",
+    "canonical_requires": [
+      "an accepted prm_g2_acceptance_v1 manifest",
+      "hash-verified G1 repaired-dataset and final acceptance receipts",
+      "a hash-verified prm_g1c_pretraining_receipt_v1 and corrected asset SHA-256",
+      "repaired permutation-invariant triplets",
+      "verified exact minimum-image distances",
+      "complete repaired pair-, host-, and impurity-OOF predictions"
+    ],
+    "legacy_model_status": "legacy_order_sensitive_graph",
+    "legacy_outputs_may_enter_main_text": false,
+    "causal_language_permitted": false
+  },
+  "execution": {
+    "allowed_hostname": "WHUServer-L40S",
+    "python": "$PRM_PYTHON",
+    "cuda_visible_devices": "",
+    "reason": "G3 is a server-side CPU statistical workload and must not reserve a GPU",
+    "require_clean_git": true,
+    "require_head_reachable_from_fetched_remote_branch": true,
+    "versioned_output_only": "analysis writes a write-once analysis_started.json attempt lock and refuses any existing attempt lock or coverage/effect/block/family/figure/analysis-manifest output; partial runs require a new output directory",
+    "required_packages": ["numpy", "scipy", "ase", "torch"],
+    "prohibited_new_shared_environment_installs": true
+  },
+  "inputs": {
+    "protocol_dir": "artifacts/prm_protocol_v2",
+    "protocol_schema": "prm_protocol_manifest_v2",
+    "cleaned_dataset": {
+      "path_alias": "$PRM_DATASET_PATH",
+      "sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b"
+    },
+    "raw_database": {
+      "path_alias": "$PRM_RAW_DB_PATH",
+      "sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4"
+    },
+    "atom_feature_table": {
+      "path_alias": "$PRM_REPO/data/atom_features_ref.pth",
+      "sha256": "5fa97d7788ef9b1e10be6d874aa9c6c7d55c532d055c187bb9452659983c5bb4"
+    },
+    "exploratory_prediction_root": "$PRM_REPO/artifacts/prm_results/comparison/runs/selected/g111/transfer",
+    "exploratory_pair_seed": 242,
+    "exploratory_host_impurity_seeds": [242, 243, 244],
+    "canonical_pair_seed": 242,
+    "canonical_host_impurity_seeds": [242, 243, 244],
+    "join_key": ["sample_index", "raw_row_id"],
+    "required_population": 10224
+  },
+  "raw_database_mapping": {
+    "depth": {
+      "output": ["depth", "depth_class_margin", "depth_boundary_distance"],
+      "definitions": {
+        "depth_class_margin": "abs(depth) - 1; negative for interstitial and nonnegative for adsorbate under the IMP2D definition",
+        "depth_boundary_distance": "abs(abs(depth) - 1)"
+      },
+      "source": "IMP2D Eq. (1); |D| < 1 interstitial and |D| >= 1 adsorbate"
+    },
+    "extension_factor": {
+      "output": ["extension_factor", "abs_log_extension_factor", "xf_pathology"],
+      "definitions": {
+        "abs_log_extension_factor": "abs(log(extension_factor)) for finite positive values",
+        "xf_pathology": "extension_factor > 2"
+      },
+      "source": "IMP2D Eq. (2); XF > 2 denotes potentially unphysical reconstruction"
+    },
+    "conv2": "source-workflow numerical-quality scalar; sensitivity control only, with no physical or unit interpretation",
+    "en1": "first workflow-stage total energy; never interpreted as a coordinate snapshot or displacement",
+    "en2": "final workflow-stage total energy; provenance-only field"
+  },
+  "feature_taxonomy": {
+    "cutoff_A": 5.0,
+    "e_module_aligned": [
+      "cn_5A",
+      "neighbor_distance_mean_A",
+      "neighbor_distance_max_A",
+      "local_abs_electronegativity_contrast"
+    ],
+    "independent_geometry": [
+      "smooth_cn_5A",
+      "neighbor_distance_std_A",
+      "postrelaxation_min_clearance_A",
+      "depth_boundary_distance",
+      "abs_log_extension_factor"
+    ],
+    "chemistry": [
+      "local_signed_covalent_radius_mismatch_A",
+      "local_abs_covalent_radius_mismatch_A",
+      "local_signed_electronegativity_mismatch",
+      "local_signed_valence_mismatch",
+      "local_abs_valence_mismatch"
+    ],
+    "audit_only_model_edge_semantics": [
+      "model_edge_periodic_impurity_self_image_count_5A",
+      "host_only_cn_5A",
+      "host_only_neighbor_distance_mean_A",
+      "host_only_neighbor_distance_max_A",
+      "raw_graph_defect_edge_count_delta_5A",
+      "raw_graph_defect_edge_topology_match_5A",
+      "raw_graph_defect_edge_distance_max_abs_delta_A"
+    ],
+    "sensitivity_controls": [
+      "natoms",
+      "cell_area_A2",
+      "host_slab_thickness_A",
+      "spacegroup",
+      "supercell",
+      "train_host_support",
+      "train_impurity_support",
+      "abs_target_eV",
+      "abs_conv2"
+    ],
+    "exact_definitions": {
+      "model_edge_neighbor_set": "directly read from edge_index/edge_dist in the exact source graph dataset used by the corresponding prediction (frozen legacy cleaned pickle for exploratory output; hash-verified G1 repaired graph pickle for canonical output), centered on the unique impurity; zero-displacement self interaction is absent, while nonzero periodic impurity self-images (i == j with nonzero lattice shift) are retained exactly as consumed by DefectEnvironmentEnrichment",
+      "physical_host_neighbor_set": "directed ASE raw-database neighbor-list entries centered on the unique impurity at cutoff 5.0 Angstrom with neighbor atom index different from the impurity index; distinct periodic images of host atoms remain separate entries",
+      "cn_5A": "number of members of model_edge_neighbor_set",
+      "neighbor_distance_mean_A": "arithmetic mean of d over model_edge_neighbor_set",
+      "neighbor_distance_max_A": "maximum d over model_edge_neighbor_set",
+      "local_abs_electronegativity_contrast": "absolute impurity-minus-neighbor mean contrast of column 2 of the hash-frozen model atom-feature table over model_edge_neighbor_set; this is the exact scale consumed by DefectEnvironmentEnrichment, not raw Pauling units",
+      "model_edge_periodic_impurity_self_image_count_5A": "number of model_edge_neighbor_set entries whose neighbor atom index equals the impurity index; audit-only and never silently removed",
+      "host_only_cn_5A": "number of members of physical_host_neighbor_set; audit-only",
+      "raw_graph_edge_audit": "for impurity-centered entries, archive raw-minus-graph count, neighbor-index multiset equality, and the maximum absolute distance difference after deterministic sorting when topology matches; these audit quantities are not substituted for graph-native E features",
+      "smooth_cn_5A": "sum over physical_host_neighbor_set of 0.5 * (cos(pi*d/5.0) + 1)",
+      "neighbor_distance_std_A": "population standard deviation of d over physical_host_neighbor_set",
+      "postrelaxation_min_clearance_A": "minimum over physical_host_neighbor_set of d - r_cov(impurity) - r_cov(neighbor)",
+      "signed_mismatches": "impurity raw elemental property minus the arithmetic physical_host_neighbor_set mean; absolute variants are the absolute value of the signed mismatch",
+      "cell_area_A2": "norm of cross(cell_vector_0, cell_vector_1)",
+      "host_slab_thickness_A": "range of host-atom Cartesian positions projected onto the unit normal cross(cell_vector_0, cell_vector_1)",
+      "element_properties": "covalent radii from the runtime ASE table; raw Pauling electronegativity and GROUP tables from src/features.py at the run commit; valence is group for groups 1-2 and 3-12, and group-10 for groups 13-18; exact E-module electronegativity uses the frozen atom_features_ref.pth column 2 instead",
+      "missing_element_property": "for physical chemistry mismatches, a nonfinite covalent radius or zero-placeholder raw Pauling electronegativity is missing and is not imputed; the exact model-feature-table E contrast retains its finite encoded placeholder values because that is what the model consumed"
+    },
+    "packing_proxy_name_rule": "postrelaxation_min_clearance_A must not be called a pristine void radius",
+    "missingness_rule": {
+      "below_0.90": "exclude",
+      "0.90_to_below_0.95": "supplement_only",
+      "at_least_0.95": "main_text_eligible only when overall, adsorbate, and interstitial coverage each meet the threshold"
+    }
+  },
+  "host_taxonomy": {
+    "chalcogenide": ["Hf2Te6", "HfS2", "HfSe2", "MoS2", "MoSSe", "MoSe2", "MoTe2", "NbS2", "NbSe2", "NiSe2", "Pd2Se4", "PtS2", "PtSe2", "Re4S8", "Re4Se8", "SnS2", "SnSe2", "TaS2", "TaSe2", "TiS2", "W2Se4", "W2Te4", "WS2", "WSe2", "WTe2", "ZrS2", "ZrSe2"],
+    "carbide_mxene_like": ["Mo2CO2", "Nb2CO2", "Nb4C3", "Ti2CO2", "V2CO2"],
+    "elemental_hydrogenated": ["As2", "C2H2", "Ge2", "Ge2H2", "P4", "Si2", "Sn2"],
+    "halide_halochalcogenide": ["Bi2I6", "BiITe", "Cr2I6", "PbI2"],
+    "oxide": ["TiO2"]
+  },
+  "impurity_taxonomy": {
+    "3d": ["Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"],
+    "4d": ["Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd"],
+    "5d": ["Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg"],
+    "main_group": ["Al", "As", "B", "Ba", "Be", "Bi", "Br", "C", "Ca", "Cl", "Cs", "F", "Ga", "Ge", "H", "I", "In", "K", "Li", "Mg", "N", "Na", "O", "P", "Pb", "Rb", "S", "Sb", "Se", "Si", "Sn", "Sr", "Te", "Tl", "Xe"],
+    "f_block_other": ["Lu"]
+  },
+  "primary_model": {
+    "outcome": "log(absolute_pair_oof_error_eV + 0.05)",
+    "estimator": "Huber M-estimator after weighted alternating projection of crossed host, impurity, and pair-fold fixed effects",
+    "not_called": "mixed-effects model",
+    "continuous_scaling": "median-centered and divided by IQR on finite analysis rows",
+    "terms": [
+      "incorporation class",
+      "all main-text-eligible E-module-aligned geometry features, including cn_5A, mean distance, and maximum distance",
+      "all main-text-eligible independent geometry features",
+      "the E-aligned local absolute electronegativity contrast exactly once",
+      "all main-text-eligible chemistry features",
+      "feature by incorporation-class interactions"
+    ],
+    "joint_tests": ["geometry block", "chemistry block"],
+    "individual_contrast": "adjusted 10th-to-90th percentile contrast within each incorporation class",
+    "back_transform": "for each class, set all continuous non-focal terms to their class median, set the focal term to its class q10 or q90, marginalize host/impurity/fold effects under the final Huber-IRLS weighted zero-sum constraint, predict eta = final_IRLS_weighted_mean(y) + beta dot (profile - final_IRLS_weighted_mean(design)), and return max(exp(eta)-0.05, 0); the eV contrast is high minus low and the percent contrast divides by max(low, 0.05)",
+    "signed_residual": "bias diagnostic only",
+    "cluster": "host-impurity pair",
+    "bootstrap_draws": 2000,
+    "bootstrap_seed": 20260810,
+    "multiplicity": "Benjamini-Hochberg at q=0.05 across all individual feature-by-class contrasts; paper-facing effects must pass the adjusted-q gate as well as interval, magnitude, fold, and XF gates",
+    "fold_stability": "refit separately in each of five pair folds",
+    "sensitivity": "repeat after retaining only finite XF <= 2 (missing XF excluded regardless of whether abs_log_XF enters the primary model) and with declared nuisance controls"
+  },
+  "effect_gate": {
+    "minimum_magnitude": "absolute back-transformed predicted absolute-error contrast >= 0.10 eV or >= 20 percent relative to the low profile",
+    "interval": "95 percent pair-cluster bootstrap interval excludes zero",
+    "fold_direction": "same direction in at least 4 of 5 pair folds",
+    "xf_sensitivity": "direction persists after excluding XF > 2",
+    "nuisance_sensitivity": "direction persists after adding eligible numeric controls and crossed spacegroup/supercell fixed effects",
+    "language": "association or correlate; never explains or causes"
+  },
+  "family_analysis": {
+    "metrics": ["sample-weighted MAE", "identity-macro MAE"],
+    "uncertainty": "identity-cluster bootstrap",
+    "inferential_minimum": {"identities": 5, "samples": 100},
+    "nitride_panel": false
+  },
+  "host_vs_impurity_analysis": {
+    "outcome": "sample-matched absolute host-OOF error minus absolute impurity-OOF error",
+    "host_novelty": "training-only identity-level standardized/PCA five-nearest-neighbor Euclidean distance among unique host identities using mean/std covalent radius, Pauling electronegativity, valence, area-per-host-atom, normal-projected slab thickness, 12 directed-entry-per-host-atom RDF bins spanning 0-6 Angstrom, and host-only coordination mean/std",
+    "impurity_novelty": "training-only identity-level standardized/PCA five-nearest-neighbor Euclidean distance among unique impurity elements using covalent radius, electronegativity, valence, period, and group",
+    "identity_aggregation": "each base descriptor is the arithmetic mean of finite structure-row values for one unique identity inside that fold partition",
+    "missing_rule": "for novelty only, each base feature is median-imputed from training identities and an explicit missingness indicator is appended; a feature missing for every training identity fails closed",
+    "scaling_rule": "training-identity median/IQR scaling after imputation and indicator augmentation; zero-IQR augmented columns are removed using training identities only",
+    "pca_rule": "center the train-only robust-scaled matrix; retain the smallest component count explaining at least 95 percent training variance, capped at 10 and never exceeding numerical rank",
+    "oof_calibration": "after all fold-local novelty distances exist, host and impurity novelty are each median/IQR calibrated over unique OOF identities without labels; this post-OOF identity-level calibration only makes the two distance scales comparable and never refits fold features, PCA, or neighbors",
+    "association_model": "Huber regression on the raw-eV sample-matched host-minus-impurity absolute-error gap with robust-calibrated host-minus-impurity novelty gap and incorporation class as fixed predictors",
+    "uncertainty": "2000 host-impurity-pair multiplicity bootstrap draws with seed 20260810",
+    "common_stability_strata": "the frozen pair_cv5 test split assigns every sample to one of five common strata; host and impurity fold IDs are never assumed to align",
+    "leakage_rule": "all descriptor imputation, feature scaling, PCA, and neighbor reference fitting occurs inside the corresponding host or impurity OOF training partition; only the declared unlabeled post-OOF identity calibration is global",
+    "claim_gate": "support requires the 95 percent pair-bootstrap lower bounds of both mean host-minus-impurity error gap and novelty-gap slope to be strictly positive, with each quantity positive in at least 4 of 5 common pair folds; negative or mixed direction is non-support or contradiction, never structural-motif-shift support"
+  },
+  "case_selection": {
+    "high_error": "greedy top-four interstitial absolute errors requiring finite XF <= 2 and finite abs(conv2) outside the exact full-population top-one-percent set, with no repeated host or impurity; ties break by sample_index",
+    "matched_low_error": "nonpathological adsorbates at or below the adsorbate-specific 25th error percentile, matched by host family, global-population target-energy decile, impurity series, and nearest atom count; no repeated control host or impurity; ties break by absolute target difference then sample_index",
+    "target_deciles": "nine NumPy linear quantile cut points from the full 10,224-row target distribution; np.searchsorted with side=right assigns ties deterministically",
+    "conv2_top_one_percent": "exactly ceil(0.01*10224)=103 finite rows ranked by descending abs(conv2), with sample_index breaking ties; fewer than 103 finite values fails closed",
+    "matching_fallback": "none; fewer than four valid matches is a fail-closed incomplete case panel and must not be manually filled",
+    "pathology_panel": "XF > 2, the exact 103-row abs(conv2) set, and missing XF/conv2 provenance are ranked independently",
+    "archive": "write the complete eligible pool and deterministic rank keys before any rendering",
+    "main_text_gate": "a passing population P1 association and at least three host families among high-error cases"
+  },
+  "physical_figure_contract": {
+    "panels": {
+      "a": "adjusted error versus coordination or clearance, stratified by incorporation class",
+      "b": "covalent-radius, electronegativity, and valence mismatch contrasts",
+      "c": "error versus extension factor with XF = 2 marked",
+      "d": "host-family and impurity-series sample-weighted and identity-macro MAE"
+    },
+    "row_level_sidecar": {
+      "panel_a": "one sample_observation row per sample and feature for cn_5A and postrelaxation_min_clearance_A, with sample_index, raw_row_id, incorporation class, feature value, and absolute pair-OOF error",
+      "panel_c": "one sample_observation row per sample with extension_factor, abs_log_extension_factor, incorporation class, absolute pair-OOF error, XF pathology flag, and literal reference_x=2/reference_label='XF = 2'"
+    },
+    "adjusted_profile_grid": {
+      "panel_a_candidates": ["cn_5A", "postrelaxation_min_clearance_A"],
+      "coverage_rule": "build profiles only for candidates passing the frozen class-stratified main-text coverage gate; at least one candidate must pass or analysis fails closed",
+      "grid": "41 linearly spaced points from the incorporation-class-specific q10 to q90",
+      "profile": "reuse the frozen primary Huber fit, class-specific non-focal medians, final weighted centering, and back-transform without refitting during figure construction",
+      "uncertainty": "pointwise 95 percent host-impurity-pair multiplicity-bootstrap intervals from the same 2000 draws; not a simultaneous confidence band",
+      "panel_c_rule": "retain raw extension-factor observations and the XF=2 marker; abs(log XF) is not inverted to a unique raw-XF adjusted profile"
+    },
+    "data_only_until_gate": true,
+    "figure_sidecar_required": true,
+    "legacy_exploratory_watermark": "EXPLORATORY — LEGACY GRAPH; NOT FOR MANUSCRIPT"
+  }
+}

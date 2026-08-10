@@ -1,0 +1,40 @@
+{
+  "schema_version": "prm_g3_status_v1",
+  "milestone": "J-R3-physics-error-map",
+  "updated_at": "2026-08-10",
+  "state": "implementation_ready_not_run",
+  "authorization": "G3 approved",
+  "canonical_blocker": "G2 repaired OOF evidence is not approved or available",
+  "exploratory_label": "EXPLORATORY — LEGACY GRAPH; NOT FOR MANUSCRIPT",
+  "preregistration": "paper_Q1/review/g3_preregistration.json",
+  "scientific_runs_completed_in_this_milestone": 0,
+  "local_scientific_computation_performed": false,
+  "implementation": {
+    "cli": "scripts/prm_g3_physics_analysis.py",
+    "tests": "tests/test_prm_g3_physics_analysis.py",
+    "commands": ["extract", "analyze", "all"],
+    "implemented_modules": ["P0 provenance and coverage", "P1 robust geometry/chemistry associations", "P2 family decomposition", "P3 identity-level host-versus-impurity novelty", "P4 deterministic structural cases"],
+    "pending_modules": [],
+    "trust_hardening": [
+      "canonical analyze fully reconstructs the joined table from accepted OOF archives, the repaired graph pickle, raw DB, and protocol",
+      "E-module-aligned quantities come from prediction graph edge_index/edge_dist rather than a raw-geometry proxy",
+      "G1C receipt, corrected initialization asset, atom-feature table, and corrected_pretrain arm are hash-bound",
+      "canonical seed ensembles, split hashes/counts, pushed ancestry, bootstrap draws/seed, and write-once attempts are frozen",
+      "panel-a adjusted profiles are precomputed on a frozen 41-point grid with pointwise pair-bootstrap intervals"
+    ]
+  },
+  "static_verification": {
+    "py_compile": "passed",
+    "json_validation": "passed",
+    "diff_check": "passed",
+    "committed_path_privacy_scan": "passed",
+    "unittest_execution": "not run locally; reserved for WHUServer-L40S"
+  },
+  "next_actions": [
+    "commit and push the frozen G3 implementation",
+    "run synthetic contract tests on WHUServer-L40S",
+    "run exploratory legacy-OOF G3 on WHUServer-L40S with CUDA disabled",
+    "retain the exploratory result outside the manuscript",
+    "wait for G2 before any canonical G3 run"
+  ]
+}
