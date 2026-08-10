@@ -142,9 +142,52 @@ def legacy_componentwise_distances(positions: np.ndarray, cell: np.ndarray) -> n
     return np.linalg.norm(fractional @ cell, axis=-1).astype(np.float32)
 
 
-def legacy_build_graph(atoms: Atoms, cutoff: float = 5.0) -> dict[str, np.ndarray]:
-    """Frozen reproduction of pre-G1 ``src.graph.build_graph``."""
+def _edge_image_keys(
+    edge_index: np.ndarray, edge_offset: np.ndarray,
+) -> list[tuple[int, int, int, int, int]]:
+    return [
+        (int(a), int(b), int(round(x)), int(round(y)), int(round(z)))
+        for (a, b), (x, y, z) in zip(
+            np.asarray(edge_index, dtype=np.int64).T.tolist(),
+            np.asarray(edge_offset, dtype=np.float64).tolist(),
+        )
+    ]
+
+
+def legacy_build_graph(
+    atoms: Atoms,
+    cutoff: float = 5.0,
+    edge_order_reference: tuple[np.ndarray, np.ndarray] | None = None,
+) -> dict[str, np.ndarray]:
+    """Frozen reproduction of pre-G1 ``src.graph.build_graph``.
+
+    ``edge_order_reference`` optionally imposes an archived ``(edge_index,
+    edge_offset)`` enumeration sequence.  The archived dataset was built with
+    a pre-3.28 ASE whose neighbour-list bin traversal enumerates the identical
+    edge set in a different arbitrary order than the current ASE; the legacy
+    first-32 triplet rule is enumeration-order dependent, so reproducing the
+    archived model inputs requires the archived sequence.  Each edge image is
+    uniquely keyed by ``(i, j, cell shift)``; the mapping fails closed if the
+    regenerated edge set is not a perfect bijection of the reference.
+    """
     i, j, d, displacements, shifts = neighbor_list("ijdDS", atoms, cutoff=cutoff)
+    if edge_order_reference is not None:
+        reference_keys = _edge_image_keys(*edge_order_reference)
+        natural_keys = _edge_image_keys(np.vstack([i, j]), shifts)
+        if len(set(natural_keys)) != len(natural_keys):
+            raise ValueError("legacy edge image keys are not unique")
+        position_by_key = {key: pos for pos, key in enumerate(natural_keys)}
+        if len(reference_keys) != len(natural_keys) or any(
+            key not in position_by_key for key in reference_keys
+        ):
+            raise ValueError(
+                "archived edge sequence is not a bijection of the regenerated edge set"
+            )
+        order = np.asarray(
+            [position_by_key[key] for key in reference_keys], dtype=np.int64,
+        )
+        i, j, d = i[order], j[order], d[order]
+        displacements, shifts = displacements[order], shifts[order]
     triplets: list[tuple[int, int, int]] = []
     angles: list[float] = []
     if len(i):
@@ -206,13 +249,27 @@ def assert_legacy_identity_graph(
     for field in ("numbers", "edge_index", "triplet_index"):
         if not np.array_equal(np.asarray(archived[field]), rebuilt[field]):
             raise ValueError(f"legacy identity {field} mismatch at sample {index}")
-    for field in (
-        "positions", "cell", "edge_dist", "edge_offset", "angles", "dist_matrix",
-    ):
+    for field in ("positions", "cell", "edge_offset", "dist_matrix"):
         np.testing.assert_allclose(
             np.asarray(archived[field]), rebuilt[field], rtol=0.0, atol=1.0e-6,
             err_msg=f"legacy identity {field} mismatch at sample {index}",
         )
+    # The archive stores float32 quantities computed by a pre-3.28 ASE; the
+    # regeneration differs by floating-point noise below 1e-6 A.  Angles are
+    # compared in cosine space because acos amplifies that noise without
+    # bound near collinear triplets.
+    np.testing.assert_allclose(
+        np.asarray(archived["edge_dist"], dtype=np.float64),
+        np.asarray(rebuilt["edge_dist"], dtype=np.float64),
+        rtol=0.0, atol=1.0e-5,
+        err_msg=f"legacy identity edge_dist mismatch at sample {index}",
+    )
+    np.testing.assert_allclose(
+        np.cos(np.asarray(archived["angles"], dtype=np.float64)),
+        np.cos(np.asarray(rebuilt["angles"], dtype=np.float64)),
+        rtol=0.0, atol=1.0e-5,
+        err_msg=f"legacy identity angle-cosine mismatch at sample {index}",
+    )
 
 
 def permutation_for(sample: dict[str, Any], variant: int) -> np.ndarray:
@@ -312,7 +369,17 @@ class DiagnosticDataset(Dataset):
                 cell=raw["cell"],
                 pbc=self.pbc_by_index[index],
             )
-            graph = legacy_build_graph(atoms)
+            # The identity variant must reproduce the archived model inputs
+            # exactly, so it imposes the archived edge enumeration sequence;
+            # permuted variants take the natural current-ASE enumeration,
+            # which is one more arbitrary ordering of the same edge set.
+            graph = legacy_build_graph(
+                atoms,
+                edge_order_reference=(
+                    (sample["edge_index"], sample["edge_offset"])
+                    if self.permutation_variant < 0 else None
+                ),
+            )
             defect_mask = defect_mask[permutation]
         else:
             graph = {key: sample[key] for key in (
@@ -513,6 +580,7 @@ def main() -> None:
     raw_geometry_by_index: dict[int, dict[str, np.ndarray]] = {}
     exact_distances: dict[int, np.ndarray] = {}
     mic_rows = []
+    enumeration_order_shifted = 0
     for index, sample in enumerate(base.data):
         raw_atoms = db.get(id=int(sample["id"])).toatoms()
         np.testing.assert_array_equal(sample["numbers"], raw_atoms.get_atomic_numbers())
@@ -525,7 +593,15 @@ def main() -> None:
             "positions": raw_atoms.get_positions().astype(np.float64),
             "cell": np.asarray(raw_atoms.get_cell()).astype(np.float64),
         }
-        assert_legacy_identity_graph(sample, legacy_build_graph(raw_atoms), index)
+        archived_edge_sequence = (sample["edge_index"], sample["edge_offset"])
+        identity_graph = legacy_build_graph(
+            raw_atoms, edge_order_reference=archived_edge_sequence,
+        )
+        natural_graph = legacy_build_graph(raw_atoms)
+        enumeration_order_shifted += int(
+            not np.array_equal(identity_graph["edge_index"], natural_graph["edge_index"])
+        )
+        assert_legacy_identity_graph(sample, identity_graph, index)
         exact = _pbc_distance_matrix(sample["positions"], sample["cell"], pbc).astype(np.float32)
         exact_distances[index] = exact
         delta = np.abs(np.asarray(sample["dist_matrix"], dtype=float) - exact)
@@ -774,6 +850,19 @@ def main() -> None:
             "permutations": list(PERMUTATION_NAMES),
             "exact_mic_intervention": "dense radial matrix only; legacy local graph retained",
             "interpretation": "diagnostic sensitivity only; not a formal invariance waiver",
+            "identity_enumeration": {
+                "imposed_from_archived_edge_sequence": True,
+                "natural_order_differs_samples": enumeration_order_shifted,
+                "reason": (
+                    "the dataset was built with a pre-3.28 ASE whose neighbour "
+                    "enumeration orders the identical edge set differently from "
+                    "the current ASE; the archived (i, j, shift) sequence is "
+                    "imposed for the identity arm so the order-dependent legacy "
+                    "triplet selection reproduces the archived model inputs "
+                    "bit-for-bit, and permuted variants keep the natural "
+                    "current-ASE enumeration as one more arbitrary ordering"
+                ),
+            },
         },
         "implementation": {
             "diagnostic_repository_path": "scripts/prm_g1_diagnose_geometry.py",

@@ -45,6 +45,19 @@ maximum range below 0.05 eV, MAE change below 0.01 eV, and zero class/site
 flips. The archived checkpoint round trip must reproduce predictions within
 `1e-5` eV or the command fails.
 
+The archived dataset was built with a pre-3.28 ASE whose neighbour-list bin
+traversal enumerates the identical edge set in a different arbitrary order
+than the pinned ASE 3.28.0. Because the legacy first-32 triplet rule is
+enumeration-order dependent, the identity arm imposes the archived
+`(i, j, shift)` edge sequence — a fail-closed bijection on unique edge-image
+keys — so the archived model inputs are reproduced bit-for-bit; permuted
+variants keep the natural current-ASE enumeration, which is one more
+arbitrary ordering of the same edge set. The diagnostic summary records how
+many samples' natural enumeration differs from the archive. Archived float32
+noise is compared with 1e-5 tolerances, and angles are compared in cosine
+space because `acos` amplifies sub-1e-6 noise without bound near collinear
+triplets.
+
 G1A also freezes the historical E-module zero-neighbour behaviour as
 `legacy_batch_dependent_v0`. This compatibility mode is diagnostic-only and is
 set explicitly when the archived g111 checkpoints are loaded; it adds no
