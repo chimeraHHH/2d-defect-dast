@@ -30,25 +30,33 @@ not redefine any contract field.
    repaired graph and version the corrected checkpoint. Required receipt:
    `prm_g1c_pretraining_receipt_v1` with the corrected asset SHA-256.
 
-## Implementation gap that must close before the queue
+## G2 tooling (implemented 2026-08-10)
 
-As of this date the repository contains **no producer** of
-`prm_g2_run_manifest_v1`; the only reference is the consumer
-`scripts/prm_g3_physics_analysis.py`. Before the queue launches:
+The producer side of the acceptance chain is implemented and unit-tested:
 
-- the training entry point must emit a complete `prm_g2_run_manifest_v1` per
-  run, with every field the acceptance contract enumerates (split identity
-  and counts, seed, `corrected_pretrain` arm, corrected asset and
-  atom-feature-table SHA-256, `env_zero_neighbor_mode=zero_residual_v1` at
-  top level and inside `config.model_kwargs`,
-  `model_recipe_scope=config.model_kwargs`, recomputable recipe hash,
-  model-source SHA-256, `config.batch_size=64`, graph-builder version,
-  repaired-data hash, prediction output hash);
-- an acceptance builder (suggested name `scripts/prm_g2_build_acceptance.py`)
-  must assemble `prm_g2_acceptance_v1` from the run manifests, recomputing
-  the recipe hash from each run's embedded `model_kwargs` rather than
-  trusting prose, and binding the three G1/G1C receipts;
-- both land in a pushed commit that descends from the G1 repair commit.
+- `src/prm_g2_contract.py` — the single producer-side implementation of both
+  schemas; mirrors every consumer check in
+  `scripts/prm_g3_physics_analysis.py` and fails closed on the first violated
+  binding. Covered by `tests/test_prm_g2_contract.py` (pure standard
+  library; 44 tests).
+- `scripts/prm_g2_run.py` — fail-closed launcher for one run. Preflight:
+  clean pushed HEAD, GPU 2 refusal, full G1/G1C receipt chain, repaired
+  dataset / corrected asset / atom-feature-table / model-source hash checks,
+  controlled-config contract (model v2, batch 64, `zero_residual_v1`,
+  `use_env_enrichment`, source `data_sha256`), seed law, exclusive run
+  directory. Postflight: unchanged HEAD, trainer-recorded commit equality,
+  prediction hash re-verification, then exclusive-create
+  `g2_run_manifest.json` derived from the verified `prm_run_manifest_v1`.
+- `scripts/prm_g2_build_acceptance.py` — enumerates
+  `<regime>_cv5_f<fold>/seed<seed>` runs, re-verifies every manifest against
+  the consumer mirror, recomputes the recipe hash from each run's embedded
+  `model_kwargs`, enforces commit/recipe/model-source uniformity, checks G1
+  ancestry and remote containment, and writes the alias-based
+  `prm_g2_acceptance_v1` exclusive-create.
+
+Remaining precondition: these tools consume the G1/G1C receipts, so the queue
+still cannot start before the G1 server acceptance closes. The tooling itself
+must be exercised once in the G1 pilot environment before the formal queue.
 
 ## Queue definition
 
