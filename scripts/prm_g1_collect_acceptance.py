@@ -1246,8 +1246,42 @@ def verify_g1a(
     summary = load_json(summary_path, "prm_g1a_geometry_diagnostic_v1")
     require_git(summary.get("git"), current, "G1A diagnostic")
     gpu = require_execution_identity(summary, inventory, "G1A diagnostic")
+    # The identity arm imposes the archived (i, j, shift) enumeration because
+    # the dataset was built with a pre-3.28 ASE; the shifted-sample count is a
+    # measured quantity, so it is bounds-checked rather than compared to a
+    # constant.  The remaining scope fields stay an exact frozen contract.
+    scope = dict(summary.get("scope") or {})
+    identity_enumeration = scope.pop("identity_enumeration", None)
     if (
-        summary.get("scope") != {
+        not isinstance(identity_enumeration, Mapping)
+        or identity_enumeration.get("imposed_from_archived_edge_sequence")
+        is not True
+        or not isinstance(
+            identity_enumeration.get("natural_order_differs_samples"), int
+        )
+        or not (
+            0
+            <= identity_enumeration["natural_order_differs_samples"]
+            <= EXPECTED_CONTAINER_ROWS
+        )
+        or identity_enumeration.get("reason") != (
+            "the dataset was built with a pre-3.28 ASE whose neighbour "
+            "enumeration orders the identical edge set differently from "
+            "the current ASE; the archived (i, j, shift) sequence is "
+            "imposed for the identity arm so the order-dependent legacy "
+            "triplet selection reproduces the archived model inputs "
+            "bit-for-bit, and permuted variants keep the natural "
+            "current-ASE enumeration as one more arbitrary ordering"
+        )
+        or set(identity_enumeration) != {
+            "imposed_from_archived_edge_sequence",
+            "natural_order_differs_samples",
+            "reason",
+        }
+    ):
+        raise ValueError("G1A identity-enumeration scope contract failed")
+    if (
+        scope != {
             "legacy_graph": LEGACY_FIRST32,
             "legacy_env_zero_neighbor_mode": ENV_ZERO_NEIGHBOR_LEGACY,
             "legacy_inference_batch_size": 64,
