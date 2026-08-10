@@ -1,0 +1,63 @@
+{
+  "schema_version": "prm_g1_contract_v1",
+  "status": "implementation_hardened_formal_gpu_acceptance_pending",
+  "authorized_scope": ["G1A", "G1B", "G1C"],
+  "forbidden_scope": ["G2_full_oof_retraining"],
+  "graph_builder_version": "exact_mic_invariant_triplets_v1",
+  "env_zero_neighbor_contract": {
+    "corrected_default": "zero_residual_v1",
+    "legacy_g1a_compatibility": "legacy_batch_dependent_v0",
+    "mask_location": "after_projection_including_bias",
+    "checkpoint_state_dict_unchanged": true
+  },
+  "formal_cutoff_A": 5.0,
+  "triplet_cap_per_centre": 32,
+  "triplet_rank_formula": "floor((2q+1)n/(2*32)), q=0,...,31, only when n>32",
+  "source_hashes": {
+    "imp2d_dataset": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+    "imp2d_raw_db": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4",
+    "ct_uae": "ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc",
+    "legacy_pretrained": "5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc",
+    "jarvis_source_dataset": "41284603e6eeb6920fe132975570e657e69601a414257bb48d2196d7389369fa"
+  },
+  "g1a_thresholds": {
+    "prediction_range_p99_eV_lt": 0.01,
+    "prediction_range_max_eV_lt": 0.05,
+    "absolute_mae_change_eV_lt": 0.01,
+    "class_and_site_flips_eq": 0,
+    "checkpoint_roundtrip_max_eV_le": 1e-05
+  },
+  "pilot": {
+    "split": "pair_cv5_f0 membership",
+    "epochs": 30,
+    "env_zero_neighbor_mode": "zero_residual_v1",
+    "catastrophic_validation_mae_eV_lt": 3.0,
+    "arms": {
+      "legacy_init": "legacy-initialization-sensitivity only",
+      "no_pretrain": "correctness-clean IMP2D pilot",
+      "corrected_pretrain": "required after G1C"
+    }
+  },
+  "acceptance_collector": {
+    "write_once": true,
+    "host_profile": "WHUServer-L40S",
+    "full_nonexcluded_gpu_uuid_required": true,
+    "current_commit_clean_and_pushed": true,
+    "property_tests": {
+      "graph_correctness": 10,
+      "negative_acceptance_contract": 5,
+      "no_skips": true,
+      "rerun_on_collector_commit": true
+    },
+    "live_revalidation": [
+      "raw_db_and_protocol_identity",
+      "current_build_graph_all_fields_for_10641_imp2d_rows",
+      "current_build_graph_all_fields_for_19902_jarvis_rows",
+      "five_legacy_checkpoints_and_all_baseline_identity_exact_mic_permutation_predictions",
+      "corrected_pretraining_best_checkpoint_val_test_source_export_and_compatibility",
+      "deterministic_split_and_three_config_reconstruction",
+      "three_pilot_checkpoints_validation_and_test_reinference"
+    ]
+  },
+  "submission_gate": "blocked_until_G1C_corrected_pretrain_pilot_passes"
+}

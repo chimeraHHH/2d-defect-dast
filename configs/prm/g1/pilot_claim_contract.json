@@ -1,0 +1,29 @@
+{
+  "schema_version": "prm_g1_pilot_claim_contract_v1",
+  "split_membership_source": "artifacts/prm_protocol_v2/splits/pair_cv5_f0.json",
+  "epochs": 30,
+  "seed": 242,
+  "formal_cutoff_A": 5.0,
+  "env_zero_neighbor_mode": "zero_residual_v1",
+  "catastrophic_validation_mae_eV_lt": 3.0,
+  "arms": {
+    "legacy_init": {
+      "status": "ready_after_imp2d_rebuild_receipt",
+      "claim": "legacy-initialization-sensitivity only"
+    },
+    "no_pretrain": {
+      "status": "ready_after_imp2d_rebuild_receipt",
+      "claim": "correctness-clean IMP2D graph pilot; no transfer claim"
+    },
+    "corrected_pretrain": {
+      "status": "blocked_until_g1c_asset_receipt",
+      "claim": "required for end-to-end corrected initialization GO"
+    }
+  },
+  "forbidden_uses": [
+    "paper metric",
+    "test-based architecture or hyperparameter selection",
+    "G2 OOF replacement",
+    "waiver of G1C source-task lineage"
+  ]
+}
