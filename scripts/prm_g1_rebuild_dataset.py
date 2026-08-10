@@ -85,13 +85,23 @@ def strict_json(payload: Any) -> str:
     return json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
 
 
-def graph_topology_records(sample: dict[str, Any]) -> list[tuple[int, int, float]]:
-    return sorted(
-        (
-            int(edge[0]), int(edge[1]), round(float(distance), 5),
-        )
-        for edge, distance in zip(sample["edge_index"].T, sample["edge_dist"])
-    )
+EDGE_DIST_ATOL = 1.0e-5
+
+
+def graph_edge_records(sample: dict[str, Any]) -> tuple[np.ndarray, np.ndarray]:
+    """Return canonically ordered edge topology and float64 edge distances.
+
+    Edges are lexsorted by (source, target, distance) so that stored and
+    recomputed edge sets can be compared positionally.  Distances are kept as
+    float64 and compared with :data:`EDGE_DIST_ATOL` rather than rounded
+    equality: the stored ``edge_dist`` is float32, so a decimal-rounding
+    comparison flips on values that sit within one float32 quantum of a
+    rounding boundary even when the physical difference is below 1e-6 A.
+    """
+    edges = np.asarray(sample["edge_index"], dtype=np.int64).reshape(2, -1)
+    dists = np.asarray(sample["edge_dist"], dtype=np.float64)
+    order = np.lexsort((dists, edges[1], edges[0]))
+    return edges[:, order], dists[order]
 
 
 def verify_raw_structure(
@@ -199,6 +209,7 @@ def main() -> None:
     capped_centres = 0
     changed_mic_samples = 0
     max_mic_delta = 0.0
+    max_edge_dist_delta = 0.0
     t0 = time.time()
 
     for index, source_sample in enumerate(samples):
@@ -219,10 +230,23 @@ def main() -> None:
             pbc=pbc,
         )
         graph = build_graph(atoms, cutoff=args.cutoff)
-        if graph_topology_records(sample) != graph_topology_records(graph):
+        old_edges, old_dists = graph_edge_records(sample)
+        new_edges, new_dists = graph_edge_records(graph)
+        if old_edges.shape != new_edges.shape or not np.array_equal(
+            old_edges, new_edges
+        ):
             raise ValueError(
-                f"edge topology/distance changed while recovering PBC at index {index}"
+                f"edge topology changed while recovering PBC at index {index}"
             )
+        edge_delta = float(
+            np.max(np.abs(old_dists - new_dists), initial=0.0)
+        )
+        if edge_delta > EDGE_DIST_ATOL:
+            raise ValueError(
+                f"edge distances changed by {edge_delta} (> {EDGE_DIST_ATOL} A) "
+                f"while recovering PBC at index {index}"
+            )
+        max_edge_dist_delta = max(max_edge_dist_delta, edge_delta)
         old_dist = np.asarray(sample["dist_matrix"], dtype=np.float64)
         delta = float(np.max(np.abs(old_dist - graph["dist_matrix"])))
         max_mic_delta = max(max_mic_delta, delta)
@@ -322,6 +346,8 @@ def main() -> None:
             "capped_centres": capped_centres,
             "samples_with_legacy_mic_delta_gt_1e-6": changed_mic_samples,
             "max_legacy_to_exact_mic_delta_A": max_mic_delta,
+            "max_edge_dist_delta_A": max_edge_dist_delta,
+            "edge_dist_atol_A": EDGE_DIST_ATOL,
         },
         "environment": {
             "python": platform.python_version(),
