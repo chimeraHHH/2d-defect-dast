@@ -59,6 +59,10 @@ from scripts.prm_g1_diagnose_geometry import (  # noqa: E402
     quantile_summary,
     sha256_file,
 )
+from scripts.prm_g1_rebuild_dataset import (  # noqa: E402
+    EDGE_DIST_ATOL,
+    graph_edge_records,
+)
 from scripts.prm_g1_freeze_pilots import (  # noqa: E402
     BASE_CONFIG_REPOSITORY_PATH,
     BASE_CONFIG_SHA256,
@@ -842,6 +846,7 @@ def verify_rebuilt_container(
     expected_pbc: Sequence[bool] | None, require_index_ids: bool,
     raw_db_path: Path | None = None,
     protocol_rows: Sequence[Mapping[str, Any]] | None = None,
+    compare_source_edges: bool = False,
 ) -> dict[str, Any]:
     with source_path.open("rb") as handle:
         source_blob = pickle.load(handle)
@@ -864,6 +869,7 @@ def verify_rebuilt_container(
         if repaired_wrapper.get("graph_builder", {}).get("version") != GRAPH_BUILDER_VERSION:
             raise ValueError("repaired container wrapper lacks the graph-builder version")
     total_edges = total_triplets = 0
+    max_edge_dist_delta = 0.0
     source_total_edges = source_total_triplets = 0
     capped_centres = 0
     changed_mic_samples = 0
@@ -941,6 +947,27 @@ def verify_rebuilt_container(
         capped_centres += int(
             np.sum(degrees * np.maximum(degrees - 1, 0) > MAX_TRIPLETS_PER_CENTRE)
         )
+        if compare_source_edges:
+            # The IMP2D repair must preserve the local edge multiset; only
+            # the enumeration order and float32 storage noise may change.
+            # JARVIS callers keep this off because the legacy source edges
+            # are wrong by design and are replaced, not preserved.
+            source_edges, source_dists = graph_edge_records(source)
+            repaired_edges, repaired_dists = graph_edge_records(repaired)
+            if source_edges.shape != repaired_edges.shape or not np.array_equal(
+                source_edges, repaired_edges
+            ):
+                raise ValueError(
+                    f"row {index} edge topology differs between source and repaired"
+                )
+            edge_delta = float(
+                np.max(np.abs(source_dists - repaired_dists), initial=0.0)
+            )
+            if edge_delta > EDGE_DIST_ATOL:
+                raise ValueError(
+                    f"row {index} edge distances differ by {edge_delta} A"
+                )
+            max_edge_dist_delta = max(max_edge_dist_delta, edge_delta)
         mic_delta = float(np.max(np.abs(
             np.asarray(source["dist_matrix"], dtype=np.float64)
             - np.asarray(repaired["dist_matrix"], dtype=np.float64)
@@ -975,6 +1002,9 @@ def verify_rebuilt_container(
         "capped_centres": capped_centres,
         "changed_mic_samples": changed_mic_samples,
         "max_legacy_to_exact_mic_delta_A": max_legacy_to_exact_mic_delta,
+        "max_edge_dist_delta_A": (
+            max_edge_dist_delta if compare_source_edges else None
+        ),
         "targets": np.asarray(targets, dtype=float),
         "ids": np.asarray(ids, dtype=np.int64),
         "pbc_patterns": dict(sorted(pbc_counts.items())),
@@ -1047,6 +1077,7 @@ def verify_repaired_imp2d(
         source_path, repaired_path, expected_rows=EXPECTED_CONTAINER_ROWS,
         expected_pbc=None, require_index_ids=False,
         raw_db_path=raw_db_path, protocol_rows=protocol_rows,
+        compare_source_edges=True,
     )
     expected_audit = {
         "pbc_patterns": live["pbc_patterns"],
@@ -1057,6 +1088,8 @@ def verify_repaired_imp2d(
         "max_legacy_to_exact_mic_delta_A": live[
             "max_legacy_to_exact_mic_delta_A"
         ],
+        "max_edge_dist_delta_A": live["max_edge_dist_delta_A"],
+        "edge_dist_atol_A": EDGE_DIST_ATOL,
     }
     require_close_payload(
         receipt.get("audit"), expected_audit, "IMP2D rebuild audit", atol=1.0e-12
