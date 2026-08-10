@@ -43,7 +43,13 @@ Report over all five pair folds and exactly 10,224 canonical rows:
 The diagnostic stability gate is: 99th-percentile range below 0.01 eV,
 maximum range below 0.05 eV, MAE change below 0.01 eV, and zero class/site
 flips. The archived checkpoint round trip must reproduce predictions within
-`1e-5` eV or the command fails.
+`5e-5` eV or the command fails. That bound is set by measured GPU
+floating-point nondeterminism, not pipeline fidelity: repeated inference of
+the identical stored graphs on the assigned L40S differs by up to ~3e-6 eV
+with single-sample spikes to ~1.1e-5 eV across the 51,120 canonical
+inferences (measured 2026-08-10, torch 2.11.0+cu126); the gate sits five
+times above the observed spike and two hundred times below the smallest
+0.01 eV decision gate.
 
 The archived dataset was built with a pre-3.28 ASE whose neighbour-list bin
 traversal enumerates the identical edge set in a different arbitrary order

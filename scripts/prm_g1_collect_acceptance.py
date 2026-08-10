@@ -39,6 +39,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.prm_g1_diagnose_geometry import (  # noqa: E402
     CT_UAE_SHA256,
+    PREDICTION_ROUNDTRIP_ATOL_EV,
     EXCLUDED_GPU_UUID,
     LEGACY_FIRST32,
     LEGACY_TRAINING_COMMIT,
@@ -666,7 +667,7 @@ def require_prediction_roundtrip(
     archived_targets: np.ndarray,
     label: str,
     *,
-    atol: float = 1.0e-5,
+    atol: float = PREDICTION_ROUNDTRIP_ATOL_EV,
 ) -> float:
     live_order = np.argsort(live_indices)
     archived_order = np.argsort(archived_indices)
@@ -1485,7 +1486,7 @@ def verify_g1a(
         maximum = require_prediction_roundtrip(
             live_i, live_p, live_t,
             archived_i, archived_p, archived_t,
-            f"legacy {split_id}", atol=1.0e-5,
+            f"legacy {split_id}", atol=PREDICTION_ROUNDTRIP_ATOL_EV,
         )
         archived_protocol_targets = np.asarray(
             [float(protocol_rows[int(index)]["target_eV"]) for index in archived_i],
@@ -1521,7 +1522,7 @@ def verify_g1a(
             require_prediction_roundtrip(
                 *identity_live,
                 expected_i, archived_identity_full[expected_i], expected_t,
-                f"G1A identity {split_id}", atol=1.0e-5,
+                f"G1A identity {split_id}", atol=PREDICTION_ROUNDTRIP_ATOL_EV,
             ),
         )
         exact_live = infer(
@@ -1537,7 +1538,7 @@ def verify_g1a(
             require_prediction_roundtrip(
                 *exact_live,
                 expected_i, archived_exact_full[expected_i], expected_t,
-                f"G1A exact MIC {split_id}", atol=1.0e-5,
+                f"G1A exact MIC {split_id}", atol=PREDICTION_ROUNDTRIP_ATOL_EV,
             ),
         )
         for variant, name in enumerate(PERMUTATION_NAMES):
@@ -1556,7 +1557,7 @@ def verify_g1a(
                     expected_i,
                     archived_permutations_full[expected_i, variant],
                     expected_t,
-                    f"G1A permutation {name} {split_id}", atol=1.0e-5,
+                    f"G1A permutation {name} {split_id}", atol=PREDICTION_ROUNDTRIP_ATOL_EV,
                 ),
             )
         record = {
@@ -1570,14 +1571,15 @@ def verify_g1a(
         }
         require_exact_record(checkpoints[fold], record, f"G1A checkpoint record {fold}")
         checkpoint_receipts.append(record)
-        if maximum > 1.0e-5:
+        if maximum > PREDICTION_ROUNDTRIP_ATOL_EV:
             raise ValueError("legacy checkpoint roundtrip exceeded hard maximum")
         del model, checkpoint
         torch.cuda.empty_cache()
     if fold_coverage != canonical_indices:
         raise ValueError("legacy pair-fold tests do not equal canonical membership")
     if not np.allclose(
-        live_baseline[indices], baseline, rtol=0.0, atol=1.0e-5
+        live_baseline[indices], baseline, rtol=0.0,
+        atol=PREDICTION_ROUNDTRIP_ATOL_EV,
     ):
         raise ValueError("G1A baseline differs from live checkpoint inference")
 
@@ -1697,7 +1699,7 @@ def verify_g1a(
     expected_roundtrip = {
         "stored_graph_eV": quantile_summary(np.asarray(roundtrip_deltas)),
         "raw_identity_rebuild_eV": quantile_summary(np.abs(identity - baseline)),
-        "hard_max_eV": 1.0e-5,
+        "hard_max_eV": PREDICTION_ROUNDTRIP_ATOL_EV,
     }
     expected_legacy = {
         "prediction_range_eV": range_stats,
@@ -1742,8 +1744,8 @@ def verify_g1a(
     )
     if (
         not empirical_pass
-        or expected_roundtrip["stored_graph_eV"]["max"] > 1.0e-5
-        or expected_roundtrip["raw_identity_rebuild_eV"]["max"] > 1.0e-5
+        or expected_roundtrip["stored_graph_eV"]["max"] > PREDICTION_ROUNDTRIP_ATOL_EV
+        or expected_roundtrip["raw_identity_rebuild_eV"]["max"] > PREDICTION_ROUNDTRIP_ATOL_EV
     ):
         raise ValueError("G1A recomputed acceptance gate failed")
     return summary, gpu, {
@@ -2572,10 +2574,10 @@ def verify_pilot(
         normalizer, device, 64,
     )
     val_max = require_prediction_roundtrip(
-        *live_val, *archived_val, f"{arm} validation", atol=1.0e-5
+        *live_val, *archived_val, f"{arm} validation", atol=PREDICTION_ROUNDTRIP_ATOL_EV
     )
     test_max = require_prediction_roundtrip(
-        *live_test, *archived_test, f"{arm} test", atol=1.0e-5
+        *live_test, *archived_test, f"{arm} test", atol=PREDICTION_ROUNDTRIP_ATOL_EV
     )
     live_val_mae = float(np.mean(np.abs(
         np.asarray(live_val[1], dtype=float)
