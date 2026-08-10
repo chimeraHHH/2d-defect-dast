@@ -19,7 +19,15 @@ The user also authorized claim-bounded prose and figure restructuring for PRB.
 This includes replacing unsupported cost-saving language with retrospective
 energy estimation or reranking of available DFT-relaxed geometries, revising
 the evidence order, and reserving a main-text physical-analysis figure without
-inventing results.  G2 full OOF reruns, new DFT, a prospective geometry campaign,
+inventing results.
+
+On 2026-08-10 the user additionally approved gate **G2** (repaired full core
+OOF) and gate **EV-A** (six convention-anchor DFT runs) as defined in
+`paper_Q1/review/reviewer_revision_plan_2026-08-10_v2.md`.  G2 launches only
+after completed G1/G1C server acceptance from a pushed clean commit, per
+`paper_Q1/review/g2_execution_runbook.md`; EV-A executes only under its frozen
+preregistration `paper_Q1/review/ev_a_preregistration.md`.  The EV-B/C/D blind
+candidate campaign, canonical G3 promotion, any prospective geometry campaign,
 release, and submission remain unapproved transitions under manual control.
 
 ## Objective
@@ -32,7 +40,9 @@ part of the active route and remains a separately authorized optional gate.
 The controlling reviewer-response artifacts are:
 
 - `paper_Q1/review/reviewer_comment_matrix_2026-08-10.md`;
-- `paper_Q1/review/reviewer_revision_plan_2026-08-10.md`.
+- `paper_Q1/review/reviewer_revision_plan_2026-08-10_v2.md`, which supersedes
+  the same-day v1 plan; v1 is retained as history and its G0/G1/G2/G4/G5 gate
+  definitions remain valid where v2 cites them.
 
 The minimum truthful task description is “retrospective energy estimation or
 reranking of available DFT-relaxed geometries.” General DFT-acceleration claims
