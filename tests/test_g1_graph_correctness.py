@@ -401,7 +401,10 @@ def _assert_zero_neighbor_enrichment_is_batch_independent() -> None:
         assert not torch.equal(corrected_mixed[1, 0], mixed_h[1, 0])
 
         # The compatibility branch must reproduce the historical mixed-batch
-        # formula exactly, including projection bias.
+        # formula, including projection bias.  The module projects a gathered
+        # feature batch while the test projects one vector, so on CUDA the two
+        # paths select different GEMM kernels and may differ by one float32
+        # ULP; the strict no-op identities above remain exact.
         legacy_mixed = legacy(
             mixed_h,
             mixed_defect,
@@ -417,7 +420,7 @@ def _assert_zero_neighbor_enrichment_is_batch_independent() -> None:
         )
         legacy_expected_a = mixed_h[0, 0] + legacy.proj(legacy_feature_a)
         torch.testing.assert_close(
-            legacy_mixed[0, 0], legacy_expected_a, rtol=0.0, atol=0.0
+            legacy_mixed[0, 0], legacy_expected_a, rtol=0.0, atol=1.0e-6
         )
         assert not torch.equal(legacy_mixed[0, 0], corrected_mixed[0, 0])
         legacy_isolated = legacy(
@@ -495,8 +498,9 @@ def _assert_zero_neighbor_enrichment_is_batch_independent() -> None:
         legacy_v2_expected_a = mixed_h[0, 0] + legacy_v2.proj(
             legacy_v2_feature_a
         )
+        # Cross-kernel comparison; see the four-feature note above.
         torch.testing.assert_close(
-            legacy_v2_mixed[0, 0], legacy_v2_expected_a, rtol=0.0, atol=0.0
+            legacy_v2_mixed[0, 0], legacy_v2_expected_a, rtol=0.0, atol=1.0e-6
         )
         assert not torch.equal(
             legacy_v2_mixed[0, 0], corrected_v2_mixed[0, 0]
