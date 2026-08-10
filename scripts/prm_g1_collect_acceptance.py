@@ -816,7 +816,11 @@ def validate_graph_sample(
             and (angles.min() < -1.0e-6 or angles.max() > math.pi + 1.0e-6)
         )
         or (distances.size and distances.min() < 0.0)
-        or not np.allclose(distances, distances.T, atol=1.0e-6, rtol=0.0)
+        # Exact-MIC distances are symmetric in exact arithmetic; float32
+        # storage quantizes d[i,j] and d[j,i] independently, and one ULP at
+        # the >20 A distances of long-c-axis JARVIS bulk cells is 1.9e-6,
+        # above a purely absolute 1e-6 bound.  rtol=1e-6 is ~8 float32 ULPs.
+        or not np.allclose(distances, distances.T, atol=1.0e-6, rtol=1.0e-6)
     ):
         raise ValueError("actual repaired graph violates cutoff/offset/metric bounds")
     centres = triplets[:, 1] if len(triplets) else np.empty(0, dtype=np.int64)
