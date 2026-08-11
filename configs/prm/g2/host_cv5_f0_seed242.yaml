@@ -1,0 +1,42 @@
+asset_integrity_required: true
+asset_sha256:
+  ct_uae: ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc
+  pretrained_embed: 293e1c21991a6c92757e30b776f8aa9aca10c9504e8830f1914916ff7b393333
+batch_size: 64
+data_path: data/processed/cleaned_dataset.pkl
+data_sha256: 1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b
+epochs: 150
+grad_clip: 5.0
+host_balanced: true
+label_noise_std: 0.03
+loss: mae
+model: v2
+model_kwargs:
+  atom_fea_len: 9
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  defect_embedding: true
+  dmax_global: 12.0
+  dropout: 0.1
+  env_zero_neighbor_mode: zero_residual_v1
+  hidden_dim: 128
+  n_global_layers: 2
+  n_local_layers: 3
+  num_heads: 4
+  rcut_local: 5.0
+  use_env_enrichment: true
+  use_gated_pooling: true
+  use_prenorm_local: true
+num_workers: 0
+online_aug: false
+optimizer:
+  lr: 0.0005
+  weight_decay: 0.0001
+output_dir: g2/host_cv5_f0/seed242
+pretrained_embed: g1c_pretrain/pretrained_embed_corrected.pt
+samples_per_host: 200
+scheduler:
+  eta_min: 1.0e-06
+scheduler_type: cosine
+seed: 242
+split_path: artifacts/prm_protocol_v2/splits/host_cv5_f0.json
+warmup_epochs: 10
