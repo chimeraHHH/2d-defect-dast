@@ -283,7 +283,7 @@ Prose obligations fixed by this plan:
 |---|---|---|
 | (already given) | G1 diagnostics/repair, G1C rebuild, G3 exploratory + W1--W3 preregistration amendments, SchNet pipeline audit, prose/figure restructuring | Everything below |
 | `批准 G2` — **granted 2026-08-10** | Frozen repaired core OOF queue, collection, `prm_g2_acceptance_v1` | Canonical G3, EV, release |
-| `批准 canonical G3` | P0--P5 + W1--W3 on repaired OOF, canonical figures | EV, release, submission |
+| `批准 canonical G3` — **granted 2026-08-11** | P0--P5 + W1--W3 on repaired OOF, canonical figures | EV, release, submission |
 | `批准 EV-A` — **granted 2026-08-10** | Six convention-anchor DFT runs | Candidate campaign |
 | `批准 EV` | Frozen 40--60 candidate blind external validation | Any acceleration claim |
 | `批准 release` | Archival release, persistent identifier | Journal upload |

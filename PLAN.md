@@ -26,9 +26,15 @@ OOF) and gate **EV-A** (six convention-anchor DFT runs) as defined in
 `paper_Q1/review/reviewer_revision_plan_2026-08-10_v2.md`.  G2 launches only
 after completed G1/G1C server acceptance from a pushed clean commit, per
 `paper_Q1/review/g2_execution_runbook.md`; EV-A executes only under its frozen
-preregistration `paper_Q1/review/ev_a_preregistration.md`.  The EV-B/C/D blind
-candidate campaign, canonical G3 promotion, any prospective geometry campaign,
-release, and submission remain unapproved transitions under manual control.
+preregistration `paper_Q1/review/ev_a_preregistration.md`.
+
+G1 was accepted on 2026-08-10 (`artifacts/prm_g1/g1_acceptance.json`, commit
+88d71cc) and the 35-run repaired core OOF queue completed with the G2
+acceptance recorded on 2026-08-11 (`artifacts/prm_g2/g2_acceptance.json`,
+runs at commit 45997d3).  On 2026-08-11 the user approved **canonical G3**
+promotion on the repaired OOF evidence.  The EV-B/C/D blind candidate
+campaign, any prospective geometry campaign, release, and submission remain
+unapproved transitions under manual control.
 
 ## Objective
 
