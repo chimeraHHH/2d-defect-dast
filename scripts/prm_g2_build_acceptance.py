@@ -302,6 +302,7 @@ def main() -> None:
         prediction_sources=prediction_sources,
     )
 
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "x", encoding="utf-8") as handle:
         json.dump(acceptance, handle, indent=2, sort_keys=True)
         handle.write("\n")
