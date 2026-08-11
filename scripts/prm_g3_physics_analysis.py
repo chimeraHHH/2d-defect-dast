@@ -1838,6 +1838,18 @@ def alternating_projection(
     raise RuntimeError("crossed fixed-effect projection did not converge")
 
 
+# Weighted-median scale re-estimation makes the IRLS map discontinuous in
+# the weights: with integer pair-bootstrap multiplicities the weighted MAD
+# jumps between adjacent order statistics, and the iteration can enter an
+# exact limit cycle instead of a fixed point (observed amplitude ~2e-5
+# relative on canonical draw 25, versus ~1e-2 bootstrap standard errors).
+# A limit cycle whose amplitude is below the bounds here is accepted as
+# statistically equivalent and counted; larger amplitudes still fail closed.
+IRLS_CYCLE_BETA_REL = 1.0e-4
+IRLS_CYCLE_ROBUST = 1.0e-3
+IRLS_DIAGNOSTICS = {"limit_cycle_accepts": 0}
+
+
 def fit_huber_fixed_effects(
     y: np.ndarray, design: np.ndarray, groups: Sequence[np.ndarray],
     base_weights: np.ndarray | None = None, max_iterations: int = 500,
@@ -1849,6 +1861,8 @@ def fit_huber_fixed_effects(
         raise ValueError("invalid robust fixed-effect inputs")
     robust = np.ones(n, dtype=float)
     beta = np.zeros(design.shape[1], dtype=float)
+    convergence = "strict"
+    recent_changes: list[tuple[float, float]] = []
     for iteration in range(max_iterations):
         total = base * robust
         projected = alternating_projection(np.column_stack([y, design]), groups, total)
@@ -1872,15 +1886,26 @@ def fit_huber_fixed_effects(
         # the bootstrap statistical precision; the estimator itself
         # (Huber delta, crossed fixed effects) is unchanged.
         beta_reference = np.maximum(1.0, np.abs(beta_new))
-        if (
-            np.max(np.abs(beta_new - beta) / beta_reference) < 1e-7
-            and np.max(np.abs(robust_new - robust)) < 1e-6
-        ):
+        beta_change = float(np.max(np.abs(beta_new - beta) / beta_reference))
+        robust_change = float(np.max(np.abs(robust_new - robust)))
+        recent_changes.append((beta_change, robust_change))
+        if len(recent_changes) > 10:
+            recent_changes.pop(0)
+        if beta_change < 1e-7 and robust_change < 1e-6:
             beta, robust = beta_new, robust_new
             break
         beta, robust = beta_new, robust_new
     else:
-        raise RuntimeError("Huber fixed-effect IRLS did not converge")
+        cycle_beta = max(change for change, _ in recent_changes)
+        cycle_robust = max(change for _, change in recent_changes)
+        if cycle_beta < IRLS_CYCLE_BETA_REL and cycle_robust < IRLS_CYCLE_ROBUST:
+            convergence = "limit_cycle"
+            IRLS_DIAGNOSTICS["limit_cycle_accepts"] += 1
+        else:
+            raise RuntimeError(
+                "Huber fixed-effect IRLS did not converge: last-10 relative "
+                f"beta change {cycle_beta}, robust-weight change {cycle_robust}"
+            )
     total = base * robust
     projected = alternating_projection(np.column_stack([y, design]), groups, total)
     y_within, x_within = projected[:, 0], projected[:, 1:]
@@ -1890,6 +1915,7 @@ def fit_huber_fixed_effects(
     return {
         "beta": beta,
         "scale": scale,
+        "irls_convergence": convergence,
         "robust_weights": robust,
         "base_weights": base,
         "x_within": x_within,
@@ -2632,6 +2658,7 @@ def bootstrap_family_rows(
 
 
 def analyze(args: argparse.Namespace) -> None:
+    IRLS_DIAGNOSTICS["limit_cycle_accepts"] = 0
     runtime = require_server_preflight(args)
     if args.bootstrap_draws != 2000 or args.bootstrap_seed != 20260810:
         raise ValueError(
@@ -3211,6 +3238,11 @@ def analyze(args: argparse.Namespace) -> None:
         "evidence_label": evidence_label,
         "env_zero_neighbor_mode": expected_zero_mode,
         "oof_inference_batch_size": OOF_INFERENCE_BATCH_SIZE,
+        "irls_limit_cycle_accepts": IRLS_DIAGNOSTICS["limit_cycle_accepts"],
+        "irls_cycle_bounds": {
+            "beta_relative_lt": IRLS_CYCLE_BETA_REL,
+            "robust_weight_lt": IRLS_CYCLE_ROBUST,
+        },
         "runtime": runtime,
         "extraction_manifest_sha256": file_sha256(extraction_manifest_path),
         "joined_descriptors_sha256": file_sha256(joined_path),
