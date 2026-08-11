@@ -1840,7 +1840,7 @@ def alternating_projection(
 
 def fit_huber_fixed_effects(
     y: np.ndarray, design: np.ndarray, groups: Sequence[np.ndarray],
-    base_weights: np.ndarray | None = None, max_iterations: int = 100,
+    base_weights: np.ndarray | None = None, max_iterations: int = 500,
 ) -> dict[str, Any]:
     """Huber IRLS with fixed-effect projection repeated inside each iteration."""
     n = len(y)
@@ -1864,7 +1864,18 @@ def fit_huber_fixed_effects(
         standardized = np.abs(residual) / scale
         robust_new = np.minimum(1.0, HUBER_DELTA / np.maximum(standardized, 1e-12))
         robust_new[base == 0] = 1.0
-        if np.max(np.abs(beta_new - beta)) < 1e-9 and np.max(np.abs(robust_new - robust)) < 1e-7:
+        # Scale-aware convergence: IRLS with a re-estimated MAD scale
+        # oscillates at ~1e-8 amplitude indefinitely, so an absolute 1e-9
+        # coefficient test is unattainable on some bootstrap draws.  A
+        # relative 1e-7 coefficient change and 1e-6 sup-change of the
+        # bounded robust weights are still five orders of magnitude below
+        # the bootstrap statistical precision; the estimator itself
+        # (Huber delta, crossed fixed effects) is unchanged.
+        beta_reference = np.maximum(1.0, np.abs(beta_new))
+        if (
+            np.max(np.abs(beta_new - beta) / beta_reference) < 1e-7
+            and np.max(np.abs(robust_new - robust)) < 1e-6
+        ):
             beta, robust = beta_new, robust_new
             break
         beta, robust = beta_new, robust_new
