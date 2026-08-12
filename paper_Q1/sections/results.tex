@@ -17,13 +17,15 @@ structural novelty}
 
 Withholding chemistry degrades prediction in a strict order.  With the
 repaired graph representation, mean absolute error is
-\PRMRepPairCvMAE\eV{} when complete host--impurity \emph{pairs} are withheld,
-but rises to \PRMRepDopantCvMAE\eV{} when complete impurities are withheld
-and to \PRMRepHostCvMAE\eV{} when complete hosts are withheld.
-\todoRepair{random-CV interpolation reference pending repaired rerun}
-Recombining constituents that were each seen in training is therefore
-substantially easier than encountering a new constituent, and a new host is
-the hardest axis of all.
+\PRMRepIdCvMAE\eV{} under random cross-validation, rises modestly to
+\PRMRepPairCvMAE\eV{} when complete host--impurity \emph{pairs} are
+withheld and to \PRMRepChemBlockMAE\eV{} on the predefined host-by-impurity
+chemistry block, but jumps to \PRMRepDopantCvMAE\eV{} when complete
+impurities are withheld and to \PRMRepHostCvMAE\eV{} when complete hosts
+are withheld.  Recombining constituents that were each seen in training is
+therefore only mildly harder than interpolation, whereas encountering a new
+constituent roughly doubles the error, and a new host is the hardest axis
+of all.
 
 The host--impurity ordering itself is small but real: the sample-matched
 host-minus-impurity absolute-error gap has a pair-clustered 95\% interval of
