@@ -1,0 +1,17 @@
+{
+  "canonical_analysis_complete": true,
+  "canonical_main_text_eligible": true,
+  "canonical_provenance_verified": true,
+  "claim_specific_gates": {
+    "any_p1_effect": true,
+    "p3_structural_motif_shift": true,
+    "p4_case_panel": false
+  },
+  "env_zero_neighbor_mode": "zero_residual_v1",
+  "evidence_label": "CANONICAL \u2014 REPAIRED G2 OOF",
+  "evidence_tier": "canonical",
+  "oof_inference_batch_size": 64,
+  "reason": "canonical analysis complete; manuscript claims remain subject to per-output gates",
+  "schema_version": "prm_g3_run_status_v1",
+  "state": "canonical_analysis_complete"
+}

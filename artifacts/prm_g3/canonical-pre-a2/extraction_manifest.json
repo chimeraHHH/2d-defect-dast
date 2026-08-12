@@ -1,6 +1,6 @@
 {
   "canonical_acceptance_embedded": null,
-  "created_at": "2026-08-12T10:42:35.464020+00:00",
+  "created_at": "2026-08-11T16:02:22.938803+00:00",
   "descriptor_contract": {
     "atom_feature_table_sha256": "5fa97d7788ef9b1e10be6d874aa9c6c7d55c532d055c187bb9452659983c5bb4",
     "cutoff_A": 5.0,
@@ -360,7 +360,7 @@
   "runtime": {
     "cuda_visible_devices": "",
     "git": {
-      "commit": "46956ef3bdf70c8efbf7d2188d73bbbb7d1b9af2",
+      "commit": "91bbf4f97e11824715be4fd3b9ea34260a48b13c",
       "dirty": false,
       "remote_refs": [
         "origin/prm-revision"

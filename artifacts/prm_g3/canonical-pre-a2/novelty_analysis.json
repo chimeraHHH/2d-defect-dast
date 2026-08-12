@@ -1,5 +1,4 @@
 {
-  "base_claim_gate_without_support": 1,
   "bootstrap_draws": 2000,
   "bootstrap_seed": 20260810,
   "claim_gate": 1,
@@ -12,36 +11,31 @@
       "mean_error_gap_eV": -0.00034736254867906224,
       "n": 2045,
       "novelty_gap_slope_eV_per_robust_unit": 0.0009870325896892541,
-      "pair_fold_stratum": 0,
-      "support_adjusted_novelty_gap_slope": 0.0009874873998276044
+      "pair_fold_stratum": 0
     },
     {
       "mean_error_gap_eV": 0.09720288420596813,
       "n": 2045,
       "novelty_gap_slope_eV_per_robust_unit": 0.0012151896802846784,
-      "pair_fold_stratum": 1,
-      "support_adjusted_novelty_gap_slope": 0.001198458672948214
+      "pair_fold_stratum": 1
     },
     {
       "mean_error_gap_eV": 0.06626796722933885,
       "n": 2045,
       "novelty_gap_slope_eV_per_robust_unit": 0.0006432785411267033,
-      "pair_fold_stratum": 2,
-      "support_adjusted_novelty_gap_slope": 0.00064918033191116
+      "pair_fold_stratum": 2
     },
     {
       "mean_error_gap_eV": 0.022551989515292338,
       "n": 2045,
       "novelty_gap_slope_eV_per_robust_unit": 0.001016019675982401,
-      "pair_fold_stratum": 3,
-      "support_adjusted_novelty_gap_slope": 0.0010240316714430684
+      "pair_fold_stratum": 3
     },
     {
       "mean_error_gap_eV": 0.04433554338657789,
       "n": 2044,
       "novelty_gap_slope_eV_per_robust_unit": 0.001118893118376634,
-      "pair_fold_stratum": 4,
-      "support_adjusted_novelty_gap_slope": 0.0011362656247531427
+      "pair_fold_stratum": 4
     }
   ],
   "host_fold_audits": [
@@ -613,10 +607,5 @@
   "novelty_gap_slope_eV_per_robust_unit": 0.0009907869124379655,
   "positive_pair_strata_mean_gap": 4,
   "positive_pair_strata_novelty_slope": 5,
-  "schema_version": "prm_g3_novelty_analysis_v2",
-  "support_adjusted_novelty_gap_slope": 0.0009960567636145316,
-  "support_adjusted_novelty_gap_slope_bootstrap_p": 0.0009995002498750624,
-  "support_adjusted_novelty_gap_slope_ci_high": 0.0012870552894378535,
-  "support_adjusted_novelty_gap_slope_ci_low": 0.000722566216279863,
-  "support_gap_definition": "log1p(same-impurity training rows in the host fold) minus log1p(same-host training rows in the impurity fold), computed strictly inside each fold's training partition (amendment A2-W2)"
+  "schema_version": "prm_g3_novelty_analysis_v1"
 }

@@ -1,0 +1,40 @@
+{
+  "amendment": "A2-W3",
+  "attenuation_ci_high": 0.5834921922891043,
+  "attenuation_ci_low": -0.012866762682163128,
+  "attenuation_point": 0.28173202572235345,
+  "attenuation_undefined_draws": 0,
+  "bootstrap_draws": 2000,
+  "bootstrap_seed": 20260810,
+  "controls": [
+    "natoms",
+    "cell_area_A2",
+    "train_host_support",
+    "train_impurity_support",
+    "abs_target_eV"
+  ],
+  "evidence_label": "CANONICAL \u2014 REPAIRED G2 OOF",
+  "evidence_tier": "canonical",
+  "fixed_effects": [
+    "host",
+    "dopant",
+    "pair_fold"
+  ],
+  "fold_attenuations": [
+    0.4758208307355717,
+    0.24812852087581394,
+    0.23934285859087268,
+    0.20028481364217454,
+    0.1859037976112513
+  ],
+  "m0_class_ci_high": 0.5766236853998506,
+  "m0_class_ci_low": 0.48330776382224083,
+  "m0_class_coefficient": 0.5302694455693215,
+  "m1_class_ci_high": 0.5448667001537293,
+  "m1_class_ci_low": 0.21617273813410173,
+  "m1_class_coefficient": 0.3808755604904073,
+  "response": "log(pair_absolute_error_eV + 0.05)",
+  "same_sign_folds": 5,
+  "schema_version": "prm_g3_a2_attenuation_v1",
+  "verdict": "the interstitial penalty is not explained by the available descriptors"
+}
