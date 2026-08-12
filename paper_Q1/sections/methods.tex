@@ -186,8 +186,11 @@ $g_{ij}$ a learned scalar gate.  Pair and angle messages are
  \mathbf a(\theta_{jik})],
 \end{align}
 where $\mathbf a$ is the angular basis and $\Vert$ denotes concatenation.  The
-graph builder retains at most the first 32 ordered neighbor pairs at each
-center; denote that retained set by $\mathcal T_i$.  The residual update is
+graph builder forms the complete ordered-angle multiset at each center and,
+when its size $n=d(d-1)$ exceeds 32, retains the midpoint order statistics
+$\lfloor (2q+1)n/64 \rfloor$, $q=0,\dots,31$, of the sorted angles; the
+selection depends only on angle values, never on stored atom order, so the
+retained set $\mathcal T_i$ is invariant to atom-index permutations.  The residual update is
 \begin{equation}
  \mathbf h_i' = \mathbf h_i+
  \phi_n\!\left(\sum_j\mathbf m_{ij}+
@@ -201,10 +204,10 @@ For attention head $a$, the subsequent global block uses
  +b_a\{\mathbf r_g(D_{ij})\}\right],
  \label{eq:radial_attention}
 \end{equation}
-where $D_{ij}$ is the norm obtained by wrapping each fractional-coordinate
-difference independently into $[-1/2,1/2)$ and mapping it through the cell.
-This componentwise wrapping is periodic but is not guaranteed to select the
-shortest image in an oblique cell.  The 32 global radial basis centers span
+where $D_{ij}$ is the exact minimum-image distance under the structure's
+periodic boundary conditions, computed with a verified shortest-image
+construction and validated against a brute-force image search on orthogonal,
+hexagonal, and adversarial oblique cells.  The 32 global radial basis centers span
 0--12~\AA; beyond the outer center their activations decay toward zero, while
 attention still connects every valid atom.  The gated
 readout is
@@ -216,11 +219,13 @@ readout is
  s\mathbf h_{\mathrm{att}}+(1-s)\mathbf h_{\max}\right].
  \label{eq:gated_readout}
 \end{align}
-Elemental scalars, local distances and angles, and wrapped global displacement
-norms make the scalar prediction invariant to rigid translation and rotation
-of a periodic structure.  Pair aggregation, attention, and graph pooling are symmetric, but
-the capped triplet enumeration follows the stored neighbor order; exact
-invariance to atom-index permutations is therefore not claimed.
+Elemental scalars, local distances and angles, and minimum-image global
+distances make the scalar prediction invariant to rigid translation and
+rotation of a periodic structure, and every aggregation --- pair messages,
+the order-free triplet selection, attention, and graph pooling --- is
+symmetric under atom-index permutations.  Both properties are enforced by
+unit and property tests and were re-verified in the independent acceptance
+audit of the released implementation.
 
 Figure~\ref{fig:environment_enrichment} illustrates the four local quantities
 entering the E branch and their association with the uniquely identified
