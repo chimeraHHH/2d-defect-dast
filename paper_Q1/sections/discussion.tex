@@ -3,135 +3,133 @@
 \ifprmresultsready
 
 %----------------------------------------------------------------------
-\subsection{Local and global context shape model choice}
+\subsection{Why chemical transfer is hierarchical}
 %----------------------------------------------------------------------
 
-The paired factorial separates module effects from variation between data
-partitions.  Validation contrasts supported small reductions in MAE for gated
-readout (G) and the composite local block (P), but did not resolve an
-independent effect of environment enrichment (E).  The negative G:P and
-positive E:P interactions indicate nonadditive module effects and help account
-for selection of the all-enabled configuration even
-though E lacks a resolved main effect.  The four E descriptors may overlap with
-information already encoded by local distance and angle messages, but the
-factorial does not establish that they are redundant.  Likewise, P changes both
-normalization placement and edge gating, so its contrast applies only to the
-composite block.
+The transfer hierarchy has a structural reading.  Pair-held-out prediction,
+in which all but one test structure has both its host and impurity
+represented elsewhere in training, costs little over random interpolation
+(\PRMRepPairCvMAE{} versus \PRMRepIdCvMAE\eV{}): recombining familiar
+constituent representations is nearly free.  The expensive step is a new
+constituent, and a new host (\PRMRepHostCvMAE\eV{}) is measurably harder
+than a new impurity (\PRMRepDopantCvMAE\eV{}).  The preregistered novelty
+analysis attributes this residual asymmetry: the sample-matched error gap
+follows the structural novelty of the held-out host --- its composition,
+cell, thickness, and coordination environment relative to the training
+hosts --- and the association survives controlling for the mechanical
+training-support asymmetry between the two protocols, with the same
+direction across the fold strata.  A new host changes the structural motif
+the defect embeds into, whereas a new impurity largely re-poses a chemistry
+seen in other combinations.
 
-Graph readout provides a direct connection between the prediction target and
-model design.  Atomwise addition is appropriate for extensive total energies,
-whereas the IMP2D formation energy is a defect excess energy and is
-non-extensive with respect to host atom count.  Local coordination is a useful
-inductive bias, but the energy difference can retain long-range elastic or
-electronic contributions; DART therefore also includes all-atom attention.
-Pooling choice is known to affect atomistic prediction of intensive and
-localized quantum properties~\cite{buterez2023pooling}.  Replacing only the additive
-SchNet readout by mean pooling reduced its host-held-out MAE from
-\PRMSchNetAddHostMAE\eV{} to \PRMSchNetMeanHostMAE\eV{} and improved all five
-folds.  For this evaluated SchNet recipe, the controlled sensitivity identifies
-additive pooling as an important contributor to its large host-held-out error;
-it does not establish a universal pooling rule for formation energies.  The remaining
-gap to DART (\PRMHostCvDARTMAE\eV{}) reflects the
-complete learning recipes, including their inputs, initialization,
-interactions, and readouts; it is not evidence for a backbone-only advantage.
-Fold-resolved errors and size--error diagnostics are reported in the
-Supplemental Material~\cite{supplemental}.
+These grouped tests do not represent element- or formula-disjoint
+pretraining.  The source task contains reduced-formula matches for 26 IMP2D
+host labels and every IMP2D impurity element, so host- and impurity-held-out
+mean absence from formation-energy supervision, not absence from all earlier
+representation learning.  All conclusions are internal to the retained 44
+hosts and 65 impurities --- a set that contains no nitride host --- and to
+the IMP2D reference conventions.
 
 %----------------------------------------------------------------------
-\subsection{Chemical axes and incorporation geometry define applicability}
+\subsection{Why the two incorporation classes fail differently}
 %----------------------------------------------------------------------
 
-The difference between random and chemistry-grouped evaluation is physically
-structured.  Pair-held-out MAE was \PRMPairCvDARTMAE\eV{}, compared with
-\PRMIdCvDARTMAE\eV{} under random cross-validation.  In the pair-held-out case,
-all but one test structure had both its host and impurity represented elsewhere
-in training, so this regime almost entirely tests recombination of familiar
-constituent representations.  Withholding every IMP2D
-target for a host or impurity instead increased MAE to \PRMHostCvDARTMAE\eV{}
-and \PRMDopantCvDARTMAE\eV{}.  This separation shows that pair-held-out
-recombination is a less severe transfer problem than an unseen constituent
-within this database.
+The class asymmetry (\PRMRepPairInterstitialMAE{} versus
+\PRMRepPairAdsorbateMAE\eV{} under pair holdout) is not one phenomenon.
+The gated error-map effects separate two regimes: interstitial error grows
+with descriptors of the local cage --- post-relaxation clearance,
+neighbor-distance dispersion, the largest defect-centered neighbor
+distance, and size and valence mismatch --- while adsorbate error is
+dominated by chemical mismatch, led by signed valence, with local geometry
+contributing through the smooth coordination number.  Physically, an
+embedded impurity samples the host's short-range repulsive landscape, so
+small geometric irregularities translate into large energy variations; an
+adsorbed impurity sits outside the layer, and the harder part is scoring
+how its bonding preference matches the surface chemistry.
 
-The grouped tests do not represent element- or formula-disjoint pretraining.
-The JARVIS source task contains reduced-formula matches for 26 IMP2D host labels
-and contains every IMP2D impurity element.  Host- and impurity-held-out
-therefore mean absence from IMP2D formation-energy supervision, not absence
-from all earlier representation learning.  The results remain internal to the
-44 hosts and 65 impurities retained from IMP2D and should not be extrapolated
-to arbitrary 2D compounds or reference conventions.
-
-Incorporation geometry creates a second hierarchy.  Interstitial MAE under
-pair-held-out prediction was \PRMPairInterstitialMAE\eV{}, more than twice the
-\PRMPairAdsorbateMAE\eV{} adsorbate error.  Interstitial sites are typically
-more highly coordinated and geometrically confined than adsorbate sites in the
-source data~\cite{imp2d2023}, which offers a plausible source of greater
-structural sensitivity, but the present analysis does not isolate a mechanism.
-The retained population is also selective: the impurity-identity audit removes
-316 interstitial and 33 adsorbate structures whose inserted atom cannot be
-identified permutation-invariantly.  The observed class asymmetry therefore
-applies to the retained population rather than to every released IMP2D row.
+How much of the interstitial penalty do these measured descriptors explain?
+The preregistered attenuation ladder gives a deliberately conservative
+answer: the class gap is firmly established after controls, and adding the
+full frozen geometry/chemistry block attenuates the class coefficient by
+about 28\% at the point estimate, consistently across all five folds, but
+the attenuation interval includes zero, so under the frozen criteria the
+penalty is reported as not yet explained by the available descriptors.  The
+candidate descriptors capture a real part of the effect; the remainder must
+live in physics they do not span, such as the anisotropy of the relaxation
+pattern, which the released database does not record.  The retained
+population is also selective --- the impurity-identity audit removes 316
+interstitial and 33 adsorbate structures --- so the asymmetry applies to
+the retained population rather than to every released IMP2D row.
 
 %----------------------------------------------------------------------
-\subsection{Retrospective energy estimation and reranking of available relaxed geometries}
+\subsection{Readout and the non-extensive target}
 %----------------------------------------------------------------------
 
-For a fixed host--impurity pair, the pristine-host energy and impurity chemical
-potential in Eq.~\eqref{eq:formation_energy} cancel when sites or incorporation
-classes are ranked.  This cancellation helps explain why useful relative
-decisions can coexist with a larger absolute formation-energy error.
-Pair-held-out predictions identified the lower-energy incorporation class with
-\PRMPreferenceAccuracy\% accuracy, and their mean global site-selection regret
-was \PRMGlobalRegret\eV{}.  Exact-site accuracy measures recovery of the
-reference minimum, whereas regret distinguishes a serious miss from selection
-of a nearly degenerate alternative.  The top-two result further quantifies
-whether a small follow-up queue retains the reference minimum.
-
-These decisions are conditional on the DFT-relaxed candidate geometries
-released by IMP2D.  Because each geometry and its reference energy are outputs
-of the same completed DFT workflow, the model does not bypass the relaxation
-cost that produced the target.  The analysis therefore concerns retrospective
-energy estimation and reranking over available relaxed candidates, not
-structural generation, relaxation, thermodynamic populations, kinetics, or
-synthesizability.
+The formation energy of Eq.~\eqref{eq:formation_energy} is a defect excess
+energy: a difference of extensive totals that does not grow with host atom
+count.  Atomwise additive pooling, natural for extensive total energies,
+imposes the wrong scaling class on this target.  The complete-recipe
+comparison shows the consequence (additive SchNet at
+\PRMSchNetAddHostCvMAE\eV{} on withheld hosts), the single-change
+sensitivity shows the lever (mean pooling alone recovers to
+\PRMSchNetMeanHostCvMAE\eV{}), and the preregistered extensivity diagnostic
+adds the residual-level picture: the additive arm's signed residual drifts
+by roughly $0.04$\eV{} per atom at the point estimate --- fifty times the
+defect-centered model's drift --- although host-level heterogeneity leaves
+the host-clustered interval spanning zero, so the mechanism is reported as
+suggested but not established at the frozen evidence standard.  Pooling
+choice is known to matter for intensive and localized
+targets~\cite{buterez2023pooling}; the remaining gap to the defect-centered
+model reflects complete recipes, not a backbone-only ranking.
 
 %----------------------------------------------------------------------
-\subsection{Internal uncertainty and remaining scope}
+\subsection{Retrospective reranking of available relaxed geometries}
 %----------------------------------------------------------------------
 
-On the dedicated ensemble split, nominal 90\% intervals had
-\PRMUQNinetyCoverage\% empirical coverage and mean width
-\PRMUQNinetyWidth\eV{}.  Coverage and width must be interpreted together, and
-the nonzero oracle gap in Supplemental Fig.~S3~\cite{supplemental} shows that
-ensemble disagreement
-does not recover all high-error cases.  Because the calibration and test rows
-come from the same finite IMP2D population, these results support internal
-marginal calibration and risk ranking, not host-conditional,
-impurity-conditional, or chemically shifted coverage.
+For a fixed host--impurity pair, the pristine-host energy and impurity
+chemical potential in Eq.~\eqref{eq:formation_energy} cancel when sites or
+incorporation classes are ranked, which is why useful relative decisions
+coexist with a larger absolute error.  Out-of-fold predictions identified
+the lower-energy incorporation class for \PRMRepPreferenceAccuracy\% of
+pairs against a \PRMRepPreferenceReference\% class-prior reference, with
+\PRMRepWithinRegret\eV{} mean within-class regret.  These decisions are
+conditional on the DFT-relaxed candidates released by IMP2D: each geometry
+and its reference energy are outputs of the same completed workflow, so no
+relaxation cost is bypassed, and the results concern retrospective energy
+estimation and reranking --- not structure generation, relaxation,
+thermodynamic populations, kinetics, or synthesizability.
 
-The evidence is limited to neutral adsorbates and interstitials, the source
-database's relaxed structures and reference energies, and a model that infers
-the reference-energy difference from the impurity-containing graph alone.
-Vacancies, substitutions, charged defects, transition levels, migration
-barriers, finite-temperature free energies, and competing phases are outside
-scope.  Duplicate control removes numerical equivalents detected by the two
-declared structural fingerprints but cannot prove that every physical
-redundancy has been found.  SchNet and the descriptor families provide aligned
-comparators rather than an exhaustive survey of atomistic architectures.
+%----------------------------------------------------------------------
+\subsection{Correctness, uncertainty, and remaining scope}
+%----------------------------------------------------------------------
 
-Two implementation details also limit geometric interpretation.  The angle
-branch retains the first 32 ordered neighbor pairs at each center, making that
-branch sensitive to stored atom order when more pairs are available.  The
-global radial bias wraps fractional-coordinate differences componentwise, which
-need not select the shortest image in an oblique cell.  The reported results are
-reproducible for the released ordering and implementation, but strict
-permutation robustness and a true shortest-image global bias have not been
-established.
+Every number in this paper comes from a repaired representation whose
+permutation invariance and exact minimum-image distances passed an
+independent acceptance audit; the source-task pretraining was rebuilt under
+the same corrected construction.  The diagnostic of the superseded
+implementation is a result in its own right: sixteen atom-relabeling
+permutations moved single predictions by up to $8.8$\eV{} and flipped
+incorporation-class decisions, while the pooled MAE moved by less than
+$10^{-3}$\eV{}.  Aggregate benchmarks are therefore nearly blind to
+representation defects that dominate individual predictions --- a caution
+we believe generalizes beyond this system.
 
-A target-matched external set would provide the most direct next test: its
-structures, chemical potentials, convergence settings, and target definition
-would need to match the IMP2D convention.  A complementary extension would
-calibrate uncertainty directly on host- or impurity-shifted partitions, where
-exchangeability is intentionally stressed.
+The evidence remains limited to neutral adsorbates and interstitials, the
+source database's relaxed structures and reference energies, and a model
+that infers the reference-energy difference from the impurity-containing
+graph alone.  Vacancies, substitutions, charged defects, transition levels,
+migration barriers, finite-temperature free energies, and competing phases
+are outside scope.  Duplicate control removes numerical equivalents
+detected by the two declared structural fingerprints but cannot prove that
+every physical redundancy has been found; SchNet and the descriptor
+families provide aligned comparators rather than an exhaustive survey of
+architectures.  Internal ensemble uncertainty (Supplemental
+Material~\cite{supplemental}) supports marginal calibration and risk
+ranking within the retained population, not host-conditional or chemically
+shifted coverage.  A target-matched external set --- structures, chemical
+potentials, convergence settings, and target definition matching the IMP2D
+convention, generated independently of their reference energies --- would
+provide the most direct next test.
 
 \else
 

@@ -2,32 +2,39 @@
 
 \ifprmresultsready
 
-Impurity formation-energy transfer within IMP2D is organized by chemical
-novelty.  Pair-held-out folds, with one singleton-host exception, gave
-\PRMPairCvDARTMAE\eV{} MAE, compared with \PRMIdCvDARTMAE\eV{} under random
-cross-validation.  Removing all target supervision for a host or impurity
-increased the error to \PRMHostCvDARTMAE\eV{} and
-\PRMDopantCvDARTMAE\eV{}, respectively.  Incorporation geometry added a second
-axis: interstitial structures were substantially harder to predict than
-adsorbates in the pair-held-out population.
+Impurity formation-energy prediction within IMP2D is organized by three
+physical regularities.  First, transfer is hierarchical and the hierarchy
+tracks structural novelty: error grows only mildly from random
+interpolation (\PRMRepIdCvMAE\eV{}) through withheld host--impurity pairs
+(\PRMRepPairCvMAE\eV{}) and the predefined chemistry block
+(\PRMRepChemBlockMAE\eV{}), but roughly doubles for a withheld impurity
+(\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}), and the
+host--impurity asymmetry follows the structural novelty of the held-out
+host after controlling for training support.  Second, the two incorporation
+classes fail for different reasons: interstitial error
+(\PRMRepPairInterstitialMAE\eV{}) tracks local crowding while adsorbate
+error (\PRMRepPairAdsorbateMAE\eV{}) tracks chemical mismatch; the measured
+descriptors attenuate the class gap by roughly a quarter without exhausting
+it.  Third, the formation energy's non-extensive, defect-local character
+constrains model design: additive pooling degrades withheld-host error to
+\PRMSchNetAddHostCvMAE\eV{}, a mean readout alone recovers most of that
+gap, and the defect-centered readout shows no size-dependent residual
+drift.
 
-The architecture results connect graph pooling to a formation-energy target
-that is non-extensive in host atom count.  Gated graph readout and the composite
-pre-normalized, distance-gated local block produced small, repeat-consistent
-gains, whereas explicit environment enrichment had no resolved independent
-effect.  In the evaluated SchNet recipe, a post hoc sensitivity test implicated
-atomwise addition, which is natural for an extensive total energy, as one
-contributor to the large host-held-out error.
-
-For existing DFT-relaxed candidate geometries, pair-held-out predictions
-selected the lower-energy incorporation class with \PRMPreferenceAccuracy\%
-accuracy and \PRMGlobalRegret\eV{} mean global site-selection regret.  Because
-the geometries and reference energies arise from the same completed DFT
-workflow, these results support retrospective energy estimation and reranking
-within the neutral, retained IMP2D domain rather than a reduction in relaxation
-cost.  Testing newly generated structures prepared independently of their
-reference energies, together with uncertainty calibration under explicit
-chemical shift, remains necessary before prospective use beyond that domain.
+These conclusions rest on a representation whose permutation invariance and
+exact minimum-image distances passed an independent acceptance audit, after
+a diagnostic showed the superseded implementation could move single
+predictions by up to $8.8$\eV{} under atom relabeling while pooled errors
+moved imperceptibly.  For existing DFT-relaxed candidates, out-of-fold
+predictions selected the lower-energy incorporation class with
+\PRMRepPreferenceAccuracy\% accuracy against a
+\PRMRepPreferenceReference\% class-prior reference.  Because the geometries
+and reference energies arise from the same completed DFT workflow, these
+results support retrospective energy estimation and reranking within the
+neutral, retained IMP2D domain rather than a reduction in relaxation cost.
+Testing independently generated, convention-matched structures and
+calibrating uncertainty under explicit chemical shift remain necessary
+before prospective use beyond that domain.
 
 \else
 

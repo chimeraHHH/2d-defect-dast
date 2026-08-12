@@ -53,32 +53,39 @@ chemistry in two-dimensional materials with a defect-aware graph Transformer}
 \begin{abstract}
 \ifprmresultsready
 We study retrospective estimation and reranking of impurity formation energies
-for available DFT-relaxed candidate geometries in two-dimensional materials.
-In IMP2D, each relaxed geometry and its reference energy are products of the
-same completed DFT workflow; this task therefore evaluates
-database-conditioned prediction rather than replacing candidate generation or
-relaxation.  Random structure splits nevertheless conceal how errors change
-with chemical novelty.  We develop the Defect-Aware Radial Transformer
-(DART) and evaluate it on a curated set of 10,224 neutral structures from the
-Impurities in Two-Dimensional Materials (IMP2D) database.  Across five paired
-repeats, a $2^3$ factorial showed small error reductions from gated graph
-readout and the pre-normalized, distance-gated local block, whereas the
-independent effect of explicit environment enrichment remained inconclusive.
-For pair-held-out structures, all but one test structure had both its host and
-impurity represented elsewhere in training; the mean absolute error was
-\PRMPairCvDARTMAE\eV{}, compared with \PRMIdCvDARTMAE\eV{} under random
-cross-validation.  Withholding every structure
-of a host or impurity increased the error to \PRMHostCvDARTMAE\eV{} and
-\PRMDopantCvDARTMAE\eV{}, respectively.  Incorporation geometry formed another
-applicability axis: pair-held-out interstitial structures had
-\PRMPairInterstitialMAE\eV{} error, more than twice the
-\PRMPairAdsorbateMAE\eV{} error for adsorbates.  For candidates sharing a host
-and impurity, pair-held-out predictions selected the lower-energy incorporation
-class with \PRMPreferenceAccuracy\% accuracy and
-\PRMGlobalRegret\eV{} mean site-selection regret.  Thus, within IMP2D,
-pair-held-out transfer almost entirely recombines familiar constituents and is
-substantially easier than transfer to a new constituent, while interstitial
-incorporation remains the more difficult energy-prediction regime.
+for available DFT-relaxed candidate geometries in two-dimensional materials,
+using a defect-aware graph Transformer with a strictly permutation-invariant
+local representation and exact minimum-image distances, evaluated on 10,224
+neutral structures curated from the IMP2D database.  Because each geometry and
+its reference energy are products of the same completed DFT workflow, the task
+evaluates database-conditioned prediction rather than replacing candidate
+generation or relaxation.  Transfer is organized by chemical novelty in a
+strict hierarchy: mean absolute error grows only mildly from random
+cross-validation (\PRMRepIdCvMAE\eV{}) through withheld host--impurity pairs
+(\PRMRepPairCvMAE\eV{}) and a predefined chemistry block
+(\PRMRepChemBlockMAE\eV{}), but roughly doubles when a complete impurity
+(\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}) is withheld.  The
+small but significant host--impurity asymmetry tracks the structural novelty
+of the held-out host after controlling for training-support asymmetry.
+Incorporation geometry forms a second axis with distinct physics: interstitial
+structures (\PRMRepPairInterstitialMAE\eV{}) are over twice as hard as
+adsorbates (\PRMRepPairAdsorbateMAE\eV{}), and preregistered error maps show
+interstitial error tracking local crowding --- clearance, neighbor-distance
+dispersion, and size mismatch --- whereas adsorbate error tracks chemical
+mismatch, led by signed valence.  A readout analysis connects model design to
+the non-extensive, defect-local character of the formation energy: an
+additive-readout baseline degrades to \PRMSchNetAddHostCvMAE\eV{} on withheld
+hosts and improves to \PRMSchNetMeanHostCvMAE\eV{} with a mean readout alone,
+while the defect-centered model shows no size-dependent residual drift.  For
+candidates sharing a host and impurity, out-of-fold predictions select the
+lower-energy incorporation class with \PRMRepPreferenceAccuracy\% accuracy
+against a \PRMRepPreferenceReference\% class-prior reference, with
+\PRMRepWithinRegret\eV{} mean within-class site-selection regret.  All
+reported numbers come from the repaired representation; a permutation
+diagnostic of the superseded implementation shifted single predictions by up
+to several eV while pooled errors moved by under $10^{-3}$\,eV, showing that
+aggregate benchmarks can hide representation defects that dominate individual
+predictions.
 \else
 We study how impurity formation-energy prediction changes across host,
 impurity, and incorporation-geometry axes in two-dimensional materials.  The
