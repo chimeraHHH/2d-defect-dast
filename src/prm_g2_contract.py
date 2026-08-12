@@ -52,6 +52,18 @@ CANONICAL_PREDICTION_SEEDS: dict[str, frozenset[int]] = {
 }
 CANONICAL_REGIMES = ("pair", "host", "dopant")
 CANONICAL_FOLDS = tuple(range(5))
+# Paper-facing repaired reruns outside the G2 acceptance contract: the
+# random-interpolation folds and the predefined chemistry block, matching the
+# legacy campaign's single-seed law.  The acceptance builder never reads
+# these regimes; they exist so the same fail-closed wrapper can produce the
+# supplementary core numbers.
+PAPER_PREDICTION_SEEDS: dict[str, frozenset[int]] = {
+    "id": frozenset({242}),
+    "chemistry_block": frozenset({242}),
+}
+ALL_PREDICTION_SEEDS: dict[str, frozenset[int]] = {
+    **CANONICAL_PREDICTION_SEEDS, **PAPER_PREDICTION_SEEDS,
+}
 
 
 def file_sha256(path: Path | str) -> str:
@@ -225,7 +237,12 @@ def regime_of_split_id(split_id: str) -> str:
         for fold in CANONICAL_FOLDS:
             if split_id == f"{regime}_cv5_f{fold}":
                 return regime
-    raise ValueError(f"split id is not a canonical G2 OOF split: {split_id}")
+    for fold in CANONICAL_FOLDS:
+        if split_id == f"id_cv5_f{fold}":
+            return "id"
+    if split_id == "chemistry_block_g6x3d":
+        return "chemistry_block"
+    raise ValueError(f"split id is not a recognized G2 split: {split_id}")
 
 
 def build_g2_run_manifest(
@@ -291,7 +308,7 @@ def build_g2_run_manifest(
     validate_split_payload(split_payload, split_id)
     regime = regime_of_split_id(split_id)
     require(
-        int(seed) in CANONICAL_PREDICTION_SEEDS[regime],
+        int(seed) in ALL_PREDICTION_SEEDS[regime],
         f"seed {seed} is outside the frozen {regime} seed law",
     )
     source_split = source_manifest.get("split", {})

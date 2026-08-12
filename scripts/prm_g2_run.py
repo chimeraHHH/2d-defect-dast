@@ -25,8 +25,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.prm_g2_contract import (  # noqa: E402
+    ALL_PREDICTION_SEEDS,
     CANONICAL_ENV_ZERO_NEIGHBOR_MODE,
-    CANONICAL_PREDICTION_SEEDS,
     EXPECTED_ATOM_FEATURE_SHA256,
     EXPECTED_SOURCE_DATA_SHA256,
     OOF_INFERENCE_BATCH_SIZE,
@@ -187,7 +187,7 @@ def main() -> None:
     )
     regime = regime_of_split_id(args.split_id)
     require(
-        args.seed in CANONICAL_PREDICTION_SEEDS[regime],
+        args.seed in ALL_PREDICTION_SEEDS[regime],
         f"seed {args.seed} violates the frozen {regime} seed law",
     )
 
