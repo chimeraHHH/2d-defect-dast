@@ -1852,7 +1852,11 @@ def alternating_projection(
 # with the measured values in the error.
 IRLS_CYCLE_BETA_REL = 6.0e-4
 IRLS_CYCLE_ROBUST = 3.0e-3
-IRLS_DIAGNOSTICS = {"limit_cycle_accepts": 0}
+IRLS_DIAGNOSTICS = {
+    "limit_cycle_accepts": 0,
+    "max_cycle_beta_rel": 0.0,
+    "max_cycle_robust": 0.0,
+}
 
 
 def fit_huber_fixed_effects(
@@ -1906,6 +1910,12 @@ def fit_huber_fixed_effects(
         if cycle_beta < IRLS_CYCLE_BETA_REL and cycle_robust < IRLS_CYCLE_ROBUST:
             convergence = "limit_cycle"
             IRLS_DIAGNOSTICS["limit_cycle_accepts"] += 1
+            IRLS_DIAGNOSTICS["max_cycle_beta_rel"] = max(
+                IRLS_DIAGNOSTICS["max_cycle_beta_rel"], cycle_beta,
+            )
+            IRLS_DIAGNOSTICS["max_cycle_robust"] = max(
+                IRLS_DIAGNOSTICS["max_cycle_robust"], cycle_robust,
+            )
         else:
             raise RuntimeError(
                 "Huber fixed-effect IRLS did not converge: last-10 relative "

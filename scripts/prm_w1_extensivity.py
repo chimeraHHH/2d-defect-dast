@@ -32,8 +32,10 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+import scripts.prm_g3_physics_analysis as g3mod  # noqa: E402
 from scripts.prm_g3_physics_analysis import (  # noqa: E402
     EXPECTED_DATA_SHA256,
+    IRLS_DIAGNOSTICS,
     bootstrap_two_sided_p,
     file_sha256,
     fit_huber_fixed_effects,
@@ -153,7 +155,20 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--bootstrap-draws", type=int, default=2000)
     parser.add_argument("--bootstrap-seed", type=int, default=20260810)
+    parser.add_argument(
+        "--cycle-beta-bound", type=float, default=None,
+        help="override the IRLS limit-cycle beta bound for the W1 fit "
+             "family; calibrated by a scan run and recorded in the output",
+    )
+    parser.add_argument("--cycle-robust-bound", type=float, default=None)
     args = parser.parse_args()
+    if args.cycle_beta_bound is not None:
+        g3mod.IRLS_CYCLE_BETA_REL = float(args.cycle_beta_bound)
+    if args.cycle_robust_bound is not None:
+        g3mod.IRLS_CYCLE_ROBUST = float(args.cycle_robust_bound)
+    IRLS_DIAGNOSTICS["limit_cycle_accepts"] = 0
+    IRLS_DIAGNOSTICS["max_cycle_beta_rel"] = 0.0
+    IRLS_DIAGNOSTICS["max_cycle_robust"] = 0.0
     if args.bootstrap_draws != 2000 or args.bootstrap_seed != 20260810:
         raise ValueError("W1 requires the frozen bootstrap count and seed")
 
@@ -349,6 +364,13 @@ def main() -> None:
             "additive_same_direction_folds": add_same_folds,
             "difference_ci_excludes_zero": bool(diff_ci[0] > 0 or diff_ci[1] < 0),
             "extensivity_explanation_established": established,
+        },
+        "irls": {
+            "limit_cycle_accepts": IRLS_DIAGNOSTICS["limit_cycle_accepts"],
+            "max_cycle_beta_rel": IRLS_DIAGNOSTICS["max_cycle_beta_rel"],
+            "max_cycle_robust": IRLS_DIAGNOSTICS["max_cycle_robust"],
+            "cycle_beta_bound": g3mod.IRLS_CYCLE_BETA_REL,
+            "cycle_robust_bound": g3mod.IRLS_CYCLE_ROBUST,
         },
         "inputs": {
             "samples_sha256": file_sha256(Path(args.samples)),
