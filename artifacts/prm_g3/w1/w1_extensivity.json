@@ -1,0 +1,90 @@
+{
+  "additive_minus_dart_slope_difference": {
+    "bootstrap_p": 0.6276861569215393,
+    "ci_high": 0.2690602827805379,
+    "ci_low": -0.21047358405913558,
+    "point": 0.0372897196473695
+  },
+  "arms": {
+    "dart_repaired": {
+      "abs_error_slope_eV_per_atom": 0.0028813309263434586,
+      "fold_slope_signs": [
+        -1.0,
+        1.0,
+        -1.0,
+        1.0,
+        -1.0
+      ],
+      "signed_slope_bootstrap_p": 0.8645677161419291,
+      "signed_slope_ci_high": 0.0076235118846878745,
+      "signed_slope_ci_low": -0.00929325198337103,
+      "signed_slope_eV_per_atom": 0.0007454996029254032,
+      "target_adjusted_signed_slope_eV_per_atom": 0.0018957929259839066
+    },
+    "schnet_add": {
+      "abs_error_slope_eV_per_atom": 0.15092731229644776,
+      "fold_slope_signs": [
+        -1.0,
+        -1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "signed_slope_bootstrap_p": 0.6306846576711644,
+      "signed_slope_ci_high": 0.27206492467902843,
+      "signed_slope_ci_low": -0.21257999741354247,
+      "signed_slope_eV_per_atom": 0.0380352192502949,
+      "target_adjusted_signed_slope_eV_per_atom": 0.04915387138671436
+    },
+    "schnet_mean": {
+      "abs_error_slope_eV_per_atom": -0.001405649819919911,
+      "fold_slope_signs": [
+        -1.0,
+        1.0,
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "signed_slope_bootstrap_p": 0.2518740629685157,
+      "signed_slope_ci_high": 0.006571274678450578,
+      "signed_slope_ci_low": -0.03718228090574724,
+      "signed_slope_eV_per_atom": -0.010761328967858471,
+      "target_adjusted_signed_slope_eV_per_atom": -0.003101980648935073
+    }
+  },
+  "bootstrap_draws": 2000,
+  "bootstrap_seed": 20260810,
+  "bundle_add_consistency_max_abs_diff_eV": 0.0,
+  "cluster": "host",
+  "created_at": "2026-08-12T11:33:38.252258+00:00",
+  "evidence_label": "CANONICAL \u2014 REPAIRED G2 OOF (DART) + AUDITED SCHNET ARCHIVES",
+  "evidence_tier": "canonical",
+  "gate": {
+    "additive_ci_excludes_zero": false,
+    "additive_same_direction_folds": 3,
+    "difference_ci_excludes_zero": false,
+    "extensivity_explanation_established": false
+  },
+  "inputs": {
+    "g2_acceptance_sha256": "6dfe8d538d77653d5c76cfc2489afac6b64adc89c60b43ce966dbdec60760d88",
+    "readout_bundle_manifest_sha256": "1ebad477305e64421e5d80b41c45fc66762f28ca18e3d83f49757bad25e4d369",
+    "samples_sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168"
+  },
+  "irls": {
+    "cycle_beta_bound": 0.0021,
+    "cycle_robust_bound": 0.006,
+    "limit_cycle_accepts": 204,
+    "max_cycle_beta_rel": 0.0006895309974357389,
+    "max_cycle_robust": 0.001895474306934708
+  },
+  "n_hosts": 44,
+  "n_rows": 10224,
+  "pipeline_independence_audit": {
+    "path": "artifacts/prm_g3/w1_pipeline_independence_audit.md",
+    "sha256": "72d1026abd1bf7dd124cfabd819f524711948eec6a612e03104ed32ab5dc76f3"
+  },
+  "preregistration": "paper_Q1/review/w1_extensivity_preregistration.md",
+  "protocol": "host_cv",
+  "schema_version": "prm_w1_extensivity_v1",
+  "seed_pooling": "per-sample mean prediction across seeds inside each fold"
+}
