@@ -138,8 +138,21 @@ The host--impurity-pair folds provide one out-of-fold prediction for every
 retained structure.  Both the input geometries and reference energies come
 from the completed IMP2D DFT workflow, so the following comparisons are
 retrospective rather than a substitute for site generation or relaxation.
-\todoRepair{all reranking decision metrics pending regeneration from the
-repaired pair-OOF predictions (prm\_materials\_analysis rerun)}
+Across pairs containing both incorporation classes, the repaired model
+identifies the lower-energy class among the retained, DFT-relaxed IMP2D
+candidates with \PRMRepPreferenceAccuracy\%\ accuracy
+[\PRMRepPreferenceAccuracyLow, \PRMRepPreferenceAccuracyHigh], against an
+empirical majority-class reference of \PRMRepPreferenceReference\%\ ---
+a gain of \PRMRepPreferenceGain{} percentage points
+[\PRMRepPreferenceGainLow, \PRMRepPreferenceGainHigh] --- and the predicted
+and reference class margins have Spearman correlation
+\PRMRepMarginSpearman.  With the incorporation class fixed, exact-site and
+top-two accuracies are \PRMRepWithinExactAccuracy\%\ and
+\PRMRepWithinTopTwoAccuracy\%\ against references of
+\PRMRepWithinExactReference\%\ and \PRMRepWithinTopTwoReference\%,
+with mean reranking regret \PRMRepWithinRegret\eV{}.  Complete decision
+metrics with pair-clustered intervals are reported in the Supplemental
+Material~\cite{supplemental}.
 
 %----------------------------------------------------------------------
 \subsection{Supporting analyses}
