@@ -1,107 +1,131 @@
 % !TEX root = ../main.tex
+% ---------------------------------------------------------------------------
+% DRAFT REWRITE (physics-first order per reviewer_revision_plan_2026-08-10_v2)
+% Repaired-model numbers come from draft_repaired_macros.tex and must be
+% replaced by the regenerated fail-closed asset bundle before any build that
+% feeds a submission.  \todoRepair marks spots whose repaired asset does not
+% exist yet (random-CV, reranking, class-resolved errors).
+% ---------------------------------------------------------------------------
 
 \ifprmresultsready
 
 %----------------------------------------------------------------------
-\subsection{Effects of defect-aware model components}
-\label{sec:factorial_results}
-%----------------------------------------------------------------------
-
-Validation MAE selected the all-enabled \PRMSelectedVariant{} variant.  Paired
-contrasts resolved lower errors for gated readout and the composite
-pre-normalized, distance-gated local block, whereas the independent main effect
-of environment enrichment was inconclusive.  The complete factorial is
-reported in Table~\ref{tab:factorial}, with its paired-effect visualization in
-Supplemental Fig.~S2~\cite{supplemental}.  The selected
-variant had mean validation MAE
-\PRMSelectedValidationMAE\eV{} (95\% bootstrap interval
-[\PRMSelectedValidationMAELow, \PRMSelectedValidationMAEHigh]\eV{}) across
-the five paired repeats and test MAE
-\PRMSelectedTestMAE\eV{} [\PRMSelectedTestMAELow,
-\PRMSelectedTestMAEHigh]\eV{}.
-
-\input{generated/tab_factorial.tex}
-
-The orthogonal contrasts separate evidence for the three modules
-from variation between random partitions.  Because P jointly changes
-normalization placement and distance gating, its contrast supports or rejects
-that composite block only; it does not identify either subchange as the causal
-source of an effect.
-\input{generated/results_factorial_narrative.tex}
-
-%----------------------------------------------------------------------
-\subsection{Interpolation, chemical transfer, and low-energy behavior}
+\subsection{Chemical transfer is hierarchical, and the hierarchy tracks
+structural novelty}
 \label{sec:transfer_results}
 %----------------------------------------------------------------------
 
-Chemical transfer was strongly axis dependent.  Mean absolute error was
-\PRMPairCvDARTMAE\eV{} when complete host--impurity pairs were withheld, versus
-\PRMIdCvDARTMAE\eV{} under random cross-validation.  Withholding complete hosts
-or impurities increased MAE to \PRMHostCvDARTMAE\eV{} and
-\PRMDopantCvDARTMAE\eV{}, respectively.  The predefined chemistry block had MAE
-\PRMChemistryBlockDARTMAE\eV{} but samples a different target distribution and
-should therefore be interpreted separately rather than placed on a monotonic
-extrapolation scale.  Across all five regimes, paired absolute-error differences
-favored DART over both the descriptor model selected by validation MAE within
-each split and the additive-readout SchNet baseline.
-Figure~\ref{fig:transfer} places the five transfer regimes and their paired
-comparator contrasts on a common visual scale; Table~\ref{tab:benchmark}
-reports the complete intervals.
+Withholding chemistry degrades prediction in a strict order.  With the
+repaired graph representation, mean absolute error is
+\PRMRepPairCvMAE\eV{} when complete host--impurity \emph{pairs} are withheld,
+but rises to \PRMRepDopantCvMAE\eV{} when complete impurities are withheld
+and to \PRMRepHostCvMAE\eV{} when complete hosts are withheld.
+\todoRepair{random-CV interpolation reference pending repaired rerun}
+Recombining constituents that were each seen in training is therefore
+substantially easier than encountering a new constituent, and a new host is
+the hardest axis of all.
 
-\input{generated/tab_benchmark.tex}
+The host--impurity ordering itself is small but real: the sample-matched
+host-minus-impurity absolute-error gap has a pair-clustered 95\% interval of
+[\PRMPThreeGapCILow, \PRMPThreeGapCIHigh]\eV{}
+($p=\PRMPThreeGapP$).  To ask \emph{why} host holdout is harder, we
+constructed fold-local novelty scores --- structural novelty of the held-out
+host from composition, cell, thickness, and coordination descriptors, and
+chemical novelty of the held-out impurity from radius, electronegativity,
+valence, and period/group --- together with a training-support covariate that
+captures the mechanical asymmetry between the two protocols.
+\PRMPThreeSupportedVerdict{}%
+% Final A2-W2 wording is inserted from the canonical novelty analysis:
+% either the structural-motif attribution with the support-adjusted slope, or
+% the honest "training-support asymmetry not excluded" fallback.
+
+%----------------------------------------------------------------------
+\subsection{Interstitial error is a local-crowding effect; adsorbate error is
+a chemical-mismatch effect}
+\label{sec:error_map_results}
+%----------------------------------------------------------------------
+
+Under pair-held-out prediction the two incorporation classes fail for
+different, measurable reasons.  Fitting the out-of-fold error against frozen
+local geometry and chemistry descriptors --- with host, impurity, and fold
+absorbed as crossed effects, and every contrast preregistered before any
+outcome was viewed --- yields seven associations that pass the main-text
+gate (adjusted decile contrast of at least $0.10\,$eV or 20\%, clustered
+interval excluding zero, direction stable in at least four of five folds,
+and surviving the exclusion of pathological out-of-plane reconstructions).
+
+For \emph{adsorbates}, error tracks chemistry: moving from the tenth to the
+ninetieth percentile of signed valence mismatch raises the adjusted error by
+\PRMPOneAdsValenceContrast\eV{}, and the smooth coordination number
+contributes \PRMPOneAdsCoordContrast\eV{}
+(+\PRMPOneAdsCoordPercent\%).  For \emph{interstitials}, error tracks the
+local cage: post-relaxation minimum clearance
+(\PRMPOneIntClearanceContrast\eV{}), neighbor-distance dispersion
+(\PRMPOneIntDispersionContrast\eV{}), the effective maximum neighbor
+distance seen by the defect-centered module
+(\PRMPOneIntMaxDistContrast\eV{}), absolute valence mismatch
+(\PRMPOneIntAbsValenceContrast\eV{}), and absolute covalent-radius mismatch
+(\PRMPOneIntRadiusContrast\eV{}) all carry gated effects.
+Figure~\ref{fig:error_map} reports the four-panel physical error map:
+class-resolved adjusted error profiles over coordination and clearance,
+the chemistry-mismatch contrasts, error against the out-of-plane expansion
+factor, and host-family and impurity-series macro errors.
+
+\todoRepair{class-resolved pair-OOF MAEs (interstitial versus adsorbate)
+pending repaired asset regeneration}
+
+To quantify how much of the interstitial penalty the measured environment
+explains, we compare the incorporation-class coefficient before and after
+adding the full geometry/chemistry block to a controls-only model.
+\PRMWThreeAttenuation{}%
+% Final A2-W3 wording from a2_attenuation.json: attenuation point, interval,
+% fold stability, and the frozen ladder verdict.
+
+Host-family decomposition places the largest interstitial errors in the
+single-identity oxide host and the carbide/MXene-like family, with
+halide/halochalcogenide hosts next; among impurity series, f-block and
+main-group interstitials are hardest.  The retained host set contains no
+nitride, so no nitride panel is reported.  Complete family tables with
+identity counts are given in the Supplemental Material~\cite{supplemental}.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_transfer.pdf}
-\caption{Interpolation and chemical-transfer evaluation.
-  (a) DART pooled test MAE across the five evaluation regimes; the dashed line
-  marks random out-of-fold MAE.
-  (b) Paired differences in absolute error for the additive-readout SchNet
-  baseline and the descriptor model selected separately by validation MAE in
-  each split, relative to DART.  Intervals are 95\%
-  bootstrap intervals using the regime-matched resampling units defined in
-  Sec.~\ref{sec:evaluation}; the broken axis isolates the large host-held-out
-  SchNet contrast.  Positive values favor DART.}
-\label{fig:transfer}
+\IfFileExists{figures/fig_error_map.pdf}{%
+\includegraphics[width=\textwidth]{fig_error_map.pdf}}{%
+\framebox[\textwidth]{\rule{0pt}{5cm}\todoRepair{render
+fig\_error\_map.pdf from physical\_figure\_data.csv}}}
+\caption{Physical error map on repaired pair-held-out predictions.
+  (a) Adjusted absolute-error profiles versus smooth coordination and
+  post-relaxation clearance, by incorporation class.
+  (b) Chemistry-mismatch decile contrasts with pair-clustered intervals.
+  (c) Error versus the database out-of-plane expansion factor; the vertical
+  line marks $\mathrm{XF}=2$, beyond which structures are treated as
+  reconstructed and analyzed separately.
+  (d) Host-family and impurity-series macro errors with identity counts.}
+\label{fig:error_map}
 \end{figure*}
 
-Aggregate MAE can hide failures in chemically sparse or reranking-relevant
-subsets.  Table~\ref{tab:applicability} therefore reports equal-weight host and
-impurity macro errors together with performance on nonpositive formation
-energies and the lowest-energy decile.  For example, on pair-held-out
-predictions, the true low-decile MAE was
-\PRMPairCvDARTLowEnergyMAE\eV{} and its recall by the predicted low decile was
-\PRMPairCvDARTLowEnergyRecall\%.  None of these low-energy summaries entered
-architecture or hyperparameter selection.
-
-\input{generated/tab_applicability.tex}
-
-Incorporation geometry introduced an additional asymmetry.  Under
-pair-held-out prediction, interstitial structures had MAE
-\PRMPairInterstitialMAE\eV{}, compared with \PRMPairAdsorbateMAE\eV{} for
-adsorbates.  Host-, impurity-, and site-resolved errors were also heterogeneous;
-the complete descriptive analysis is reported in Supplemental
-Fig.~S4~\cite{supplemental}.
-
 %----------------------------------------------------------------------
-\subsection{Internal uncertainty and selective prediction}
-\label{sec:uq_results}
+\subsection{Formation energy is not atomwise additive, and the readout must
+respect that}
+\label{sec:readout_results}
 %----------------------------------------------------------------------
 
-On the internal ensemble test partition, the five-member ensemble had MAE
-\PRMUQTestMAE\eV{}, Gaussian negative log
-likelihood \PRMUQNLL, and mean Gaussian CRPS \PRMUQCRPS\eV{}.  The Spearman
-correlation between calibrated standard deviation and absolute error was
-\PRMUQErrorSpearman.  The risk--coverage curve had AURC \PRMUQAURC\eV{} and
-excess AURC \PRMUQExcessAURC\eV{} relative to oracle error ordering.
-
-At 90\% nominal coverage, the split-conformal interval covered
-\PRMUQNinetyCoverage\% of test structures with mean width
-\PRMUQNinetyWidth\eV{}.  Supplemental Table~SII and
-Fig.~S3~\cite{supplemental} report all evaluated nominal levels, the
-risk--coverage curve, and the error--uncertainty relation.  These values measure
-empirical marginal coverage within the internal ensemble split, not
-calibration under a chemically shifted distribution.
+The impurity formation energy is a difference of extensive totals and is
+therefore a \emph{local} target: its magnitude does not grow with supercell
+size.  A sum readout imposes extensive scaling on the prediction, and the
+data show the consequence directly.  Under the same training protocol and
+host-held-out splits, the additive-readout SchNet baseline reaches a pooled
+MAE of \PRMSchNetAddHostCvMAE\eV{}; replacing only its readout by a mean
+reduces this to \PRMSchNetMeanHostCvMAE\eV{}, still well above the
+defect-centered model.  The preregistered extensivity diagnostic makes the
+mechanism explicit:
+\PRMWOneAddSlope{}%
+% Final W1 wording from w1_extensivity.json: additive residual-size slope
+% with host-clustered interval, the near-zero mean-readout and repaired-DART
+% slopes (\PRMWOneDartSlope), and the paired additive-minus-DART difference.
+These comparisons are complete-recipe contrasts under one protocol; the
+readout sensitivity is a diagnostic, not a universal backbone ranking.
 
 %----------------------------------------------------------------------
 \subsection{Retrospective out-of-fold reranking within IMP2D}
@@ -111,48 +135,20 @@ calibration under a chemically shifted distribution.
 The host--impurity-pair folds provide one out-of-fold prediction for every
 retained structure.  Both the input geometries and reference energies come
 from the completed IMP2D DFT workflow, so the following comparisons are
-retrospective rather than a substitute for relaxation.  Across pairs
-containing both incorporation classes, DART
-identified the lower-energy class among the retained, DFT-relaxed IMP2D
-candidates with
-\PRMPreferenceAccuracy\% accuracy; the predicted and reference class margins
-had Spearman correlation \PRMPreferenceMarginSpearman{} and margin MAE
-\PRMPreferenceMarginMAE\eV{}.  Selecting one configuration globally gave
-\PRMGlobalExactAccuracy\% exact-site accuracy and mean regret
-\PRMGlobalRegret\eV{}.  When the incorporation class was fixed, exact and
-top-two site accuracies were \PRMWithinTypeExactAccuracy\% and
-\PRMWithinTypeTopTwoAccuracy\%, respectively, with mean regret
-\PRMWithinTypeRegret\eV{}.
-The corresponding descriptive reference accuracies were
-\PRMPreferenceReferenceAccuracy\%, \PRMGlobalReferenceAccuracy\%,
-\PRMWithinTypeReferenceExactAccuracy\%, and
-\PRMWithinTypeReferenceTopTwoAccuracy\%, respectively.  Relative to these
-references, DART improved accuracy by
-\PRMPreferenceGain{} [\PRMPreferenceGainLow, \PRMPreferenceGainHigh],
-\PRMGlobalAccuracyGain{} [\PRMGlobalAccuracyGainLow,
-\PRMGlobalAccuracyGainHigh], \PRMWithinTypeExactAccuracyGain{}
-[\PRMWithinTypeExactAccuracyGainLow, \PRMWithinTypeExactAccuracyGainHigh], and
-\PRMWithinTypeTopTwoAccuracyGain{} [\PRMWithinTypeTopTwoAccuracyGainLow,
-\PRMWithinTypeTopTwoAccuracyGainHigh] percentage points, respectively.
+retrospective rather than a substitute for site generation or relaxation.
+\todoRepair{all reranking decision metrics pending regeneration from the
+repaired pair-OOF predictions (prm\_materials\_analysis rerun)}
 
-Complete decision metrics and clustered intervals are reported in
-Supplemental Table~SIII~\cite{supplemental}.  Figure~\ref{fig:reranking}
-shows the class-margin agreement, the distribution of reranking regret, and
-the clustered decision-accuracy intervals.
+%----------------------------------------------------------------------
+\subsection{Supporting analyses}
+\label{sec:uq_results}
+%----------------------------------------------------------------------
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_screening.pdf}
-\caption{Retrospective reranking of available DFT-relaxed IMP2D geometries
-  using pair-held-out predictions.
-  (a) Predicted versus reference preference margins between adsorbate and
-  interstitial configurations.
-  (b) Empirical cumulative distributions of global and within-class reranking
-  regret.
-  (c) Host--impurity-pair cluster-bootstrap intervals for incorporation-class,
-  exact-site, and top-two decision accuracy.}
-\label{fig:reranking}
-\end{figure*}
+The architecture factorial that selected the frozen recipe, the internal
+ensemble uncertainty analysis, and all cutoff and threshold sensitivities are
+reported in the Supplemental Material~\cite{supplemental}; they use the
+frozen recipe unchanged and none of their numbers supports a main-text
+claim.
 
 \else
 

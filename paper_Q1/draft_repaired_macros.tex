@@ -1,0 +1,37 @@
+% ============================================================================
+% DRAFT MACROS — REPAIRED-MODEL NUMBERS, PENDING CANONICAL ASSET REGENERATION
+% ----------------------------------------------------------------------------
+% Every value below was computed from the accepted repaired G2 OOF archives
+% (seed-averaged per fold, pooled) or from the canonical G3 outputs recorded
+% under artifacts/prm_g3/canonical/.  They are drafting aids: before any
+% submission build, the fail-closed asset generator must replace this file's
+% role by regenerating generated/results_macros.tex with clustered intervals,
+% and the independent numeric audit must pass.  Values marked TBD await the
+% in-flight canonical runs (G3 with A2 amendments; W1 extensivity).
+% ============================================================================
+% --- repaired transfer hierarchy (G2 OOF, seed-averaged, pooled) ------------
+\newcommand{\PRMRepPairCvMAE}{0.442}
+\newcommand{\PRMRepHostCvMAE}{0.891}
+\newcommand{\PRMRepDopantCvMAE}{0.845}
+% --- canonical G3 headline effects (artifacts/prm_g3/canonical) -------------
+\newcommand{\PRMPOneAdsCoordContrast}{0.151}
+\newcommand{\PRMPOneAdsCoordPercent}{135}
+\newcommand{\PRMPOneAdsValenceContrast}{0.317}
+\newcommand{\PRMPOneIntClearanceContrast}{0.091}
+\newcommand{\PRMPOneIntDispersionContrast}{-0.103}
+\newcommand{\PRMPOneIntMaxDistContrast}{0.087}
+\newcommand{\PRMPOneIntAbsValenceContrast}{0.089}
+\newcommand{\PRMPOneIntRadiusContrast}{-0.074}
+\newcommand{\PRMPThreeGapCILow}{0.010}
+\newcommand{\PRMPThreeGapCIHigh}{0.085}
+\newcommand{\PRMPThreeGapP}{0.011}
+% --- in-flight (fill from canonical-46956ef and canonical-044ce91) ----------
+\newcommand{\PRMPThreeSupportedVerdict}{TBD-A2W2-VERDICT}
+\newcommand{\PRMWThreeAttenuation}{TBD-W3-ATTENUATION}
+\newcommand{\PRMWOneAddSlope}{TBD-W1-ADD-SLOPE}
+\newcommand{\PRMWOneDartSlope}{TBD-W1-DART-SLOPE}
+% --- legacy SchNet numbers retained under the independence audit ------------
+\newcommand{\PRMSchNetAddHostCvMAE}{6.703}
+\newcommand{\PRMSchNetMeanHostCvMAE}{2.552}
+% --- draft-only visible marker for spots whose repaired asset is pending ----
+\newcommand{\todoRepair}[1]{\textbf{[PENDING REPAIRED ASSET: #1]}}
