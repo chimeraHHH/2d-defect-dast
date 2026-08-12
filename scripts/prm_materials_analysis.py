@@ -209,6 +209,105 @@ def load_oof_predictions(
     return predictions, sources
 
 
+def load_repaired_oof_predictions(
+    acceptance_path: Path, protocol_dir: Path,
+) -> Tuple[Dict[int, float], List[Dict[str, Any]], Dict[str, Any]]:
+    """Load the repaired pair-OOF predictions through the G2 acceptance.
+
+    The acceptance chain (G1 receipts, recipe hash, commit ancestry) was
+    validated fail-closed when the acceptance was built and again by
+    canonical G3; here every referenced manifest and prediction file is
+    re-verified by hash before use, and coverage of the canonical retained
+    set is enforced exactly as in the legacy loader.
+    """
+    import os as _os
+
+    def resolve_contract_path(value: Any) -> Path:
+        expanded = _os.path.expandvars(str(value))
+        if "$" in expanded:
+            raise ValueError(f"unresolved acceptance path alias: {value}")
+        path = Path(expanded).expanduser()
+        return path if path.is_absolute() else ROOT / path
+
+    acceptance = json.loads(acceptance_path.read_text())
+    if (
+        acceptance.get("schema_version") != "prm_g2_acceptance_v1"
+        or acceptance.get("status") != "accepted"
+        or acceptance.get("graph_status") != "repaired_exact_mic_invariant_triplets"
+    ):
+        raise ValueError("repaired mode requires an accepted prm_g2_acceptance_v1")
+    protocol_targets = load_protocol_targets(protocol_dir / "samples.csv")
+    predictions: Dict[int, float] = {}
+    sources: List[Dict[str, Any]] = []
+    commits = set()
+    for fold in range(5):
+        entries = acceptance["prediction_sources"]["pair_cv"][str(fold)]
+        if len(entries) != 1 or int(entries[0]["seed"]) != 242:
+            raise ValueError(f"repaired pair fold {fold} violates the seed law")
+        entry = entries[0]
+        split_id = f"pair_cv5_f{fold}"
+        split_path = protocol_dir / "splits" / f"{split_id}.json"
+        if entry.get("split_sha256") != file_sha256(split_path):
+            raise ValueError(f"repaired fold {fold} split hash mismatch")
+        manifest_path = resolve_contract_path(entry["run_manifest_path"])
+        if file_sha256(manifest_path) != str(entry["run_manifest_sha256"]):
+            raise ValueError(f"repaired fold {fold} manifest hash mismatch")
+        manifest = json.loads(manifest_path.read_text())
+        if (
+            manifest.get("schema_version") != "prm_g2_run_manifest_v1"
+            or manifest.get("status") != "complete"
+            or manifest.get("git", {}).get("dirty") is not False
+            or manifest.get("split_id") != split_id
+            or int(manifest.get("seed", -1)) != 242
+        ):
+            raise ValueError(f"repaired fold {fold} manifest contract failed")
+        commits.add(str(manifest["git"]["commit"]))
+        prediction_path = resolve_contract_path(entry["prediction_path"])
+        if file_sha256(prediction_path) != str(entry["prediction_sha256"]):
+            raise ValueError(f"repaired fold {fold} prediction hash mismatch")
+        indices, values, targets = load_prediction_array(
+            prediction_path, expected_split_id=split_id
+        )
+        validate_protocol_targets(
+            indices, targets, protocol_targets,
+            context=f"repaired pair-OOF predictions in {prediction_path}",
+        )
+        for index, value in zip(indices, values):
+            if int(index) in predictions:
+                raise ValueError(f"duplicate repaired prediction for sample {index}")
+            predictions[int(index)] = float(value)
+        sources.append({
+            "manifest": str(manifest_path),
+            "manifest_sha256": str(entry["run_manifest_sha256"]),
+            "prediction_sha256": str(entry["prediction_sha256"]),
+            "git": manifest["git"], "seed": 242,
+            "split_id": split_id,
+            "data_sha256": manifest["data"]["data_sha256"],
+            "split_sha256": str(entry["split_sha256"]),
+            "config_sha256": manifest["model_recipe_sha256"],
+            "expected_config": "prm_g2_acceptance_v1",
+        })
+    if len(commits) != 1:
+        raise ValueError("repaired pair-OOF runs do not share one commit")
+    expected_indices = set()
+    for fold in range(5):
+        split = json.loads(
+            (protocol_dir / "splits" / f"pair_cv5_f{fold}.json").read_text()
+        )
+        expected_indices.update(int(index) for index in split["test"])
+    if set(predictions) != expected_indices:
+        raise ValueError("repaired pair-OOF predictions do not cover the canonical set")
+    provenance = {
+        "acceptance_path": str(acceptance_path.resolve()),
+        "acceptance_sha256": file_sha256(acceptance_path),
+        "code_commit": acceptance["code_commit"],
+        "model_recipe_sha256": acceptance["model_recipe_sha256"],
+        "graph_builder_version": "exact_mic_invariant_triplets_v1",
+        "initialization_arm": acceptance["initialization_arm"],
+    }
+    return predictions, sources, provenance
+
+
 def bootstrap_mean(
     values: Sequence[float], seed: int, draws: int = 20_000,
 ) -> Dict[str, float]:
@@ -561,33 +660,55 @@ def main() -> None:
         "--promoted-config-root", type=Path,
         default=ROOT / "configs/prm/promoted",
     )
+    parser.add_argument(
+        "--g2-acceptance", type=Path, default=None,
+        help="repaired mode: load pair-OOF predictions through an accepted "
+             "prm_g2_acceptance_v1 instead of the legacy factorial chain",
+    )
     args = parser.parse_args()
 
-    selection, factorial_bundle = load_verified_factorial_selection(
-        args.selection, args.factorial_bundle
-    )
-    variant = selection["selected_variant"]
-    protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
-    if selection["data_sha256"] != protocol_manifest["data_sha256"]:
-        raise ValueError("factorial selection does not match the frozen protocol dataset")
-    expected_configs = load_expected_configs(
-        sorted(
-            (args.promoted_config_root.resolve() / variant / "transfer").glob(
-                "pair_cv5_*.yaml"
+    if args.g2_acceptance is not None:
+        out_dir = args.out_dir.resolve()
+        if out_dir.exists():
+            raise FileExistsError(
+                f"repaired-mode output directory already exists: {out_dir}"
+            )
+        protocol_manifest = json.loads(
+            (args.protocol_dir / "manifest.json").read_text()
+        )
+        predictions, sources, provenance = load_repaired_oof_predictions(
+            args.g2_acceptance.resolve(), args.protocol_dir.resolve()
+        )
+        selection = None
+        variant = "repaired_g2"
+        factorial_bundle = None
+    else:
+        selection, factorial_bundle = load_verified_factorial_selection(
+            args.selection, args.factorial_bundle
+        )
+        variant = selection["selected_variant"]
+        protocol_manifest = json.loads((args.protocol_dir / "manifest.json").read_text())
+        if selection["data_sha256"] != protocol_manifest["data_sha256"]:
+            raise ValueError("factorial selection does not match the frozen protocol dataset")
+        expected_configs = load_expected_configs(
+            sorted(
+                (args.promoted_config_root.resolve() / variant / "transfer").glob(
+                    "pair_cv5_*.yaml"
+                )
             )
         )
-    )
-    run_dirs = sorted(
-        path for path in args.result_root.resolve().glob(
-            f"selected/{variant}/transfer/pair_cv5_f*/seed242"
+        run_dirs = sorted(
+            path for path in args.result_root.resolve().glob(
+                f"selected/{variant}/transfer/pair_cv5_f*/seed242"
+            )
+            if path.is_dir()
         )
-        if path.is_dir()
-    )
-    predictions, sources = load_oof_predictions(
-        run_dirs, selection, args.protocol_dir.resolve(),
-        expected_configs,
-        protocol_manifest["data_sha256"],
-    )
+        predictions, sources = load_oof_predictions(
+            run_dirs, selection, args.protocol_dir.resolve(),
+            expected_configs,
+            protocol_manifest["data_sha256"],
+        )
+        provenance = None
     sample_table = read_sample_table(args.protocol_dir / "samples.csv")
     sample_rows = []
     for index, prediction in sorted(predictions.items()):
@@ -607,17 +728,27 @@ def main() -> None:
         group_rows.extend(group_error_rows(sample_rows, axis))
     collector_git = git_snapshot()
     require_clean_git_snapshot(collector_git, context="materials collection")
+    if provenance is not None:
+        model_block = {"repaired_acceptance": provenance}
+        schema_version = "prm_materials_analysis_v2_repaired"
+    else:
+        model_block = {
+            "selection": {
+                "path": str(args.selection.resolve()),
+                "sha256": file_sha256(args.selection),
+                "selected_variant": variant,
+                "selection_data": selection["selection_data"],
+                "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
+                "factorial_training_commit": selection["training_commits"][0],
+                "factorial_collector_git": factorial_bundle["collector_git"],
+            },
+        }
+        schema_version = "prm_materials_analysis_v1"
     summary = {
-        "schema_version": "prm_materials_analysis_v1",
+        "schema_version": schema_version,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "collector_git": collector_git,
-        "selection": {
-            "path": str(args.selection.resolve()), "sha256": file_sha256(args.selection),
-            "selected_variant": variant, "selection_data": selection["selection_data"],
-            "factorial_bundle_sha256": selection["factorial_bundle_sha256"],
-            "factorial_training_commit": selection["training_commits"][0],
-            "factorial_collector_git": factorial_bundle["collector_git"],
-        },
+        **model_block,
         "data_sha256": protocol_manifest["data_sha256"],
         "training_commit": sources[0]["git"]["commit"],
         "sources": sources,
