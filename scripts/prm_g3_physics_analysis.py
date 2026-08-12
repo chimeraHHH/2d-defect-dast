@@ -2203,11 +2203,13 @@ def identity_robust_scale(
 def p3_gap_fit(
     error_gap: np.ndarray, novelty_gap: np.ndarray, defecttype: np.ndarray,
     weights: np.ndarray | None = None,
+    support_gap: np.ndarray | None = None,
 ) -> tuple[float, float]:
-    design = np.column_stack([
-        novelty_gap,
-        (defecttype == "interstitial").astype(float),
-    ])
+    columns = [novelty_gap, (defecttype == "interstitial").astype(float)]
+    if support_gap is not None:
+        # Frozen amendment A2-W2: the training-support asymmetry covariate.
+        columns.append(np.asarray(support_gap, dtype=float))
+    design = np.column_stack(columns)
     fit = fit_huber_fixed_effects(
         np.asarray(error_gap, dtype=float), design, [], base_weights=weights,
     )
@@ -2237,6 +2239,157 @@ def p3_positive_claim_gate(
     return gate, positive_mean_folds, positive_slope_folds
 
 
+A2_ATTENUATION_CONTROLS = (
+    "natoms", "cell_area_A2", "train_host_support",
+    "train_impurity_support", "abs_target_eV",
+)
+
+
+def run_a2_attenuation(
+    complete: Sequence[Mapping[str, Any]], y: np.ndarray,
+    defecttype: np.ndarray, feature_design: np.ndarray,
+    zero_neighbor_indicator: np.ndarray, groups: Sequence[np.ndarray],
+    pair_labels: Sequence[str], pair_fold: np.ndarray,
+    draws: int, seed: int, evidence_tier: str, evidence_label: str,
+) -> dict[str, Any]:
+    """Frozen amendment A2-W3: incorporation-class attenuation ladder.
+
+    M0 regresses log-error on the class indicator plus the frozen controls
+    (atom count, cell area, training support, target magnitude; folds and
+    host/impurity identities are absorbed as the same crossed fixed effects
+    the P1 primary model uses).  M1 adds the full frozen geometry/chemistry
+    block.  Attenuation is 1 - beta1/beta0 and is defined only when the M0
+    class interval excludes zero.
+    """
+    is_interstitial = (defecttype == "interstitial").astype(float)
+    control_columns = []
+    for name in A2_ATTENUATION_CONTROLS:
+        values = np.asarray([
+            float(row[name]) for row in complete
+        ], dtype=float)
+        if name in ("train_host_support", "train_impurity_support"):
+            values = np.log1p(values)
+        if not np.isfinite(values).all():
+            raise ValueError(f"A2-W3 control {name} contains nonfinite values")
+        median = float(np.median(values))
+        q25, q75 = np.quantile(values, [0.25, 0.75])
+        iqr = float(q75 - q25)
+        if iqr <= 1e-12:
+            raise ValueError(f"A2-W3 control {name} has zero IQR")
+        control_columns.append((values - median) / iqr)
+    controls = np.column_stack(control_columns)
+    # feature_design already leads with the class_interstitial column, so
+    # both models carry exactly one class column at index zero.
+    m0_design = np.column_stack([
+        is_interstitial, controls, zero_neighbor_indicator,
+    ])
+    m1_design = np.column_stack([
+        feature_design, controls, zero_neighbor_indicator,
+    ])
+
+    def class_beta(design: np.ndarray, weights: np.ndarray | None = None) -> float:
+        fit = fit_huber_fixed_effects(y, design, list(groups), base_weights=weights)
+        return float(fit["beta"][0])
+
+    beta0_point = class_beta(m0_design)
+    beta1_point = class_beta(m1_design)
+
+    unique_pairs = sorted(set(pair_labels))
+    pair_lookup = {pair: index for index, pair in enumerate(unique_pairs)}
+    row_pair = np.asarray([pair_lookup[pair] for pair in pair_labels], dtype=int)
+    rng = np.random.default_rng(seed)
+    beta0_draws, beta1_draws, attenuation_draws = [], [], []
+    undefined_draws = 0
+    for _ in range(draws):
+        selected = rng.integers(0, len(unique_pairs), size=len(unique_pairs))
+        weights = np.bincount(
+            selected, minlength=len(unique_pairs),
+        ).astype(float)[row_pair]
+        b0 = class_beta(m0_design, weights)
+        b1 = class_beta(m1_design, weights)
+        beta0_draws.append(b0)
+        beta1_draws.append(b1)
+        if abs(b0) > 1e-12:
+            attenuation_draws.append(1.0 - b1 / b0)
+        else:
+            undefined_draws += 1
+    beta0_ci = np.quantile(beta0_draws, [0.025, 0.975])
+    beta1_ci = np.quantile(beta1_draws, [0.025, 0.975])
+    attenuation_ci = np.quantile(attenuation_draws, [0.025, 0.975])
+    attenuation_point = (
+        1.0 - beta1_point / beta0_point if abs(beta0_point) > 1e-12 else float("nan")
+    )
+
+    fold_attenuations = []
+    for fold in range(5):
+        mask = pair_fold == fold
+        fold_fit0 = fit_huber_fixed_effects(
+            y[mask], m0_design[mask],
+            [codes[mask] for codes in groups],
+        )
+        fold_fit1 = fit_huber_fixed_effects(
+            y[mask], m1_design[mask],
+            [codes[mask] for codes in groups],
+        )
+        b0 = float(fold_fit0["beta"][0])
+        b1 = float(fold_fit1["beta"][0])
+        fold_attenuations.append(
+            1.0 - b1 / b0 if abs(b0) > 1e-12 else float("nan")
+        )
+    point_sign = np.sign(attenuation_point) if np.isfinite(attenuation_point) else 0.0
+    same_sign_folds = int(sum(
+        np.isfinite(value) and np.sign(value) == point_sign and point_sign != 0.0
+        for value in fold_attenuations
+    ))
+
+    beta0_excludes_zero = beta0_ci[0] > 0 or beta0_ci[1] < 0
+    beta1_excludes_zero = beta1_ci[0] > 0 or beta1_ci[1] < 0
+    if evidence_tier != "canonical":
+        verdict = "exploratory tier; no canonical verdict"
+    elif not beta0_excludes_zero:
+        verdict = "class gap not established"
+    elif (
+        not beta1_excludes_zero
+        and np.isfinite(attenuation_point) and attenuation_point >= 0.5
+        and same_sign_folds >= 4
+    ):
+        verdict = "accounted for by the measured local environment"
+    elif (
+        beta1_excludes_zero
+        and float(attenuation_ci[0]) > 0
+        and np.isfinite(attenuation_point) and attenuation_point >= 0.25
+        and same_sign_folds >= 4
+    ):
+        verdict = "partially accounted for"
+    else:
+        verdict = "the interstitial penalty is not explained by the available descriptors"
+
+    return {
+        "schema_version": "prm_g3_a2_attenuation_v1",
+        "amendment": "A2-W3",
+        "evidence_tier": evidence_tier,
+        "evidence_label": evidence_label,
+        "response": "log(pair_absolute_error_eV + 0.05)",
+        "controls": list(A2_ATTENUATION_CONTROLS),
+        "fixed_effects": ["host", "dopant", "pair_fold"],
+        "bootstrap_draws": draws,
+        "bootstrap_seed": seed,
+        "m0_class_coefficient": beta0_point,
+        "m0_class_ci_low": float(beta0_ci[0]),
+        "m0_class_ci_high": float(beta0_ci[1]),
+        "m1_class_coefficient": beta1_point,
+        "m1_class_ci_low": float(beta1_ci[0]),
+        "m1_class_ci_high": float(beta1_ci[1]),
+        "attenuation_point": attenuation_point,
+        "attenuation_ci_low": float(attenuation_ci[0]),
+        "attenuation_ci_high": float(attenuation_ci[1]),
+        "attenuation_undefined_draws": undefined_draws,
+        "fold_attenuations": [finite_float(v) for v in fold_attenuations],
+        "same_sign_folds": same_sign_folds,
+        "verdict": verdict,
+    }
+
+
 def run_p3_novelty_analysis(
     rows: Sequence[Mapping[str, Any]], protocol_dir: Path,
     draws: int, seed: int, evidence_tier: str, evidence_label: str,
@@ -2251,6 +2404,9 @@ def run_p3_novelty_analysis(
     impurity_scaled, impurity_scale = identity_robust_scale(
         rows, "dopant", impurity_novelty,
     )
+    rows_by_index = {int(row["sample_index"]): row for row in rows}
+    _, host_fold_support = fold_maps(protocol_dir, rows_by_index, "host")
+    _, impurity_fold_support = fold_maps(protocol_dir, rows_by_index, "dopant")
     novelty_rows = []
     for row in rows:
         index = int(row["sample_index"])
@@ -2273,6 +2429,18 @@ def run_p3_novelty_analysis(
             "host_minus_impurity_absolute_error_eV": finite_float(
                 row["host_minus_dopant_absolute_error_eV"]
             ),
+            # A2-W2: same-impurity support inside the host fold's training
+            # partition versus same-host support inside the impurity fold's.
+            "train_same_impurity_support_host_fold": int(
+                host_fold_support[index][1]
+            ),
+            "train_same_host_support_impurity_fold": int(
+                impurity_fold_support[index][0]
+            ),
+            "train_support_gap_log1p": float(
+                np.log1p(host_fold_support[index][1])
+                - np.log1p(impurity_fold_support[index][0])
+            ),
         })
     error_gap = np.asarray([
         row["host_minus_impurity_absolute_error_eV"] for row in novelty_rows
@@ -2281,14 +2449,22 @@ def run_p3_novelty_analysis(
     defecttype = np.asarray([row["defecttype"] for row in novelty_rows])
     if not np.isfinite(error_gap).all() or not np.isfinite(novelty_gap).all():
         raise ValueError("P3 paired gaps contain nonfinite values")
+    support_gap = np.asarray([
+        row["train_support_gap_log1p"] for row in novelty_rows
+    ], dtype=float)
+    if not np.isfinite(support_gap).all():
+        raise ValueError("A2-W2 support gap contains nonfinite values")
     point_mean, point_slope = p3_gap_fit(error_gap, novelty_gap, defecttype)
+    _, point_supported_slope = p3_gap_fit(
+        error_gap, novelty_gap, defecttype, support_gap=support_gap,
+    )
 
     pair_labels = [f"{row['host']}::{row['dopant']}" for row in novelty_rows]
     unique_pairs = sorted(set(pair_labels))
     pair_lookup = {pair: index for index, pair in enumerate(unique_pairs)}
     row_pair = np.asarray([pair_lookup[pair] for pair in pair_labels], dtype=int)
     rng = np.random.default_rng(seed)
-    mean_draws, slope_draws = [], []
+    mean_draws, slope_draws, supported_slope_draws = [], [], []
     for _ in range(draws):
         selected = rng.integers(0, len(unique_pairs), size=len(unique_pairs))
         multiplicity = np.bincount(
@@ -2297,10 +2473,16 @@ def run_p3_novelty_analysis(
         mean_gap, slope = p3_gap_fit(
             error_gap, novelty_gap, defecttype, multiplicity[row_pair],
         )
+        _, supported_slope = p3_gap_fit(
+            error_gap, novelty_gap, defecttype, multiplicity[row_pair],
+            support_gap=support_gap,
+        )
         mean_draws.append(mean_gap)
         slope_draws.append(slope)
+        supported_slope_draws.append(supported_slope)
     mean_ci = np.quantile(mean_draws, [0.025, 0.975])
     slope_ci = np.quantile(slope_draws, [0.025, 0.975])
+    supported_slope_ci = np.quantile(supported_slope_draws, [0.025, 0.975])
 
     fold_rows = []
     for fold in range(5):
@@ -2310,19 +2492,36 @@ def run_p3_novelty_analysis(
         fold_mean, fold_slope = p3_gap_fit(
             error_gap[mask], novelty_gap[mask], defecttype[mask],
         )
+        _, fold_supported_slope = p3_gap_fit(
+            error_gap[mask], novelty_gap[mask], defecttype[mask],
+            support_gap=support_gap[mask],
+        )
         fold_rows.append({
             "pair_fold_stratum": fold,
             "n": int(mask.sum()),
             "mean_error_gap_eV": fold_mean,
             "novelty_gap_slope_eV_per_robust_unit": fold_slope,
+            "support_adjusted_novelty_gap_slope": fold_supported_slope,
         })
-    claim_gate, stable_mean, stable_slope = p3_positive_claim_gate(
+    base_gate, stable_mean, stable_slope = p3_positive_claim_gate(
         evidence_tier, mean_ci, slope_ci,
         [row["mean_error_gap_eV"] for row in fold_rows],
         [row["novelty_gap_slope_eV_per_robust_unit"] for row in fold_rows],
     )
+    # Frozen amendment A2-W2 verdict hardening: the structural-motif claim
+    # additionally requires the novelty-gap slope's lower bootstrap bound to
+    # stay positive after the training-support covariate is included; an
+    # association surviving only without it is reported as non-isolated.
+    support_survives = float(supported_slope_ci[0]) > 0
+    claim_gate = int(bool(base_gate) and support_survives)
+    if claim_gate:
+        claim_language = "consistent with structural-motif shift"
+    elif base_gate:
+        claim_language = "training-support asymmetry not excluded"
+    else:
+        claim_language = "P3 gate not met; cause remains unisolated"
     analysis = {
-        "schema_version": "prm_g3_novelty_analysis_v1",
+        "schema_version": "prm_g3_novelty_analysis_v2",
         "evidence_tier": evidence_tier,
         "evidence_label": evidence_label,
         "model": (
@@ -2347,11 +2546,20 @@ def run_p3_novelty_analysis(
         "impurity_oof_identity_scale": impurity_scale,
         "host_fold_audits": host_audits,
         "impurity_fold_audits": impurity_audits,
-        "claim_gate": claim_gate,
-        "claim_language": (
-            "consistent with structural-motif shift" if claim_gate
-            else "P3 gate not met; cause remains unisolated"
+        "support_adjusted_novelty_gap_slope": point_supported_slope,
+        "support_adjusted_novelty_gap_slope_ci_low": float(supported_slope_ci[0]),
+        "support_adjusted_novelty_gap_slope_ci_high": float(supported_slope_ci[1]),
+        "support_adjusted_novelty_gap_slope_bootstrap_p": bootstrap_two_sided_p(
+            supported_slope_draws
         ),
+        "support_gap_definition": (
+            "log1p(same-impurity training rows in the host fold) minus "
+            "log1p(same-host training rows in the impurity fold), computed "
+            "strictly inside each fold's training partition (amendment A2-W2)"
+        ),
+        "base_claim_gate_without_support": int(bool(base_gate)),
+        "claim_gate": claim_gate,
+        "claim_language": claim_language,
     }
     return novelty_rows, analysis
 
@@ -2679,7 +2887,8 @@ def analyze(args: argparse.Namespace) -> None:
     analysis_outputs = (
         "coverage.csv", "analysis_row_ledger.csv", "effect_estimates.csv", "block_tests.csv",
         "family_mae.csv", "physical_figure_data.csv", "analysis_started.json",
-        "novelty_rows.csv", "novelty_analysis.json", "case_eligible_pool.csv",
+        "novelty_rows.csv", "novelty_analysis.json", "a2_attenuation.json",
+        "case_eligible_pool.csv",
         "case_selection.csv", "case_selection_summary.json",
         "analysis_manifest.json",
     )
@@ -2866,6 +3075,7 @@ def analyze(args: argparse.Namespace) -> None:
     ], dtype=float)
     if not set(np.unique(zero_neighbor_indicator)).issubset({0.0, 1.0}):
         raise RuntimeError("zero-neighbor nuisance indicator is not binary")
+    a2_feature_design = design
     design = np.column_stack([design, zero_neighbor_indicator])
     design_names.append("nuisance:model_edge_zero_defect_neighbor_5A")
     groups = [
@@ -2875,6 +3085,13 @@ def analyze(args: argparse.Namespace) -> None:
     ]
     pair_labels = [f"{row['host']}::{row['dopant']}" for row in complete]
     fit = fit_huber_fixed_effects(y, design, groups)
+    a2_attenuation = run_a2_attenuation(
+        complete, y, defecttype, a2_feature_design, zero_neighbor_indicator,
+        groups, pair_labels,
+        np.asarray([int(row["pair_fold"]) for row in complete], dtype=int),
+        int(args.bootstrap_draws), int(args.bootstrap_seed),
+        evidence_tier, evidence_label,
+    )
     class_medians = {
         class_name: {
             feature: float(np.median(numeric[feature][defecttype == class_name]))
@@ -3222,6 +3439,7 @@ def analyze(args: argparse.Namespace) -> None:
     write_csv(run_dir / "physical_figure_data.csv", figure_rows, figure_fields)
     write_csv(run_dir / "novelty_rows.csv", novelty_rows, list(novelty_rows[0]))
     (run_dir / "novelty_analysis.json").write_text(strict_json(novelty_analysis))
+    (run_dir / "a2_attenuation.json").write_text(strict_json(a2_attenuation))
     write_csv(run_dir / "case_eligible_pool.csv", case_pool, list(case_pool[0]))
     write_csv(
         run_dir / "case_selection.csv", case_selection, list(case_selection[0]),
@@ -3232,7 +3450,8 @@ def analyze(args: argparse.Namespace) -> None:
     for name in (
         "coverage.csv", "analysis_row_ledger.csv", "effect_estimates.csv", "block_tests.csv",
         "family_mae.csv", "physical_figure_data.csv", "analysis_started.json",
-        "novelty_rows.csv", "novelty_analysis.json", "case_eligible_pool.csv",
+        "novelty_rows.csv", "novelty_analysis.json", "a2_attenuation.json",
+        "case_eligible_pool.csv",
         "case_selection.csv", "case_selection_summary.json",
     ):
         outputs[name] = {"sha256": file_sha256(run_dir / name)}
@@ -3288,8 +3507,12 @@ def analyze(args: argparse.Namespace) -> None:
             "P2 family decomposition",
             "P3 identity-level host-versus-impurity novelty",
             "P4 deterministic structural-case ledger",
+            "A2-W2 training-support arm for the host-versus-impurity gap",
+            "A2-W3 incorporation-class attenuation ladder",
         ],
-        "pending_prespecified_modules": [],
+        "pending_prespecified_modules": [
+            "W1 extensivity diagnostic (separate preregistration and script)",
+        ],
         "outputs": outputs,
     }
     (run_dir / "analysis_manifest.json").write_text(strict_json(manifest))
