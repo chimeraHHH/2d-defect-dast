@@ -33,26 +33,9 @@ defect-aware graph Transformer''}
 
 The retained modeling set is obtained through a sequential source audit,
 target-provenance check, unique-impurity requirement, and duplicate-control
-procedure.  Figure~\ref{fig:supp_protocol} summarizes those exclusions, the
-formation-energy distribution, chemical coverage, and the fixed evaluation
-partitions used throughout the study.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
-\caption{Data provenance and evaluation protocol. (a) Sequential source
-filtering, raw-energy reconstruction audit, impurity-identity audit, and
-structure canonicalization. The final set excludes four rows with zero
-sentinels in a raw energy component, 349 rows without a unique impurity atom,
-and 64 redundant structures. (b) Formation-energy distributions for the two
-incorporation classes in the retained set. (c) Number of structures for each
-of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
-(d) Train, validation, calibration, and test fractions for each evaluation
-regime. Bars for fivefold protocols show fold averages. All regimes cover the
-same 10,224 retained structures; the common 417-row exclusion set is omitted
-from the bars.}
-\label{fig:supp_protocol}
-\end{figure}
+procedure.  The protocol-overview figure in the main text (Sec.~II)
+summarizes those exclusions, the formation-energy distribution, chemical
+coverage, and the fixed evaluation partitions used throughout the study.
 
 \clearpage
 \section{Architecture factorial}
@@ -65,6 +48,21 @@ recipe-selection provenance; no main-text claim rests on them, and every
 main-text number derives from the repaired representation.
 
 \input{generated/tab_factorial.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{figure3_manual.png}
+\caption{Illustration of the defect-environment enrichment (E) module of the
+main-text architecture.  Within the periodic 5-\AA{} neighbor graph, four
+impurity-centered quantities --- the neighbor count $N$, mean and maximum
+neighbor distances ($d_{\mathrm{mean}}$ and $d_{\mathrm{max}}$), and the
+normalized Pauling-electronegativity contrast
+$\Delta\chi=|\chi_{\mathrm{imp}}-\langle\chi_{\mathrm{nn}}\rangle|$ ---
+form a four-component descriptor.  The descriptor is normalized, projected to
+128 channels, and added only to the impurity-node representation before local
+message passing.  The $N=3$ neighborhood shown is schematic.}
+\label{fig:supp_emodule}
+\end{figure}
 
 \begin{figure}[htbp]
 \centering

@@ -111,8 +111,25 @@ through mutually disjoint train, validation, test, optional calibration, and
 exclusion sets.
 
 The sequential data audit, retained chemical coverage, target distribution,
-and fixed partition geometry are summarized in Supplemental
-Fig.~S1~\cite{supplemental}.
+and fixed partition geometry are summarized in
+Fig.~\ref{fig:protocol_overview}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
+\caption{Data provenance and evaluation protocol. (a) Sequential source
+filtering, raw-energy reconstruction audit, impurity-identity audit, and
+structure canonicalization. The final set excludes four rows with zero
+sentinels in a raw energy component, 349 rows without a unique impurity atom,
+and 64 redundant structures. (b) Formation-energy distributions for the two
+incorporation classes in the retained set. (c) Number of structures for each
+of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
+(d) Train, validation, calibration, and test fractions for each evaluation
+regime. Bars for fivefold protocols show fold averages. All regimes cover the
+same 10,224 retained structures; the common 417-row exclusion set is omitted
+from the bars.}
+\label{fig:protocol_overview}
+\end{figure*}
 
 %----------------------------------------------------------------------
 \subsection{Defect-aware graph Transformer}
@@ -227,24 +244,9 @@ symmetric under atom-index permutations.  Both properties are enforced by
 unit and property tests and were re-verified in the independent acceptance
 audit of the released implementation.
 
-Figure~\ref{fig:environment_enrichment} illustrates the four local quantities
-entering the E branch and their association with the uniquely identified
-impurity node.
-
-\begin{figure}[t]
- \centering
- \includegraphics[width=\columnwidth]{figure3_manual.png}
- \caption{Illustration of the defect-environment enrichment (E) module. Within
- the periodic 5-\AA{} neighbor graph, four impurity-centered quantities---the neighbor count
- $N$, mean and maximum neighbor distances ($d_{\mathrm{mean}}$ and
- $d_{\mathrm{max}}$), and the normalized Pauling-electronegativity contrast
- $\Delta\chi=|\chi_{\mathrm{imp}}-\langle\chi_{\mathrm{nn}}\rangle|$---form a
- four-component descriptor. The descriptor is
- normalized, projected to 128 channels, and added only to the impurity-node
- representation before local message passing. The $N=3$ neighborhood shown is
- schematic.}
- \label{fig:environment_enrichment}
-\end{figure}
+The four local quantities entering the E branch and their association with
+the uniquely identified impurity node are illustrated in the Supplemental
+Material~\cite{supplemental}.
 
 The full $2^3$ factorial contains all eight G/E/P combinations on each of the
 five paired random partitions.  Within a partition, all variants share the
