@@ -124,9 +124,16 @@ graph alone.  Vacancies, substitutions, charged defects, transition levels,
 migration barriers, finite-temperature free energies, and competing phases
 are outside scope.  Duplicate control removes numerical equivalents
 detected by the two declared structural fingerprints but cannot prove that
-every physical redundancy has been found; SchNet and the descriptor
-families provide aligned comparators rather than an exhaustive survey of
-architectures.  Internal ensemble uncertainty (Supplemental
+every physical redundancy has been found.  SchNet and the descriptor
+families provide aligned comparators under the frozen protocol rather than
+an exhaustive survey: a development-era survey (Supplemental
+Material~\cite{supplemental}) additionally evaluated trained equivariant
+models (MACE, ViSNet), ALIGNN, and the MACE-MP-0 foundation model as a
+zero-shot label surrogate --- the latter essentially uncorrelated with the
+IMP2D formation-energy convention --- and none approached the
+defect-centered design at matched scale, consistent with recent reports
+that universal interatomic potentials degrade precisely on interstitial-like
+environments far from their bulk training distributions.  Internal ensemble uncertainty (Supplemental
 Material~\cite{supplemental}) supports marginal calibration and risk
 ranking within the retained population, not host-conditional or chemically
 shifted coverage.  A target-matched external set --- structures, chemical

@@ -77,6 +77,54 @@ bootstrap intervals over paired repeats. Negative effects reduce MAE.}
 \end{figure}
 
 \clearpage
+\section{Development-era architecture survey}
+
+Before the formal protocol was frozen, a broad architecture survey was run
+on the development-era random split (the superseded ``leak-free v1''
+partition with a 1{,}065-structure test set, predating the protocol-v2
+sample audit and the graph repair).  These values are development history:
+they are not comparable to the main-text protocol and support no main-text
+claim, but they document why the formal comparison kept SchNet as the
+aligned neural comparator.  At matched parameter budgets, a trained
+equivariant MACE (0.44M parameters) reached 1.46\,eV test MAE and the
+equivariant ViSNet (1.69M) 0.86\,eV, against 0.58\,eV for SchNet (0.46M),
+0.54\,eV for ALIGNN at 4.0M parameters, and 0.52\,eV for the early
+defect-centered transformer (0.75M).  Classical baselines spanned
+1.16--2.30\,eV.  Separately, the MACE-MP-0 foundation model was evaluated
+as a zero-shot energy surrogate for the IMP2D formation-energy labels on a
+100-structure sample and was found inadequate (2.62\,eV, correlation
+$r\approx0.04$): the database's formation-energy convention with its
+crystalline impurity reference is not recoverable from generic
+foundation-model total energies without convention-matched chemical
+potentials.  No claim about foundation-model \emph{relaxation} quality is
+made; only the label-surrogate use was tested.
+
+\begin{table}[h!]
+\caption{Development-era survey on the superseded random split
+(1{,}065-structure test set; pre-repair implementation era).  Not
+comparable to main-text protocol numbers.}
+\label{tab:dev_survey}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Model & Parameters (M) & Test MAE (eV) \\
+\midrule
+Mean predictor & -- & 2.30 \\
+Ridge regression & -- & 1.92 \\
+Random forest & -- & 1.23 \\
+LightGBM & -- & 1.16 \\
+MACE (small, trained) & 0.44 & 1.46 \\
+ViSNet & 1.69 & 0.86 \\
+SchNet & 0.46 & 0.58 \\
+ALIGNN & 4.03 & 0.54 \\
+Early defect-centered transformer & 0.75 & 0.52 \\
+\midrule
+MACE-MP-0 (zero-shot label surrogate) & -- & 2.62 ($r\approx0.04$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
 \section{Reproducibility specification}
 
 Table~\ref{tab:reproducibility} records the fixed model and optimization
