@@ -430,3 +430,17 @@
   no overfull boxes, and embedded fonts; all pages passed rendered contact-sheet
   inspection. SHA-256 values are `ddbb3c02...109f06c` (main) and
   `25b5f584...5b6a20b` (Supplemental).
+
+### REV-027: Figure 1 local-environment inset
+
+- Change: replaced the first V19 architecture draft with an author-directed
+  GPT Image 2 edit that uses two callout leaders from the impurity node to a
+  true 5-\AA{} local-neighborhood inset. The inset displays coordination
+  number, mean and maximum neighbor distances, and electronegativity contrast;
+  the former standalone E-module figure remains absent.
+- Integrity boundary: all backbone, radial-grid, local-cutoff, readout, and
+  per-structure output labels are unchanged. No quantitative result or model
+  claim was added.
+- QA: the revised 13-page PRB build has no unresolved reference, overfull box,
+  clipping, or page-count change; the final-size Figure 1 page passed visual
+  inspection.

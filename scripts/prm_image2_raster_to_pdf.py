@@ -36,13 +36,27 @@ def convert(source: Path, destination: Path) -> None:
     axis.imshow(image)
     axis.axis("off")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    figure.savefig(destination, dpi=400, bbox_inches="tight", pad_inches=0)
+    figure.savefig(
+        destination,
+        dpi=400,
+        bbox_inches="tight",
+        pad_inches=0,
+        metadata={
+            "Creator": "prm_image2_raster_to_pdf.py",
+            "CreationDate": None,
+            "ModDate": None,
+        },
+    )
     plt.close(figure)
 
 
 def main() -> None:
     figure_dir = ROOT / "paper_Q1/figures"
-    for stem in ("figure1_image2_v19", "figure2_image2_v19"):
+    for stem in (
+        "figure1_image2_v19",
+        "figure1_image2_v19_inset",
+        "figure2_image2_v19",
+    ):
         convert(figure_dir / f"{stem}.png", figure_dir / f"{stem}.pdf")
 
 
