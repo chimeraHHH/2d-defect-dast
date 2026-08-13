@@ -29,8 +29,11 @@ of all.  Figure~\ref{fig:transfer} places the five regimes and the two
 aligned comparators --- the additive-readout SchNet under the identical
 protocol and the descriptor model selected by validation MAE within each
 split --- on a common scale, and Table~\ref{tab:benchmark} reports the
-values; the defect-centered model leads every regime, and the comparator
-gaps widen precisely on the constituent-transfer axes.
+values.  The defect-centered model leads every regime; the SchNet gap
+widens sharply on the constituent-transfer axes, while the descriptor gap
+is roughly scale invariant at 1.3--1.6$\times$, so the constituent-transfer
+difficulty is shared by all three model families rather than an artifact of
+one architecture.
 
 \input{draft_tab_benchmark.tex}
 
@@ -75,16 +78,22 @@ and surviving the exclusion of pathological out-of-plane reconstructions).
 
 For \emph{adsorbates}, error tracks chemistry: moving from the tenth to the
 ninetieth percentile of signed valence mismatch raises the adjusted error by
-\PRMPOneAdsValenceContrast\eV{}, and the smooth coordination number
+\PRMPOneAdsValenceContrast\eV{}, and the smoothed coordination measure
 contributes \PRMPOneAdsCoordContrast\eV{}
-(+\PRMPOneAdsCoordPercent\%).  For \emph{interstitials}, error tracks the
-local cage: post-relaxation minimum clearance
-(\PRMPOneIntClearanceContrast\eV{}), neighbor-distance dispersion
-(\PRMPOneIntDispersionContrast\eV{}), the effective maximum neighbor
-distance seen by the defect-centered module
-(\PRMPOneIntMaxDistContrast\eV{}), absolute valence mismatch
-(\PRMPOneIntAbsValenceContrast\eV{}), and absolute covalent-radius mismatch
-(\PRMPOneIntRadiusContrast\eV{}) all carry gated effects.
+(+\PRMPOneAdsCoordPercent\%; the raw five-\AA{}ngstr\"om count shown as
+the frozen profile feature in Fig.~\ref{fig:error_map} carries no gated
+adsorbate effect).  For \emph{interstitials}, the gated effects share a
+consistent direction: error \emph{rises} with post-relaxation clearance
+(\PRMPOneIntClearanceContrast\eV{}) and with the largest defect-centered
+neighbor distance (\PRMPOneIntMaxDistContrast\eV{}), \emph{falls} with
+neighbor-distance dispersion (\PRMPOneIntDispersionContrast\eV{}) and with
+absolute covalent-radius mismatch (\PRMPOneIntRadiusContrast\eV{}), and
+rises with absolute valence mismatch
+(\PRMPOneIntAbsValenceContrast\eV{}).  Interstitial error therefore
+concentrates not in tight fits but in \emph{roomy, uniformly spaced,
+loosely constrained} cages with mismatched valence --- environments where
+the impurity is weakly held and snug packing constraints do not pin the
+energy.
 Figure~\ref{fig:error_map} reports the four-panel physical error map:
 class-resolved adjusted error profiles over coordination and clearance,
 the chemistry-mismatch contrasts, error against the out-of-plane expansion

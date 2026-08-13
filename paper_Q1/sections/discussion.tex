@@ -36,16 +36,19 @@ the IMP2D reference conventions.
 
 The class asymmetry (\PRMRepPairInterstitialMAE{} versus
 \PRMRepPairAdsorbateMAE\eV{} under pair holdout) is not one phenomenon.
-The gated error-map effects separate two regimes: interstitial error grows
-with descriptors of the local cage --- post-relaxation clearance,
-neighbor-distance dispersion, the largest defect-centered neighbor
-distance, and size and valence mismatch --- while adsorbate error is
-dominated by chemical mismatch, led by signed valence, with local geometry
-contributing through the smooth coordination number.  Physically, an
-embedded impurity samples the host's short-range repulsive landscape, so
-small geometric irregularities translate into large energy variations; an
-adsorbed impurity sits outside the layer, and the harder part is scoring
-how its bonding preference matches the surface chemistry.
+The gated error-map effects separate two regimes.  Interstitial error
+concentrates in roomy, loosely constrained cages: it rises with
+post-relaxation clearance and with the largest defect-centered neighbor
+distance, falls with neighbor-distance dispersion and with covalent-radius
+mismatch, and rises with valence mismatch.  A snugly caged impurity sits in
+a steep, sterically pinned energy well whose depth follows the local
+geometry the model sees directly; a loosely held impurity in a large,
+uniform cage samples a flatter landscape with near-degenerate placements,
+where the energy depends on subtler electronic contributions.  Adsorbate
+error is instead dominated by chemical mismatch, led by signed valence,
+with local geometry contributing through the smoothed coordination measure.
+These are controlled associations, not causal mechanisms; the sign pattern
+is what the frozen analysis established.
 
 How much of the interstitial penalty do these measured descriptors explain?
 The preregistered attenuation ladder gives a deliberately conservative
