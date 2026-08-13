@@ -77,7 +77,9 @@ bootstrap intervals over paired repeats. Negative effects reduce MAE.}
 \end{figure}
 
 \clearpage
-\section{Development-era architecture survey}
+\section{Development-era surveys and pilots}
+
+\subsection{Architecture survey}
 
 Before the formal protocol was frozen, a broad architecture survey was run
 on the development-era random split (the superseded ``leak-free v1''
@@ -124,6 +126,39 @@ MACE-MP-0 (zero-shot label surrogate) & -- & 2.62 ($r\approx0.04$) \\
 \end{tabular}
 \end{table}
 
+\subsection{Defect locality of the learned representation}
+
+Attribution analyses of the development-era model support the
+defect-centered design from inside the network.  Masking single atoms and
+recording the prediction change (100 test structures) places
+$91\pm13\%$ of the total attribution on the impurity atom itself; the
+mean occlusion effect at the impurity atom exceeds that at other atoms by
+more than two orders of magnitude; per-atom attributions decay with
+distance from the defect (mean Pearson correlation $0.99$ with inverse
+distance); and $80\%$ of the non-defect attribution is contained within
+roughly $9$\,\AA{} of the defect site, inside the $12$\,\AA{}
+radial-bias horizon of the architecture.  Attention shows the same
+concentration (200 structures): mean incoming attention to the defect atom
+is $32$ times that to a random other atom.  The learned function is
+therefore defect-local in the same sense as the target --- the property
+that the main text's mean-versus-additive readout comparison probes
+behaviorally.
+
+\subsection{Held-out-host case studies}
+
+Five leave-one-host-out case studies, each withholding every structure of
+one named host, trace the novelty gradient concretely on the development
+split.  Hosts with close structural relatives in training transfer at no
+measurable cost: MoS$_2$ ($n=308$) matches the in-distribution reference
+exactly ($0.516$ versus $0.516$\,eV) and the Janus host MoSSe ($n=464$)
+comes in below it ($0.448$\,eV).  TaSe$_2$ ($n=222$, $1.23\times$) and
+the halide Cr$_2$I$_6$ ($n=334$, $1.63\times$) degrade moderately.  The
+hydrogenated covalent host graphane, C$_2$H$_2$ ($n=231$, $2.40$\,eV), is
+the extreme of the distribution --- and it is also the one host with no
+hydrogenated or purely covalent relative anywhere in the database, so the
+gradient anticipates the main-text attribution of held-out-host error to
+the structural novelty of the withheld host.
+
 \subsection{Cross-database and multi-source experiments}
 
 The same development era probed whether other formation-energy sources
@@ -136,13 +171,55 @@ $R^2$; few-shot fine-tuning onto those targets underperformed training
 from scratch at every budget tested (10--300 labels); and four-source
 joint training (IMP2D with JARVIS-2D, JARVIS-3D, and DFT-3D at tuned
 weights) improved the IMP2D development-split error by only about
-$4.5\%$.  Together with the foundation-model surrogate test above, these
+$4.5\%$ --- and leave-one-host-out replays of the same multi-source
+recipe degraded held-out-host transfer by $22$--$65\%$ across the three
+hosts tested, so diluting defect-centered supervision with bulk-crystal
+gradients hurts exactly the transfer axis this paper measures.  Together
+with the foundation-model surrogate test above, these
 results identify the cross-database barrier as one of reference
 conventions and defect-class mismatch rather than representation capacity,
 and they motivated both the frozen single-database protocol and the
 convention-matching requirements of the preregistered external-validation
 design.  The retained pipeline is nevertheless two-source: the corrected
 JARVIS-3D pretraining (19{,}902 records) initializes every reported model.
+
+\subsection{Prospective DFT feasibility pilot}
+
+The development era also exercised, end to end, the external test the main
+text identifies as the most direct next step: independent first-principles
+calculations on candidates ranked by the model itself.  From a pool of 287
+generated single-impurity candidates (interstitial and substitutional
+mutations of database hosts), 60 were selected --- the 30 lowest predicted
+formation energies and the 30 largest calibrated uncertainties, with a
+per-host diversity cap --- and evaluated with plane-wave PBE calculations
+in Quantum ESPRESSO 7.3.1 (PSL~1.0.0 pseudopotentials, $30/180$\,Ry
+cutoffs, $\Gamma$-only, Methfessel--Paxton smearing): 125 runs in total
+covering the defect supercells, the 27 pristine hosts, and 38
+isolated-atom chemical-potential references.  A pseudopotential-library
+augmentation incompatibility removed the 22 La/Cs candidates and one run
+did not converge, leaving $N=37$ validated formation energies.
+
+The pilot's two findings sharpen the convention analysis above.  First,
+the raw predicted-versus-DFT comparison is uncorrelated, and aligning the
+pilot's isolated-atom chemical-potential reference with the database's
+crystalline convention through one constant per impurity element
+(estimated from the paired data, as the pilot computed no bulk references)
+restores rank agreement --- Spearman $0.35$, stratified-bootstrap $95\%$
+interval $[0.04, 0.60]$, excluding zero.  The cross-database barrier is
+therefore a per-element reference-convention offset, not a loss of rank
+information.  Second, model ranking concentrates first-principles effort
+effectively: within the low-predicted-energy bucket, $70\%$ ($14/20$;
+interval $[50\%, 90\%]$) of the converged candidates were confirmed below
+$+1$\,eV and $40\%$ were exothermic, against roughly $18\%$ of the full
+pool predicted below the same threshold.  The pilot used development-era
+model predictions and unrelaxed single-point energies at pilot-grade
+settings, so its absolute errors (median $1.7$\,eV on this deliberately
+out-of-distribution set) characterize the pilot rather than the repaired
+model, and no pilot number supports a main-text claim; what carries over
+is the demonstrated workflow --- candidate generation, reference
+chemical potentials, pseudopotential coverage, and per-element convention
+alignment --- which leaves convention matching as the only remaining
+ingredient of the preregistered external-validation design.
 
 \clearpage
 \section{Reproducibility specification}

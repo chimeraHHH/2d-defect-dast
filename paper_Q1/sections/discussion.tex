@@ -20,7 +20,11 @@ hosts --- and the association survives controlling for the mechanical
 training-support asymmetry between the two protocols, with the same
 direction across the fold strata.  A new host changes the structural motif
 the defect embeds into, whereas a new impurity largely re-poses a chemistry
-seen in other combinations.
+seen in other combinations.  Development-era case studies of five named
+held-out hosts (Supplemental Material~\cite{supplemental}) trace the same
+gradient concretely: hosts with close structural relatives in training
+transfer at no measurable cost, while the one host with no structural
+relative in the database sits at the failure extreme.
 
 These grouped tests do not represent element- or formula-disjoint
 pretraining.  The source task contains reduced-formula matches for 26 IMP2D
@@ -84,6 +88,11 @@ suggested but not established at the frozen evidence standard.  Pooling
 choice is known to matter for intensive and localized
 targets~\cite{buterez2023pooling}; the remaining gap to the defect-centered
 model reflects complete recipes, not a backbone-only ranking.
+Development-era attribution analyses (Supplemental
+Material~\cite{supplemental}) show the same property from inside the
+model: occlusion attributions concentrate at the impurity atom and decay
+with distance from it, so the learned function is defect-local in the same
+sense as the target.
 
 %----------------------------------------------------------------------
 \subsection{Retrospective reranking of available relaxed geometries}
@@ -140,13 +149,21 @@ shifted coverage.  The single-database scope is itself an evidence-based
 protocol choice: development-era experiments (Supplemental
 Material~\cite{supplemental}) found zero-shot cross-database evaluation on
 JARVIS vacancy data failing at the 2--3\,eV level with negative $R^2$,
-few-shot fine-tuning losing to training from scratch, and four-source joint
-training yielding only marginal gains --- the barrier is one of reference
+few-shot fine-tuning losing to training from scratch, and multi-source
+joint training buying small in-distribution gains at the price of degraded
+held-out-host transfer --- the barrier is one of reference
 conventions and defect-class mismatch, which is exactly what a
 target-matched external set --- structures, chemical potentials,
 convergence settings, and target definition matching the IMP2D convention,
 generated independently of their reference energies --- would address as
-the most direct next test.
+the most direct next test.  A development-era pilot (Supplemental
+Material~\cite{supplemental}) has already exercised that test end to end,
+running independent plane-wave calculations on model-ranked candidates: it
+located the barrier in per-element reference conventions --- rank agreement
+survives once a per-element offset is removed --- and confirmed that model
+ranking concentrates first-principles effort well above the pool base
+rate, so the remaining step is convention matching rather than new
+machinery.
 
 \else
 
