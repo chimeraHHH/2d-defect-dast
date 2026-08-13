@@ -25,7 +25,24 @@ impurities are withheld and to \PRMRepHostCvMAE\eV{} when complete hosts
 are withheld.  Recombining constituents that were each seen in training is
 therefore only mildly harder than interpolation, whereas encountering a new
 constituent roughly doubles the error, and a new host is the hardest axis
-of all.
+of all.  Figure~\ref{fig:transfer} places the five regimes and the two
+aligned comparators --- the additive-readout SchNet under the identical
+protocol and the descriptor model selected by validation MAE within each
+split --- on a common scale, and Table~\ref{tab:benchmark} reports the
+values; the defect-centered model leads every regime, and the comparator
+gaps widen precisely on the constituent-transfer axes.
+
+\input{draft_tab_benchmark.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_transfer_repaired.pdf}
+\caption{Test MAE across the five transfer regimes for the repaired
+  defect-centered model, the additive-readout SchNet baseline, and the
+  validation-selected descriptor model (log scale).  Small open markers show
+  individual folds where five folds exist.}
+\label{fig:transfer}
+\end{figure}
 
 The host--impurity ordering itself is small but real: the sample-matched
 host-minus-impurity absolute-error gap has a pair-clustered 95\% interval of
@@ -153,7 +170,24 @@ top-two accuracies are \PRMRepWithinExactAccuracy\%\ and
 \PRMRepWithinExactReference\%\ and \PRMRepWithinTopTwoReference\%,
 with mean reranking regret \PRMRepWithinRegret\eV{}.  Complete decision
 metrics with pair-clustered intervals are reported in the Supplemental
-Material~\cite{supplemental}.
+Material~\cite{supplemental}.  Figure~\ref{fig:reranking} shows the
+class-margin agreement, the regret distributions, and the clustered
+decision-accuracy intervals; class flips concentrate where the reference
+margin itself is small.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_reranking_repaired.pdf}
+\caption{Retrospective reranking of available DFT-relaxed IMP2D geometries
+  from repaired pair-held-out predictions.
+  (a) Predicted versus reference incorporation-class margins; flipped
+  decisions (orange) cluster at small reference margins.
+  (b) Empirical cumulative distributions of global and within-class
+  reranking regret.
+  (c) Host--impurity-pair cluster-bootstrap intervals for the four decision
+  accuracies against their class-prior or uniform references (diamonds).}
+\label{fig:reranking}
+\end{figure*}
 
 %----------------------------------------------------------------------
 \subsection{Supporting analyses}

@@ -29,7 +29,6 @@ REGIMES = {
     "dopant": ("dopant_cv5_f{fold}", (242, 243, 244), "impurity held out"),
     "host": ("host_cv5_f{fold}", (242, 243, 244), "host held out"),
 }
-SCHNET_SEEDS = (342, 343, 344)
 
 
 def fold_mae(run_dir: Path, seeds: tuple[int, ...]) -> float:
@@ -52,10 +51,10 @@ def fold_mae(run_dir: Path, seeds: tuple[int, ...]) -> float:
     return float(np.mean(np.abs(mean_preds - reference[1])))
 
 
-def model_metrics(root: Path, seeds_map, seed_override=None) -> dict:
+def model_metrics(root: Path, seed_offset: int = 0) -> dict:
     out = {}
     for regime, (pattern, dart_seeds, label) in REGIMES.items():
-        seeds = seed_override if seed_override else dart_seeds
+        seeds = tuple(seed + seed_offset for seed in dart_seeds)
         if "{fold}" in pattern:
             folds = [
                 fold_mae(root / pattern.format(fold=fold), seeds)
@@ -87,13 +86,13 @@ def main() -> None:
     if output.exists():
         raise FileExistsError(output)
 
-    dart = model_metrics(Path(args.dart_root), REGIMES)
-    schnet = model_metrics(Path(args.schnet_root), REGIMES,
-                           seed_override=SCHNET_SEEDS)
+    dart = model_metrics(Path(args.dart_root))
+    # the SchNet campaign mirrors the DART seed law shifted by +100
+    schnet = model_metrics(Path(args.schnet_root), seed_offset=100)
     descriptor = {}
     with open(args.descriptor_summary, newline="") as handle:
         for row in csv.DictReader(handle):
-            if row["model"] != "descriptor:selected":
+            if row["model"] != "descriptor:validation_selected":
                 continue
             regime = {
                 "id_cv": "id", "pair_cv": "pair", "host_cv": "host",
