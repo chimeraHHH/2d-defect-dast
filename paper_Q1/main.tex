@@ -52,36 +52,27 @@ two-dimensional materials: Chemical transferability and error analysis}
 
 \begin{abstract}
 \ifprmresultsready
-Graph models now predict defect formation energies at useful accuracy, but
-pooled benchmarks answer neither \emph{where} such models transfer across
-chemistry nor \emph{why} they fail where they do.  We address both
-questions for neutral impurities in two-dimensional materials with the
-Defect-Aware Radial Transformer (DART), an impurity-centered graph model
-built on a strictly permutation-invariant local representation with exact
-minimum-image distances and evaluated on 10,224 structures curated from
-the IMP2D database; because every geometry and reference energy comes
-from the same completed DFT workflow, the task is retrospective,
-database-conditioned estimation and reranking.  Transfer is organized by
-chemical novelty in a strict hierarchy: recombining constituents seen in
-training costs little over random interpolation, whereas withholding a
-complete impurity or host roughly doubles the error, and the
-host--impurity asymmetry tracks the structural novelty of the held-out
-host after controlling for training support.  Incorporation geometry
-forms a second axis with distinct physics: interstitials are over twice
-as hard as adsorbates, with preregistered error maps placing interstitial
-error in roomy, loosely constrained cages and adsorbate error on chemical
-mismatch, led by signed valence.  The formation energy's non-extensive,
-defect-local character constrains model design: an additive readout
-degrades sharply on withheld hosts, a mean readout alone recovers most of
-that gap, and the defect-centered readout shows no size-dependent drift.
-Out-of-fold predictions identify the lower-energy incorporation class
-well above the class-prior reference, supporting retrospective reranking
-within the retained neutral domain.  Every reported number derives from
-an independently audited repaired representation: under atom relabeling,
-a superseded implementation moved single predictions by several
-electron-volts while pooled errors were essentially unchanged ---
-aggregate benchmarks can hide representation defects that dominate
-individual predictions.
+Random-split accuracy does not show how defect-energy models transfer across
+chemistry or how their errors depend on incorporation geometry.  We develop
+the Defect-Aware Radial Transformer (DART), an impurity-centered graph model
+that combines defect-local message passing, geometric attention, and a
+non-extensive gated readout.  Evaluated on 10,224 neutral impurity structures
+from IMP2D, DART achieves similar errors under random and pair-held-out
+evaluation, but the mean absolute error rises to 0.845 and 0.891~eV for unseen
+impurities and hosts, respectively.  The host--impurity asymmetry is associated
+with structural novelty after accounting for training support.  Interstitials
+are more than twice as difficult as adsorbates: their errors are associated
+with roomy, weakly constrained environments, whereas adsorbate errors track
+chemical mismatch, particularly signed valence differences.  A readout
+comparison shows that atomwise addition is poorly matched to the non-extensive
+target, while defect-centered pooling avoids size-dependent drift.  For
+retrospective reranking of existing DFT-relaxed IMP2D candidates,
+pair-held-out predictions identify the lower-energy incorporation class with
+91.4\% accuracy.  Atom-relabeling tests further show that an order-sensitive
+representation can shift individual predictions by up to 8.8~eV while leaving
+pooled error nearly unchanged.  Together, these results connect chemical
+transfer, local defect environments, and representation correctness in
+machine-learned defect energetics.
 \else
 We study how impurity formation-energy prediction changes across host,
 impurity, and incorporation-geometry axes in two-dimensional materials.  The
