@@ -55,11 +55,16 @@ from the bars.}
 \end{figure}
 
 \clearpage
-\section{Architecture factorial visualization}
+\section{Architecture factorial}
 
-The paired architecture experiment is tabulated in the main text.  The
-corresponding visual comparison is retained here so that the main-text figure
-sequence can emphasize chemical transfer and materials-physics analysis.
+The paired architecture experiment selected the frozen all-enabled recipe and
+is reported here in full so that the main text can emphasize chemical
+transfer and materials-physics analysis.  These runs were executed under the
+superseded, order-sensitive graph implementation and are retained as
+recipe-selection provenance; no main-text claim rests on them, and every
+main-text number derives from the repaired representation.
+
+\input{generated/tab_factorial.tex}
 
 \begin{figure}[htbp]
 \centering
@@ -148,7 +153,10 @@ reported separately and never entered family selection.
 The internal ensemble analysis uses a dedicated calibration/test partition
 drawn from the retained IMP2D population.  Its intervals therefore assess
 marginal calibration inside that population rather than calibration under an
-explicit host or impurity shift.
+explicit host or impurity shift.  The ensemble members were trained under the
+superseded graph implementation; the analysis is retained as supporting
+evidence for the calibration methodology, and no main-text claim rests on
+these values.
 
 % Values mirror generated/tab_uq.tex; the local table controls float order.
 \begin{table}[h!]
@@ -185,9 +193,10 @@ standard deviation versus absolute error on the dedicated test partition.}
 \section{Retrospective reranking metrics}
 
 These metrics compare predictions and reference energies over available
-DFT-relaxed IMP2D geometries.  The geometries and reference energies were
-produced by the same completed DFT workflow, so the analysis does not replace
-candidate generation or relaxation.
+DFT-relaxed IMP2D geometries, using the repaired representation's
+pair-held-out predictions throughout.  The geometries and reference energies
+were produced by the same completed DFT workflow, so the analysis does not
+replace candidate generation or relaxation.
 
 % Values mirror generated/tab_screening.tex; terminology and float order are
 % controlled locally without altering any number.
@@ -202,12 +211,12 @@ points.}
 \toprule
 Metric & Model [95\% interval] & Reference & Gain [95\% interval] & $n$ \\
 \midrule
-Incorporation-class preference accuracy (\%) & 91.0 [89.7, 92.4] & 66.2 & 24.8 [22.4, 27.2] & 1730 \\
-Global exact-site accuracy (\%) & 69.5 [67.3, 71.7] & 23.4 & 46.1 [44.0, 48.3] & 1730 \\
-Global reranking regret (eV) & 0.139 [0.113, 0.169] & -- & -- & 1730 \\
+Incorporation-class preference accuracy (\%) & 91.4 [90.0, 92.7] & 66.2 & 25.1 [22.7, 27.6] & 1730 \\
+Global exact-site accuracy (\%) & 68.9 [66.7, 71.1] & 23.4 & 45.5 [43.4, 47.7] & 1730 \\
+Global reranking regret (eV) & 0.142 [0.116, 0.172] & -- & -- & 1730 \\
 Within-class exact-site accuracy (\%) & 73.6 [72.0, 75.1] & 37.1 & 36.5 [35.0, 38.0] & 3140 \\
-Within-class top-2 accuracy (\%) & 91.4 [90.2, 92.6] & 62.1 & 29.2 [28.0, 30.4] & 2145 \\
-Within-class reranking regret (eV) & 0.103 [0.087, 0.121] & -- & -- & 3140 \\
+Within-class top-2 accuracy (\%) & 91.5 [90.3, 92.7] & 62.1 & 29.4 [28.2, 30.6] & 2145 \\
+Within-class reranking regret (eV) & 0.099 [0.083, 0.118] & -- & -- & 3140 \\
 \bottomrule
 \end{tabular}
 \end{table}

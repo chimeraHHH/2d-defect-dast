@@ -47,15 +47,26 @@ one pooled error.
 Here we develop the Defect-Aware Radial Transformer (DART), an
 impurity-centered graph model that combines defect-local message passing,
 radial-bias self-attention, and graph readout for a non-extensive
-formation-energy target [Fig.~\ref{fig:architecture}].  A paired $2^3$
-factorial quantifies module effects, after which grouped tests distinguish
-transfer to unseen host--impurity pairs from transfer to hosts or impurities
-absent from IMP2D target supervision.  Retrospective reranking metrics are
-computed from pair-held-out predictions for existing DFT-relaxed candidates.
-Because those geometries and their reference energies come from the same
-completed DFT workflow, this analysis does not replace structure generation or
-relaxation.  A separate ensemble experiment assesses internal uncertainty calibration and selective
-prediction~\cite{peterson2017,hu2022,grasselli2025}.
+formation-energy target [Fig.~\ref{fig:architecture}], built on a strictly
+permutation-invariant local representation with exact minimum-image
+distances.  Grouped evaluations distinguish transfer to unseen
+host--impurity pairs from transfer to hosts or impurities absent from IMP2D
+target supervision, and preregistered analyses then ask \emph{why} the
+resulting error structure looks the way it does: which local geometric and
+chemical environments carry the error, whether the host-versus-impurity
+asymmetry reflects structural novelty or a mechanical training-support
+imbalance, and how the readout's scaling class interacts with a defect-local
+target.  Retrospective reranking metrics are computed from pair-held-out
+predictions for existing DFT-relaxed candidates; because those geometries
+and their reference energies come from the same completed DFT workflow,
+this analysis does not replace structure generation or relaxation.  Two
+methodological results accompany the physics: a diagnostic showing that a
+superseded, order-sensitive implementation moved individual predictions by
+several eV while leaving pooled benchmarks essentially unchanged, and the
+independently audited repair from which every reported number derives.  The
+architecture factorial and internal uncertainty
+calibration~\cite{peterson2017,hu2022,grasselli2025} support the frozen
+recipe and are reported in the Supplemental Material~\cite{supplemental}.
 
 \begin{figure*}[t]
 \centering
