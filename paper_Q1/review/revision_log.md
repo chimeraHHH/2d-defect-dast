@@ -480,3 +480,17 @@
   atoms with continuous blue bonds and retained one orange impurity node.
 - Scope: no other panel, label, arrow, icon, layout, or scientific topology was
   changed. The close-up was used only to identify the visual defect.
+
+### REV-031: Figure 2 typography and Figure 6 label clearance
+
+- Figure 2: used GPT Image 2 for a typography-only edit, replacing the heavy
+  condensed lettering with a STIXGeneral-like academic serif hierarchy that
+  matches Figure 3. All labels, structures, arrows, colors, and positions were
+  retained.
+- Figure 6: regenerated the quantitative diagnostic from its archived G1A
+  inputs. Increased bottom-panel row spacing and placed each label on an opaque
+  white text layer above the corresponding guide line, so no data mark or line
+  obscures a label. Numeric values and axis encoding are unchanged.
+- Reproducibility: Figure 6 now also exports editable SVG with live text from
+  `scripts/prm_render_permutation_figure.py`; no image model touched the
+  quantitative figure.

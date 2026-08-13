@@ -59,6 +59,7 @@ def main() -> None:
         "figure1_image2_v19_aligned_icons",
         "figure1_image2_v19_clean_lattice",
         "figure2_image2_v19",
+        "figure2_image2_v19_stix",
     ):
         convert(figure_dir / f"{stem}.png", figure_dir / f"{stem}.pdf")
 

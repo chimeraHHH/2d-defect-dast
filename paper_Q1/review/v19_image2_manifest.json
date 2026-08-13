@@ -44,6 +44,11 @@
       "paper_asset": "paper_Q1/figures/figure2_image2_v19.pdf",
       "edited_png_sha256": "2f0e0138206937b08b086c66e3f122560d8ed03f85ad4f3dcaa6efbb05a445c1",
       "paper_asset_sha256": "ba23729c7129a0d800450638e474e0e330b128383a164bf96b4a853ff4972439",
+      "stix_png": "paper_Q1/figures/figure2_image2_v19_stix.png",
+      "stix_pdf": "paper_Q1/figures/figure2_image2_v19_stix.pdf",
+      "stix_png_sha256": "27644b54c0af1c0bc4ffeac41a61ae20b5b65145d4c3994b11c4c2245bc9923f",
+      "stix_pdf_sha256": "ee210a27f90b33d904fb6be4dfdf7d429ded10bcd21c8e7896aa773d5359d7cc",
+      "stix_scope": "typography-only edit matching the STIXGeneral-like hierarchy of Figure 3",
       "edit_scope": "Separate adsorbate and interstitial into alternative single-impurity panels and add redundant shape encoding",
       "scientific_qa": "author-directed class separation and labels verified against manuscript dataset definition"
     }

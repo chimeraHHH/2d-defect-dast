@@ -29,6 +29,7 @@ def style() -> None:
         "ytick.labelsize": 7, "legend.fontsize": 7, "axes.linewidth": 0.6,
         "xtick.major.width": 0.6, "ytick.major.width": 0.6,
         "axes.spines.top": False, "axes.spines.right": False,
+        "svg.fonttype": "none",
     })
 
 
@@ -49,8 +50,8 @@ def main() -> None:
     assert np.isclose(pooled.max(), summary["prediction_range_eV"]["max"])
 
     figure, (ax_top, ax_bot) = plt.subplots(
-        2, 1, figsize=(3.4, 3.0), sharex=True,
-        gridspec_kw={"height_ratios": [2.4, 1.0], "hspace": 0.12})
+        2, 1, figsize=(3.4, 3.18), sharex=True,
+        gridspec_kw={"height_ratios": [2.35, 1.15], "hspace": 0.18})
 
     # (a) ECDF of the legacy per-structure permutation spread, by class.
     for key, color, linestyle in (
@@ -78,14 +79,23 @@ def main() -> None:
         ("legacy: per-structure spread, max",
          summary["prediction_range_eV"]["max"], ORANGE, "D"),
     ]
+    row_spacing = 1.45
     for k, (label, value, color, marker) in enumerate(entries):
-        y = len(entries) - 1 - k
+        y = (len(entries) - 1 - k) * row_spacing
         ax_bot.plot([1.1e-6, value], [y, y], color="0.85", linewidth=0.8, zorder=1)
         ax_bot.plot(value, y, marker, color=color, markersize=4.5, zorder=2)
-        ax_bot.text(1.3e-6, y + 0.22, label, fontsize=6.2, va="bottom",
-                    color="0.15")
+        ax_bot.text(
+            1.3e-6,
+            y + 0.34,
+            label,
+            fontsize=6.15,
+            va="bottom",
+            color="0.15",
+            zorder=4,
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.7},
+        )
     ax_bot.set_yticks([])
-    ax_bot.set_ylim(-0.5, len(entries) - 0.1)
+    ax_bot.set_ylim(-0.45, (len(entries) - 1) * row_spacing + 0.9)
     ax_bot.set_xscale("log")
     ax_bot.set_xlim(1e-6, 40)
     ax_bot.set_xlabel("prediction change under atom relabeling (eV)")
@@ -94,9 +104,18 @@ def main() -> None:
     for label, ax in zip(("(a)", "(b)"), (ax_top, ax_bot)):
         ax.text(-0.16, 1.02, label, transform=ax.transAxes,
                 fontweight="bold", fontsize=9, va="bottom")
-    figure.subplots_adjust(left=0.15, right=0.97, top=0.95, bottom=0.14)
+    figure.subplots_adjust(left=0.15, right=0.97, top=0.95, bottom=0.135)
     output = ROOT / "paper_Q1/figures/fig_permutation_repair.pdf"
     figure.savefig(output, dpi=400)
+    svg_output = output.with_suffix(".svg")
+    figure.savefig(svg_output, dpi=400)
+    # Matplotlib emits trailing spaces in multiline SVG path data. Normalize
+    # the editable artifact so repository whitespace checks stay meaningful.
+    svg_text = svg_output.read_text(encoding="utf-8")
+    svg_output.write_text(
+        "\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n",
+        encoding="utf-8",
+    )
     print(f"wrote {output}")
     print("repaired bound", repaired_bound,
           "legacy p99", summary["prediction_range_eV"]["p99"],
