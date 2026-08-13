@@ -1,75 +1,77 @@
 % !TEX root = ../main.tex
 
-Point defects and incorporated impurity atoms can alter carrier density,
-localized electronic states, magnetism, and catalytic activity in
-two-dimensional (2D) materials.  Their formation energies compare a relaxed
-defective structure with a pristine host and an atomic reservoir, and therefore
-depend on both the local defect environment and the surrounding chemical
-reference state~\cite{freysoldt2014}.  Defect structures and energetics can
-differ between bulk and monolayer hosts~\cite{komsa2015}, while the accessible
-surface and internal voids introduce distinct adsorbate and interstitial
-incorporation geometries~\cite{imp2d2023}.  Systematic first-principles surveys
-remain demanding because the search space grows across host chemistry,
-impurity identity, incorporation class, and symmetry-distinct site.  Once such
-a survey exists, a separate question is whether learned representations can
-organize its energy landscape and expose where transfer across chemistry or
-incorporation geometry fails.
+Point defects and incorporated impurity atoms reshape carrier densities,
+localized electronic states, magnetism, and catalytic response in
+two-dimensional (2D) materials.  Their formation energies rank relaxed
+defective structures relative to a pristine host and an atomic reservoir, and
+therefore couple the local defect environment to the surrounding chemical
+reference state~\cite{freysoldt2014}.  This coupling is especially varied in
+2D hosts: defect structures and energetics differ from their bulk
+counterparts~\cite{komsa2015}, while exposed surfaces and internal voids support distinct
+adsorbate and interstitial incorporation geometries~\cite{imp2d2023}.  The
+IMP2D database provides a systematic survey of these neutral impurities across
+host chemistries, impurity elements, incorporation classes, and candidate
+sites~\cite{imp2d2023}.  It thereby enables a broader question than pooled
+energy prediction: how does model error evolve when the host, impurity, or
+incorporation geometry departs from the training distribution?
 
-The IMP2D database provides such a survey for neutral adsorbate and
-interstitial impurities in 2D hosts~\cite{imp2d2023}, and graph neural
-networks are the natural learners because they operate directly on
-periodic atomic structures~\cite{alignn2021,schutt2018}.  Defect-specific
-models have followed: for bulk energetics through defect graph networks,
-semiconductor graph models, persistent-homology features, and
-charge-aware predictors~\cite{witman2023,rahman2024,fang2025,kiyohara2025},
-and for 2D systems through sparse defect representations on 2DMD and tree
-or descriptor models directly on
-IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  Together these studies
-show that representation and data preparation materially affect reported
-errors, and they fix the requirements a model for this task must meet:
-operate on the periodic structure \emph{alone}, expose the impurity site
-\emph{explicitly}, and respect the \emph{non-extensive}, defect-local
-scaling of the target.
+Structure-based machine learning now provides several routes to defect
+energetics.  Graph models operate directly on periodic atomic
+structures~\cite{alignn2021,schutt2018} and have been adapted to bulk defects through
+defect-specific networks, semiconductor models, and persistent-homology
+features~\cite{witman2023,rahman2024,fang2025}.  A recent framework extended
+structural prediction to multiple charge states by aligning reference energies
+and treating perturbed host states consistently~\cite{kiyohara2025}.  For 2D
+systems, sparse defect representations on 2DMD and tree or descriptor models
+on IMP2D have demonstrated complementary data-efficient
+strategies~\cite{kazeev2023,kesorn2024,elalouani2026}.  Universal machine-learning
+interatomic potentials offer another route: large-scale calculations of
+unrelaxed vacancy energies across 86,259 Materials Project entries can be
+followed by relaxation of selected candidates~\cite{berger2025screening}.
+These advances establish predictive accuracy, charge-state treatment, and
+computational throughput, but leave the structure of chemical transfer error
+largely unresolved.
 
-Evaluation practice has not kept pace.  A random structure split places
-closely related chemistries and numerically equivalent structures on both
-sides of the train--test boundary, yielding optimistic
-estimates~\cite{li2024mdhit}, and it conflates two physically different
-questions: recombining known constituents in an unseen pair versus
-predicting a host or impurity absent from all target
-supervision~\cite{omee2024,li2025ood}.  One pooled error likewise hides
-the role of incorporation geometry --- adsorbate versus interstitial ---
-and hides a third failure mode entirely: a representation defect can move
-individual predictions by electron-volts while leaving the pooled error
-essentially unchanged.
+The central challenge is to distinguish interpolation from transfer across
+chemistry.  A host--impurity pair absent from training may still recombine two
+familiar constituents, whereas a held-out host or impurity removes an entire
+source of target supervision.  Random structure splits mix these regimes and
+can also place numerically equivalent structures across the train--test
+boundary~\cite{li2024mdhit}; grouped evaluation is required to separate the
+resulting levels of chemical novelty~\cite{omee2024,li2025ood}.  A single
+pooled error further averages over physically distinct adsorbate and
+interstitial environments.  Finally, a periodic representation must assign
+identical predictions to structures that differ only by atom labeling.  These
+requirements connect transfer evaluation to both local defect physics and
+representation correctness.
 
-Here we develop the Defect-Aware Radial Transformer (DART), an
-impurity-centered graph model that combines defect-local message passing,
-radial-bias self-attention, and a gated graph readout matched to a
-non-extensive formation-energy target [Fig.~\ref{fig:architecture}], built
-on a strictly permutation-invariant local representation with exact
-minimum-image distances.  This paper makes four contributions: a chemically resolved
-transferability evaluation whose grouped protocols separate random
-interpolation, recombination of familiar constituents, a predefined
-chemistry block, and transfer to hosts or impurities absent from target
-supervision; a preregistered error analysis of \emph{why} the error
-structure looks the way it does --- which local environments carry the
-error, whether the host-versus-impurity asymmetry reflects structural
-novelty or training support, and how the readout's scaling class
-interacts with a defect-local target; retrospective reranking metrics
-over existing DFT-relaxed candidates, conditional on the completed IMP2D
-workflow; and a correctness methodology --- a diagnostic showing that a
-superseded, order-sensitive implementation moved individual predictions
-by several eV while leaving pooled benchmarks essentially unchanged,
-together with the independently audited repair behind every reported
-number.  The
-architecture factorial that selected the frozen recipe and the internal
-uncertainty calibration~\cite{peterson2017,hu2022,grasselli2025} are
-reported in the Supplemental Material~\cite{supplemental}.  The paper
-proceeds from the audited data set and model (Sec.~\ref{sec:method})
-through the frozen evaluation protocol (Sec.~\ref{sec:setup}) to the
-results (Sec.~\ref{sec:results}) and their physical reading and limits
-(Secs.~\ref{sec:discussion} and~\ref{sec:conclusion}).
+Impurity formation energy combines a localized structural perturbation with
+the broader chemistry and geometry of the host, while remaining a
+non-extensive target.  This observation motivates the Defect-Aware Radial
+Transformer (DART), an impurity-centered graph model that combines defect-local
+message passing, radial-bias self-attention, and a gated graph readout
+[Fig.~\ref{fig:architecture}].  The local representation is strictly invariant
+to atom relabeling and uses exact minimum-image distances; the readout fuses
+defect-sensitive and graph-level information without imposing atomwise
+extensive scaling.  We evaluate the resulting model under random,
+host--impurity-pair, predefined chemistry-block, impurity-held-out, and
+host-held-out protocols, followed by class-resolved error analysis.
+
+Across 10,224 retained IMP2D structures, recombining familiar constituents
+remains close to random interpolation, whereas withholding a complete impurity
+or host roughly doubles the mean absolute error.  The larger host-transfer
+error is associated with structural novelty after accounting for training
+support.  Incorporation geometry defines a second axis: interstitials are more
+than twice as difficult as adsorbates, with their errors associated with roomy,
+weakly constrained environments while adsorbate errors track chemical
+mismatch.  Readout comparisons show that atomwise addition is poorly matched
+to the non-extensive target.  For existing DFT-relaxed IMP2D candidates,
+pair-held-out predictions identify the lower-energy incorporation class with
+91.4\% accuracy.  Atom-relabeling tests further reveal that an order-sensitive
+representation can shift individual predictions by up to 8.8~eV while leaving
+pooled error nearly unchanged.  Together, these results connect transferability
+in impurity energetics to chemical novelty, local defect environments, target
+scaling, and representation correctness.
 
 \begin{figure*}[t]
 \centering
