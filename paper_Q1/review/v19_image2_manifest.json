@@ -16,6 +16,12 @@
       "superseded_by_pdf": "paper_Q1/figures/figure1_image2_v19_inset.pdf",
       "superseded_by_png_sha256": "36e684b74922d43ccaa6009e4c9b12580e8ec9e85ec369e5e093646e88cf1bff",
       "superseded_by_pdf_sha256": "da33d709d97a4d463ac263dccd8a0b881347e1373221dead5802beb57084ecfd",
+      "paperstyle_png": "paper_Q1/figures/figure1_image2_v19_paperstyle.png",
+      "paperstyle_pdf": "paper_Q1/figures/figure1_image2_v19_paperstyle.pdf",
+      "paperstyle_png_sha256": "e57656edf3b5942100179f6ab4146e5f4fc8740acd8ff9a089aee6c662cb441e",
+      "paperstyle_pdf_sha256": "cd4c4571fd3d0a1890c6a7b00e787c9e5202909a46556d554b707f5808972f2b",
+      "style_reference_sha256": "174b8cf74ba480eda85629709138cb21e91958943e71828191524e6365c7040f",
+      "style_reference_use": "visual style only; no objects, labels, data, or layout copied",
       "edit_scope": "Correct architecture labels and topology; remove prospective screening decision; integrate the E-module inset",
       "scientific_qa": "author-directed labels and topology verified against manuscript methods"
     },

@@ -444,3 +444,16 @@
 - QA: the revised 13-page PRB build has no unresolved reference, overfull box,
   clipping, or page-count change; the final-size Figure 1 page passed visual
   inspection.
+
+### REV-028: Figure 1 paper-infographic style transfer
+
+- Change: used GPT Image 2 to redraw the verified Figure 1 topology in the
+  broad visual language of an author-supplied paper figure: warm paper ground,
+  subtle hatch texture, hand-drawn rounded cards, stronger panel headings, and
+  a slim architecture takeaway strip.
+- Source separation: the supplied DriveCache image was used only as a style
+  reference. No vehicles, robots, icons, labels, data, or exact composition
+  were copied. The DART diagram remained the sole source of scientific content.
+- Integrity boundary: every architecture module, numerical setting, callout,
+  and arrow direction was preserved. The takeaway strip restates the caption's
+  local-plus-global, non-extensive prediction principle and is not a new module.

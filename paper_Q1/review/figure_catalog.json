@@ -15,9 +15,9 @@
       "number": 1,
       "label": "fig:architecture",
       "role": "Verified DART data path and non-extensive readout",
-      "source": "paper_Q1/figures/figure1_image2_v19_inset.pdf",
+      "source": "paper_Q1/figures/figure1_image2_v19_paperstyle.pdf",
       "provenance": "paper_Q1/review/v19_image2_manifest.json",
-      "status": "author_directed_image2_local_inset_revision_verified"
+      "status": "author_directed_image2_paper_infographic_revision_verified"
     },
     {
       "number": 2,
