@@ -15,66 +15,54 @@ a survey exists, a separate question is whether learned representations can
 organize its energy landscape and expose where transfer across chemistry or
 incorporation geometry fails.
 
-The IMP2D database provides a systematic first-principles survey of neutral
-adsorbate and interstitial impurities in 2D hosts~\cite{imp2d2023}.  Its scale
-makes supervised energy estimation possible, and graph neural networks are natural
-models because they operate directly on periodic atomic structures.  ALIGNN
-demonstrated the value of joint bond and angle representations for crystalline
-properties~\cite{alignn2021}, while SchNet established continuous-filter
-message passing from interatomic distances~\cite{schutt2018}.  Defect-specific
-learning has developed along several complementary directions.
-Bulk defect energetics have been treated with defect graph networks,
-semiconductor graph models, persistent-homology features, and charge-aware
-predictors~\cite{witman2023,rahman2024,fang2025,kiyohara2025}.  For 2D
-systems, sparse defect representations have been evaluated on the 2DMD data,
-whereas tree and descriptor models have been applied directly to
-IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  These studies establish
-descriptor baselines for IMP2D and show that representation and data
-preparation materially affect reported errors.  They also motivate
-architectures that expose the impurity site while retaining local coordination
-and longer-range periodic context.  A model suited to this task must
-therefore operate on the periodic structure \emph{alone}, expose the
-impurity site \emph{explicitly}, and respect the \emph{non-extensive},
-defect-local scaling of the target.
+The IMP2D database provides such a survey for neutral adsorbate and
+interstitial impurities in 2D hosts~\cite{imp2d2023}, and graph neural
+networks are the natural learners because they operate directly on
+periodic atomic structures~\cite{alignn2021,schutt2018}.  Defect-specific
+models have followed: for bulk energetics through defect graph networks,
+semiconductor graph models, persistent-homology features, and
+charge-aware predictors~\cite{witman2023,rahman2024,fang2025,kiyohara2025},
+and for 2D systems through sparse defect representations on 2DMD and tree
+or descriptor models directly on
+IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  Together these studies
+show that representation and data preparation materially affect reported
+errors, and they fix the requirements a model for this task must meet:
+operate on the periodic structure \emph{alone}, expose the impurity site
+\emph{explicitly}, and respect the \emph{non-extensive}, defect-local
+scaling of the target.
 
-Evaluation practice has not kept pace with these representational
-advances.  A random structure split can place closely related
-host--impurity chemistries or numerically equivalent structures on both
-sides of the train--test boundary, leading to optimistic
-estimates~\cite{li2024mdhit}.  It also conflates two
-physically different questions: combining a known host with a known impurity in
-a previously unseen pair, and predicting a host or impurity absent from all
-target supervision.  Materials models are known to degrade when test chemistry
-differs from training chemistry~\cite{omee2024,li2025ood}, but this distinction
-has not been resolved for impurity incorporation energies in IMP2D.  The role of
-incorporation geometry---adsorbate versus interstitial---is likewise hidden by
-one pooled error.  And pooled benchmarks hide a third failure mode
-entirely: a representation defect that moves individual predictions by
-electron-volts can leave the pooled error essentially unchanged, so a
-benchmark-passing model can still be unreliable structure by structure.
+Evaluation practice has not kept pace.  A random structure split places
+closely related chemistries and numerically equivalent structures on both
+sides of the train--test boundary, yielding optimistic
+estimates~\cite{li2024mdhit}, and it conflates two physically different
+questions: recombining known constituents in an unseen pair versus
+predicting a host or impurity absent from all target
+supervision~\cite{omee2024,li2025ood}.  One pooled error likewise hides
+the role of incorporation geometry --- adsorbate versus interstitial ---
+and hides a third failure mode entirely: a representation defect can move
+individual predictions by electron-volts while leaving the pooled error
+essentially unchanged.
 
 Here we develop the Defect-Aware Radial Transformer (DART), an
 impurity-centered graph model that combines defect-local message passing,
 radial-bias self-attention, and a gated graph readout matched to a
 non-extensive formation-energy target [Fig.~\ref{fig:architecture}], built
 on a strictly permutation-invariant local representation with exact
-minimum-image distances.  This paper makes four contributions.  First, a
-chemically resolved transferability evaluation: grouped protocols separate
-random interpolation, recombination of familiar constituents, a predefined
-chemistry block, and transfer to hosts or impurities absent from IMP2D
-target supervision.  Second, a preregistered error analysis that asks
-\emph{why} the resulting error structure looks the way it does --- which
-local geometric and chemical environments carry the error, whether the
-host-versus-impurity asymmetry reflects structural novelty or a mechanical
-training-support imbalance, and how the readout's scaling class interacts
-with a defect-local target.  Third, retrospective reranking metrics over
-existing DFT-relaxed candidates; because those geometries and their
-reference energies come from the same completed DFT workflow, this analysis
-does not replace structure generation or relaxation.  Fourth, a
-correctness methodology: a diagnostic showing that a superseded,
-order-sensitive implementation moved individual predictions by several eV
-while leaving pooled benchmarks essentially unchanged, and the
-independently audited repair from which every reported number derives.  The
+minimum-image distances.  This paper makes four contributions: a chemically resolved
+transferability evaluation whose grouped protocols separate random
+interpolation, recombination of familiar constituents, a predefined
+chemistry block, and transfer to hosts or impurities absent from target
+supervision; a preregistered error analysis of \emph{why} the error
+structure looks the way it does --- which local environments carry the
+error, whether the host-versus-impurity asymmetry reflects structural
+novelty or training support, and how the readout's scaling class
+interacts with a defect-local target; retrospective reranking metrics
+over existing DFT-relaxed candidates, conditional on the completed IMP2D
+workflow; and a correctness methodology --- a diagnostic showing that a
+superseded, order-sensitive implementation moved individual predictions
+by several eV while leaving pooled benchmarks essentially unchanged,
+together with the independently audited repair behind every reported
+number.  The
 architecture factorial that selected the frozen recipe and the internal
 uncertainty calibration~\cite{peterson2017,hu2022,grasselli2025} are
 reported in the Supplemental Material~\cite{supplemental}.  The paper

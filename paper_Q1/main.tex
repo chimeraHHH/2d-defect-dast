@@ -58,36 +58,30 @@ chemistry nor \emph{why} they fail where they do.  We address both
 questions for neutral impurities in two-dimensional materials with the
 Defect-Aware Radial Transformer (DART), an impurity-centered graph model
 built on a strictly permutation-invariant local representation with exact
-minimum-image distances, evaluated on 10,224 structures curated from the
-IMP2D database.  Every geometry and reference energy is a product of the
-same completed DFT workflow, so the task is retrospective,
-database-conditioned estimation and reranking rather than a replacement
-for candidate generation or relaxation.  Transfer is organized by chemical
-novelty in a strict hierarchy: mean absolute error grows only mildly from
-random cross-validation (\PRMRepIdCvMAE\eV{}) through withheld
-host--impurity pairs (\PRMRepPairCvMAE\eV{}) and a predefined chemistry
-block (\PRMRepChemBlockMAE\eV{}), but roughly doubles when a complete
-impurity (\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}) is
-withheld, and the host--impurity asymmetry tracks the structural novelty
-of the held-out host after controlling for training support.
-Incorporation geometry forms a second axis with distinct physics:
-interstitial structures (\PRMRepPairInterstitialMAE\eV{}) are over twice
-as hard as adsorbates (\PRMRepPairAdsorbateMAE\eV{}), and preregistered
-error maps place interstitial error in roomy, loosely constrained cages
-while adsorbate error tracks chemical mismatch, led by signed valence.
-The formation energy's non-extensive, defect-local character constrains
-model design: an additive readout degrades to \PRMSchNetAddHostCvMAE\eV{}
-on withheld hosts, a mean readout alone recovers to
-\PRMSchNetMeanHostCvMAE\eV{}, and the defect-centered readout shows no
-size-dependent residual drift.  Out-of-fold predictions select the
-lower-energy incorporation class for \PRMRepPreferenceAccuracy\% of
-host--impurity pairs against a \PRMRepPreferenceReference\% class-prior
-reference, with \PRMRepWithinRegret\eV{} mean within-class regret.  All
-numbers derive from an independently audited repaired representation:
-under atom relabeling, the superseded implementation moved single
-predictions by up to several eV while pooled errors changed by under
-$10^{-3}$\,eV --- aggregate benchmarks can hide representation defects
-that dominate individual predictions.
+minimum-image distances and evaluated on 10,224 structures curated from
+the IMP2D database; because every geometry and reference energy comes
+from the same completed DFT workflow, the task is retrospective,
+database-conditioned estimation and reranking.  Transfer is organized by
+chemical novelty in a strict hierarchy: recombining constituents seen in
+training costs little over random interpolation, whereas withholding a
+complete impurity or host roughly doubles the error, and the
+host--impurity asymmetry tracks the structural novelty of the held-out
+host after controlling for training support.  Incorporation geometry
+forms a second axis with distinct physics: interstitials are over twice
+as hard as adsorbates, with preregistered error maps placing interstitial
+error in roomy, loosely constrained cages and adsorbate error on chemical
+mismatch, led by signed valence.  The formation energy's non-extensive,
+defect-local character constrains model design: an additive readout
+degrades sharply on withheld hosts, a mean readout alone recovers most of
+that gap, and the defect-centered readout shows no size-dependent drift.
+Out-of-fold predictions identify the lower-energy incorporation class
+well above the class-prior reference, supporting retrospective reranking
+within the retained neutral domain.  Every reported number derives from
+an independently audited repaired representation: under atom relabeling,
+a superseded implementation moved single predictions by several
+electron-volts while pooled errors were essentially unchanged ---
+aggregate benchmarks can hide representation defects that dominate
+individual predictions.
 \else
 We study how impurity formation-energy prediction changes across host,
 impurity, and incorporation-geometry axes in two-dimensional materials.  The
