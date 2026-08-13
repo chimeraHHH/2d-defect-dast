@@ -1,4 +1,4 @@
-\documentclass[aps,prb,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
+\documentclass[aps,prmaterials,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -40,8 +40,8 @@
 
 \begin{document}
 
-\title{Learning impurity incorporation energetics across host and impurity
-chemistry in two-dimensional materials with a defect-aware graph Transformer}
+\title{Defect-aware graph transformer for impurity formation energies in
+two-dimensional materials: Chemical transferability and error analysis}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
@@ -52,11 +52,12 @@ chemistry in two-dimensional materials with a defect-aware graph Transformer}
 
 \begin{abstract}
 \ifprmresultsready
-We study retrospective estimation and reranking of impurity formation energies
-for available DFT-relaxed candidate geometries in two-dimensional materials,
-using a defect-aware graph Transformer with a strictly permutation-invariant
-local representation and exact minimum-image distances, evaluated on 10,224
-neutral structures curated from the IMP2D database.  Because each geometry and
+We develop the Defect-Aware Radial Transformer (DART), an impurity-centered
+graph model with a strictly permutation-invariant local representation and
+exact minimum-image distances, and evaluate the chemical transferability of
+its impurity formation-energy predictions on 10,224 neutral structures
+curated from the IMP2D database.  The task is retrospective estimation and
+reranking over available DFT-relaxed candidate geometries.  Because each geometry and
 its reference energy are products of the same completed DFT workflow, the task
 evaluates database-conditioned prediction rather than replacing candidate
 generation or relaxation.  Transfer is organized by chemical novelty in a

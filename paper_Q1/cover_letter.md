@@ -1,38 +1,45 @@
-# Cover letter draft — Physical Review B
+# Cover letter draft — Physical Review Materials
 
 > Author action required before submission: replace every bracketed field,
-> verify the final title and journal section, and remove this note.
+> verify the final title, and remove this note.
 
 [DATE]
 
 Dear Editors,
 
-We submit the manuscript “Learning impurity incorporation energetics across
-host and impurity chemistry in two-dimensional materials with a defect-aware
-graph Transformer” for consideration as a Regular Article in *Physical Review
-B*. We suggest B15(4), “Surface physics, nanoscale physics, low-dimensional
-systems,” as the primary section and B1(1), “Structure, structural phase
-transitions, mechanical properties, defects,” as a secondary section.
+We submit the manuscript “Defect-aware graph transformer for impurity
+formation energies in two-dimensional materials: Chemical transferability and
+error analysis” for consideration in *Physical Review Materials*. The work
+sits at the journal's materials-informatics core and is a natural fit for the
+scope represented by the Machine Learning for Materials Discovery and
+Understanding collection.
 
 Formation-energy models are often assessed with random structure splits, even
-though retrospective database analysis spans chemically distinct forms of transfer. Our
-study resolves those forms for 10,224 neutral impurity structures from IMP2D.
-Except for one singleton-host structure, its pair-held-out folds recombine
-hosts and impurities represented elsewhere in training and are much easier
-than transfer to a host or impurity absent from target supervision. Under the
-same pair-held-out evaluation, interstitial incorporation energies are more
-difficult to predict than adsorbate energies. These observations define a chemically and geometrically
-resolved applicability domain for energy estimation in two-dimensional
-materials.
+though retrospective database analysis spans chemically distinct forms of
+transfer. Our study resolves those forms for 10,224 neutral impurity
+structures from IMP2D with the Defect-Aware Radial Transformer (DART), an
+impurity-centered graph model whose permutation invariance and exact
+minimum-image distances passed an independent acceptance audit. Error grows
+only mildly from random interpolation (0.408 eV) through recombination of
+familiar host--impurity pairs (0.442 eV) and a predefined chemistry block
+(0.483 eV), but roughly doubles for a withheld impurity (0.845 eV) or host
+(0.891 eV); a preregistered analysis attributes the residual host--impurity
+asymmetry to the structural novelty of the held-out host after controlling
+for training-support asymmetry.
 
-The Defect-Aware Radial Transformer (DART) supplies the modeling framework. A
-paired factorial isolates small, repeat-consistent contributions from gated
-graph readout and a composite local interaction block. A controlled SchNet
-readout analysis further connects model design to the target physics: atomwise
-addition, natural for extensive total energies, contributes to the large
-host-held-out error for this evaluated recipe. Finally,
-pair-held-out predictions recover the lower-energy incorporation
-class with 91.0% accuracy and quantify site-selection regret.
+The error analysis then separates the physics of the two incorporation
+classes --- interstitial error tracks local crowding while adsorbate error
+tracks chemical mismatch --- and a readout analysis connects model design to
+the non-extensive, defect-local target: atomwise addition, natural for
+extensive total energies, degrades withheld-host error to 6.7 eV, a mean
+readout alone recovers most of that gap, and the defect-centered readout
+shows no size-dependent residual drift. Pair-held-out predictions recover the
+lower-energy incorporation class with 91.4% accuracy against a 66.2%
+class-prior reference and quantify site-selection regret. A methodological
+finding accompanies the physics: a permutation diagnostic of a superseded,
+order-sensitive implementation moved single predictions by up to 8.8 eV while
+pooled errors moved by under 1e-3 eV, showing that aggregate benchmarks can
+hide representation defects that dominate individual predictions.
 
 The claims are deliberately tied to the available evidence. Energy estimation
 and reranking are retrospective and conditional on the DFT-relaxed candidate
