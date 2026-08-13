@@ -471,3 +471,12 @@
 - Integrity boundary: each pictogram illustrates an operation already named in
   its enclosing module. No model branch, training signal, metric, or scientific
   claim was introduced.
+
+### REV-030: Figure 1 lattice ghosting repair
+
+- Change: used a user-supplied close-up to localize and remove three doubled,
+  dashed atom contours and one duplicate contour below the impurity in the
+  panel-(a) 2D-supercell inset. Reconstructed those sites as single crisp host
+  atoms with continuous blue bonds and retained one orange impurity node.
+- Scope: no other panel, label, arrow, icon, layout, or scientific topology was
+  changed. The close-up was used only to identify the visual defect.

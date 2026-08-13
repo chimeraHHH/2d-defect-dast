@@ -27,6 +27,12 @@
       "aligned_icons_png_sha256": "0bbf7c74ef3c816add54d0f39a57d9235c25f175f624bd9fab57bc9eb4795491",
       "aligned_icons_pdf_sha256": "6114b3a02cd79a93d4ac4b91f2b2c3884ccef1bdb4f954c7663d603192731d13",
       "aligned_icons_scope": "grid alignment; removal of the in-image attention-cutoff disclaimer; pictograms for existing operations only",
+      "clean_lattice_png": "paper_Q1/figures/figure1_image2_v19_clean_lattice.png",
+      "clean_lattice_pdf": "paper_Q1/figures/figure1_image2_v19_clean_lattice.pdf",
+      "clean_lattice_png_sha256": "f02f3d74ba7d95471c7d2e9d435a32a5e0b5add85f0fbfbce69672e013b84d96",
+      "clean_lattice_pdf_sha256": "0fd59a60d88140d83dcbf97bed0896a7d2c8e19cbc94e1724a7b39b62c06e382",
+      "repair_reference_sha256": "547ad6aaaf551f3c022d167127439347fe529bb7328ca589bf84549969bfeb3a",
+      "clean_lattice_scope": "localized removal of ghosted and duplicated atom contours in the 2D-supercell inset",
       "edit_scope": "Correct architecture labels and topology; remove prospective screening decision; integrate the E-module inset",
       "scientific_qa": "author-directed labels and topology verified against manuscript methods"
     },
