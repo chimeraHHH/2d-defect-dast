@@ -76,24 +76,23 @@ gate (adjusted decile contrast of at least $0.10\,$eV or 20\%, clustered
 interval excluding zero, direction stable in at least four of five folds,
 and surviving the exclusion of pathological out-of-plane reconstructions).
 
-For \emph{adsorbates}, error tracks chemistry: moving from the tenth to the
-ninetieth percentile of signed valence mismatch raises the adjusted error by
-\PRMPOneAdsValenceContrast\eV{}, and the smoothed coordination measure
-contributes \PRMPOneAdsCoordContrast\eV{}
-(+\PRMPOneAdsCoordPercent\%; the raw five-\AA{}ngstr\"om count shown as
-the frozen profile feature in Fig.~\ref{fig:error_map} carries no gated
-adsorbate effect).  For \emph{interstitials}, the gated effects share a
-consistent direction: error \emph{rises} with post-relaxation clearance
-(\PRMPOneIntClearanceContrast\eV{}) and with the largest defect-centered
-neighbor distance (\PRMPOneIntMaxDistContrast\eV{}), \emph{falls} with
-neighbor-distance dispersion (\PRMPOneIntDispersionContrast\eV{}) and with
-absolute covalent-radius mismatch (\PRMPOneIntRadiusContrast\eV{}), and
-rises with absolute valence mismatch
-(\PRMPOneIntAbsValenceContrast\eV{}).  Interstitial error therefore
-concentrates not in tight fits but in \emph{roomy, uniformly spaced,
-loosely constrained} cages with mismatched valence --- environments where
-the impurity is weakly held and snug packing constraints do not pin the
-energy.
+For \emph{adsorbates}, error tracks chemistry, led by signed valence
+mismatch: moving from the tenth to the ninetieth percentile raises the
+adjusted error by \PRMPOneAdsValenceContrast\eV{}, with local geometry
+contributing through the smoothed coordination measure (the raw
+five-\AA{}ngstr\"om count shown as the frozen profile feature in
+Fig.~\ref{fig:error_map} carries no gated adsorbate effect).  For
+\emph{interstitials}, the five gated effects share one consistent --- and
+initially counterintuitive --- direction: error \emph{rises} with
+post-relaxation clearance (\PRMPOneIntClearanceContrast\eV{}) and
+\emph{falls} with neighbor-distance dispersion
+(\PRMPOneIntDispersionContrast\eV{}), with the largest neighbor
+distance, covalent-radius mismatch, and valence mismatch following the
+same pattern, contrast by contrast in Fig.~\ref{fig:error_map}(b).
+Interstitial error therefore concentrates not in tight fits but in
+\emph{roomy, uniformly spaced, loosely constrained} cages with mismatched
+valence --- environments where the impurity is weakly held and snug
+packing constraints do not pin the energy.
 Figure~\ref{fig:error_map} reports the gated physical error map:
 class-resolved adjusted error profiles over coordination and clearance,
 and the chemistry-mismatch decile contrasts.  The out-of-plane
@@ -103,7 +102,11 @@ Material~\cite{supplemental}.
 
 The asymmetry is large in absolute terms: under pair-held-out prediction,
 interstitial structures have MAE \PRMRepPairInterstitialMAE\eV{} against
-\PRMRepPairAdsorbateMAE\eV{} for adsorbates --- a factor of $2.2$.
+\PRMRepPairAdsorbateMAE\eV{} for adsorbates --- a factor of $2.2$.  The
+largest surviving interstitial errors occur for extreme-formation-energy
+cases such as Cr@ZrSe$_2$ and Li@WTe$_2$; the Supplemental
+Material~\cite{supplemental} renders them alongside matched adsorbate
+controls as illustrations rather than gated evidence.
 
 To quantify how much of the interstitial penalty the measured environment
 explains, we compare the incorporation-class coefficient before and after
@@ -186,8 +189,7 @@ from the completed IMP2D DFT workflow, so the following comparisons are
 retrospective rather than a substitute for site generation or relaxation.
 Across pairs containing both incorporation classes, the repaired model
 identifies the lower-energy class among the retained, DFT-relaxed IMP2D
-candidates with \PRMRepPreferenceAccuracy\%\ accuracy
-[\PRMRepPreferenceAccuracyLow, \PRMRepPreferenceAccuracyHigh], against an
+candidates with \PRMRepPreferenceAccuracy\%\ accuracy against an
 empirical majority-class reference of \PRMRepPreferenceReference\%\ ---
 a gain of \PRMRepPreferenceGain{} percentage points
 [\PRMRepPreferenceGainLow, \PRMRepPreferenceGainHigh] --- and the predicted

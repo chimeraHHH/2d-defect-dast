@@ -11,31 +11,32 @@ interpolation (\PRMRepIdCvMAE\eV{}) through withheld host--impurity pairs
 (\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}), and the
 host--impurity asymmetry follows the structural novelty of the held-out
 host after controlling for training support.  Second, the two incorporation
-classes fail for different reasons: interstitial error
-(\PRMRepPairInterstitialMAE\eV{}) concentrates in roomy, loosely
-constrained cages while adsorbate error (\PRMRepPairAdsorbateMAE\eV{})
-tracks chemical mismatch; the measured
-descriptors attenuate the class gap by roughly a quarter without exhausting
-it.  Third, the formation energy's non-extensive, defect-local character
-constrains model design: additive pooling degrades withheld-host error to
-\PRMSchNetAddHostCvMAE\eV{}, a mean readout alone recovers most of that
-gap, and the defect-centered readout shows no size-dependent residual
-drift.
+classes fail for different reasons: interstitial error concentrates in
+roomy, loosely constrained cages while adsorbate error tracks chemical
+mismatch, and the measured descriptors attenuate the class gap by roughly
+a quarter without exhausting it.  Third, the formation energy's
+non-extensive, defect-local character constrains model design: additive
+pooling degrades withheld-host error severely, a mean readout alone
+recovers most of that gap, and the defect-centered readout shows no
+size-dependent residual drift.
 
 These conclusions rest on a representation whose permutation invariance and
 exact minimum-image distances passed an independent acceptance audit, after
 a diagnostic showed the superseded implementation could move single
 predictions by up to $8.8$\eV{} under atom relabeling while pooled errors
 moved imperceptibly.  For existing DFT-relaxed candidates, out-of-fold
-predictions selected the lower-energy incorporation class with
-\PRMRepPreferenceAccuracy\% accuracy against a
-\PRMRepPreferenceReference\% class-prior reference.  Because the geometries
+predictions selected the lower-energy incorporation class well above its
+class-prior reference.  Because the geometries
 and reference energies arise from the same completed DFT workflow, these
 results support retrospective energy estimation and reranking within the
 neutral, retained IMP2D domain rather than a reduction in relaxation cost.
 Testing independently generated, convention-matched structures and
 calibrating uncertainty under explicit chemical shift remain necessary
-before prospective use beyond that domain.
+before prospective use beyond that domain.  The methodology, by contrast,
+travels as it stands: audit the representation before believing the
+benchmark, group the evaluation by the chemistry it must survive, and
+preregister the error analysis --- defaults we suggest for machine-learned
+defect energetics generally.
 
 \else
 

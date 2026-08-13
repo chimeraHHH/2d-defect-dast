@@ -207,6 +207,18 @@ ingredient of the preregistered external-validation design.
 \clearpage
 \section{Reproducibility specification}
 
+\paragraph{Elemental feature construction.}
+The nine elemental attribute columns of the main-text node representation
+are min--max normalized over atomic numbers 1--100; an unavailable van der
+Waals radius is replaced by the corresponding covalent radius, and the
+other tabulated values, including explicit unavailable or approximate
+entries, are fixed by the released feature table.  The 128-dimensional
+ct-UAE table is reconstructed from the published checkpoint by applying
+its linear \texttt{atom\_embed} layer to each one-hot elemental code,
+$\mathbf U=\mathbf W^{\mathsf T}+\mathbf 1\mathbf b^{\mathsf T}$;
+after a zero-padding row is prepended, atomic number $Z$ indexes table row
+$Z$, corresponding to row $Z-1$ of $\mathbf U$.
+
 Table~\ref{tab:reproducibility} records the fixed model and optimization
 settings used in the main comparison.  The resolved configuration for every
 run, including split and seed, is archived under \path{configs/prm/}; the
