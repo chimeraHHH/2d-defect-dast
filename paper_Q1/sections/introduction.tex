@@ -75,7 +75,7 @@ scaling, and representation correctness.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figure1_image2_v19_paperstyle.pdf}
+\includegraphics[width=\textwidth]{figure1_image2_v19_aligned_icons.pdf}
 \caption{Architecture of the Defect-Aware Radial Transformer (DART).
   (a) A fixed 128-dimensional ct-UAE vector and nine normalized elemental
   attributes are projected from 137 to 128 channels, after which a learned
@@ -86,12 +86,12 @@ scaling, and representation correctness.
   normalized, projected, and added only at the impurity node before three
   5-\AA{} distance-gated local blocks and two four-head geometric Transformer
   blocks. The Transformer radial bias uses 32 basis functions spanning
-  0--12~\AA{}; 12~\AA{} is the end of the basis grid rather than an attention
-  cutoff. (c) A graph-dependent scalar gate fuses an atom-attention weighted
+  0--12~\AA{}. (c) A graph-dependent scalar gate fuses an atom-attention weighted
   sum and a channelwise maximum before a
   $128\rightarrow128\rightarrow1$ head predicts one formation energy per
-  structure. The bottom strip summarizes the same architecture-level design
-  principle and does not introduce an additional model component. The
+  structure. The small pictograms illustrate only the operations named in
+  their enclosing boxes, and the bottom strip summarizes the same
+  architecture-level design principle; neither introduces an additional model component. The
   schematic was edited with OpenAI GPT Image 2; the authors specified and
   verified its scientific content.}
 \label{fig:architecture}

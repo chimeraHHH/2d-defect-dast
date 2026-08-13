@@ -4,7 +4,7 @@ Target: PRB Regular Article, two-column main text.
 
 | Main figure | Core claim | Source | v19 decision |
 | --- | --- | --- | --- |
-| Fig. 1 | DART combines impurity-local enrichment, local geometry, global attention, and gated non-extensive readout. | Manuscript methods and implementation | Use the author-directed GPT Image 2 paper-infographic edit with an impurity-node callout to a true 5-Å local-environment inset; the supplied DriveCache figure informs visual style only, not content or composition. |
+| Fig. 1 | DART combines impurity-local enrichment, local geometry, global attention, and gated non-extensive readout. | Manuscript methods and implementation | Use the author-directed GPT Image 2 paper-infographic edit with a strict three-panel grid, an impurity-node callout to a true 5-Å local-environment inset, and subordinate pictograms for existing operations only; the supplied DriveCache figure informs visual style only, not content or composition. |
 | Fig. 2 | Adsorbate and interstitial structures are alternative single-impurity configurations. | IMP2D task definition | Replace the overlaid schematic with two author-directed GPT Image 2 panels distinguished by color and shape. |
 | Fig. 3 | Pair-held-out predictions retain useful accuracy, whereas missing constituent supervision causes a sharp error increase. | Repaired pair OOF predictions and repaired transfer metrics | Merge parity and transfer hierarchy in one deterministic figure. |
 | Fig. 4 | Adsorbate and interstitial errors have different geometry/chemistry associations. | Canonical G3 physical analysis | Retain unchanged. |

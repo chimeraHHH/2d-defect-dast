@@ -457,3 +457,17 @@
 - Integrity boundary: every architecture module, numerical setting, callout,
   and arrow direction was preserved. The takeaway strip restates the caption's
   local-plus-global, non-extensive prediction principle and is not a new module.
+
+### REV-029: Figure 1 alignment and operation pictograms
+
+- Change: aligned all three panel cards to one grid, centered headings and box
+  labels, made the readout branches symmetric, and regularized the vertical
+  backbone spacing. Removed the in-image sentence about 12~\AA{} not being a
+  cutoff while retaining the correct 0--12~\AA{} radial-basis-grid label.
+- Visual enrichment: added subordinate pictograms for the latent vector,
+  elemental attributes, three repeated local blocks, four-head attention,
+  radial basis functions, attention pooling, channelwise maximum, scalar gate,
+  and scalar formation-energy output.
+- Integrity boundary: each pictogram illustrates an operation already named in
+  its enclosing module. No model branch, training signal, metric, or scientific
+  claim was introduced.
