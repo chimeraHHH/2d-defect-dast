@@ -94,10 +94,12 @@ concentrates not in tight fits but in \emph{roomy, uniformly spaced,
 loosely constrained} cages with mismatched valence --- environments where
 the impurity is weakly held and snug packing constraints do not pin the
 energy.
-Figure~\ref{fig:error_map} reports the four-panel physical error map:
+Figure~\ref{fig:error_map} reports the gated physical error map:
 class-resolved adjusted error profiles over coordination and clearance,
-the chemistry-mismatch contrasts, error against the out-of-plane expansion
-factor, and host-family and impurity-series macro errors.
+and the chemistry-mismatch decile contrasts.  The out-of-plane
+expansion-factor diagnostic behind the $\mathrm{XF}\leq2$ gate and the
+family-level macro errors are reported in the Supplemental
+Material~\cite{supplemental}.
 
 The asymmetry is large in absolute terms: under pair-held-out prediction,
 interstitial structures have MAE \PRMRepPairInterstitialMAE\eV{} against
@@ -113,12 +115,15 @@ adding the full geometry/chemistry block to a controls-only model.
 Host-family decomposition places the largest interstitial errors in the
 single-identity oxide host and the carbide/MXene-like family, with
 halide/halochalcogenide hosts next; among impurity series, f-block and
-main-group interstitials are hardest.  The retained host set contains no
-nitride, so no nitride panel is reported.  Complete family tables with
-identity counts, a periodic-table map of per-impurity-element error, the
-class-resolved parity of the out-of-fold predictions, and rendered
-extreme-case and matched-control structures selected by the frozen case
-rule are given in the Supplemental Material~\cite{supplemental}.
+main-group interstitials are hardest.  Figure~\ref{fig:ptable} resolves
+the impurity axis element by element, mapping the pair-held-out MAE and
+retained count of each of the 65 impurity elements onto the periodic
+table.  The retained host set contains no nitride, so no nitride panel is
+reported.  Family macro errors with identity counts, the out-of-plane
+expansion diagnostic, the class-resolved parity of the out-of-fold
+predictions, and rendered extreme-case and matched-control structures
+selected by the frozen case rule are given in the Supplemental
+Material~\cite{supplemental}.
 
 \begin{figure*}[t]
 \centering
@@ -128,13 +133,24 @@ rule are given in the Supplemental Material~\cite{supplemental}.
 fig\_error\_map.pdf from physical\_figure\_data.csv}}}
 \caption{Physical error map on repaired pair-held-out predictions.
   (a) Adjusted absolute-error profiles versus smooth coordination and
-  post-relaxation clearance, by incorporation class.
-  (b) Chemistry-mismatch decile contrasts with pair-clustered intervals.
-  (c) Error versus the database out-of-plane expansion factor; the vertical
-  line marks $\mathrm{XF}=2$, beyond which structures are treated as
-  reconstructed and analyzed separately.
-  (d) Host-family and impurity-series macro errors with identity counts.}
+  post-relaxation clearance, by incorporation class, with pointwise
+  intervals.
+  (b) Chemistry-mismatch decile contrasts with pair-clustered intervals;
+  filled markers pass the preregistered main-text gate, open markers do
+  not.}
 \label{fig:error_map}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_impurity_ptable.pdf}
+\caption{Per-impurity-element MAE of the repaired pair-held-out
+  out-of-fold predictions.  Each occupied cell reports the element and its
+  retained structure count; gray cells are elements outside the
+  65-impurity set.  The color scale is clipped at the 95th percentile of
+  the per-element MAEs.  Per-element values are descriptive summaries of
+  the same out-of-fold predictions; no per-element claim is gated.}
+\label{fig:ptable}
 \end{figure*}
 
 %----------------------------------------------------------------------
@@ -152,7 +168,7 @@ MAE of \PRMSchNetAddHostCvMAE\eV{}; replacing only its readout by a mean
 reduces this to \PRMSchNetMeanHostCvMAE\eV{}, still well above the
 defect-centered model.  The preregistered extensivity diagnostic makes the
 mechanism explicit:
-\PRMWOneAddSlope{}%
+\PRMWOneAddSlope{}
 % Final W1 wording from w1_extensivity.json: additive residual-size slope
 % with host-clustered interval, the near-zero mean-readout and repaired-DART
 % slopes (\PRMWOneDartSlope), and the paired additive-minus-DART difference.

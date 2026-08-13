@@ -244,9 +244,24 @@ symmetric under atom-index permutations.  Both properties are enforced by
 unit and property tests and were re-verified in the independent acceptance
 audit of the released implementation.
 
-The four local quantities entering the E branch and their association with
-the uniquely identified impurity node are illustrated in the Supplemental
-Material~\cite{supplemental}.
+Figure~\ref{fig:environment_enrichment} illustrates the four local quantities
+entering the E branch and their association with the uniquely identified
+impurity node.
+
+\begin{figure}[t]
+ \centering
+ \includegraphics[width=\columnwidth]{figure3_manual.png}
+ \caption{Illustration of the defect-environment enrichment (E) module. Within
+ the periodic 5-\AA{} neighbor graph, four impurity-centered quantities---the neighbor count
+ $N$, mean and maximum neighbor distances ($d_{\mathrm{mean}}$ and
+ $d_{\mathrm{max}}$), and the normalized Pauling-electronegativity contrast
+ $\Delta\chi=|\chi_{\mathrm{imp}}-\langle\chi_{\mathrm{nn}}\rangle|$---form a
+ four-component descriptor. The descriptor is
+ normalized, projected to 128 channels, and added only to the impurity-node
+ representation before local message passing. The $N=3$ neighborhood shown is
+ schematic.}
+ \label{fig:environment_enrichment}
+\end{figure}
 
 The full $2^3$ factorial contains all eight G/E/P combinations on each of the
 five paired random partitions.  Within a partition, all variants share the

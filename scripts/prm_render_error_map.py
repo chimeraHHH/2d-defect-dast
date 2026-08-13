@@ -1,8 +1,11 @@
-"""Render the four-panel physical error map (Fig. error_map) for PRB.
+"""Render the physical error map figures for PRM.
 
 Reads only the canonical G3 figure sidecar
-(``artifacts/prm_g3/canonical/physical_figure_data.csv``) and writes
-``paper_Q1/figures/fig_error_map.pdf``.  Encoding follows the manuscript's
+(``artifacts/prm_g3/canonical/physical_figure_data.csv``) and writes the
+main-text gated-effects figure (``fig_error_map.pdf``: adjusted profiles and
+mismatch contrasts) plus the supplemental macro figure
+(``fig_error_map_macro.pdf``: XF diagnostic and family macro errors with
+identity counts).  Encoding follows the manuscript's
 accessibility contract: the two incorporation classes are separated by hue
 (Okabe--Ito blue/vermillion, CVD-validated), line style, and marker shape,
 so the figure stays legible in grayscale; gated effects are filled markers,
@@ -187,9 +190,22 @@ def panel_d(ax, data: pd.DataFrame) -> None:
                 fmt=marker, markersize=3.4 if defecttype == "overall" else 3.8,
                 color=color, elinewidth=0.9, capsize=1.4, capthick=0.9,
             )
+    counts = {}
+    for (axis, group) in positions:
+        row = families[
+            (families.axis == axis) & (families.group == group)
+            & (families.defecttype == "overall")
+        ]
+        if not row.empty:
+            row = row.iloc[0]
+            counts[(axis, group)] = (int(row.n_identities), int(row.n_samples))
     tick_positions = [positions[key] for key in positions]
     ax.set_yticks(tick_positions)
-    ax.set_yticklabels([GROUP_SHORT[group] for _, group in positions])
+    ax.set_yticklabels([
+        f"{GROUP_SHORT[group]} ({counts[(axis, group)][0]}/{counts[(axis, group)][1]})"
+        if (axis, group) in counts else GROUP_SHORT[group]
+        for axis, group in positions
+    ])
     divider_y = (positions[("host_family", host_order[-1])]
                  + positions[("impurity_series", series_order[0])]) / 2
     ax.axhline(divider_y, color="0.8", linewidth=0.6)
@@ -220,26 +236,20 @@ def main() -> None:
     if set(data.evidence_tier.dropna().unique()) != {"canonical"}:
         raise ValueError("figure data is not uniformly canonical tier")
     style()
-    figure = plt.figure(figsize=(7.05, 5.9))
+
+    # Main-text figure: gated physics only (profiles + mismatch contrasts).
+    figure = plt.figure(figsize=(7.05, 2.9))
     outer = figure.add_gridspec(
-        2, 2, hspace=0.34, wspace=0.30,
-        left=0.10, right=0.985, top=0.965, bottom=0.075,
+        1, 2, wspace=0.30, left=0.10, right=0.985, top=0.93, bottom=0.155,
     )
     slot_a = outer[0, 0].subgridspec(1, 2, wspace=0.08)
     ax_a1 = figure.add_subplot(slot_a[0, 0])
     ax_a2 = figure.add_subplot(slot_a[0, 1], sharey=ax_a1)
     plt.setp(ax_a2.get_yticklabels(), visible=False)
     ax_b = figure.add_subplot(outer[0, 1])
-    ax_c = figure.add_subplot(outer[1, 0])
-    ax_d = figure.add_subplot(outer[1, 1])
     panel_a((ax_a1, ax_a2), data)
     panel_b(ax_b, data)
-    panel_c(ax_c, data)
-    panel_d(ax_d, data)
-    for label, ax, x_off in (
-        ("(a)", ax_a1, -0.28), ("(b)", ax_b, -0.42),
-        ("(c)", ax_c, -0.13), ("(d)", ax_d, -0.42),
-    ):
+    for label, ax, x_off in (("(a)", ax_a1, -0.28), ("(b)", ax_b, -0.42)):
         ax.text(x_off, 1.03, label, transform=ax.transAxes,
                 fontweight="bold", fontsize=9, va="bottom")
     output = Path(args.output)
@@ -248,6 +258,22 @@ def main() -> None:
     if args.preview:
         figure.savefig(args.preview, dpi=180)
     print(f"wrote {output}")
+
+    # Supplemental macro figure: XF diagnostic + family macro errors.
+    figure = plt.figure(figsize=(7.05, 3.1))
+    outer = figure.add_gridspec(
+        1, 2, wspace=0.42, left=0.09, right=0.985, top=0.93, bottom=0.15,
+    )
+    ax_c = figure.add_subplot(outer[0, 0])
+    ax_d = figure.add_subplot(outer[0, 1])
+    panel_c(ax_c, data)
+    panel_d(ax_d, data)
+    for label, ax, x_off in (("(a)", ax_c, -0.13), ("(b)", ax_d, -0.58)):
+        ax.text(x_off, 1.03, label, transform=ax.transAxes,
+                fontweight="bold", fontsize=9, va="bottom")
+    macro_output = output.parent / "fig_error_map_macro.pdf"
+    figure.savefig(macro_output, dpi=400)
+    print(f"wrote {macro_output}")
 
 
 if __name__ == "__main__":
