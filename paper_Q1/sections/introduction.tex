@@ -32,17 +32,26 @@ IMP2D~\cite{kazeev2023,kesorn2024,elalouani2026}.  These studies establish
 descriptor baselines for IMP2D and show that representation and data
 preparation materially affect reported errors.  They also motivate
 architectures that expose the impurity site while retaining local coordination
-and longer-range periodic context.  A random
-structure split, however, can place closely related host--impurity chemistries
-or numerically equivalent structures on both sides of the train--test boundary,
-leading to optimistic estimates~\cite{li2024mdhit}.  It also conflates two
+and longer-range periodic context.  A model suited to this task must
+therefore operate on the periodic structure \emph{alone}, expose the
+impurity site \emph{explicitly}, and respect the \emph{non-extensive},
+defect-local scaling of the target.
+
+Evaluation practice has not kept pace with these representational
+advances.  A random structure split can place closely related
+host--impurity chemistries or numerically equivalent structures on both
+sides of the train--test boundary, leading to optimistic
+estimates~\cite{li2024mdhit}.  It also conflates two
 physically different questions: combining a known host with a known impurity in
 a previously unseen pair, and predicting a host or impurity absent from all
 target supervision.  Materials models are known to degrade when test chemistry
 differs from training chemistry~\cite{omee2024,li2025ood}, but this distinction
 has not been resolved for impurity incorporation energies in IMP2D.  The role of
 incorporation geometry---adsorbate versus interstitial---is likewise hidden by
-one pooled error.
+one pooled error.  And pooled benchmarks hide a third failure mode
+entirely: a representation defect that moves individual predictions by
+electron-volts can leave the pooled error essentially unchanged, so a
+benchmark-passing model can still be unreliable structure by structure.
 
 Here we develop the Defect-Aware Radial Transformer (DART), an
 impurity-centered graph model that combines defect-local message passing,
@@ -68,7 +77,11 @@ while leaving pooled benchmarks essentially unchanged, and the
 independently audited repair from which every reported number derives.  The
 architecture factorial that selected the frozen recipe and the internal
 uncertainty calibration~\cite{peterson2017,hu2022,grasselli2025} are
-reported in the Supplemental Material~\cite{supplemental}.
+reported in the Supplemental Material~\cite{supplemental}.  The paper
+proceeds from the audited data set and model (Sec.~\ref{sec:method})
+through the frozen evaluation protocol (Sec.~\ref{sec:setup}) to the
+results (Sec.~\ref{sec:results}) and their physical reading and limits
+(Secs.~\ref{sec:discussion} and~\ref{sec:conclusion}).
 
 \begin{figure*}[t]
 \centering

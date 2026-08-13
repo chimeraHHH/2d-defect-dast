@@ -52,42 +52,42 @@ two-dimensional materials: Chemical transferability and error analysis}
 
 \begin{abstract}
 \ifprmresultsready
-We develop the Defect-Aware Radial Transformer (DART), an impurity-centered
-graph model with a strictly permutation-invariant local representation and
-exact minimum-image distances, and evaluate the chemical transferability of
-its impurity formation-energy predictions on 10,224 neutral structures
-curated from the IMP2D database.  The task is retrospective estimation and
-reranking over available DFT-relaxed candidate geometries.  Because each geometry and
-its reference energy are products of the same completed DFT workflow, the task
-evaluates database-conditioned prediction rather than replacing candidate
-generation or relaxation.  Transfer is organized by chemical novelty in a
-strict hierarchy: mean absolute error grows only mildly from random
-cross-validation (\PRMRepIdCvMAE\eV{}) through withheld host--impurity pairs
-(\PRMRepPairCvMAE\eV{}) and a predefined chemistry block
-(\PRMRepChemBlockMAE\eV{}), but roughly doubles when a complete impurity
-(\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}) is withheld.  The
-small but significant host--impurity asymmetry tracks the structural novelty
-of the held-out host after controlling for training-support asymmetry.
-Incorporation geometry forms a second axis with distinct physics: interstitial
-structures (\PRMRepPairInterstitialMAE\eV{}) are over twice as hard as
-adsorbates (\PRMRepPairAdsorbateMAE\eV{}), and preregistered error maps show
-interstitial error concentrating in roomy, loosely constrained cages ---
-large clearance and neighbor distances with uniform spacing --- and rising
-with valence mismatch, whereas adsorbate error tracks chemical mismatch,
-led by signed valence.  A readout analysis connects model design to
-the non-extensive, defect-local character of the formation energy: an
-additive-readout baseline degrades to \PRMSchNetAddHostCvMAE\eV{} on withheld
-hosts and improves to \PRMSchNetMeanHostCvMAE\eV{} with a mean readout alone,
-while the defect-centered model shows no size-dependent residual drift.  For
-candidates sharing a host and impurity, out-of-fold predictions select the
-lower-energy incorporation class with \PRMRepPreferenceAccuracy\% accuracy
-against a \PRMRepPreferenceReference\% class-prior reference, with
-\PRMRepWithinRegret\eV{} mean within-class site-selection regret.  All
-reported numbers come from the repaired representation; a permutation
-diagnostic of the superseded implementation shifted single predictions by up
-to several eV while pooled errors moved by under $10^{-3}$\,eV, showing that
-aggregate benchmarks can hide representation defects that dominate individual
-predictions.
+Graph models now predict defect formation energies at useful accuracy, but
+pooled benchmarks answer neither \emph{where} such models transfer across
+chemistry nor \emph{why} they fail where they do.  We address both
+questions for neutral impurities in two-dimensional materials with the
+Defect-Aware Radial Transformer (DART), an impurity-centered graph model
+built on a strictly permutation-invariant local representation with exact
+minimum-image distances, evaluated on 10,224 structures curated from the
+IMP2D database.  Every geometry and reference energy is a product of the
+same completed DFT workflow, so the task is retrospective,
+database-conditioned estimation and reranking rather than a replacement
+for candidate generation or relaxation.  Transfer is organized by chemical
+novelty in a strict hierarchy: mean absolute error grows only mildly from
+random cross-validation (\PRMRepIdCvMAE\eV{}) through withheld
+host--impurity pairs (\PRMRepPairCvMAE\eV{}) and a predefined chemistry
+block (\PRMRepChemBlockMAE\eV{}), but roughly doubles when a complete
+impurity (\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}) is
+withheld, and the host--impurity asymmetry tracks the structural novelty
+of the held-out host after controlling for training support.
+Incorporation geometry forms a second axis with distinct physics:
+interstitial structures (\PRMRepPairInterstitialMAE\eV{}) are over twice
+as hard as adsorbates (\PRMRepPairAdsorbateMAE\eV{}), and preregistered
+error maps place interstitial error in roomy, loosely constrained cages
+while adsorbate error tracks chemical mismatch, led by signed valence.
+The formation energy's non-extensive, defect-local character constrains
+model design: an additive readout degrades to \PRMSchNetAddHostCvMAE\eV{}
+on withheld hosts, a mean readout alone recovers to
+\PRMSchNetMeanHostCvMAE\eV{}, and the defect-centered readout shows no
+size-dependent residual drift.  Out-of-fold predictions select the
+lower-energy incorporation class for \PRMRepPreferenceAccuracy\% of
+host--impurity pairs against a \PRMRepPreferenceReference\% class-prior
+reference, with \PRMRepWithinRegret\eV{} mean within-class regret.  All
+numbers derive from an independently audited repaired representation:
+under atom relabeling, the superseded implementation moved single
+predictions by up to several eV while pooled errors changed by under
+$10^{-3}$\,eV --- aggregate benchmarks can hide representation defects
+that dominate individual predictions.
 \else
 We study how impurity formation-energy prediction changes across host,
 impurity, and incorporation-geometry axes in two-dimensional materials.  The
