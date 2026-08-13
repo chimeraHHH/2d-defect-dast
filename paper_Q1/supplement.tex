@@ -124,6 +124,26 @@ MACE-MP-0 (zero-shot label surrogate) & -- & 2.62 ($r\approx0.04$) \\
 \end{tabular}
 \end{table}
 
+\subsection{Cross-database and multi-source experiments}
+
+The same development era probed whether other formation-energy sources
+could extend or substitute IMP2D supervision; all values below carry the
+same superseded-split provenance and support no main-text claim.
+Zero-shot evaluation of an IMP2D-trained model on JARVIS vacancy data ---
+a different defect type computed with a different DFT code --- failed at
+the 2.3\,eV (2D hosts) and 2.6\,eV (3D hosts) level with negative
+$R^2$; few-shot fine-tuning onto those targets underperformed training
+from scratch at every budget tested (10--300 labels); and four-source
+joint training (IMP2D with JARVIS-2D, JARVIS-3D, and DFT-3D at tuned
+weights) improved the IMP2D development-split error by only about
+$4.5\%$.  Together with the foundation-model surrogate test above, these
+results identify the cross-database barrier as one of reference
+conventions and defect-class mismatch rather than representation capacity,
+and they motivated both the frozen single-database protocol and the
+convention-matching requirements of the preregistered external-validation
+design.  The retained pipeline is nevertheless two-source: the corrected
+JARVIS-3D pretraining (19{,}902 records) initializes every reported model.
+
 \clearpage
 \section{Reproducibility specification}
 

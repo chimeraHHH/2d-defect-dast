@@ -136,10 +136,17 @@ that universal interatomic potentials degrade precisely on interstitial-like
 environments far from their bulk training distributions.  Internal ensemble uncertainty (Supplemental
 Material~\cite{supplemental}) supports marginal calibration and risk
 ranking within the retained population, not host-conditional or chemically
-shifted coverage.  A target-matched external set --- structures, chemical
-potentials, convergence settings, and target definition matching the IMP2D
-convention, generated independently of their reference energies --- would
-provide the most direct next test.
+shifted coverage.  The single-database scope is itself an evidence-based
+protocol choice: development-era experiments (Supplemental
+Material~\cite{supplemental}) found zero-shot cross-database evaluation on
+JARVIS vacancy data failing at the 2--3\,eV level with negative $R^2$,
+few-shot fine-tuning losing to training from scratch, and four-source joint
+training yielding only marginal gains --- the barrier is one of reference
+conventions and defect-class mismatch, which is exactly what a
+target-matched external set --- structures, chemical potentials,
+convergence settings, and target definition matching the IMP2D convention,
+generated independently of their reference energies --- would address as
+the most direct next test.
 
 \else
 
