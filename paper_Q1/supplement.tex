@@ -384,6 +384,55 @@ Within-class reranking regret (eV) & 0.099 [0.083, 0.118] & -- & -- & 3140 \\
 \label{fig:supp_error_heterogeneity}
 \end{figure}
 
+Figure~\ref{fig:supp_parity} shows the parity of the repaired pair-held-out
+out-of-fold predictions by incorporation class; the class MAEs match the
+main-text values, and the interstitial cloud carries both the larger spread
+and the extreme-target tail.  Figure~\ref{fig:supp_ptable} maps the same
+out-of-fold errors onto the periodic table of impurity elements together
+with retained structure counts.  Figure~\ref{fig:supp_cases} renders the
+four highest-error non-pathological interstitials and their matched
+bottom-quartile adsorbate controls, aligned column by column by the frozen
+matching rule (the first-ranked interstitial has no eligible control); the
+extreme interstitial errors concentrate at extreme formation-energy
+targets ($E_f \approx 12$--$19$\,eV for three of the four).  The case
+panel is
+illustrative (exploratory tier under the frozen evidence rules) and
+supports no gated main-text claim.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.55\textwidth]{fig_parity_pair.pdf}
+\caption{Parity of repaired pair-held-out out-of-fold predictions for the
+  10{,}224 retained structures, by incorporation class.  Marker shape and
+  color encode the class; the inset reports pooled and per-class MAE.}
+\label{fig:supp_parity}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_impurity_ptable.pdf}
+\caption{Per-impurity-element MAE of the repaired pair-held-out
+  out-of-fold predictions.  Each occupied cell reports the element and its
+  retained structure count; gray cells are elements outside the 65-impurity
+  set.  The color scale is clipped at the 95th percentile of the
+  per-element MAEs.}
+\label{fig:supp_ptable}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_case_gallery.pdf}
+\caption{Structures selected by the frozen case rule, rendered from the
+  source-database geometries (side view, periodic images tiled in plane,
+  impurity atom outlined in black and labeled).  Top row: the four
+  highest-error non-pathological interstitials under pair holdout, in
+  match order.  Bottom row: the matched bottom-quartile adsorbate controls
+  under the same frozen rule.  Panel headers give the pair-held-out
+  absolute error and the reference formation energy.  Illustrative only;
+  no gated claim.}
+\label{fig:supp_cases}
+\end{figure}
+
 \clearpage
 \section{Post-hoc SchNet graph-readout sensitivity}
 

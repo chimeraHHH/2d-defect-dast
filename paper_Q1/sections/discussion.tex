@@ -119,12 +119,30 @@ Every number in this paper comes from a repaired representation whose
 permutation invariance and exact minimum-image distances passed an
 independent acceptance audit; the source-task pretraining was rebuilt under
 the same corrected construction.  The diagnostic of the superseded
-implementation is a result in its own right: sixteen atom-relabeling
-permutations moved single predictions by up to $8.8$\eV{} and flipped
-incorporation-class decisions, while the pooled MAE moved by less than
-$10^{-3}$\eV{}.  Aggregate benchmarks are therefore nearly blind to
-representation defects that dominate individual predictions --- a caution
-we believe generalizes beyond this system.
+implementation is a result in its own right [Fig.~\ref{fig:permutation}]:
+sixteen atom-relabeling permutations moved single predictions by up to
+$8.8$\eV{} and flipped incorporation-class decisions, while the pooled MAE
+moved by less than $10^{-3}$\eV{}.  Aggregate benchmarks are therefore
+nearly blind to representation defects that dominate individual predictions
+--- a caution we believe generalizes beyond this system.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_permutation_repair.pdf}
+\caption{Atom relabeling as a representation diagnostic.
+  (a) Cumulative distribution of the per-structure prediction spread of the
+  superseded (legacy) implementation across sixteen atom permutations, by
+  incorporation class ($p_{99}=0.46$\eV{}, maximum $8.8$\eV{}); under the
+  repaired representation every structure reproduces its prediction to
+  within the archived round-trip bound ($\leq 1.7\times10^{-5}$\eV{},
+  vertical line).
+  (b) The same axis at aggregate level: the legacy pooled MAE changes by at
+  most $8\times10^{-4}$\eV{} across permutations --- four orders of
+  magnitude below the largest single-structure spread --- while individual
+  relabelings flip 9--19 incorporation-class decisions and 76--102 site
+  selections.  Aggregate benchmarks are nearly blind to this defect.}
+\label{fig:permutation}
+\end{figure}
 
 The evidence remains limited to neutral adsorbates and interstitials, the
 source database's relaxed structures and reference energies, and a model
@@ -142,7 +160,13 @@ zero-shot label surrogate --- the latter essentially uncorrelated with the
 IMP2D formation-energy convention --- and none approached the
 defect-centered design at matched scale, consistent with recent reports
 that universal interatomic potentials degrade precisely on interstitial-like
-environments far from their bulk training distributions.  Internal ensemble uncertainty (Supplemental
+environments far from their bulk training distributions.  In absolute
+terms, the repaired random-split and pair-held-out errors sit in the same
+few-tenths-of-an-eV band reported for specialized defect formation-energy
+models on bulk and low-dimensional
+benchmarks~\cite{witman2023,kiyohara2025,kazeev2023}; the grouped regimes
+report the additional cost of chemical novelty that pooled numbers do not
+expose.  Internal ensemble uncertainty (Supplemental
 Material~\cite{supplemental}) supports marginal calibration and risk
 ranking within the retained population, not host-conditional or chemically
 shifted coverage.  The single-database scope is itself an evidence-based
