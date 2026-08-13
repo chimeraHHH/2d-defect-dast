@@ -82,15 +82,14 @@ Official sources:
 - [x] Keep Supplemental references represented in the main bibliography and
       cite Supplemental Material once as a numbered reference.
 - [x] Provide `README.TXT` for the Supplemental Material upload.
-- [ ] Correct the baked-in Figure 1 phrases “1 binary impurity embedding” and
-      “Radial bias up to 12 Å” in the source artwork through the approved
-      AutoFigure editing workflow.
-- [ ] Add fully redundant non-color encoding to Figure 2 and recheck grayscale
-      legibility.
-- [ ] Confirm the creation tools, versions, rights, and author verification for
-      all three user-supplied manual figures.  If any figure was AI-generated,
-      add the tool and use disclosure to that figure's caption before submission.
-- [ ] Repeat final-size visual QA after the two artwork corrections.
+- [x] Replace Figure 1 with the author-directed GPT Image 2 revision that uses
+      the verified embedding, radial-grid, enrichment, and readout language.
+- [x] Separate the two Figure 2 incorporation classes and provide redundant
+      circle/diamond shape encoding in addition to color.
+- [x] Record the Image 2 model, authorization, input scope, derivative hashes,
+      and author verification in `review/v19_image2_manifest.json`, and disclose
+      the assisted generation in both captions and Acknowledgments.
+- [x] Repeat final-size visual QA after the artwork revisions.
 
 ## Build and release gate
 
@@ -101,9 +100,9 @@ Official sources:
       server-side figure-label regeneration: 1346 checks, 0 failures.
 - [ ] Run the targeted paper test modules in an accepted server environment;
       the frozen server Python lacks `pytest`, so these tests were not run.
-- [x] Record the verified rebuild: 12-page main PDF
-      (`4aa3d11...35c275`) and 7-page Supplemental PDF
-      (`ac1e5dba...8ba82`).
+- [x] Record the V19 visual rebuild: 13-page main PDF
+      (`ddbb3c02...109f06c`) and 13-page Supplemental PDF
+      (`25b5f584...5b6a20b`).
 - [x] Author approval was given for scoped G1/G3 and figure/prose milestone
       commits and pushes; release and journal upload remain unapproved.
 - [ ] Exclude or regenerate the stale `main_latex729.zip`; it contains the
@@ -116,5 +115,6 @@ server acceptance (including corrected JARVIS pretraining lineage), the absence
 of an authorized repaired full-OOF G2 bundle, and the resulting block on
 canonical G3 evidence. The current manuscript
 numbers remain legacy-graph evidence. Author metadata, archival release,
-cover-letter declarations, and two figure-source corrections are additional
-submission blockers.
+cover-letter declarations, and the final archival package are additional
+submission blockers. The two previously open schematic-source corrections are
+closed in V19.

@@ -1,120 +1,70 @@
 {
-  "catalog_version": "prb_jr1_figures_v4",
-  "updated_on": "2026-08-10",
-  "evidence_boundary": "Main and Supplemental figures use the frozen E1-E9 legacy-graph evidence. G3 is reserved but absent until repaired OOF evidence passes its gate.",
+  "catalog_version": "prb_v19_figures_v1",
+  "updated_on": "2026-08-13",
+  "evidence_boundary": "Quantitative panels reproduce existing repaired-model evidence; GPT Image 2 was used only for the two author-directed scientific schematics.",
   "rendered_package": {
-    "main_pdf_pages": 12,
-    "supplement_pdf_pages": 7,
-    "main_figure_count": 5,
-    "supplement_figure_count": 4,
-    "main_pdf_render_qa": "pass_with_known_raster_wording_advisory",
-    "supplement_render_qa": "pass",
-    "numeric_audit": {
-      "status": "pass",
-      "checks": 1346,
-      "failures": 0,
-      "sha256": "b63cb1eaf14074acf8f7ac6eebf6bc0282baf7334805fda8debaf44ac29bc2c2",
-      "source_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5"
-    }
+    "main_pdf_pages": 13,
+    "supplement_pdf_pages": 13,
+    "main_figure_count": 6,
+    "supplement_figure_count": 8,
+    "main_pdf_render_qa": "pass",
+    "supplement_render_qa": "pass"
   },
   "main_figures": [
     {
       "number": 1,
-      "id": "main_fig_1",
       "label": "fig:architecture",
-      "role": "DART architecture and bounded retrospective decision path",
-      "source": "paper_Q1/figures/figure1_manual.png",
-      "provenance": "paper_Q1/review/manual_figure_manifest.json",
-      "status": "integrated_pixels_unchanged",
-      "advisory": "Raster labels retain legacy screening/application wording and two method ambiguities; the caption supplies the approved scientific guard. Source-level author revision remains preferable."
+      "role": "Verified DART data path and non-extensive readout",
+      "source": "paper_Q1/figures/figure1_image2_v19.pdf",
+      "provenance": "paper_Q1/review/v19_image2_manifest.json",
+      "status": "author_directed_image2_revision_verified"
     },
     {
       "number": 2,
-      "id": "main_fig_2",
       "label": "fig:incorporation_classes",
       "role": "Alternative adsorbate and interstitial single-impurity configurations",
-      "source": "paper_Q1/figures/figure2_manual.png",
-      "provenance": "paper_Q1/review/manual_figure_manifest.json",
-      "status": "integrated_pixels_unchanged",
-      "advisory": "Creator/license attestation and a color-independent source marker remain author-controlled submission gates."
+      "source": "paper_Q1/figures/figure2_image2_v19.pdf",
+      "provenance": "paper_Q1/review/v19_image2_manifest.json",
+      "status": "author_directed_image2_revision_verified"
     },
     {
       "number": 3,
-      "id": "main_fig_3",
-      "label": "fig:environment_enrichment",
-      "role": "Four projected defect-environment enrichment quantities",
-      "source": "paper_Q1/figures/figure3_manual.png",
-      "provenance": "paper_Q1/review/manual_figure_manifest.json",
-      "status": "integrated_pixels_unchanged"
+      "label": "fig:prediction_transfer",
+      "role": "Pair-held-out parity and chemical-transfer hierarchy",
+      "source": "paper_Q1/figures/fig_prediction_transfer_v19.pdf",
+      "generator": "scripts/prm_render_v19_main_figure.py",
+      "status": "deterministic_existing_evidence"
     },
     {
       "number": 4,
-      "id": "main_fig_4",
-      "label": "fig:transfer",
-      "role": "Axis-resolved transfer and paired comparator contrasts",
-      "source": "paper_Q1/figures/fig_transfer.pdf",
-      "generator": "scripts/prm_make_result_assets.py",
-      "evidence": [
-        "artifacts/prm_results/comparison/pooled_metrics.csv",
-        "artifacts/prm_results/comparison/paired_comparisons.csv"
-      ],
-      "status": "legacy_graph_evidence_retained"
+      "label": "fig:error_map",
+      "role": "Adjusted physical error map",
+      "source": "paper_Q1/figures/fig_error_map.pdf",
+      "status": "existing_repaired_evidence"
     },
     {
       "number": 5,
-      "id": "main_fig_5",
       "label": "fig:reranking",
-      "role": "Retrospective class and site reranking of available DFT-relaxed IMP2D candidates",
-      "source": "paper_Q1/figures/fig_screening.pdf",
-      "generator": "scripts/prm_make_result_assets.py",
-      "evidence": [
-        "artifacts/prm_results/materials/pair_preferences.csv",
-        "artifacts/prm_results/materials/site_selection.csv"
-      ],
-      "status": "server_regenerated_reranking_labels_verified"
+      "role": "Retrospective reranking of available relaxed candidates",
+      "source": "paper_Q1/figures/fig_reranking_repaired.pdf",
+      "status": "existing_repaired_evidence"
+    },
+    {
+      "number": 6,
+      "label": "fig:permutation",
+      "role": "Permutation-sensitivity diagnostic",
+      "source": "paper_Q1/figures/fig_permutation_repair.pdf",
+      "status": "existing_repaired_evidence"
     }
   ],
   "supplement_figures": [
-    {
-      "number": "S1",
-      "id": "supp_fig_s1",
-      "role": "Data provenance and fixed evaluation protocol",
-      "source": "paper_Q1/figures/fig_protocol_overview.pdf",
-      "generator": "scripts/prm_make_protocol_figure.py",
-      "status": "retained"
-    },
-    {
-      "number": "S2",
-      "id": "supp_fig_s2",
-      "role": "Paired architecture factorial",
-      "source": "paper_Q1/figures/fig_factorial_autofigure_v1.pdf",
-      "generator": "scripts/prm_make_result_assets.py plus AutoFigure-Edit editor-only presentation derivative",
-      "provenance": "paper_Q1/review/autofigure_edit_manifest.json",
-      "status": "reallocated_from_main"
-    },
-    {
-      "number": "S3",
-      "id": "supp_fig_s3",
-      "role": "Internal uncertainty and selective prediction",
-      "source": "paper_Q1/figures/fig_uq.pdf",
-      "generator": "scripts/prm_make_result_assets.py",
-      "status": "reallocated_from_main"
-    },
-    {
-      "number": "S4",
-      "id": "supp_fig_s4",
-      "role": "Legacy descriptive error heterogeneity",
-      "source": "paper_Q1/figures/fig_error_heterogeneity.pdf",
-      "generator": "scripts/prm_make_result_assets.py",
-      "status": "supplement_only_and_superseded_if_canonical_g3_passes"
-    }
-  ],
-  "reserved_g3_figure": {
-    "target_main_position": 5,
-    "working_id": "g3_physical_error_map",
-    "contract": "paper_Q1/review/visual-composer/visual-contract.md",
-    "preregistration": "paper_Q1/review/g3_preregistration.json",
-    "status": "not_rendered_not_cited",
-    "admission_gate": "accepted repaired-model pair OOF plus G3 numeric, figure-sidecar, and render QA"
-  }
+    {"number": "S1", "role": "Data provenance and evaluation protocol", "source": "paper_Q1/figures/fig_protocol_overview.pdf"},
+    {"number": "S2", "role": "Paired architecture factorial", "source": "paper_Q1/figures/fig_factorial_autofigure_v1.pdf"},
+    {"number": "S3", "role": "Internal uncertainty evaluation", "source": "paper_Q1/figures/fig_uq.pdf"},
+    {"number": "S4", "role": "Descriptive error heterogeneity", "source": "paper_Q1/figures/fig_error_heterogeneity.pdf"},
+    {"number": "S5", "role": "Pair-held-out parity reference", "source": "paper_Q1/figures/fig_parity_pair.pdf"},
+    {"number": "S6", "role": "Macro physical-error panels", "source": "paper_Q1/figures/fig_error_map_macro.pdf"},
+    {"number": "S7", "role": "Per-impurity error map", "source": "paper_Q1/figures/fig_impurity_ptable.pdf"},
+    {"number": "S8", "role": "Illustrative case gallery", "source": "paper_Q1/figures/fig_case_gallery.pdf"}
+  ]
 }

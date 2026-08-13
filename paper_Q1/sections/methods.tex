@@ -18,14 +18,16 @@ Fig.~\ref{fig:incorporation_classes}.
 
 \begin{figure*}[t]
  \centering
- \includegraphics[width=0.92\textwidth]{figure2_manual.png}
+ \includegraphics[width=\textwidth]{figure2_image2_v19.pdf}
  \caption{Structural representation of the two neutral impurity incorporation
- classes in two-dimensional host materials. The overlaid top and side views
- show two alternative single-impurity configurations in a WSe$_2$-like host:
- a red adsorbate at a top-host site (Top-W in this example) and a green
- interstitial impurity in a hollow void. The alternatives do not coexist in a
- single structure and illustrate representative, rather than exhaustive,
- IMP2D incorporation sites.}
+ classes in two-dimensional host materials. (a) Top and side views of an
+ adsorbate above a top-host site. (b) The corresponding views of an
+ interstitial impurity in a hollow void below the upper chalcogen surface.
+ Orange circles and blue diamonds encode the two classes by both color and
+ shape. The panels are alternative single-impurity configurations in a
+ WSe$_2$-like host, not coexisting dopants, and illustrate representative
+ rather than exhaustive IMP2D sites. The schematic was edited with OpenAI GPT
+ Image 2; the authors specified and verified its scientific content.}
  \label{fig:incorporation_classes}
 \end{figure*}
 
@@ -110,26 +112,9 @@ not used for calibration.  All split files cover the full 10,641-row container
 through mutually disjoint train, validation, test, optional calibration, and
 exclusion sets.
 
-The sequential data audit, retained chemical coverage, target distribution,
-and fixed partition geometry are summarized in
-Fig.~\ref{fig:protocol_overview}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
-\caption{Data provenance and evaluation protocol. (a) Sequential source
-filtering, raw-energy reconstruction audit, impurity-identity audit, and
-structure canonicalization. The final set excludes four rows with zero
-sentinels in a raw energy component, 349 rows without a unique impurity atom,
-and 64 redundant structures. (b) Formation-energy distributions for the two
-incorporation classes in the retained set. (c) Number of structures for each
-of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
-(d) Train, validation, calibration, and test fractions for each evaluation
-regime. Bars for fivefold protocols show fold averages. All regimes cover the
-same 10,224 retained structures; the common 417-row exclusion set is omitted
-from the bars.}
-\label{fig:protocol_overview}
-\end{figure*}
+The sequential audit, retained chemical coverage, target distribution, and
+fixed partition geometry are summarized in the Supplemental
+Material~\cite{supplemental}.
 
 %----------------------------------------------------------------------
 \subsection{Defect-aware graph Transformer}
@@ -238,25 +223,6 @@ the order-free triplet selection, attention, and graph pooling --- is
 symmetric under atom-index permutations.  Both properties are enforced by
 unit and property tests and were re-verified in the independent acceptance
 audit of the released implementation.
-
-Figure~\ref{fig:environment_enrichment} illustrates the four local quantities
-entering the E branch and their association with the uniquely identified
-impurity node.
-
-\begin{figure}[t]
- \centering
- \includegraphics[width=\columnwidth]{figure3_manual.png}
- \caption{Illustration of the defect-environment enrichment (E) module. Within
- the periodic 5-\AA{} neighbor graph, four impurity-centered quantities---the neighbor count
- $N$, mean and maximum neighbor distances ($d_{\mathrm{mean}}$ and
- $d_{\mathrm{max}}$), and the normalized Pauling-electronegativity contrast
- $\Delta\chi=|\chi_{\mathrm{imp}}-\langle\chi_{\mathrm{nn}}\rangle|$---form a
- four-component descriptor. The descriptor is
- normalized, projected to 128 channels, and added only to the impurity-node
- representation before local message passing. The $N=3$ neighborhood shown is
- schematic.}
- \label{fig:environment_enrichment}
-\end{figure}
 
 The full $2^3$ factorial contains all eight G/E/P combinations on each of the
 five paired random partitions.  Within a partition, all variants share the

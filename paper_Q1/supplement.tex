@@ -1,4 +1,4 @@
-\documentclass[aps,prmaterials,onecolumn,superscriptaddress,floatfix]{revtex4-2}
+\documentclass[aps,prb,onecolumn,superscriptaddress,floatfix]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{array}
@@ -33,9 +33,28 @@ defect-aware graph Transformer''}
 
 The retained modeling set is obtained through a sequential source audit,
 target-provenance check, unique-impurity requirement, and duplicate-control
-procedure.  The protocol-overview figure in the main text (Sec.~II)
-summarizes those exclusions, the formation-energy distribution, chemical
-coverage, and the fixed evaluation partitions used throughout the study.
+procedure. Figure~\ref{fig:supp_protocol} summarizes those exclusions, the
+formation-energy distribution, chemical coverage, and the fixed evaluation
+partitions used throughout the study.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
+\caption{Data provenance and evaluation protocol. (a) Sequential source
+filtering, raw-energy reconstruction audit, impurity-identity audit, and
+structure canonicalization. The final set excludes four rows with zero
+sentinels in a raw energy component, 349 rows without a unique impurity atom,
+and 64 redundant structures. (b) Formation-energy distributions for the two
+incorporation classes in the retained set. (c) Number of structures for each
+of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
+(d) Train, validation, calibration, and test fractions for each evaluation
+regime. Bars for fivefold protocols show fold averages. All regimes cover the
+same 10{,}224 retained structures; the common 417-row exclusion set is omitted
+from the bars.}
+\label{fig:supp_protocol}
+\end{figure}
+
+\input{draft_tab_benchmark.tex}
 
 \clearpage
 \section{Architecture factorial}
@@ -385,8 +404,8 @@ main-text values, and the interstitial cloud carries both the larger spread
 and the extreme-target tail.  Figure~\ref{fig:supp_error_macro} reports
 the canonical family-level macro errors with identity and structure counts,
 alongside the out-of-plane expansion-factor diagnostic behind the
-$\mathrm{XF}\leq2$ gate; the per-impurity-element periodic-table map is in
-the main text.  Figure~\ref{fig:supp_cases} renders the
+$\mathrm{XF}\leq2$ gate. Figure~\ref{fig:supp_ptable} maps the descriptive
+per-impurity-element errors and retained counts. Figure~\ref{fig:supp_cases} renders the
 four highest-error non-pathological interstitials and their matched
 bottom-quartile adsorbate controls, aligned column by column by the frozen
 matching rule (the first-ranked interstitial has no eligible control); the
@@ -416,6 +435,18 @@ supports no gated main-text claim.
   pair-clustered intervals; group labels give (identities/structures), and
   the diamond marks the class-pooled value.}
 \label{fig:supp_error_macro}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_impurity_ptable.pdf}
+\caption{Per-impurity-element MAE of the repaired pair-held-out out-of-fold
+  predictions. Each occupied cell reports the element and its retained
+  structure count; gray cells are elements outside the 65-impurity set. The
+  color scale is clipped at the 95th percentile of the per-element MAEs. These
+  are descriptive summaries of the same out-of-fold predictions; no
+  per-element claim is gated.}
+\label{fig:supp_ptable}
 \end{figure}
 
 \begin{figure}[htbp]

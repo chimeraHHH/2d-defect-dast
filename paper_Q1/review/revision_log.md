@@ -405,3 +405,28 @@
   metadata, licensing, and the archival release also remain open.
 - Control: no commit, push, release, or upload was performed; progress remains
   under manual user control.
+
+### REV-026: PRM V19 figure-story reconstruction
+
+- Severity: presentation, figure provenance, and PRB package consistency; no
+  new training, inference, DFT, or numerical evidence was introduced.
+- Change: replaced the first two user schematics with author-directed GPT
+  Image 2 revisions; merged pair-held-out parity and the five-regime transfer
+  hierarchy into a deterministic quantitative Figure 3; retained the physical
+  error map, retrospective reranking, and permutation diagnostic as Figures
+  4--6; moved protocol, benchmark, periodic-table, factorial, UQ,
+  heterogeneity, and case-level support to the Supplemental Material.
+- Scientific guards: Figure 1 distinguishes the 12-Angstrom radial-grid end
+  from an attention cutoff and ends at per-structure energy prediction;
+  Figure 2 shows the incorporation classes as alternative single-impurity
+  configurations with redundant color and shape. No image model touched a
+  quantitative figure.
+- Provenance: `v19_image2_manifest.json` records authorization, model, input
+  scope, source and derivative hashes, and author verification;
+  `v19_visual_contract.md` records the role and evidence boundary of every
+  main-text figure. Captions and Acknowledgments disclose Image 2 assistance.
+- Build and QA: the PRB-profile main and Supplemental PDFs each contain 13
+  letter-size pages. The main PDF has six figures, no unresolved references,
+  no overfull boxes, and embedded fonts; all pages passed rendered contact-sheet
+  inspection. SHA-256 values are `ddbb3c02...109f06c` (main) and
+  `25b5f584...5b6a20b` (Supplemental).

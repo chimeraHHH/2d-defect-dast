@@ -75,23 +75,19 @@ scaling, and representation correctness.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth,trim=67bp 190bp 37bp 151bp,clip]
-  {figure1_manual.png}
+\includegraphics[width=\textwidth]{figure1_image2_v19.pdf}
 \caption{Architecture of the Defect-Aware Radial Transformer (DART).
-  (a) Feature initialization of the atomistic graph. A fixed
-  128-dimensional ct-UAE vector and nine normalized elemental attributes are
-  concatenated and projected from 137 to 128 channels, after which a learned
-  binary impurity-status embedding marks the unique impurity node. (b) The
-  DART backbone adds four projected defect-environment descriptors only at
-  that node before three 5-\AA{} pre-normalized, distance-gated local blocks
-  and two four-head geometric Transformer blocks. The radial bias uses 32 basis
-  functions spanning 0--12~\AA{}, while attention connects all valid atoms.
-  (c) A graph-dependent scalar gate
-  fuses an atom-attention weighted sum and a channelwise maximum before a
-  $128\rightarrow128\rightarrow1$ head predicts the formation energy of each
-  structure. For each host--impurity pair, retrospective incorporation-class reranking
-  compares the minimum predicted energy among retained adsorbate candidates
-  with the corresponding minimum among interstitial candidates; the displayed
-  ordering is illustrative.}
+  (a) A fixed 128-dimensional ct-UAE vector and nine normalized elemental
+  attributes are projected from 137 to 128 channels, after which a learned
+  impurity-status embedding marks the unique impurity node. (b) Four projected
+  defect-environment quantities are added only at that node before three
+  5-\AA{} distance-gated local blocks and two four-head geometric Transformer
+  blocks. The Transformer radial bias uses 32 basis functions spanning
+  0--12~\AA{}; 12~\AA{} is the end of the basis grid rather than an attention
+  cutoff. (c) A graph-dependent scalar gate fuses an atom-attention weighted
+  sum and a channelwise maximum before a
+  $128\rightarrow128\rightarrow1$ head predicts one formation energy per
+  structure. The schematic was edited with OpenAI GPT Image 2; the authors
+  specified and verified its scientific content.}
 \label{fig:architecture}
 \end{figure*}
