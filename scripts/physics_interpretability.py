@@ -23,6 +23,8 @@ import torch
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from src.models.element_table import lookup_ct_uae
+
 
 def analyze_attention(model, loader, device, n_samples=200):
     """Analyze attention weights: does the model focus on defect atoms?"""
@@ -49,8 +51,9 @@ def analyze_attention(model, loader, device, n_samples=200):
             if model.ct_uae_table is not None:
                 z = batch.get("atomic_numbers")
                 if z is not None:
-                    z_c = z.clamp(0, model.ct_uae_table.shape[0] - 1)
-                    x = torch.cat([x, model.ct_uae_table[z_c]], dim=-1)
+                    x = torch.cat(
+                        [x, lookup_ct_uae(model.ct_uae_table, z)], dim=-1
+                    )
             h = model.embed(x)
             if model.defect_embedding is not None and defect_mask is not None:
                 h = h + model.defect_embedding(defect_mask)

@@ -1,0 +1,37 @@
+{
+  "base_config_repository_path": "configs/prm/promoted/g111/transfer/pair_cv5_f0_seed242.yaml",
+  "base_config_sha256": "04cdb90d48f8e55e0c15b92064ca1af4dc5d64dcc3db012c059e3ea58b642f8e",
+  "configs": [
+    {
+      "arm": "legacy_init",
+      "config_sha256": "ec683005292fbcda30d9f535dd545c9804e6f4d71de1c0b9ca70393a7fa7e140",
+      "repository_path": "configs/prm/g1/generated/legacy_init_pair_cv5_f0_seed242.yaml",
+      "sha256": "7eceabebc274d71b45b2afeb0f6718e4f9ce93ababb39b902643ef7a8e5dcc19"
+    },
+    {
+      "arm": "no_pretrain",
+      "config_sha256": "70ff245bdad1778f47cfb8a56db9116aaaa18dc2fb527ef876c11b2cb7469162",
+      "repository_path": "configs/prm/g1/generated/no_pretrain_pair_cv5_f0_seed242.yaml",
+      "sha256": "6025526c4829be371cef4819f40a3e099abfab493899b29383a270725541a7f5"
+    },
+    {
+      "arm": "corrected_pretrain",
+      "config_sha256": "0c96aeaa70e550b69be2af24336f9fb98bd90954c39149fd134ed41fc7280831",
+      "repository_path": "configs/prm/g1/generated/corrected_pretrain_pair_cv5_f0_seed242.yaml",
+      "sha256": "2eab671227848e4427ac6cd7a47296065fd0a6aecacab1d17322bc619efa97fe"
+    }
+  ],
+  "corrected_pretraining_receipt_sha256": "976e80504e6475166936102fbc7e8d83f837dc60c6a90c1bfb2d8fddb5a9c770",
+  "derived_split_repository_path": "artifacts/prm_g1/splits/pair_cv5_f0_repaired_v1.json",
+  "derived_split_sha256": "1db92c551ed2f4168bf8f4710d99b7f0884b987eee2f88a2e27e043daaf82123",
+  "env_zero_neighbor_mode": "zero_residual_v1",
+  "git_commit": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+  "graph_builder_source_sha256": "86d035ef407cae48c4e375bfcbcfdc7492203529d1529e96be0a5bf23b8038a7",
+  "graph_builder_version": "exact_mic_invariant_triplets_v1",
+  "model_source_sha256": "57f44e468c9420bdc0405daaddd31d79d2d622ca2c195e860631a950328495b3",
+  "repaired_dataset_receipt_sha256": "4e643ea1a38c195c460eb6613f97e31b65f5dd2b1463f87b90ab4d1838e968fe",
+  "repaired_dataset_sha256": "cdcbef7cf1098063b446f4f4c672008961dd6c92e9b6b6054000abc4dceb474a",
+  "schema_version": "prm_g1_pilot_freeze_v1",
+  "source_split_repository_path": "artifacts/prm_protocol_v2/splits/pair_cv5_f0.json",
+  "source_split_sha256": "2a27fd4f3e862d2225048b6255ef3c5d9d2e7b88f326e9cd9bd3da5a0223895a"
+}

@@ -1,133 +1,162 @@
 % !TEX root = ../main.tex
 
+\ifprmresultsready
+
 %----------------------------------------------------------------------
-\subsection{Why a compact model suffices}
+\subsection{Physical reading of the error structure}
 %----------------------------------------------------------------------
 
-\dart{}'s 0.83\,M parameters outperform ALIGNN's 4.03\,M by 30\%.
-Our scaling analysis finds power-law exponents
-$\alpha_\mathrm{data} = -0.40$ for data scaling but
-$\beta_\mathrm{params} \approx -0.01$ for parameter scaling ($R^2 = 0.95$),
-confirming that \emph{more data, not more parameters}, is the primary lever
-in the $N \sim 10^4$ regime.
+The transfer hierarchy has a structural reading.  Recombining familiar
+constituent representations is nearly free; the expensive step is a new
+constituent, and the preregistered novelty analysis attributes the
+host--impurity asymmetry: the sample-matched error gap follows the
+structural novelty of the held-out host --- its composition, cell,
+thickness, and coordination environment relative to the training hosts ---
+and survives controlling for the mechanical training-support asymmetry
+between the two protocols.  A new host changes the structural motif the
+defect embeds into, whereas a new impurity largely re-poses a chemistry
+seen in other combinations.  Development-era case studies of five named
+held-out hosts (Supplemental Material~\cite{supplemental}) trace the same
+gradient concretely: hosts with close structural relatives in training
+transfer at no measurable cost, while the one host with no structural
+relative in the database sits at the failure extreme.
 
-The decomposition of \dart{}'s improvement is instructive:
-of the total 0.137\eV{} reduction (0.516 $\to$ 0.379\eV{}), the
-architectural innovations (gated pooling, environment enrichment,
-pre-norm) contribute ${\sim}0.135$\eV{} (Table~\ref{tab:arch}), while
-the MoE readout adds a further ${\sim}0.002$\eV{}.
-This confirms that targeted inductive bias dominates over capacity
-scaling in data-limited materials science (Fig.~\ref{fig:scaling}).
+These grouped tests do not represent element- or formula-disjoint
+pretraining.  The source task contains reduced-formula matches for 26 IMP2D
+host labels and every IMP2D impurity element, so host- and impurity-held-out
+mean absence from formation-energy supervision, not absence from all earlier
+representation learning.  All conclusions are internal to the retained 44
+hosts and 65 impurities --- a set that contains no nitride host --- and to
+the IMP2D reference conventions.
+
+The class asymmetry is likewise not one phenomenon.  A snugly caged
+impurity sits in a steep, sterically pinned energy well whose depth
+follows the local geometry the model sees directly; a loosely held
+impurity in a large, uniform cage samples a flatter landscape with
+near-degenerate placements, where the energy depends on subtler electronic
+contributions --- which is why interstitial error concentrates in roomy,
+loosely constrained cages while adsorbate error tracks chemical mismatch.
+These are controlled associations, not causal mechanisms; the sign pattern
+is what the frozen analysis established.  The measured descriptors
+attenuate the class gap by roughly a quarter at the point estimate, but
+the attenuation interval includes zero, so the penalty is reported as not
+yet explained: the remainder must live in physics the frozen descriptors
+do not span, such as the anisotropy of the relaxation pattern, which the
+released database does not record.  The impurity-identity audit also makes
+the retained population selective (316 interstitial and 33 adsorbate rows
+removed), so the asymmetry applies to the retained population rather than
+to every released IMP2D row.
+
+The readout result follows the same defect-local logic.  The formation
+energy of Eq.~\eqref{eq:formation_energy} is a defect excess energy --- a
+difference of extensive totals that does not grow with host atom count ---
+so atomwise additive pooling imposes the wrong scaling class, and pooling
+choice is known to matter for intensive and localized
+targets~\cite{buterez2023pooling}.  The extensivity diagnostic supports
+this mechanism at the residual level, with a positive additive
+residual-size slope whose host-clustered interval nevertheless spans zero,
+so the mechanism is suggested rather than established; development-era
+attribution analyses (Supplemental Material~\cite{supplemental}) show the
+same property from inside the model, with occlusion attributions
+concentrated at the impurity atom and decaying with distance from it.
+These are complete-recipe contrasts under one protocol, not a universal
+backbone ranking.
+
+%----------------------------------------------------------------------
+\subsection{Scope of the reranking claim}
+%----------------------------------------------------------------------
+
+For a fixed host--impurity pair, the pristine-host energy and impurity
+chemical potential in Eq.~\eqref{eq:formation_energy} cancel when sites or
+incorporation classes are ranked, which is why useful relative decisions
+coexist with a larger absolute error.  The decisions are conditional on
+the DFT-relaxed candidates released by IMP2D: each geometry and its
+reference energy are outputs of the same completed workflow, so no
+relaxation cost is bypassed, and the results concern retrospective energy
+estimation and reranking --- not structure generation, relaxation,
+thermodynamic populations, kinetics, or synthesizability.
+
+%----------------------------------------------------------------------
+\subsection{Correctness, uncertainty, and remaining scope}
+%----------------------------------------------------------------------
+
+Every number in this paper comes from a repaired representation whose
+permutation invariance and exact minimum-image distances passed an
+independent acceptance audit; the source-task pretraining was rebuilt under
+the same corrected construction.  The diagnostic of the superseded
+implementation is a result in its own right [Fig.~\ref{fig:permutation}]:
+sixteen atom-relabeling permutations moved single predictions by up to
+$8.8$\eV{} and flipped incorporation-class decisions, while the pooled MAE
+moved by less than $10^{-3}$\eV{}.  Aggregate benchmarks are therefore
+nearly blind to representation defects that dominate individual predictions
+--- a caution we believe generalizes beyond this system.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig6_scaling_law.pdf}
-\caption{Scaling analysis from abbreviated 30-epoch training runs.
-  (a) Data scaling at fixed model size ($d = 128$): power-law exponent
-  $\alpha \approx -0.4$ indicates strong data dependence.
-  (b) Parameter scaling at fixed data ($N = 8{,}000$): $\beta$ is near
-  zero, showing negligible improvement from larger models.
-  Both panels confirm that data, not capacity, is the bottleneck in the
-  $N \sim 10^4$ regime.}
-\label{fig:scaling}
+\includegraphics[width=\columnwidth]{fig_permutation_repair.pdf}
+\caption{Atom relabeling as a representation diagnostic.
+  (a) Cumulative distribution of the per-structure prediction spread of the
+  superseded (legacy) implementation across sixteen atom permutations, by
+  incorporation class ($p_{99}=0.46$\eV{}, maximum $8.8$\eV{}); under the
+  repaired representation every structure reproduces its prediction to
+  within the archived round-trip bound ($\leq 1.7\times10^{-5}$\eV{},
+  vertical line).
+  (b) The same axis at aggregate level: the legacy pooled MAE changes by at
+  most $8\times10^{-4}$\eV{} across permutations --- four orders of
+  magnitude below the largest single-structure spread --- while individual
+  relabelings flip 9--19 incorporation-class decisions and 76--102 site
+  selections.  Aggregate benchmarks are nearly blind to this defect.}
+\label{fig:permutation}
 \end{figure}
 
-%----------------------------------------------------------------------
-\subsection{Why auxiliary losses fail}\label{sec:disc_negative}
-%----------------------------------------------------------------------
+The evidence remains limited to neutral adsorbates and interstitials, the
+source database's relaxed structures and reference energies, and a model
+that infers the reference-energy difference from the impurity-containing
+graph alone.  Vacancies, substitutions, charged defects, transition levels,
+migration barriers, finite-temperature free energies, and competing phases
+are outside scope.  Duplicate control removes numerical equivalents
+detected by the two declared structural fingerprints but cannot prove that
+every physical redundancy has been found.  SchNet and the descriptor
+families are aligned comparators under the frozen protocol, not an
+exhaustive survey; a development-era survey (Supplemental
+Material~\cite{supplemental}) additionally evaluated trained equivariant
+models (MACE, ViSNet), ALIGNN, and the MACE-MP-0 foundation model as a
+zero-shot label surrogate --- the latter essentially uncorrelated with the
+IMP2D formation-energy convention --- and none approached the
+defect-centered design at matched scale, consistent with reports that
+universal interatomic potentials degrade on interstitial-like environments
+far from their bulk training distributions.  In absolute terms, the
+repaired random-split and pair-held-out errors sit in the
+few-tenths-of-an-eV band reported for specialized defect formation-energy
+models on bulk and low-dimensional
+benchmarks~\cite{witman2023,kiyohara2025,kazeev2023}; the grouped regimes
+report the additional cost of chemical novelty that pooled numbers do not
+expose.  Internal ensemble uncertainty (Supplemental
+Material~\cite{supplemental}) supports marginal calibration and risk
+ranking within the retained population, not host-conditional or chemically
+shifted coverage.
 
-A striking finding is that all six training-strategy innovations
-(LDS, focal MAE, RnC contrastive, heteroscedastic uncertainty, and their
-combinations) significantly \emph{worsen} performance.
-Per-range analysis reveals a consistent mechanism: these methods
-improve accuracy on rare high-$\ef$ samples ($[7, 25)$\eV{}) at the
-cost of degrading common low-$\ef$ samples ($[0, 2)$\eV{}).
-Since the low-$\ef$ range contains 48.5\% of test data vs.\ 7.1\%
-for the high-$\ef$ range, the net effect is always negative.
+The single-database scope is itself an evidence-based protocol choice.
+Development-era experiments (Supplemental Material~\cite{supplemental})
+found zero-shot cross-database evaluation on JARVIS vacancy data failing
+at the 2--3\,eV level with negative $R^2$; few-shot fine-tuning lost to
+training from scratch; and multi-source joint training bought small
+in-distribution gains at the price of degraded held-out-host transfer.
+The barrier is one of reference conventions and defect-class mismatch.
+The most direct next test is therefore a target-matched external set:
+structures, chemical potentials, convergence settings, and target
+definition matching the IMP2D convention, generated independently of their
+reference energies.  A development-era pilot (Supplemental
+Material~\cite{supplemental}) has already exercised that test end to end
+with independent plane-wave calculations on model-ranked candidates; it
+located the barrier in per-element reference conventions and confirmed
+that model ranking concentrates first-principles effort well above the
+pool base rate.  The remaining step is convention matching, not new
+machinery.
 
-LDS exemplifies this trade-off most clearly: it improves the $[7, 25)$
-range by 0.126\eV{} (not significant, $p = 0.16$) while degrading
-$[0, 2)$ by 0.074\eV{} ($p < 0.001$)---a 1.7$\times$ net loss.
-Focal MAE shows the same pattern with smaller magnitude.
-Heteroscedastic uncertainty produces the most extreme failure: the
-variance prediction head competes with the mean prediction head for
-model capacity, catastrophically degrading the $[7, 25)$ range by
-0.695\eV{} ($p < 0.001$).
+\else
 
-These results caution against na\"{i}vely importing imbalanced-learning
-techniques from computer vision to materials science: the underlying
-assumption---that improving tail performance is costless for the
-head---does not hold when model capacity is constrained and the
-regression target spans multiple orders of magnitude.
+\noindent\textit{The numerical discussion is unavailable because the audited
+result bundle is not present.}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_per_range.pdf}
-\caption{Per-range MAE decomposition explaining why auxiliary losses
-  fail.  LDS and focal MAE sacrifice accuracy on the dominant
-  $[0, 2)$\eV{} range (48.5\% of data) for marginal gains at the tail.
-  Heteroscedastic uncertainty degrades all ranges through capacity
-  competition.}
-\label{fig:per_range}
-\end{figure}
-
-%----------------------------------------------------------------------
-\subsection{Ensemble diversity from architectural innovation}
-%----------------------------------------------------------------------
-
-Although no single innovation significantly outperforms the \dart{}
-baseline, four innovation variants (V4 MoE, V14 JK, V6 Physics,
-V3 DefType) are selected into the optimal 8-model ensemble, reducing
-the MAE from 0.349\eV{} (prior best) to 0.344\eV{}.
-This resolves an apparent paradox: innovations that are individually
-neutral become collectively valuable through error decorrelation.
-
-The mechanism is clear from the attention analysis: the baseline
-concentrates 99.68\% of pooling attention on the defect atom, while
-V3 (11.4\%) and V6 (6.0\%) distribute attention more broadly.
-These distinct information-processing strategies produce diverse error
-patterns---the prerequisite for effective ensembling.
-
-%----------------------------------------------------------------------
-\subsection{Self-attention as learned potential summation}
-%----------------------------------------------------------------------
-
-The global attention layers' success can be understood through the
-``neural potential summation'' framework~\cite{crystalformer2024}:
-the distance bias $\phi_\mathrm{bias}(d_{ij}^{\mathrm{PBC}})$ acts
-as a non-parametric interatomic potential gating information flow.
-For 2D point defects, whose strain fields decay as ${\sim}1/r^2$,
-this mechanism naturally allocates higher attention to nearby atoms
-while retaining non-zero coupling to distant atoms---precisely matching
-the physics of defect-induced perturbation.
-
-V14's JK weights [0.30, 0.31, 0.39] empirically confirm this:
-the model assigns the highest weight to the deepest global layer,
-where long-range interactions have been most thoroughly processed.
-
-%----------------------------------------------------------------------
-\subsection{Limitations and outlook}
-%----------------------------------------------------------------------
-
-Several limitations warrant acknowledgment:
-(1)~IMP2D covers only 44 host materials with substitutional adsorbates
-and interstitials; vacancy-type defects are absent from both training
-and evaluation.
-(2)~We predict only defect formation energies; extending to charge
-transition levels, migration barriers, and optical transition energies
-would broaden utility.
-(3)~The OOD evaluation is limited to the G6-TMD subfamily; broader
-cross-family assessment awaits datasets with sufficient diversity.
-(4)~The 8-model ensemble, while efficient, still requires $8\times$
-inference cost; knowledge distillation into a single student model
-would be desirable for deployment.
-
-Looking forward, integration with active learning could efficiently expand
-the training distribution into unexplored host--dopant space, guided by
-calibrated uncertainty.
-The architectural innovations demonstrated here---particularly the gated
-pooling and environment enrichment---are transferable to other
-defect-property prediction tasks (formation energies in 3D, migration
-barriers, charged defects) and other crystal-property domains where local
-perturbations drive global behavior.
-
+\fi

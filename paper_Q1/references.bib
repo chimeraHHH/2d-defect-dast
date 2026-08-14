@@ -5,6 +5,29 @@
 
 % --- Datasets and benchmarks ---
 
+@article{freysoldt2014,
+  title     = {First-principles calculations for point defects in solids},
+  author    = {Freysoldt, Christoph and Grabowski, Blazej and Hickel, Tilmann
+               and Neugebauer, J{"o}rg and Kresse, Georg and Janotti, Anderson
+               and {Van de Walle}, Chris G.},
+  journal   = {Reviews of Modern Physics},
+  volume    = {86},
+  pages     = {253--305},
+  year      = {2014},
+  doi       = {10.1103/RevModPhys.86.253},
+}
+
+@article{komsa2015,
+  title     = {Native defects in bulk and monolayer {MoS$_2$} from first
+               principles},
+  author    = {Komsa, Hannu-Pekka and Krasheninnikov, Arkady V.},
+  journal   = {Physical Review B},
+  volume    = {91},
+  pages     = {125304},
+  year      = {2015},
+  doi       = {10.1103/PhysRevB.91.125304},
+}
+
 @article{imp2d2023,
   title     = {Absorption versus adsorption: high-throughput computation of
                impurities in {2D} materials},
@@ -15,6 +38,27 @@
   pages     = {26},
   year      = {2023},
   doi       = {10.1038/s41699-023-00380-6},
+}
+
+@misc{imp2d_dataset2022,
+  title     = {Interstitial and Adsorbate Structure Database},
+  author    = {Bertoldo, Fabian Felix and Davidsson, Joel and Thygesen,
+               Kristian Sommer and Armiento, Rickard},
+  publisher = {Technical University of Denmark},
+  year      = {2022},
+  doi       = {10.11583/DTU.19692238.v2},
+  url       = {https://data.dtu.dk/articles/dataset/19692238/2},
+  note      = {Version 2; dataset},
+}
+
+@misc{dart_repository2026,
+  title        = {{DART}: Impurity-incorporation-energy modeling and audited
+                  evaluation artifacts},
+  author       = {Hua, Yiming},
+  year         = {2026},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/chimeraHHH/2d-defect-dast/tree/7bd7905f60513fc4f9bb9a7bfe0dd8cd9c08c5b1},
+  note         = {Commit 7bd7905f60513fc4f9bb9a7bfe0dd8cd9c08c5b1},
 }
 
 % --- Baseline models ---
@@ -39,16 +83,62 @@
   volume    = {148},
   pages     = {241722},
   year      = {2018},
+  doi       = {10.1063/1.5019779},
 }
 
-@article{elalouani2024,
+@article{buterez2023pooling,
+  title     = {Modelling local and general quantum mechanical properties with
+               attention-based pooling},
+  author    = {Buterez, David and Janet, Jon Paul and Kiddle, Steven J. and
+               Oglic, Dino and Li{\`o}, Pietro},
+  journal   = {Communications Chemistry},
+  volume    = {6},
+  number    = {1},
+  pages     = {262},
+  year      = {2023},
+  doi       = {10.1038/s42004-023-01045-7},
+}
+
+@misc{supplemental,
+  note      = {See Supplemental Material at [URL will be inserted by
+               publisher] for descriptive error heterogeneity and the
+               controlled SchNet graph-readout sensitivity protocol,
+               fold-resolved errors, and size--error diagnostics.},
+}
+
+@article{kesorn2024,
   title     = {Formation energy prediction of neutral single-atom impurities
                in {2D} materials using tree-based machine learning},
-  author    = {El~Alouani, Hamza and Dau, Hoang-Anh and others},
+  author    = {Kesorn, Aniwat and Hunkao, Rutchapon and Na Talang, Cheewawut
+               and Cholsuk, Chanaprom and Sinsarp, Asawin and Vogl, Tobias
+               and Suwanna, Sujin and Yuma, Suraphong},
   journal   = {Machine Learning: Science and Technology},
   volume    = {5},
-  pages     = {035061},
+  number    = {3},
+  pages     = {035039},
   year      = {2024},
+  doi       = {10.1088/2632-2153/ad66ae},
+}
+
+@article{elalouani2026,
+  title     = {Defect formation energy of impurities in {2D} materials: How
+               does data engineering shape machine learning model selection?},
+  author    = {{El Alouani}, A. and Al Khalfioui, M. and Michon, A. and
+               V{\'e}zian, S. and Boucaud, P. and Dau, M. T.},
+  journal   = {Materials Today Physics},
+  volume    = {61},
+  pages     = {102006},
+  year      = {2026},
+  doi       = {10.1016/j.mtphys.2025.102006},
+}
+
+@inproceedings{ke2017lightgbm,
+  title     = {{LightGBM}: A Highly Efficient Gradient Boosting Decision Tree},
+  author    = {Ke, Guolin and Meng, Qi and Finley, Thomas and Wang, Taifeng and
+               Chen, Wei and Ma, Weidong and Ye, Qiwei and Liu, Tie-Yan},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
 }
 
 % --- Atomic embeddings ---
@@ -65,20 +155,28 @@
   doi       = {10.1038/s41467-025-56481-x},
 }
 
-% --- Defect ML (3D) ---
-
-@article{definet2025,
-  title     = {{DefiNet}: Equivariant Graph Neural Network for Predicting
-               Defect Formation Energies in Crystalline Materials},
-  author    = {Park, Jaehyeok and Kim, Jaesun and Kang, Yoonsu and
-               Lee, In-Ho and Han, Seungwu},
-  journal   = {Chemistry of Materials},
-  volume    = {37},
-  number    = {2},
-  pages     = {694--703},
-  year      = {2025},
-  doi       = {10.1021/acs.chemmater.4c02907},
+@article{jarvis2020,
+  title     = {The Joint Automated Repository for Various Integrated
+               Simulations ({JARVIS}) for Data-Driven Materials Design},
+  author    = {Choudhary, Kamal and Garrity, Kevin F. and Reid, Andrew C. E.
+               and DeCost, Brian and Biacchi, Adam J. and Hight Walker,
+               Angela R. and Trautt, Zachary and Hattrick-Simpers, Jason and
+               Kusne, A. Gilad and Centrone, Andrea and Davydov, Albert and
+               Jiang, Jie and Pachter, Ruth and Cheon, Gowoon and Reed, Evan
+               and Agrawal, Ankit and Qian, Xiaofeng and Sharma, Vinit and
+               Zhuang, Houlong and Kalinin, Sergei V. and Sumpter, Bobby G.
+               and Pilania, Ghanshyam and Acar, Pinar and Mandal, Subhasish
+               and Haule, Kristjan and Vanderbilt, David and Rabe, Karin and
+               Tavazza, Francesca},
+  journal   = {npj Computational Materials},
+  volume    = {6},
+  number    = {1},
+  pages     = {173},
+  year      = {2020},
+  doi       = {10.1038/s41524-020-00440-1},
 }
+
+% --- Defect ML (3D) ---
 
 @article{fang2025,
   title     = {Leveraging Persistent Homology Features for Accurate Defect
@@ -98,8 +196,21 @@
   author    = {Kiyohara, Shin and Shibui, Chisa and Bae, Soungmin and
                Kumagai, Yu},
   journal   = {Physical Review Letters},
+  volume    = {135},
+  pages     = {246101},
   year      = {2025},
   doi       = {10.1103/h66h-y5k6},
+}
+
+@article{berger2025screening,
+  title     = {Screening of Material Defects Using Universal
+               Machine-Learning Interatomic Potentials},
+  author    = {Berger, Ethan and Bagheri, Mohammad and Komsa, Hannu-Pekka},
+  journal   = {Small},
+  volume    = {21},
+  pages     = {e03956},
+  year      = {2025},
+  doi       = {10.1002/smll.202503956},
 }
 
 @article{witman2023,
@@ -119,19 +230,25 @@
   title     = {Accelerating defect predictions in semiconductors using graph
                neural networks},
   author    = {Rahman, Md Habibur and Gollapalli, Prince and Manganaris,
-               Panayotis and others},
+               Panayotis and Yadav, Satyesh Kumar and Pilania, Ghanshyam and
+               DeCost, Brian and Choudhary, Kamal and
+               Mannodi-Kanakkithodi, Arun},
   journal   = {APL Machine Learning},
   volume    = {2},
   number    = {1},
   pages     = {016122},
   year      = {2024},
+  doi       = {10.1063/5.0176333},
 }
 
 @article{kazeev2023,
   title     = {Sparse representation for machine learning the properties of
                defects in {2D} materials},
-  author    = {Kazeev, Nikita and Al-Maeeni, Aqeel R. and Romanov, Igor and
-               others},
+  author    = {Kazeev, Nikita and {Al-Maeeni}, Abdalaziz Rashid and
+               Romanov, Ignat and Faleev, Maxim and Lukin, Ruslan and
+               Tormasov, Alexander and {Castro Neto}, A. H. and
+               Novoselov, Kostya S. and Huang, Pengru and
+               Ustyuzhanin, Andrey},
   journal   = {npj Computational Materials},
   volume    = {9},
   pages     = {113},
@@ -214,6 +331,75 @@
 
 % --- Training and calibration ---
 
+@article{peterson2017,
+  title     = {Addressing uncertainty in atomistic machine learning},
+  author    = {Peterson, Andrew A. and Christensen, Rune and
+               Khorshidi, Alireza},
+  journal   = {Physical Chemistry Chemical Physics},
+  volume    = {19},
+  number    = {18},
+  pages     = {10978--10985},
+  year      = {2017},
+  doi       = {10.1039/C7CP00375G},
+}
+
+@inproceedings{lakshminarayanan2017,
+  title     = {Simple and Scalable Predictive Uncertainty Estimation Using
+               Deep Ensembles},
+  author    = {Lakshminarayanan, Balaji and Pritzel, Alexander and
+               Blundell, Charles},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+}
+
+@article{angelopoulos2023,
+  title     = {Conformal Prediction: A Gentle Introduction},
+  author    = {Angelopoulos, Anastasios N. and Bates, Stephen},
+  journal   = {Foundations and Trends in Machine Learning},
+  volume    = {16},
+  number    = {4},
+  pages     = {494--591},
+  year      = {2023},
+  doi       = {10.1561/2200000101},
+}
+
+@article{hu2022,
+  title     = {Robust and scalable uncertainty estimation with conformal
+               prediction for machine-learned interatomic potentials},
+  author    = {Hu, Yuge and Musielewicz, Joseph and Ulissi, Zachary W. and
+               Medford, Andrew J.},
+  journal   = {Machine Learning: Science and Technology},
+  volume    = {3},
+  number    = {4},
+  pages     = {045028},
+  year      = {2022},
+  doi       = {10.1088/2632-2153/aca7b1},
+}
+
+@article{grasselli2025,
+  title     = {Uncertainty in the era of machine learning for atomistic
+               modeling},
+  author    = {Grasselli, Federico and Chong, Sanggyu and Kapil, Venkat and
+               Bonfanti, Silvia and Rossi, Kevin},
+  journal   = {Digital Discovery},
+  volume    = {4},
+  number    = {10},
+  pages     = {2654--2675},
+  year      = {2025},
+  doi       = {10.1039/D5DD00102A},
+}
+
+@article{elyaniv2010,
+  title     = {On the Foundations of Noise-Free Selective Classification},
+  author    = {El-Yaniv, Ran and Wiener, Yair},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {11},
+  number    = {53},
+  pages     = {1605--1641},
+  year      = {2010},
+}
+
 @article{swa2018,
   title     = {Averaging Weights Leads to Wider Optima and Better
                Generalization},
@@ -257,4 +443,15 @@
   pages     = {144},
   year      = {2024},
   doi       = {10.1038/s41524-024-01316-4},
+}
+
+@article{li2024mdhit,
+  title     = {{MD-HIT}: Machine learning for material property prediction
+               with dataset redundancy control},
+  author    = {Li, Qin and Fu, Nihang and Omee, Sadman Sadeed and Hu, Jianjun},
+  journal   = {npj Computational Materials},
+  volume    = {10},
+  pages     = {245},
+  year      = {2024},
+  doi       = {10.1038/s41524-024-01426-z},
 }

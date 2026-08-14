@@ -1,0 +1,640 @@
+{
+  "dataset": {
+    "container_type": "list",
+    "embedded_meta": null,
+    "file_name": "cleaned_dataset.pkl",
+    "n_modeling_samples": 10572,
+    "n_samples": 10641,
+    "path_recorded": "/storage/ssd/metaiot_guest/yiminghua/project/data/processed/cleaned_dataset.pkl",
+    "sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+    "size_bytes": 829736567
+  },
+  "duplicates": {
+    "canonical_deduplication": {
+      "excluded_indices": [
+        1397,
+        1401,
+        1411,
+        1417,
+        1488,
+        1493,
+        1498,
+        1514,
+        1515,
+        1530,
+        1574,
+        1579,
+        1586,
+        1605,
+        1625,
+        1640,
+        1652,
+        1657,
+        1677,
+        1678,
+        1679,
+        1723,
+        1753,
+        1755,
+        1775,
+        1778,
+        1812,
+        1819,
+        1834,
+        1878,
+        1983,
+        2051,
+        2086,
+        2101,
+        2106,
+        2114,
+        2139,
+        2156,
+        2165,
+        2201,
+        2214,
+        2264,
+        2362,
+        2373,
+        2375,
+        2379,
+        2384,
+        2391,
+        2450,
+        2454,
+        2463,
+        2464,
+        2471,
+        2474,
+        2489,
+        2494,
+        2500,
+        2543,
+        2548,
+        2627,
+        2629,
+        2633,
+        2647,
+        2659,
+        2676,
+        2986,
+        3431,
+        3565,
+        6114
+      ],
+      "max_target_delta_eV_within_duplicate_group": 0.03752713000000085,
+      "n_duplicate_excluded": 65,
+      "n_excluded": 69,
+      "n_raw_component_excluded": 4,
+      "n_retained": 10572,
+      "raw_component_excluded_indices": [
+        2986,
+        3431,
+        3565,
+        6114
+      ],
+      "strategy": "retain the lowest sample index in each connected component of coordinate and invariant-distance duplicate groups"
+    },
+    "fingerprint_note": "Union of (i) atom-order/cell/Cartesian-coordinate hashes rounded to 1e-6 and (ii) permutation/translation-invariant, element-labelled periodic pair-distance spectra rounded to 1e-4 Angstrom.",
+    "host_dopant_defecttype_site": {
+      "max_multiplicity": 1,
+      "repeated_groups": 0,
+      "samples_in_repeated_groups": 0,
+      "unique": 10641
+    },
+    "id": {
+      "max_multiplicity": 1,
+      "repeated_groups": 0,
+      "samples_in_repeated_groups": 0,
+      "unique": 10641
+    },
+    "invariant_element_pair_distance_fingerprint": {
+      "max_multiplicity": 2,
+      "repeated_groups": 63,
+      "samples_in_repeated_groups": 126,
+      "unique": 10578
+    },
+    "rounded_coordinate_fingerprint": {
+      "max_multiplicity": 2,
+      "repeated_groups": 58,
+      "samples_in_repeated_groups": 116,
+      "unique": 10583
+    },
+    "semantic_groups_with_target_conflicts": 0,
+    "unique_id": {
+      "max_multiplicity": 1,
+      "repeated_groups": 0,
+      "samples_in_repeated_groups": 0,
+      "unique": 10641
+    }
+  },
+  "formation_energy_provenance": {
+    "all_modeling_rows_formula_verified": true,
+    "auditable_from_clean_pickle": false,
+    "raw_database_audit": {
+      "filter_replay": {
+        "missing_or_nonfinite_eform": 1828,
+        "not_converged": 4551,
+        "outside_abs_20_eV": 344,
+        "raw_rows": 17364,
+        "valid_after_filter": 10641
+      },
+      "formula": "eform = en2 - hostenergy - dopant_chemical_potential",
+      "formula_component_exceptions": [
+        {
+          "defecttype": "interstitial",
+          "dopant": "Ti",
+          "eform_eV": 6.8851534949999165,
+          "en2": 0.0,
+          "host": "Nb4C3",
+          "reason": "en2_zero_sentinel",
+          "row_id": 4741,
+          "site": "int1"
+        },
+        {
+          "defecttype": "interstitial",
+          "dopant": "Ti",
+          "eform_eV": 8.982057374999814,
+          "en2": 0.0,
+          "host": "Nb4C3",
+          "reason": "en2_zero_sentinel",
+          "row_id": 5977,
+          "site": "int2"
+        },
+        {
+          "defecttype": "adsorbate",
+          "dopant": "Re",
+          "eform_eV": 7.08681764,
+          "en2": 0.0,
+          "host": "Nb2CO2",
+          "reason": "en2_zero_sentinel",
+          "row_id": 6351,
+          "site": "ads0"
+        },
+        {
+          "defecttype": "interstitial",
+          "dopant": "Y",
+          "eform_eV": 17.20439837000001,
+          "en2": 0.0,
+          "host": "TiO2",
+          "reason": "en2_zero_sentinel",
+          "row_id": 10736,
+          "site": "int0"
+        }
+      ],
+      "max_cleaned_target_abs_delta_eV": 0.0,
+      "max_formula_abs_delta_eV": 2.2737367544323206e-13,
+      "mean_formula_abs_delta_eV": 1.356631972234457e-15,
+      "metadata_mismatches": 0,
+      "n_formula_component_exceptions": 4,
+      "n_formula_verified": 10637,
+      "path_recorded": "/home/huayiming/Workspace/yiminghua/project/data/raw/imp2d.db",
+      "sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4",
+      "size_bytes": 71819264,
+      "valid_id_set_matches_cleaned": true
+    },
+    "status": "cleaned targets verified against the filtered ASE database; all rows lacking auditable raw energy components are excluded from modeling splits"
+  },
+  "metadata_cardinality": {
+    "defecttype": 2,
+    "dopant": 65,
+    "host": 44,
+    "site": 12,
+    "spacegroup": 9,
+    "supercell": 3
+  },
+  "metadata_counts": {
+    "defecttype": {
+      "adsorbate": 6959,
+      "interstitial": 3682
+    },
+    "dopant": {
+      "Ag": 166,
+      "Al": 186,
+      "As": 169,
+      "Au": 160,
+      "B": 224,
+      "Ba": 143,
+      "Be": 218,
+      "Bi": 38,
+      "Br": 174,
+      "C": 210,
+      "Ca": 184,
+      "Cd": 163,
+      "Cl": 186,
+      "Co": 184,
+      "Cr": 184,
+      "Cs": 156,
+      "Cu": 163,
+      "F": 216,
+      "Fe": 171,
+      "Ga": 143,
+      "Ge": 148,
+      "H": 247,
+      "Hf": 151,
+      "Hg": 144,
+      "I": 152,
+      "In": 35,
+      "Ir": 129,
+      "K": 166,
+      "Li": 213,
+      "Lu": 184,
+      "Mg": 190,
+      "Mn": 190,
+      "Mo": 155,
+      "N": 215,
+      "Na": 82,
+      "Nb": 147,
+      "Ni": 169,
+      "O": 225,
+      "Os": 145,
+      "P": 186,
+      "Pb": 63,
+      "Pd": 163,
+      "Pt": 155,
+      "Rb": 163,
+      "Re": 174,
+      "Rh": 151,
+      "Ru": 163,
+      "S": 187,
+      "Sb": 155,
+      "Sc": 170,
+      "Se": 171,
+      "Si": 179,
+      "Sn": 136,
+      "Sr": 158,
+      "Ta": 147,
+      "Tc": 158,
+      "Te": 151,
+      "Ti": 169,
+      "Tl": 139,
+      "V": 175,
+      "W": 156,
+      "Xe": 167,
+      "Y": 163,
+      "Zn": 157,
+      "Zr": 160
+    },
+    "host": {
+      "As2": 235,
+      "Bi2I6": 52,
+      "BiITe": 57,
+      "C2H2": 231,
+      "Cr2I6": 334,
+      "Ge2": 185,
+      "Ge2H2": 228,
+      "Hf2Te6": 430,
+      "HfS2": 282,
+      "HfSe2": 281,
+      "Mo2CO2": 177,
+      "MoS2": 308,
+      "MoSSe": 464,
+      "MoSe2": 301,
+      "MoTe2": 265,
+      "Nb2CO2": 199,
+      "Nb4C3": 215,
+      "NbS2": 354,
+      "NbSe2": 390,
+      "NiSe2": 259,
+      "P4": 182,
+      "PbI2": 69,
+      "Pd2Se4": 167,
+      "PtS2": 281,
+      "PtSe2": 268,
+      "Re4S8": 241,
+      "Re4Se8": 264,
+      "Si2": 236,
+      "Sn2": 199,
+      "SnS2": 254,
+      "SnSe2": 197,
+      "TaS2": 219,
+      "TaSe2": 222,
+      "Ti2CO2": 1,
+      "TiO2": 234,
+      "TiS2": 237,
+      "V2CO2": 211,
+      "W2Se4": 234,
+      "W2Te4": 276,
+      "WS2": 261,
+      "WSe2": 310,
+      "WTe2": 274,
+      "ZrS2": 273,
+      "ZrSe2": 284
+    }
+  },
+  "schema_version": "prm_data_audit_v1",
+  "splits": [
+    {
+      "counts": {
+        "excluded": 0,
+        "test": 1065,
+        "train": 8512,
+        "val": 1064
+      },
+      "protocol": "historical_random_80_10_10",
+      "split_id": "id_historical_s42"
+    },
+    {
+      "counts": {
+        "excluded": 10385,
+        "test": 64,
+        "train": 128,
+        "val": 64
+      },
+      "protocol": "smoke_only",
+      "split_id": "smoke_protocol"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
+        "val": 1057
+      },
+      "protocol": "random_80_10_10",
+      "split_id": "id_repeat_s42"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
+        "val": 1057
+      },
+      "protocol": "random_80_10_10",
+      "split_id": "id_repeat_s43"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
+        "val": 1057
+      },
+      "protocol": "random_80_10_10",
+      "split_id": "id_repeat_s44"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
+        "val": 1057
+      },
+      "protocol": "random_80_10_10",
+      "split_id": "id_repeat_s45"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 1058,
+        "train": 8457,
+        "val": 1057
+      },
+      "protocol": "random_80_10_10",
+      "split_id": "id_repeat_s46"
+    },
+    {
+      "counts": {
+        "calibration": 528,
+        "excluded": 69,
+        "test": 1058,
+        "train": 7929,
+        "val": 1057
+      },
+      "protocol": "random_75_10_5_10_deduplicated_with_heldout_calibration",
+      "split_id": "uq_calibration_s62"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2115,
+        "train": 6342,
+        "val": 2115
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2115,
+        "train": 6343,
+        "val": 2114
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6343,
+        "val": 2115
+      },
+      "protocol": "random_cv5_oof",
+      "split_id": "id_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2095,
+        "train": 6389,
+        "val": 2088
+      },
+      "protocol": "host_grouped_cv5",
+      "split_id": "host_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2088,
+        "train": 6349,
+        "val": 2135
+      },
+      "protocol": "host_grouped_cv5",
+      "split_id": "host_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2135,
+        "train": 6312,
+        "val": 2125
+      },
+      "protocol": "host_grouped_cv5",
+      "split_id": "host_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2125,
+        "train": 6318,
+        "val": 2129
+      },
+      "protocol": "host_grouped_cv5",
+      "split_id": "host_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2129,
+        "train": 6348,
+        "val": 2095
+      },
+      "protocol": "host_grouped_cv5",
+      "split_id": "host_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2110,
+        "train": 6377,
+        "val": 2085
+      },
+      "protocol": "dopant_grouped_cv5",
+      "split_id": "dopant_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2085,
+        "train": 6405,
+        "val": 2082
+      },
+      "protocol": "dopant_grouped_cv5",
+      "split_id": "dopant_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2082,
+        "train": 6366,
+        "val": 2124
+      },
+      "protocol": "dopant_grouped_cv5",
+      "split_id": "dopant_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2124,
+        "train": 6277,
+        "val": 2171
+      },
+      "protocol": "dopant_grouped_cv5",
+      "split_id": "dopant_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2171,
+        "train": 6291,
+        "val": 2110
+      },
+      "protocol": "dopant_grouped_cv5",
+      "split_id": "dopant_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2115,
+        "train": 6342,
+        "val": 2115
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f0"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2115,
+        "train": 6343,
+        "val": 2114
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f1"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f2"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6344,
+        "val": 2114
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f3"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 2114,
+        "train": 6343,
+        "val": 2115
+      },
+      "protocol": "pair_grouped_cv5",
+      "split_id": "pair_cv5_f4"
+    },
+    {
+      "counts": {
+        "excluded": 69,
+        "test": 365,
+        "train": 9815,
+        "val": 392
+      },
+      "protocol": "matrix_completion_block",
+      "split_id": "chemistry_block_g6x3d"
+    }
+  ],
+  "target_eV": {
+    "all_finite": true,
+    "max": 19.885423434999808,
+    "mean": 2.611792320395049,
+    "min": -10.201078370000005,
+    "n_above_7_eV": 838,
+    "n_abs_above_20_eV": 0,
+    "n_negative": 1630,
+    "quantiles": {
+      "0.0": -10.201078370000005,
+      "0.01": -2.9505080889999826,
+      "0.05": -1.4048448124999755,
+      "0.25": 0.6369915374999966,
+      "0.5": 2.128391153333331,
+      "0.75": 3.9669247949999855,
+      "0.95": 8.04651089500001,
+      "0.99": 14.601709146999996,
+      "1.0": 19.885423434999808
+    },
+    "std": 3.1973268611612156
+  }
+}

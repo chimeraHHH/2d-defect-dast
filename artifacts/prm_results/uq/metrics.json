@@ -1,0 +1,442 @@
+{
+  "archive_policy": {
+    "checkpoint": "SHA-256 recorded; binary retained outside Git",
+    "included": [
+      "run_manifest.json",
+      "metrics.json",
+      "split_indices.npz",
+      "val_predictions.npz",
+      "calibration_predictions.npz",
+      "test_predictions.npz"
+    ]
+  },
+  "archived_runs": [
+    {
+      "artifacts": {
+        "calibration_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/calibration_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/calibration_predictions.npz",
+          "sha256": "c4af4c551c7f7d24fa76bc9adbc16069dcdb203cb4bc8edbf2a3e3f167f89a71"
+        },
+        "manifest": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/run_manifest.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/run_manifest.json",
+          "sha256": "006bf7e41be8409650b130fcb4417d6d50cbd0958370d29f0de044c499ae6488"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/metrics.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/metrics.json",
+          "sha256": "77d6d0c09efb35a6e542bdf512139c89587466c93a092943a9dd067937f450d0"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/split_indices.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/split_indices.npz",
+          "sha256": "92005414572b355d39b975a669c6e2827e1e8a92d4082431031c4de19e0da6f4"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/test_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/test_predictions.npz",
+          "sha256": "6f8175e15bacfc2a410040b25ef2f630b3e8d79f23d666c046351361a31ad85e"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed442/val_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed442/val_predictions.npz",
+          "sha256": "63ed7864d2d1baa52b88bf86d0fe996860669a0e792040427a0c0328d3418475"
+        }
+      },
+      "config_sha256": "b59a297e8c6df454e48fddf6135c68cfd887bef74491682bddf922c3ea05fd8e",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "5f79a7429c34a1d1256833270bf76d8f21816095c126d49583832b4e2782a2fc"
+        }
+      },
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed442"
+    },
+    {
+      "artifacts": {
+        "calibration_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/calibration_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/calibration_predictions.npz",
+          "sha256": "dad4bc468faee31bb2786e3c83a3ca982e5dfbdb119046d717725434d8b53da4"
+        },
+        "manifest": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/run_manifest.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/run_manifest.json",
+          "sha256": "da0213def4fd4305919babece283756c1bc974841726f3227b311df732b329ee"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/metrics.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/metrics.json",
+          "sha256": "945ef79197430fc2bc9e2fe5ac41475e62d296a486d8f680e753694adc6abf03"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/split_indices.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/split_indices.npz",
+          "sha256": "92005414572b355d39b975a669c6e2827e1e8a92d4082431031c4de19e0da6f4"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/test_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/test_predictions.npz",
+          "sha256": "28525ef72dab39b220127f84c931800ee668992801d0d9df860b5c9d45f4334a"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed443/val_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed443/val_predictions.npz",
+          "sha256": "9e6e8cd9a8927f3994e94485d9348ce3af94e587322c9174f40ce44f8f75051a"
+        }
+      },
+      "config_sha256": "848379b02d107a8e1215b88f8fa9f8a55649810ccf8b47005756ea169eb5ada2",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "f644424da51eb8629491a734fc1796ec5cc76f76fcf09b7ca37be2985f9d2e0d"
+        }
+      },
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed443"
+    },
+    {
+      "artifacts": {
+        "calibration_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/calibration_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/calibration_predictions.npz",
+          "sha256": "4e9494c294a78acbb359faf8f154f8d8d8aaff4a4510342c558df30252bf813d"
+        },
+        "manifest": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/run_manifest.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/run_manifest.json",
+          "sha256": "0d855e501290ee6faddcb905f57fe6702fc5d811b2c966173617c4c46fb69f7d"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/metrics.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/metrics.json",
+          "sha256": "4d99eb58f9908905bfeec1c541e68dfaabf7f5c88c336b5c8f96c6d1c462f321"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/split_indices.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/split_indices.npz",
+          "sha256": "92005414572b355d39b975a669c6e2827e1e8a92d4082431031c4de19e0da6f4"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/test_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/test_predictions.npz",
+          "sha256": "0ccaee967273b057131de33d2d37bda92fd9ab02404b98014e5800e98fee3d52"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed444/val_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed444/val_predictions.npz",
+          "sha256": "79662533e7f3dbc816df7366b94e41fb11955cca546e72bb918aebdda0f60e87"
+        }
+      },
+      "config_sha256": "e0539c77a6d13f0944481e952d1a8b1ff9ab8528f2ce5e8d737e19c383bd80cd",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "39f518adaa8eb4a21516eaeedd60d59fa9f8a3f3678f6fe6eacacd0d179221e4"
+        }
+      },
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed444"
+    },
+    {
+      "artifacts": {
+        "calibration_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/calibration_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/calibration_predictions.npz",
+          "sha256": "2c518017d46e0fa0f42ea52de064a05b035e6ef45be73cabe962fbb055d73fa7"
+        },
+        "manifest": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/run_manifest.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/run_manifest.json",
+          "sha256": "f991d57c38f70de352ea1b0fee06635759de8dce6423093e27b59458d859ce03"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/metrics.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/metrics.json",
+          "sha256": "ace752f0cb3b3ba56f37729f4b630ca51facb8b08c14472ad0afa0a217546644"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/split_indices.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/split_indices.npz",
+          "sha256": "92005414572b355d39b975a669c6e2827e1e8a92d4082431031c4de19e0da6f4"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/test_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/test_predictions.npz",
+          "sha256": "4904a280a8dc10ee111d2541c988dc883ab302ea39afd626c599296625d0c794"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed445/val_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed445/val_predictions.npz",
+          "sha256": "7418d3a7d90b2572c87fd1fff7a83a0a66edd7027da69825239a6cc240349b7f"
+        }
+      },
+      "config_sha256": "581212fed7c503f81c23747ae0c9f540aef2d07c398ed2a97a139792200c4e69",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "85aebf4e451483a841ff9b39b67e9bcba01feb979df53a9088868df7de74e5a9"
+        }
+      },
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed445"
+    },
+    {
+      "artifacts": {
+        "calibration_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/calibration_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/calibration_predictions.npz",
+          "sha256": "2bf3bfa6b9e7c36bf7a36a2c6f205030f8af4046e81e1f9c09ca8e281df5f79b"
+        },
+        "manifest": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/run_manifest.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/run_manifest.json",
+          "sha256": "15d6a83a594acfffc5dc9c38a816785b562c3986a2b41939b7c7d4313f3862b5"
+        },
+        "metrics": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/metrics.json",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/metrics.json",
+          "sha256": "387dbf43427bc8354476a88d75e0d1d1dfb6de3676a94e5ff258dba74bbbe65b"
+        },
+        "split_indices": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/split_indices.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/split_indices.npz",
+          "sha256": "92005414572b355d39b975a669c6e2827e1e8a92d4082431031c4de19e0da6f4"
+        },
+        "test_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/test_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/test_predictions.npz",
+          "sha256": "a1052ae1749068c47638a94b2c79529a38e25aca360dd9dbefdc211607d179c6"
+        },
+        "validation_predictions": {
+          "archive_relative_path": "runs/selected/g111/uq/uq_calibration_s62/seed446/val_predictions.npz",
+          "path": "artifacts/prm_results/uq/runs/selected/g111/uq/uq_calibration_s62/seed446/val_predictions.npz",
+          "sha256": "81f8bacf9b723a9ce46efe1c3c3671cb4cc430a5e9f7113a6dd09f9b08474f72"
+        }
+      },
+      "config_sha256": "f8efc7e15c42a983e8cf9011e2b4a490b61e0419d051006afba89f38633d7d2b",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "omitted_outputs": {
+        "checkpoint": {
+          "reason": "checkpoint retained outside Git; digest preserved",
+          "sha256": "fa1158d80b881534b64525fae4aaa5c96ca1c90a894fcb040e12953afc0231e3"
+        }
+      },
+      "output_dir": "selected/g111/uq/uq_calibration_s62/seed446"
+    }
+  ],
+  "calibration_contract": {
+    "conformal_subset": 255,
+    "dedicated_calibration_partition": 511,
+    "split_id": "uq_calibration_s62",
+    "subset_rule": "fixed-seed random partition of calibration rows without labels",
+    "subset_seed": 6201,
+    "variance_calibration": {
+      "calibration_nll": 0.8664745649684684,
+      "floor_eV": 0.44379281119067115,
+      "optimizer": "L-BFGS-B on Gaussian NLL",
+      "scale": 2.0795489467116797,
+      "success": true
+    },
+    "variance_fit_subset": 256
+  },
+  "collector_git": {
+    "commit": "bc215ab60b79eaf86419332edc96536cf182147f",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "created_at": "2026-07-28T16:31:03.491233+00:00",
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "member_sources": [
+    {
+      "config_sha256": "b59a297e8c6df454e48fddf6135c68cfd887bef74491682bddf922c3ea05fd8e",
+      "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/configs/prm/promoted/g111/uq/uq_calibration_s62_seed442.yaml",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/selected/g111/uq/uq_calibration_s62/seed442/run_manifest.json",
+      "manifest_sha256": "006bf7e41be8409650b130fcb4417d6d50cbd0958370d29f0de044c499ae6488",
+      "seed": 442,
+      "split_id": "uq_calibration_s62",
+      "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002"
+    },
+    {
+      "config_sha256": "848379b02d107a8e1215b88f8fa9f8a55649810ccf8b47005756ea169eb5ada2",
+      "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/configs/prm/promoted/g111/uq/uq_calibration_s62_seed443.yaml",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/selected/g111/uq/uq_calibration_s62/seed443/run_manifest.json",
+      "manifest_sha256": "da0213def4fd4305919babece283756c1bc974841726f3227b311df732b329ee",
+      "seed": 443,
+      "split_id": "uq_calibration_s62",
+      "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002"
+    },
+    {
+      "config_sha256": "e0539c77a6d13f0944481e952d1a8b1ff9ab8528f2ce5e8d737e19c383bd80cd",
+      "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/configs/prm/promoted/g111/uq/uq_calibration_s62_seed444.yaml",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/selected/g111/uq/uq_calibration_s62/seed444/run_manifest.json",
+      "manifest_sha256": "0d855e501290ee6faddcb905f57fe6702fc5d811b2c966173617c4c46fb69f7d",
+      "seed": 444,
+      "split_id": "uq_calibration_s62",
+      "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002"
+    },
+    {
+      "config_sha256": "581212fed7c503f81c23747ae0c9f540aef2d07c398ed2a97a139792200c4e69",
+      "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/configs/prm/promoted/g111/uq/uq_calibration_s62_seed445.yaml",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/selected/g111/uq/uq_calibration_s62/seed445/run_manifest.json",
+      "manifest_sha256": "f991d57c38f70de352ea1b0fee06635759de8dce6423093e27b59458d859ce03",
+      "seed": 445,
+      "split_id": "uq_calibration_s62",
+      "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002"
+    },
+    {
+      "config_sha256": "f8efc7e15c42a983e8cf9011e2b4a490b61e0419d051006afba89f38633d7d2b",
+      "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+      "expected_config": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/configs/prm/promoted/g111/uq/uq_calibration_s62_seed446.yaml",
+      "git": {
+        "commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+        "dirty": false,
+        "status_porcelain": []
+      },
+      "manifest": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/selected/g111/uq/uq_calibration_s62/seed446/run_manifest.json",
+      "manifest_sha256": "15d6a83a594acfffc5dc9c38a816785b562c3986a2b41939b7c7d4313f3862b5",
+      "seed": 446,
+      "split_id": "uq_calibration_s62",
+      "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002"
+    }
+  ],
+  "n_archived_runs": 5,
+  "n_members": 5,
+  "output_sha256": {
+    "interval_calibration": "f466c4692d1b4582978b7fbda050d813bfb353da48e1bc9198ed6e744e91c5e6",
+    "predictions": "a958b7a0c95b2e35a3ee32b54fc4d01f61a0ba825979808cee11ef2dc687582f",
+    "risk_coverage": "29cb5eb0d1aea3cac2177a20ef36424e494f6e27ad8c152cfc5a7f227faa7e75"
+  },
+  "schema_version": "prm_uq_results_v1",
+  "selection": {
+    "factorial_bundle_sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e",
+    "factorial_collector_git": {
+      "commit": "865e90a695e3641e21bc9f2c98fc05c80723abcf",
+      "dirty": false,
+      "status_porcelain": []
+    },
+    "factorial_training_commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+    "path": "/storage/ssd/metaiot_guest/yiminghua/prm_checks/uq-bc215ab/artifacts/prm_results/factorial/selection.json",
+    "selected_variant": "g111",
+    "selection_data": "validation only",
+    "sha256": "6b0bef7c69fc12a6ed97885961ccde444cd60a0d5db47558a71391eeba2b0773"
+  },
+  "split_sha256": "57c4a129abf7f4bd5ad9c48146318fe0ad9eb59c0e3918e1413ec9ccf748b002",
+  "test": {
+    "gaussian_nll": 1.127811398992075,
+    "intervals": {
+      "0.50": {
+        "conformal_quantile": 0.2702842095138303,
+        "mean_test_width_eV": 0.3363950114379098,
+        "n_conformal_calibration": 255,
+        "nominal_coverage": 0.5,
+        "observed_test_coverage": 0.520039100684262
+      },
+      "0.80": {
+        "conformal_quantile": 0.6041336707024575,
+        "mean_test_width_eV": 0.7519031667870357,
+        "n_conformal_calibration": 255,
+        "nominal_coverage": 0.8,
+        "observed_test_coverage": 0.782991202346041
+      },
+      "0.90": {
+        "conformal_quantile": 0.9169364158431362,
+        "mean_test_width_eV": 1.1412166350754,
+        "n_conformal_calibration": 255,
+        "nominal_coverage": 0.9,
+        "observed_test_coverage": 0.8719452590420332
+      },
+      "0.95": {
+        "conformal_quantile": 1.4837785321136603,
+        "mean_test_width_eV": 1.8467068319659248,
+        "n_conformal_calibration": 255,
+        "nominal_coverage": 0.95,
+        "observed_test_coverage": 0.9374389051808406
+      }
+    },
+    "mean_gaussian_crps_eV": 0.3242894557719179,
+    "n": 1023,
+    "point_prediction": {
+      "bias": -0.08578368441135166,
+      "mae": 0.37704740170378587,
+      "r2": 0.89176504566344,
+      "rmse": 1.005481725815942,
+      "spearman": 0.972530028970422
+    },
+    "selective_prediction": {
+      "aurc_eV": 0.17673358137383108,
+      "excess_aurc_eV": 0.095381115394738,
+      "oracle_aurc_eV": 0.08135246597909308,
+      "risk_at_coverage": {
+        "0.25": {
+          "mae_eV": 0.09884370781318731,
+          "n": 255
+        },
+        "0.50": {
+          "mae_eV": 0.17541588175189926,
+          "n": 511
+        },
+        "0.75": {
+          "mae_eV": 0.2165771388856222,
+          "n": 767
+        },
+        "0.90": {
+          "mae_eV": 0.24711663899579572,
+          "n": 920
+        },
+        "1.00": {
+          "mae_eV": 0.37704740170378553,
+          "n": 1023
+        }
+      }
+    },
+    "uncertainty_absolute_error_spearman": 0.5462057180625937
+  },
+  "training_commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f"
+}

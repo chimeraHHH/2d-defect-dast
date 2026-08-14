@@ -1,0 +1,31 @@
+{
+  "checks": {
+    "all_component_flags_enabled": true,
+    "all_config_hashes_match": true,
+    "all_epochs_150": true,
+    "all_num_workers_zero": true,
+    "factorial_training_commit_bound": true,
+    "forty_eight_unique_output_directories": true,
+    "local_configs_match_remote": true,
+    "promoter_git_clean_before_generation": true,
+    "selection_validation_only": true
+  },
+  "config_counts": {
+    "total": 48,
+    "transfer": 43,
+    "uq_ensemble": 5
+  },
+  "factorial_training_commit": "7a6593a7eaaf991fd9c18a15653c3d888b060c7e",
+  "manifest_path": "configs/prm/promoted/g111/manifest.json",
+  "manifest_sha256": "42a3bfb26251fc586faf2f7a31a0dd62de80dc1029763f5e07739214d1e12df5",
+  "promoter_git": {
+    "commit": "7e0324f224fef144934b964aa44822d27cfed000",
+    "dirty_before_generation": false
+  },
+  "recorded_at": "2026-07-28T11:58:29Z",
+  "schema_version": "prm_promoted_configs_operation_v1",
+  "selected_variant": "g111",
+  "selection_data": "validation only",
+  "selection_sha256": "6b0bef7c69fc12a6ed97885961ccde444cd60a0d5db47558a71391eeba2b0773",
+  "status": "complete"
+}

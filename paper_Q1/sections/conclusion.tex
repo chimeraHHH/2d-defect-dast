@@ -1,61 +1,46 @@
 % !TEX root = ../main.tex
 
-We have presented \dart{}, a compact 0.83\,M-parameter defect-aware graph
-transformer that achieves state-of-the-art accuracy for predicting defect
-formation energies in two-dimensional materials, accompanied by a rigorous
-assessment of twelve physically motivated innovations.
-Five principal findings emerge:
+\ifprmresultsready
 
-\begin{enumerate}
-  \item \textbf{Targeted inductive bias over capacity scaling.}
-    Three architectural innovations---defect-aware gated attention pooling,
-    local environment enrichment, and pre-norm residual connections---reduce
-    the single-model MAE from 0.516 to 0.381\eV{} ($-26.2\%$) with only
-    10.7\% more parameters.
-    The best variant (MoE readout) reaches 0.379\eV{}, a 30\% improvement
-    over ALIGNN with $4.9\times$ fewer parameters.
-    Power-law scaling confirms that data ($\alpha = -0.40$), not model
-    capacity ($\beta \approx -0.01$), is the primary lever in the
-    $N \sim 10^4$ regime.
+Impurity formation-energy prediction with DART within IMP2D is organized by
+three physical regularities.  First, transfer is hierarchical and the hierarchy
+tracks structural novelty: error grows only mildly from random
+interpolation (\PRMRepIdCvMAE\eV{}) through withheld host--impurity pairs
+(\PRMRepPairCvMAE\eV{}) and the predefined chemistry block
+(\PRMRepChemBlockMAE\eV{}), but roughly doubles for a withheld impurity
+(\PRMRepDopantCvMAE\eV{}) or host (\PRMRepHostCvMAE\eV{}), and the
+host--impurity asymmetry follows the structural novelty of the held-out
+host after controlling for training support.  Second, the two incorporation
+classes fail for different reasons: interstitial error concentrates in
+roomy, loosely constrained cages while adsorbate error tracks chemical
+mismatch, and the measured descriptors attenuate the class gap by roughly
+a quarter without exhausting it.  Third, the formation energy's
+non-extensive, defect-local character constrains model design: additive
+pooling degrades withheld-host error severely, a mean readout alone
+recovers most of that gap, and the defect-centered readout shows no
+size-dependent residual drift.
 
-  \item \textbf{Rigorous negative results from auxiliary losses.}
-    All six training-strategy innovations---label distribution smoothing,
-    focal MAE, contrastive ranking, and heteroscedastic uncertainty---are
-    significantly harmful ($p < 0.05$), consistently sacrificing accuracy on
-    common low-$\ef$ samples for marginal gains on rare high-$\ef$ tails.
-    This cautions against na\"{i}vely importing imbalanced-learning
-    techniques from computer vision to data-limited materials science.
+These conclusions rest on a representation whose permutation invariance and
+exact minimum-image distances passed an independent acceptance audit, after
+a diagnostic showed the superseded implementation could move single
+predictions by up to $8.8$\eV{} under atom relabeling while pooled errors
+moved imperceptibly.  For existing DFT-relaxed candidates, out-of-fold
+predictions selected the lower-energy incorporation class well above its
+class-prior reference.  Because the geometries
+and reference energies arise from the same completed DFT workflow, these
+results support retrospective energy estimation and reranking within the
+neutral, retained IMP2D domain rather than a reduction in relaxation cost.
+Testing independently generated, convention-matched structures and
+calibrating uncertainty under explicit chemical shift remain necessary
+before prospective use beyond that domain.  The methodology, by contrast,
+travels as it stands: audit the representation before believing the
+benchmark, group the evaluation by the chemistry it must survive, and
+preregister the error analysis --- defaults we suggest for machine-learned
+defect energetics generally.
 
-  \item \textbf{Ensemble diversity from individually neutral innovations.}
-    An 8-model greedy ensemble achieves 0.344\eV{} ($-36\%$ vs.\ ALIGNN),
-    outperforming a prior 29-model ensemble with $3.6\times$ fewer members.
-    Four of the eight members are innovation variants (MoE, JK, Physics,
-    DefType) whose individual MAEs are statistically indistinguishable from
-    the baseline, demonstrating that the primary value of physically
-    informed innovations lies in error decorrelation.
+\else
 
-  \item \textbf{Quantified generalization boundaries.}
-    The graduated three-tier OOD assessment reveals graceful degradation:
-    intra-family leave-one-host-out increases MAE by only $1.5\times$
-    (0.540\eV{}), far below the na\"{i}ve-baseline collapse ($4.9\times$).
-    Compositional block-out yields comparable degradation (0.534\eV{}),
-    confirming robust matrix-completion generalization.
+\noindent\textit{The numerical conclusion is unavailable because the audited
+result bundle is not present.}
 
-  \item \textbf{Calibrated uncertainty for deployment.}
-    Temperature-scaled ensemble uncertainty achieves 93.4\% coverage at
-    the 90\% nominal level (ECE $= 0.037$), with a Spearman correlation
-    of 0.577 between predicted $\sigma$ and absolute error, enabling
-    practitioners to identify unreliable predictions before deployment.
-\end{enumerate}
-
-Together, these results establish \dart{} as a reliable and efficient
-surrogate for accelerating defect engineering in 2D materials---from
-ranking candidate dopants for catalytic activation and single-photon
-emission to flagging deep-trap species detrimental to electronic
-transport---with clearly delineated applicability domains and
-element-resolved confidence estimates.
-The architectural innovations demonstrated here, particularly the
-gated pooling and environment enrichment modules, are transferable to
-other defect-property prediction tasks in both 2D and 3D settings.
-The code, trained models, and evaluation protocols are publicly available
-to support reproducibility and community benchmarking.
+\fi

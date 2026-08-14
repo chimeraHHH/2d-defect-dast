@@ -1,0 +1,99 @@
+{
+  "schema_version": "prm_asset_provenance_v1",
+  "ct_uae": {
+    "citation_doi": "10.1038/s41467-025-56481-x",
+    "derived_asset": {
+      "dtype": "float32",
+      "serialized_sha256": "ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc",
+      "shape": [
+        100,
+        128
+      ],
+      "size_bytes": 52875,
+      "tensor_sha256": "acf66488770f2e82d81cf396c0c28a3a3c244e9825f7e0ae443d2ff0e7a32edc"
+    },
+    "derivation": {
+      "exact_formula": "atom_embed.weight.T + atom_embed.bias",
+      "source_bias_shape": [
+        128
+      ],
+      "source_weight_shape": [
+        128,
+        100
+      ],
+      "verification_script": "scripts/prm_verify_ct_uae_asset.py"
+    },
+    "index_contract": {
+      "asset_row_for_atomic_number": "Z - 1",
+      "internal_padding_row": 0,
+      "supported_atomic_numbers": [
+        1,
+        100
+      ]
+    },
+    "source": {
+      "atom_init_sha256": "72b822e4a4cf53e6ba3bd6aeaf38ab10052dc219c3f2592b5c559e6251ba3da9",
+      "checkpoint_path": "embeddings/model_best_mt3_256.pth.tar",
+      "checkpoint_sha256": "6f5305770a64a91f683e27c1d9b2c574f5b748b381598590e9b675ee9b43e26b",
+      "checkpoint_size_bytes": 35770509,
+      "git_commit": "0141ff9e09277d2229c9d7a24c1bcc5eac9de78e",
+      "git_tag_v1_0": "010bbc33f0db1242837b760daa729b40fb1c217a",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "repository": "https://github.com/fduabinitio/ct-UAE"
+    }
+  },
+  "jarvis_dft3d_pretraining": {
+    "citation_doi": "10.1038/s41524-020-00440-1",
+    "conversion": {
+      "git_commit": "2ab75b55b6d70573d750b5f24096676f666c21fb",
+      "script": "scripts/fetch_dft_3d.py",
+      "script_sha256": "cb8489ea6e5dcae518cfc3782c23619a270f533a62390cd973a25fc70c49647c"
+    },
+    "dataset": {
+      "all_targets_finite": true,
+      "defect_type": "pristine",
+      "n_elements": 89,
+      "n_samples": 19902,
+      "n_unique_jids": 19902,
+      "natoms_range": [
+        2,
+        80
+      ],
+      "sha256": "41284603e6eeb6920fe132975570e657e69601a414257bb48d2196d7389369fa",
+      "size_bytes": 297169701,
+      "source_identifier": "jarvis_dft_3d",
+      "target": "formation_energy_peratom",
+      "target_unit": "eV per atom"
+    },
+    "output": {
+      "embed_bias_shape": [
+        128
+      ],
+      "embed_weight_shape": [
+        128,
+        9
+      ],
+      "local_tensor_count": 51,
+      "n_parameters": 747145,
+      "pretrained_embed_sha256": "5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc",
+      "pretrained_embed_size_bytes": 1316375,
+      "source_test_mae_eV_per_atom": 0.10964541205325239
+    },
+    "training": {
+      "best_validation_mae_eV_per_atom": 0.10665765293878526,
+      "config": "configs/pretrain_dft3d.yaml",
+      "config_sha256": "1af3e2a96ec84a4a2e0c40906a79b0ed9f97e371dc4c98a75fcb822f734555e0",
+      "epochs": 30,
+      "git_commit": "69f74424e515517228384151bdde2a1c254303c2",
+      "script": "scripts/pretrain_element_embeddings.py",
+      "script_sha256": "08d40aebd42e8a97be6d198ac5da27d25f5006e586024fe39abdc93375ad1ba1",
+      "seed": 42,
+      "split_ratios": [
+        0.8,
+        0.1,
+        0.1
+      ]
+    }
+  }
+}

@@ -1,0 +1,76 @@
+% ============================================================================
+% DRAFT MACROS — REPAIRED-MODEL NUMBERS, PENDING CANONICAL ASSET REGENERATION
+% ----------------------------------------------------------------------------
+% Every value below was computed from the accepted repaired G2 OOF archives
+% (seed-averaged per fold, pooled) or from the canonical G3 outputs recorded
+% under artifacts/prm_g3/canonical/.  They are drafting aids: before any
+% submission build, the fail-closed asset generator must replace this file's
+% role by regenerating generated/results_macros.tex with clustered intervals,
+% and the independent numeric audit must pass.  Values marked TBD await the
+% in-flight canonical runs (G3 with A2 amendments; W1 extensivity).
+% ============================================================================
+% --- repaired transfer hierarchy (G2 OOF, seed-averaged, pooled) ------------
+\newcommand{\PRMRepPairCvMAE}{0.442}
+\newcommand{\PRMRepHostCvMAE}{0.891}
+\newcommand{\PRMRepDopantCvMAE}{0.845}
+\newcommand{\PRMRepIdCvMAE}{0.408}
+\newcommand{\PRMRepChemBlockMAE}{0.483}
+% --- canonical G3 headline effects (artifacts/prm_g3/canonical) -------------
+\newcommand{\PRMPOneAdsCoordContrast}{0.151}
+\newcommand{\PRMPOneAdsCoordPercent}{135}
+\newcommand{\PRMPOneAdsValenceContrast}{0.317}
+\newcommand{\PRMPOneIntClearanceContrast}{0.091}
+\newcommand{\PRMPOneIntDispersionContrast}{-0.103}
+\newcommand{\PRMPOneIntMaxDistContrast}{0.087}
+\newcommand{\PRMPOneIntAbsValenceContrast}{0.089}
+\newcommand{\PRMPOneIntRadiusContrast}{-0.074}
+\newcommand{\PRMPThreeGapCILow}{0.010}
+\newcommand{\PRMPThreeGapCIHigh}{0.085}
+\newcommand{\PRMPThreeGapP}{0.011}
+% --- in-flight (fill from canonical-46956ef and canonical-044ce91) ----------
+\newcommand{\PRMPThreeSupportedVerdict}{The error gap tracks the host's
+structural novelty: the novelty-gap slope is $0.0010$\,eV per robust unit
+(95\% interval $[0.0007,\,0.0013]$) and is unchanged when the
+training-support covariate is included ($p=0.001$), so the association is not an artifact of
+the mechanically smaller per-row training support of the host protocol.
+The preregistered verdict is \emph{consistent with structural-motif
+shift}: a held-out host confronts the model with unseen structural motifs,
+whereas a held-out impurity is still surrounded by familiar hosts.}
+\newcommand{\PRMWThreeAttenuation}{The class gap itself is firmly
+established (controls-only class coefficient $0.53$ in log-error units,
+interval $[0.48,\,0.58]$).  Adding the full block attenuates it to $0.38$
+$[0.22,\,0.54]$ --- a $28\%$ point-estimate reduction with the same sign in
+all five folds, but the attenuation interval $[-0.01,\,0.58]$ does not
+exclude zero, so under the frozen ladder the interstitial penalty is
+\emph{not explained} by the available descriptors: local crowding accounts
+for at most a modest fraction, and the remainder is an open question for
+descriptors beyond this frozen set.}
+\newcommand{\PRMWOneAddSlope}{the additive arm's signed residual grows by
+$0.038$\,eV per atom at the point estimate --- fifty times the repaired
+defect-centered model's $0.0007$\,eV per atom, with the mean readout at
+$-0.011$\,eV per atom --- but the host-clustered 95\% interval spans zero
+($[-0.213,\,0.272]$\,eV per atom; three of five folds share the sign), so
+under the frozen gate the extensivity explanation is \emph{not established}
+and the readout conclusion remains an empirical complete-recipe result.}
+\newcommand{\PRMWOneDartSlope}{0.0007}
+% --- legacy SchNet numbers retained under the independence audit ------------
+\newcommand{\PRMSchNetAddHostCvMAE}{6.703}
+\newcommand{\PRMSchNetMeanHostCvMAE}{2.552}
+% --- draft-only visible marker for spots whose repaired asset is pending ----
+\newcommand{\todoRepair}[1]{\textbf{[PENDING REPAIRED ASSET: #1]}}
+% --- repaired retrospective reranking (materials_repaired, c9300f7) ---------
+\newcommand{\PRMRepPreferenceAccuracy}{91.4}
+\newcommand{\PRMRepPreferenceAccuracyLow}{90.0}
+\newcommand{\PRMRepPreferenceAccuracyHigh}{92.7}
+\newcommand{\PRMRepPreferenceReference}{66.2}
+\newcommand{\PRMRepPreferenceGain}{25.1}
+\newcommand{\PRMRepPreferenceGainLow}{22.7}
+\newcommand{\PRMRepPreferenceGainHigh}{27.6}
+\newcommand{\PRMRepMarginSpearman}{0.957}
+\newcommand{\PRMRepWithinExactAccuracy}{73.6}
+\newcommand{\PRMRepWithinExactReference}{37.1}
+\newcommand{\PRMRepWithinTopTwoAccuracy}{91.5}
+\newcommand{\PRMRepWithinTopTwoReference}{62.1}
+\newcommand{\PRMRepWithinRegret}{0.099}
+\newcommand{\PRMRepPairAdsorbateMAE}{0.315}
+\newcommand{\PRMRepPairInterstitialMAE}{0.708}

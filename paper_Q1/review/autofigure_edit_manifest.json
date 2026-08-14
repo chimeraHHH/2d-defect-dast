@@ -1,0 +1,169 @@
+{
+  "schema_version": "prm_autofigure_edit_manifest_v1",
+  "captured_at": "2026-08-09T23:20:09+08:00",
+  "paper_repository_commit": "7bd7905f60513fc4f9bb9a7bfe0dd8cd9c08c5b1",
+  "paper_asset_regeneration_source_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5",
+  "workflow": {
+    "mode": "editor_only",
+    "classification": "presentation_derivative",
+    "canonical_replacement": false,
+    "new_experiment_or_scientific_analysis": false,
+    "remote_api_calls": false,
+    "generative_stages_invoked": false
+  },
+  "tool": {
+    "name": "AutoFigure-Edit",
+    "official_repository": "https://github.com/ResearAI/AutoFigure-Edit",
+    "official_release_tag": "v1.1",
+    "official_release_commit": "7522638e30bda4b3d0d917630596433bf0fd2c28",
+    "execution_checkout_commit": "a14889f82b9ed1376b848d8e8eaaf6bca6077033",
+    "execution_checkout_describe": "v1.1-24-ga14889f",
+    "interface": "embedded SVG-Edit source editor",
+    "execution_location": "localhost"
+  },
+  "figures": [
+    {
+      "id": "main_fig_1",
+      "name": "DART architecture",
+      "status": "editor_only_derivative_qa_passed_superseded_by_manual_figure",
+      "canonical_scientific_source": {
+        "pdf": {
+          "path": "paper_Q1/figures/fig_dart_architecture.pdf",
+          "sha256": "a37bf236c851bda5c3c27ef35ee01c4fd1ecca64c414b5006288c0d1df6a7c89"
+        },
+        "png": {
+          "path": "paper_Q1/figures/fig_dart_architecture.png",
+          "sha256": "d83c7e164a9547bdb0217f6c77dfa9600a1ad4f71d3ff8c63ff936b33c9cf17a"
+        },
+        "provenance": {
+          "path": "artifacts/prm_results/paper/protocol_figure.json",
+          "sha256": "09c1b4a48400d6af73466c9421a0904d18bea53e643d16a67ddb22fb9fa93412"
+        }
+      },
+      "ui_import_source": {
+        "tool_relative_path": "web/staging/fig_dart_architecture_editable.svg",
+        "sha256": "aa201fb348a5cb1c051b87784d3cfa69a8936d40ebc91a50131ca6f0e0868b31"
+      },
+      "ui_applied_source": {
+        "path": "paper_Q1/figures/fig_dart_architecture_autofigure_v1.svg",
+        "sha256": "89d577224a8d8290a4d817524e665040e29f9eb8121eb175dbfc0b028eced97f"
+      },
+      "presentation_outputs": {
+        "pdf": {
+          "path": "paper_Q1/figures/fig_dart_architecture_autofigure_v1.pdf",
+          "sha256": "d02b00bdc5511f32658cf9a49816cc340436cae7b4e8ca4f704dc26441ff7905"
+        },
+        "png": {
+          "path": "paper_Q1/figures/fig_dart_architecture_autofigure_v1.png",
+          "sha256": "7fac96638cba1da3a94794dda0f93670c5c5280527ec51bfbbef85af88a65aee",
+          "dpi": 300
+        }
+      },
+      "observed_editor_delta": [
+        "Added SVG accessibility metadata.",
+        "Changed four panel headings from 7.2 px regular to 7.4 px weight 600.",
+        "Wrapped '9 normalized attributes' onto two lines without changing wording."
+      ],
+      "data_layer_guard": {
+        "status": "exact_match",
+        "paths_input": 91,
+        "paths_output": 91,
+        "path_geometry_and_styles_changed": false,
+        "svg_image_elements": 0
+      },
+      "superseded_by": "paper_Q1/figures/figure1_manual.png",
+      "latex_integration": "not active; the user-supplied manual architecture is selected in paper_Q1/sections/introduction.tex"
+    },
+    {
+      "id": "supp_fig_s2",
+      "name": "Paired factorial variants and orthogonal effects",
+      "status": "editor_only_derivative_qa_passed_integrated",
+      "current_supplement_figure_number": "S2",
+      "current_latex_label": "fig:supp_factorial",
+      "canonical_scientific_source": {
+        "pdf": {
+          "path": "paper_Q1/figures/fig_factorial.pdf",
+          "sha256": "4c91b36837680bd2c66f16112654b74bf0b2922ad50c12c029841613d35c143d"
+        },
+        "png": {
+          "path": "paper_Q1/figures/fig_factorial.png",
+          "sha256": "f54e8a4c7e2ce1608e94f21e98a80e46513cca43bc0c2570c409df98ae899b87"
+        },
+        "factorial_bundle": {
+          "path": "artifacts/prm_results/factorial/bundle.json",
+          "sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e"
+        }
+      },
+      "editor_input_scientific_source_snapshot": {
+        "pdf_sha256": "b93ec93c94f2493feea851ee3e973fea6afe74b411acde3d4b7168314d7b62fd",
+        "png_sha256": "4323b515b642306cd86f019e9dae88622f4cd3fa35ca1287ee332595c7d38a28",
+        "note": "The editor-only derivative was compared with this immutable pre-regeneration snapshot. The current canonical plot was independently regenerated from the same frozen factorial bundle on source commit ccf41e3 and passed the 1346-check numeric audit."
+      },
+      "ui_import_source": {
+        "tool_relative_path": "web/staging/fig_factorial_editable.svg",
+        "sha256": "97bdb0821eed82a904a65fe3a1ee38d6969f46f9016e6a0ff5bcfd0d7f8b335c"
+      },
+      "ui_applied_source": {
+        "path": "paper_Q1/figures/fig_factorial_autofigure_v1.svg",
+        "sha256": "fbadaa0b97db76d8a79dd23cf1c60b5daae23015018c1ef3310faf9e07716823"
+      },
+      "presentation_outputs": {
+        "pdf": {
+          "path": "paper_Q1/figures/fig_factorial_autofigure_v1.pdf",
+          "sha256": "debcf08320ca450ea729b2dfeb42ff0c61d4da57633e7b634b1881d5481d53d2"
+        },
+        "png": {
+          "path": "paper_Q1/figures/fig_factorial_autofigure_v1.png",
+          "sha256": "7b8ede342e4e47c4333dae4d15dfa8b3a4f120be6a3a9310adc601f07cd7153e",
+          "dpi": 300
+        }
+      },
+      "observed_editor_delta": [
+        "Removed duplicate left-panel group legend_1.",
+        "Retained upper-right legend_2 as the sole shared key.",
+        "Added SVG accessibility metadata."
+      ],
+      "data_layer_guard": {
+        "status": "exact_match_after_allowlisted_legend_removal",
+        "path": 65,
+        "use": 121,
+        "rect": 2,
+        "text": 40,
+        "image": 0,
+        "axes_points_intervals_labels_changed": false
+      },
+      "latex_integration": "paper_Q1/supplement.tex; compiled as Supplemental Fig. S2 in paper_Q1/supplement.pdf"
+    }
+  ],
+  "full_pipeline": {
+    "status": "blocked_not_run",
+    "eligible_scope_if_reconsidered": ["main_fig_1"],
+    "blocking_conditions": [
+      "No configured image or multimodal LLM provider credential.",
+      "No remote SAM credential and local SAM3 is unavailable.",
+      "No local RMBG-2.0 weights if icon extraction is required.",
+      "External transmission of unpublished figures is not authorized."
+    ],
+    "secrets_recorded": false
+  },
+  "generative_chain_policy": {
+    "decision": "NO-GO",
+    "figures": [
+      "protocol overview",
+      "factorial result",
+      "axis-resolved transfer",
+      "internal uncertainty",
+      "screening",
+      "supplementary heterogeneity"
+    ]
+  },
+  "promotion_gate": {
+    "structural_svg_qa": "pass",
+    "pdf_font_and_raster_qa": "pass",
+    "publication_scale_visual_qa": "pass",
+    "latex_integration": "pass_12_page_main_and_7_page_supplement_pdfs",
+    "numeric_audit_after_integration": "pass_1346_checks_0_failures_sha256_b63cb1eaf14074acf8f7ac6eebf6bc0282baf7334805fda8debaf44ac29bc2c2",
+    "targeted_tests_after_integration": "not_run_server_environment_missing_pytest",
+    "local_milestone_commit": "ccf41e39b55f0b1885fe1d8ca163ae4e41343fa5"
+  }
+}

@@ -1,0 +1,22 @@
+% Auto-generated; do not edit.
+\begin{table*}[t]
+\caption{Applicability-domain diagnostics for DART. Macro MAEs weight each
+host or impurity equally. Nonpositive-target MAE uses
+$E_\mathrm{f}\leq0$; low-decile MAE and recall use the true and predicted
+lowest 10\% of each pooled test regime. Energy errors are in eV and recall is
+in percent. A dash denotes a regime with no eligible nonpositive test
+targets.}
+\label{tab:applicability}
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Regime & Host macro & Impurity macro & Nonpositive-target MAE & Low-decile MAE & Low-decile recall \\
+\midrule
+Random OOF & 0.489 & 0.440 & 0.396 & 0.440 & 87.1 \\
+Pair OOF & 0.533 & 0.468 & 0.450 & 0.480 & 86.0 \\
+Host OOF & 0.990 & 0.968 & 1.134 & 1.284 & 69.2 \\
+Impurity OOF & 0.887 & 0.826 & 0.973 & 1.041 & 71.6 \\
+Chemistry block & 0.384 & 0.387 & -- & 0.305 & 75.0 \\
+\bottomrule
+\end{tabular}
+\end{table*}

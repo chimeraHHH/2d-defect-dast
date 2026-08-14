@@ -1,0 +1,24 @@
+% Auto-generated; do not edit.
+\begin{table*}[t]
+\caption{Retrospective out-of-fold reranking metrics from host--impurity-pair folds.
+Intervals are 95\% nonparametric cluster-bootstrap intervals over
+host--impurity pairs; multiple within-class decisions from one pair remain
+together in every resample. The incorporation-class reference always predicts
+the empirical majority class; site references select uniformly over the
+observed candidate set, with ties retained. Accuracy gains are model minus
+reference in percentage points.}
+\label{tab:screening}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Metric & Model [95\% interval] & Reference & Gain [95\% interval] & $n$ \\
+\midrule
+Incorporation-class preference accuracy (\%) & 91.0 [89.7, 92.4] & 66.2 & 24.8 [22.4, 27.2] & 1730 \\
+Global exact-site accuracy (\%) & 69.5 [67.3, 71.7] & 23.4 & 46.1 [44.0, 48.3] & 1730 \\
+Global reranking regret (eV) & 0.139 [0.113, 0.169] & -- & -- & 1730 \\
+Within-class exact-site accuracy (\%) & 73.6 [72.0, 75.1] & 37.1 & 36.5 [35.0, 38.0] & 3140 \\
+Within-class top-2 accuracy (\%) & 91.4 [90.2, 92.6] & 62.1 & 29.2 [28.0, 30.4] & 2145 \\
+Within-class reranking regret (eV) & 0.103 [0.087, 0.121] & -- & -- & 3140 \\
+\bottomrule
+\end{tabular}
+\end{table*}

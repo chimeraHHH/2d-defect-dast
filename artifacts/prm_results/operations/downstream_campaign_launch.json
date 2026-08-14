@@ -1,0 +1,94 @@
+{
+  "checks": {
+    "both_config_counts_48": true,
+    "both_queues_running": true,
+    "dart_git_clean_and_exact": true,
+    "dart_uses_g111_only": true,
+    "disjoint_gpu_sets": true,
+    "gpu2_excluded_from_both": true,
+    "no_failed_jobs_at_recording": true,
+    "result_namespaces_disjoint": true,
+    "schnet_git_clean_and_exact": true
+  },
+  "dart": {
+    "allowed_gpus": [
+      1,
+      4,
+      5
+    ],
+    "config_count": 48,
+    "config_manifest_sha256": "42a3bfb26251fc586faf2f7a31a0dd62de80dc1029763f5e07739214d1e12df5",
+    "counts_at_recording": {
+      "complete": 0,
+      "failed": 0,
+      "pending": 45,
+      "running": 3,
+      "stopped": 0
+    },
+    "excluded_gpus": [
+      0,
+      2,
+      3,
+      6,
+      7
+    ],
+    "glob": "configs/prm/promoted/g111/**/*.yaml",
+    "module": "src.train_enhanced",
+    "queue_id": "dart-g111-v1",
+    "result_namespace": "selected/g111",
+    "running_gpus_at_recording": [
+      1,
+      4,
+      5
+    ],
+    "started_at": "2026-07-28T12:08:03.944769+00:00",
+    "state_sha256_at_recording": "b3996a5bf621cb797feee2b8f4f0ca59989f934ac14123769ae57b54386ca638",
+    "systemd_unit": "prm-dart-g111-v1.service"
+  },
+  "git_commit": "6c401374baa9ac22b5fa4353d467366ac7cc222f",
+  "recorded_at": "2026-07-28T12:09:46Z",
+  "result_root": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2",
+  "scheduler_settings": {
+    "idle_confirmations": 2,
+    "max_attempts": 2,
+    "max_memory_mib": 1500,
+    "max_utilization": 5,
+    "poll_seconds": 30
+  },
+  "schema_version": "prm_downstream_campaign_launch_v1",
+  "schnet": {
+    "allowed_gpus": [
+      6,
+      7
+    ],
+    "config_count": 48,
+    "config_manifest_sha256": "90870c57ee6624b8baf28ed6ea136c63cb5e9882326a54ae6a437e6561ba140c",
+    "counts_at_recording": {
+      "complete": 0,
+      "failed": 0,
+      "pending": 46,
+      "running": 2,
+      "stopped": 0
+    },
+    "excluded_gpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "glob": "configs/prm/generated/schnet/*.yaml",
+    "module": "src.train_schnet",
+    "queue_id": "schnet-v1",
+    "result_namespace": "baselines/schnet",
+    "running_gpus_at_recording": [
+      6,
+      7
+    ],
+    "started_at": "2026-07-28T12:08:04.024891+00:00",
+    "state_sha256_at_recording": "1e2de901a4992b8eb58e5f5d352aa65278e64d7c41e3169f9be8871ca8b48a56",
+    "systemd_unit": "prm-schnet-v1.service"
+  },
+  "status": "running"
+}

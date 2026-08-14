@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, Subset
 
+from src.defect_identity import permutation_safe_defect_mask
 from src.features import get_atom_feature_table
 
 # Defect type → integer encoding (used for defect-type conditioning)
@@ -94,34 +95,14 @@ class CrystalGraphDataset(Dataset):
 
     # ------------------------------------------------------------------ helpers
     def _compute_defect_mask(self, sample: Dict[str, Any]) -> np.ndarray:
-        """Heuristic: mark the defect atom in IMP2D supercells.
+        """Mark an impurity only when its element occurs exactly once.
 
-        IMP2D defects are constructed by ASE's ``DefectBuilder`` which appends
-        the dopant atom at the end of the positions list. We mark the LAST
-        atom whose element matches the dopant tag in metadata; if the dopant
-        is unique to the host (e.g. SnS2:Cl) this picks the only candidate.
-        For self-substitution / anti-site defects (e.g. MoTe2:Te) the heuristic
-        still localises to one atom, biased toward the inserted one.
+        The released IMP2D rows contain relaxed structures without persistent
+        per-atom identity tags. Array order is not a physical label for
+        identical nuclei, so same-element self-interstitials receive no
+        arbitrary mask and are excluded by the formal PRM protocol.
         """
-        natoms = len(sample["numbers"])
-        mask = np.zeros(natoms, dtype=np.int64)
-        dopant = sample["metadata"].get("dopant", "")
-        if not dopant:
-            return mask
-        try:
-            from ase.data import atomic_numbers as _AZ
-
-            z = _AZ.get(dopant, None)
-        except Exception:  # pragma: no cover - defensive
-            z = None
-        if z is None:
-            return mask
-        candidates = np.flatnonzero(sample["numbers"] == z)
-        if candidates.size == 0:
-            return mask
-        # mark the last candidate (DefectBuilder convention)
-        mask[candidates[-1]] = 1
-        return mask
+        return permutation_safe_defect_mask(sample)
 
     # ------------------------------------------------------------------ pytorch
     def __len__(self) -> int:
@@ -140,6 +121,7 @@ class CrystalGraphDataset(Dataset):
         defect_type_str = sample.get("metadata", {}).get("defecttype", "vacancy")
         defect_type_idx = DEFECT_TYPE_MAP.get(defect_type_str, 0)
         item = {
+            "sample_index": torch.tensor(idx, dtype=torch.long),
             "x": x,
             "atomic_numbers": numbers,
             "defect_mask": defect_mask,
@@ -190,6 +172,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
     positions = torch.zeros(batch_size, n_max, 3, dtype=torch.float32)
     target = torch.zeros(batch_size, dtype=torch.float32)
     num_atoms = torch.zeros(batch_size, dtype=torch.long)
+    sample_index = torch.zeros(batch_size, dtype=torch.long)
 
     edge_index_list, edge_dist_list, edge_offset_list = [], [], []
     triplet_index_list, angles_list = [], []
@@ -207,6 +190,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
             positions[i, :n] = item["positions"]
         target[i] = item["target"]
         num_atoms[i] = n
+        sample_index[i] = item.get("sample_index", i)
         cell[i] = item["cell"]
         edge_index_list.append(item["edge_index"])
         edge_dist_list.append(item["edge_dist"])
@@ -230,6 +214,7 @@ def collate_fn(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tens
         "cell": cell,
         "target": target,
         "num_atoms": num_atoms,
+        "sample_index": sample_index,
         "num_atoms_list": natoms_list,
         "edge_index_list": edge_index_list,
         "edge_dist_list": edge_dist_list,

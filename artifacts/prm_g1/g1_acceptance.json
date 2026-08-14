@@ -1,0 +1,178 @@
+{
+  "code_commit": "88d71cc2bb2982653886e75449a9d2c9c89b9319",
+  "collector_gpu": {
+    "host_profile": "WHUServer-L40S",
+    "name": "NVIDIA L40S",
+    "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+  },
+  "corrected_jarvis_dataset_receipt_sha256": "0b5fd1a0d0bba06086b3922f5aae7754d881a28b5ee6e142f57f41780e939d98",
+  "corrected_jarvis_dataset_sha256": "794b7e645535be9d870816e02684bfe7c7267fb2337bb67b7c85aa178501afea",
+  "corrected_jarvis_live_audit": {
+    "current_build_graph_all_fields_recomputed": true,
+    "id_order_targets_non_graph_exact": true,
+    "pbc_all_true": true,
+    "rows": 19902,
+    "total_edges": 7279818,
+    "total_triplets": 6609054
+  },
+  "corrected_pretrained_asset_sha256": "293e1c21991a6c92757e30b776f8aa9aca10c9504e8830f1914916ff7b393333",
+  "corrected_pretraining_lineage_sha256": "976e80504e6475166936102fbc7e8d83f837dc60c6a90c1bfb2d8fddb5a9c770",
+  "corrected_pretraining_live_audit": {
+    "best_checkpoint_state_strict_loaded": true,
+    "best_history_flags_recomputed": true,
+    "dart_compatibility_reexecuted": true,
+    "epochs_revalidated": 30,
+    "source_export_matches_best_checkpoint": true,
+    "test_mae_eV": 0.08512870222330093,
+    "test_rmse_eV": 0.13481882214546204,
+    "validation_and_test_reinferred": true,
+    "validation_mae_eV": 0.08498261868953705
+  },
+  "created_at": "2026-08-10T21:10:43.211952+00:00",
+  "env_zero_neighbor_contract": {
+    "corrected": "zero_residual_v1",
+    "legacy_g1a_compatibility": "legacy_batch_dependent_v0"
+  },
+  "env_zero_neighbor_mode": "zero_residual_v1",
+  "execution_gpu_bindings": {
+    "corrected_pretraining": {
+      "name": "NVIDIA L40S",
+      "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+    },
+    "g1a": {
+      "name": "NVIDIA L40S",
+      "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+    },
+    "pilots": {
+      "corrected_pretrain": {
+        "name": "NVIDIA L40S",
+        "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+      },
+      "legacy_init": {
+        "name": "NVIDIA L40S",
+        "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+      },
+      "no_pretrain": {
+        "name": "NVIDIA L40S",
+        "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+      }
+    },
+    "property_tests": {
+      "name": "NVIDIA L40S",
+      "uuid": "GPU-4fe38366-e143-fe49-58b4-0b15e5d4de97"
+    }
+  },
+  "g1a_empirical_stability_pass": false,
+  "g1a_live_audit": {
+    "canonical_rows": 10224,
+    "checkpoint_roundtrip_max_eV": 8.58306884765625e-06,
+    "folds_strict_loaded_and_reinferred": 5,
+    "identity_exact_and_16_permutations_reinferred": true,
+    "intervention_roundtrip_max_abs_delta_eV": {
+      "atomic_number_asc": 5.7220458984375e-06,
+      "atomic_number_desc": 1.1444091796875e-05,
+      "cartesian_lex_asc": 7.62939453125e-06,
+      "cartesian_lex_desc": 6.198883056640625e-06,
+      "defect_distance_asc": 1.3828277587890625e-05,
+      "defect_distance_desc": 1.430511474609375e-05,
+      "even_then_odd": 1.0013580322265625e-05,
+      "exact_mic": 7.867813110351562e-06,
+      "identity_rebuild": 6.67572021484375e-06,
+      "random_00": 3.814697265625e-06,
+      "random_01": 6.9141387939453125e-06,
+      "random_02": 3.814697265625e-06,
+      "random_03": 1.1444091796875e-05,
+      "random_04": 7.62939453125e-06,
+      "random_05": 1.049041748046875e-05,
+      "random_06": 1.621246337890625e-05,
+      "random_07": 4.76837158203125e-06,
+      "reverse": 5.0067901611328125e-06
+    },
+    "raw_db_reopened_for_geometry_and_pbc": true,
+    "summary_and_csv_recomputed": true
+  },
+  "g1a_predictions_sha256": "45237602e9045193af700c1d0a62a1633d2c6b26e1af270d5c23fb2c792480ea",
+  "g1a_sample_diagnostics_sha256": "fceb40c18aab7842bc82d8a21f7228e05c82bfdc1611ba4e2af50d9cbb36f7d6",
+  "g1a_summary_sha256": "2a90d2003caaae889d568caf3417122801f5935b465fbc6a8068656ee2cd88c3",
+  "graph_builder_source_sha256": "86d035ef407cae48c4e375bfcbcfdc7492203529d1529e96be0a5bf23b8038a7",
+  "graph_builder_version": "exact_mic_invariant_triplets_v1",
+  "host_profile": "WHUServer-L40S",
+  "live_artifact_binding": {
+    "all_scientific_outputs_recomputed_or_checkpoint_reinferred": true,
+    "all_upstream_files_reopened": true,
+    "ct_uae_sha256": "ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc",
+    "jarvis_source_sha256": "41284603e6eeb6920fe132975570e657e69601a414257bb48d2196d7389369fa",
+    "legacy_pretrained_sha256": "5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc",
+    "protocol_samples_sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168",
+    "raw_db_sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4"
+  },
+  "model_source_sha256": "57f44e468c9420bdc0405daaddd31d79d2d622ca2c195e860631a950328495b3",
+  "pilot_freeze_sha256": "f12d9013475d3761147bd8ff4e8c9541bca954a67975d3463a8ccbc200921715",
+  "pilot_live_checkpoint_reinference": {
+    "corrected_pretrain": {
+      "best_history_flags_and_checkpoint_epoch_recomputed": true,
+      "checkpoint_strict_loaded": true,
+      "live_validation_mae_eV": 0.49300714386418404,
+      "pretraining_compatibility_reexecuted": true,
+      "test_reinference_max_abs_delta_eV": 3.814697265625e-06,
+      "validation_reinference_max_abs_delta_eV": 2.86102294921875e-06
+    },
+    "legacy_init": {
+      "best_history_flags_and_checkpoint_epoch_recomputed": true,
+      "checkpoint_strict_loaded": true,
+      "live_validation_mae_eV": 0.5303729003308592,
+      "pretraining_compatibility_reexecuted": true,
+      "test_reinference_max_abs_delta_eV": 2.86102294921875e-06,
+      "validation_reinference_max_abs_delta_eV": 1.9073486328125e-06
+    },
+    "no_pretrain": {
+      "best_history_flags_and_checkpoint_epoch_recomputed": true,
+      "checkpoint_strict_loaded": true,
+      "live_validation_mae_eV": 0.5979996062505134,
+      "pretraining_compatibility_reexecuted": false,
+      "test_reinference_max_abs_delta_eV": 3.814697265625e-06,
+      "validation_reinference_max_abs_delta_eV": 2.86102294921875e-06
+    }
+  },
+  "pilot_passed": true,
+  "pilot_receipts": {
+    "corrected_pretrain": "7d2fe2069d063f7c3a7967d86600ff88c6f9c57539f7e0fc0ad575a151ea625e",
+    "legacy_init": "64924b6eeb65f2091c6b261607e1caaa4823846d2bd9d7bc3e227c54a276bc42",
+    "no_pretrain": "be47b11fe9923daa7f292ae8789c982980ba623be3aeb3547c30cd25ec09010e"
+  },
+  "pilot_split_sha256": "1db92c551ed2f4168bf8f4710d99b7f0884b987eee2f88a2e27e043daaf82123",
+  "producer_commits": {
+    "corrected_pretraining": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+    "g1a": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+    "imp2d_rebuild": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+    "jarvis_rebuild": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+    "pilot_freeze": "73fd7cef51a45945977f2602f216e1ac7b6bb697",
+    "pilots": "88d71cc2bb2982653886e75449a9d2c9c89b9319",
+    "property_tests": "88d71cc2bb2982653886e75449a9d2c9c89b9319"
+  },
+  "property_tests_live_audit": {
+    "current_commit_reexecuted": true,
+    "output_sha256": "0a696da093639d26960fab489e54c289cd628a2fad9d5ce631b85ed0cde7b34c",
+    "return_code": 0,
+    "tests": 15
+  },
+  "property_tests_passed": true,
+  "property_tests_receipt_sha256": "48bb93662cec9278a89932fb2ec6cc66fd7e618b9d0f856d862b91752730a2d2",
+  "protocol_samples_sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168",
+  "raw_db_sha256": "3a71db999b477112da248dcf762c4384e455689953679d58b3d71a91e7148fc4",
+  "repaired_dataset_live_audit": {
+    "current_build_graph_all_fields_recomputed": true,
+    "non_graph_fields_and_order_exact": true,
+    "protocol_identity_targets_and_canonical_membership_exact": true,
+    "raw_db_identity_and_pbc_reopened": true,
+    "rows": 10641,
+    "total_edges": 9871460,
+    "total_triplets": 14431792
+  },
+  "repaired_dataset_receipt_sha256": "4e643ea1a38c195c460eb6613f97e31b65f5dd2b1463f87b90ab4d1838e968fe",
+  "repaired_dataset_sha256": "cdcbef7cf1098063b446f4f4c672008961dd6c92e9b6b6054000abc4dceb474a",
+  "schema_version": "prm_g1_acceptance_v1",
+  "scope_boundary": "G1 accepted; G2 remains unauthorized",
+  "source_data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "status": "accepted"
+}

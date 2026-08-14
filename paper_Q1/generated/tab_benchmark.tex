@@ -1,0 +1,23 @@
+% Auto-generated; do not edit.
+\begin{table*}[t]
+\caption{Pooled out-of-fold or single-block test MAE (eV). SchNet-add denotes
+the prespecified periodic SchNet recipe with atomwise-additive readout. The descriptor
+column selects a learned family independently within every split by that
+split's validation MAE (Histogram GB, LightGBM were selected across
+the resulting folds). $\Delta$
+is comparator minus DART absolute error with a paired 95\% bootstrap interval
+using the regime-matched resampling unit; positive values favor DART.}
+\label{tab:benchmark}
+\centering
+\begin{tabular}{lccc cc}
+\toprule
+Regime & DART & SchNet-add & Descriptor & $\Delta_{\rm SchNet-add}$ & $\Delta_{\rm desc.}$ \\
+\midrule
+Random OOF & 0.418 & 0.571 & 0.625 & +0.154 [+0.136, +0.174] & +0.208 [+0.194, +0.221] \\
+Pair OOF & 0.450 & 0.628 & 0.674 & +0.178 [+0.157, +0.202] & +0.224 [+0.207, +0.242] \\
+Host OOF & 0.938 & 6.703 & 1.266 & +5.765 [+3.006, +9.296] & +0.328 [+0.205, +0.450] \\
+Impurity OOF & 0.844 & 1.692 & 1.336 & +0.848 [+0.626, +1.092] & +0.492 [+0.368, +0.623] \\
+Chemistry block & 0.386 & 0.508 & 0.642 & +0.122 [+0.069, +0.175] & +0.256 [+0.189, +0.323] \\
+\bottomrule
+\end{tabular}
+\end{table*}

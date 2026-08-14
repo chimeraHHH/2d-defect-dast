@@ -12,13 +12,20 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import os
+import platform
 import random
+import socket
+import subprocess
 import sys
 import time
+from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import numpy as np
 import torch
@@ -32,8 +39,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.dataset import CrystalGraphDataset, collate_fn, make_splits
+from src.splits import load_split
 from src.sampler import HostBalancedSampler
+from src.prm_assets import load_pretrained_initialization, verify_training_assets
+from src.prm_metrics import regression_metrics
+from src.prm_provenance import config_sha256
 from src.augment_online import OnlineAugTransform, OnlineAugDataset, adversarial_perturbation
+from src.models.element_table import lookup_ct_uae
 from src.models import (
     CrystalTransformer,
     DefectAwareTransformer,
@@ -50,6 +62,73 @@ MODEL_REGISTRY = {
     "dualstream": DualStreamPeriodicTransformer,
     "v2": CrystalTransformerV2,
 }
+
+
+def resolve_path(value: str | Path, root: Path = ROOT) -> Path:
+    path = Path(value).expanduser()
+    return path if path.is_absolute() else root / path
+
+
+def resolve_runtime_assets(
+    controlled_config: Dict[str, Any],
+    ct_uae_override: str | None = None,
+    pretrained_override: str | None = None,
+) -> Dict[str, Any]:
+    runtime = deepcopy(controlled_config)
+    ct_uae_path = runtime.get("model_kwargs", {}).get("ct_uae_path")
+    if ct_uae_override:
+        runtime.setdefault("model_kwargs", {})["ct_uae_path"] = ct_uae_override
+    elif ct_uae_path:
+        runtime["model_kwargs"]["ct_uae_path"] = str(resolve_path(ct_uae_path))
+    if pretrained_override:
+        runtime["pretrained_embed"] = pretrained_override
+    elif runtime.get("pretrained_embed"):
+        runtime["pretrained_embed"] = str(resolve_path(runtime["pretrained_embed"]))
+    return runtime
+
+
+def git_snapshot() -> Dict[str, Any]:
+    def run(*args: str) -> str:
+        result = subprocess.run(
+            ["git", *args], cwd=ROOT, text=True, capture_output=True, check=False
+        )
+        return result.stdout.strip()
+
+    commit = run("rev-parse", "HEAD")
+    status = run("status", "--porcelain")
+    return {
+        "commit": commit or None,
+        "dirty": bool(status),
+        "status_porcelain": status.splitlines(),
+    }
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def environment_snapshot(device: torch.device) -> Dict[str, Any]:
+    cuda_name = None
+    if device.type == "cuda" and torch.cuda.is_available():
+        cuda_name = torch.cuda.get_device_name(device)
+    return {
+        "hostname": socket.gethostname(),
+        "platform": platform.platform(),
+        "python": sys.version,
+        "torch": torch.__version__,
+        "cuda_runtime": torch.version.cuda,
+        "cuda_available": torch.cuda.is_available(),
+        "device": str(device),
+        "device_name": cuda_name,
+    }
+
+
+def write_json(path: Path, payload: Dict[str, Any]) -> None:
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
 class Normalizer:
@@ -86,6 +165,38 @@ def set_seed(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def make_label_noise_generator(
+    device: torch.device,
+    *,
+    seed: int,
+    epoch: int,
+) -> torch.Generator:
+    """Create a model-independent target-noise stream for one epoch."""
+    stream_seed = (int(seed) * 1_000_003 + int(epoch) * 97_409 + 17) % (2**63 - 1)
+    generator = torch.Generator(device=device)
+    generator.manual_seed(stream_seed)
+    return generator
+
+
+def capture_rng_state() -> Dict[str, Any]:
+    state: Dict[str, Any] = {
+        "python": random.getstate(),
+        "numpy": np.random.get_state(),
+        "torch": torch.get_rng_state(),
+    }
+    if torch.cuda.is_available():
+        state["cuda"] = torch.cuda.get_rng_state_all()
+    return state
+
+
+def restore_rng_state(state: Dict[str, Any]) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.set_rng_state(state["torch"])
+    if torch.cuda.is_available() and "cuda" in state:
+        torch.cuda.set_rng_state_all(state["cuda"])
 
 
 def move_batch(batch, device):
@@ -339,8 +450,7 @@ def apply_stochastic_depth(model, drop_rate: float = 0.1):
 def evaluate(model, loader, normalizer, device, swa_model=None):
     eval_model = swa_model if swa_model is not None else model
     eval_model.eval()
-    abs_err, sq_err, n = 0.0, 0.0, 0
-    preds_all, targets_all = [], []
+    preds_all, targets_all, indices_all = [], [], []
     with torch.no_grad():
         for batch in loader:
             batch = move_batch(batch, device)
@@ -349,18 +459,15 @@ def evaluate(model, loader, normalizer, device, swa_model=None):
             # Handle uncertainty output: (pred, log_var) tuple
             preds_norm = model_out[0] if isinstance(model_out, tuple) else model_out
             preds = normalizer.denorm(preds_norm)
-            err = preds - target
-            abs_err += err.abs().sum().item()
-            sq_err += err.pow(2).sum().item()
-            n += target.numel()
             preds_all.append(preds.cpu())
             targets_all.append(target.cpu())
-    mae = abs_err / max(n, 1)
-    rmse = math.sqrt(sq_err / max(n, 1))
+            indices_all.append(batch["sample_index"].detach().cpu())
+    preds_np = torch.cat(preds_all).numpy() if preds_all else np.array([])
+    targets_np = torch.cat(targets_all).numpy() if targets_all else np.array([])
+    indices_np = torch.cat(indices_all).numpy() if indices_all else np.array([], dtype=int)
     return {
-        "mae": mae, "rmse": rmse,
-        "preds": torch.cat(preds_all).numpy() if preds_all else np.array([]),
-        "targets": torch.cat(targets_all).numpy() if targets_all else np.array([]),
+        **regression_metrics(targets_np, preds_np),
+        "preds": preds_np, "targets": targets_np, "indices": indices_np,
     }
 
 
@@ -372,6 +479,9 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--resume", action="store_true",
                         help="Resume training from latest.pt checkpoint")
+    parser.add_argument("--data-path", default=None)
+    parser.add_argument("--split-path", default=None)
+    parser.add_argument("--output-dir", default=None)
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
@@ -381,6 +491,23 @@ def main() -> None:
         cfg["seed"] = args.seed
         cfg["output_dir"] = cfg["output_dir"] + f"_s{args.seed}"
 
+    if args.data_path is not None:
+        cfg["data_path"] = args.data_path
+    if args.split_path is not None:
+        cfg["split_path"] = args.split_path
+    if args.output_dir is not None:
+        cfg["output_dir"] = args.output_dir
+
+    # Preserve the controlled experiment config before resolving machine-local
+    # asset paths. Collectors compare this copy with the versioned YAML.
+    controlled_cfg = deepcopy(cfg)
+    cfg = resolve_runtime_assets(
+        controlled_cfg,
+        ct_uae_override=os.environ.get("PRM_CT_UAE_PATH"),
+        pretrained_override=os.environ.get("PRM_PRETRAINED_EMBED"),
+    )
+    asset_records = verify_training_assets(cfg)
+
     split_seed = cfg.get("split_seed", 42)
 
     # ── Limit CPU threads to avoid overloading shared servers ────────
@@ -388,12 +515,18 @@ def main() -> None:
     # machine, causing severe contention when multiple runs share the node.
     n_workers = cfg.get("num_workers", 4)
     cpu_threads = cfg.get("cpu_threads", 8)
-    import os
     os.environ.setdefault("OMP_NUM_THREADS", str(cpu_threads))
     os.environ.setdefault("MKL_NUM_THREADS", str(cpu_threads))
     torch.set_num_threads(cpu_threads)
 
-    out_dir = ROOT / cfg["output_dir"]
+    configured_output = Path(cfg["output_dir"]).expanduser()
+    results_root = os.environ.get("PRM_RESULTS_ROOT")
+    if configured_output.is_absolute():
+        out_dir = configured_output
+    elif results_root:
+        out_dir = Path(results_root).expanduser() / configured_output
+    else:
+        out_dir = ROOT / configured_output
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "train.log"
     metrics_path = out_dir / "metrics.json"
@@ -414,15 +547,87 @@ def main() -> None:
     soft_labels_path = cfg.get("soft_labels_path")
     if soft_labels_path:
         soft_labels_path = ROOT / soft_labels_path
-    dataset = CrystalGraphDataset(ROOT / cfg["data_path"],
+    data_value = os.environ.get("PRM_DATA_PATH", cfg["data_path"])
+    data_path = resolve_path(data_value)
+    dataset = CrystalGraphDataset(data_path,
                                    asph_features_path=asph_path,
                                    soft_labels_path=soft_labels_path)
-    train_set, val_set, test_set = make_splits(
-        dataset,
-        train_ratio=cfg.get("train_ratio", 0.8),
-        val_ratio=cfg.get("val_ratio", 0.1),
-        seed=split_seed,
-    )
+    split_payload = None
+    if cfg.get("split_path"):
+        split_path = resolve_path(cfg["split_path"])
+        split_payload = load_split(
+            split_path,
+            len(dataset),
+            expected_data_sha256=cfg.get("data_sha256"),
+        )
+        train_set = Subset(dataset, split_payload["train"])
+        val_set = Subset(dataset, split_payload["val"])
+        test_set = Subset(dataset, split_payload["test"])
+        calibration_set = (
+            Subset(dataset, split_payload["calibration"])
+            if "calibration" in split_payload else None
+        )
+        split_id = split_payload["split_id"]
+    else:
+        split_path = None
+        train_set, val_set, test_set = make_splits(
+            dataset,
+            train_ratio=cfg.get("train_ratio", 0.8),
+            val_ratio=cfg.get("val_ratio", 0.1),
+            seed=split_seed,
+        )
+        calibration_set = None
+        split_id = f"legacy_random_s{split_seed}"
+
+    split_counts = {
+        "train": len(train_set), "val": len(val_set), "test": len(test_set),
+    }
+    if calibration_set is not None:
+        split_counts["calibration"] = len(calibration_set)
+
+    run_manifest = {
+        "schema_version": "prm_run_manifest_v1",
+        "status": "running",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "command": [sys.executable, *sys.argv],
+        "git": git_snapshot(),
+        "config": controlled_cfg,
+        "config_sha256": config_sha256(controlled_cfg),
+        "runtime_config": cfg,
+        "runtime_config_sha256": config_sha256(cfg),
+        "execution": {
+            "max_steps": int(args.max_steps),
+            "resume_requested": bool(args.resume),
+            "label_noise_stream": "model_seed_and_epoch_v1",
+        },
+        "assets": asset_records,
+        "data": {
+            "path": str(data_path),
+            "size_bytes": data_path.stat().st_size,
+            "data_sha256": split_payload.get("data_sha256") if split_payload else cfg.get("data_sha256"),
+        },
+        "split": {
+            "split_id": split_id,
+            "path": str(split_path) if split_path else None,
+            "sha256": file_sha256(split_path) if split_path else None,
+            "counts": split_counts,
+        },
+        "seed": cfg.get("seed", 42),
+        "environment": environment_snapshot(device),
+    }
+    write_json(out_dir / "run_manifest.json", run_manifest)
+    split_arrays = {
+        "schema_version": np.asarray("prm_split_indices_v1"),
+        "train": np.asarray(train_set.indices, dtype=np.int64),
+        "val": np.asarray(val_set.indices, dtype=np.int64),
+        "test": np.asarray(test_set.indices, dtype=np.int64),
+        "split_id": np.asarray(split_id),
+    }
+    if calibration_set is not None:
+        split_arrays["calibration"] = np.asarray(
+            calibration_set.indices, dtype=np.int64,
+        )
+    np.savez(out_dir / "split_indices.npz", **split_arrays)
 
     set_seed(cfg.get("seed", 42))
 
@@ -441,6 +646,7 @@ def main() -> None:
 
     # P0-2: Host-balanced sampling
     use_balanced = cfg.get("host_balanced", False)
+    sampler = None
     if use_balanced:
         # Sampler always indexes into the full dataset by original indices
         sampler = HostBalancedSampler(
@@ -473,6 +679,14 @@ def main() -> None:
                              shuffle=False, collate_fn=collate_fn,
                              num_workers=n_workers, pin_memory=True,
                              persistent_workers=(n_workers > 0))
+    calibration_loader = (
+        DataLoader(
+            calibration_set, batch_size=cfg.get("batch_size", 64),
+            shuffle=False, collate_fn=collate_fn, num_workers=n_workers,
+            pin_memory=True, persistent_workers=(n_workers > 0),
+        )
+        if calibration_set is not None else None
+    )
 
     # Normalizer
     targets = torch.tensor(
@@ -515,28 +729,24 @@ def main() -> None:
         aux_defect_head = DefectClassifierHead(hidden_dim).to(device)
         n_params += sum(p.numel() for p in aux_defect_head.parameters())
 
-    # P1-2: Load pretrained element embeddings + local layers
+    # Load the exact shared input/local initialization and record what matched.
     pretrained_embed_path = cfg.get("pretrained_embed", None)
     if pretrained_embed_path:
-        embed_ckpt = torch.load(ROOT / pretrained_embed_path, map_location=device, weights_only=False)
-        loaded = []
-        if "embed_weight" in embed_ckpt and hasattr(model, "embed"):
-            with torch.no_grad():
-                pre_w = embed_ckpt["embed_weight"]
-                cur_w = model.embed.weight
-                if pre_w.shape == cur_w.shape:
-                    cur_w.copy_(pre_w)
-                else:
-                    # UAE widens input dim: copy pretrained cols into first slice
-                    n_pre = pre_w.shape[1]
-                    cur_w[:, :n_pre].copy_(pre_w)
-                if "embed_bias" in embed_ckpt:
-                    model.embed.bias.copy_(embed_ckpt["embed_bias"])
-            loaded.append("embed")
-        if "local_layers" in embed_ckpt and hasattr(model, "local_layers"):
-            model.local_layers.load_state_dict(embed_ckpt["local_layers"], strict=False)
-            loaded.append("local_layers")
-        print(f"Loaded pretrained {'+'.join(loaded)} from {pretrained_embed_path}")
+        pretraining_report = load_pretrained_initialization(
+            model, resolve_path(pretrained_embed_path)
+        )
+        expected_checkpoint_hash = asset_records.get("pretrained_embed", {}).get("sha256")
+        if pretraining_report["checkpoint_sha256"] != expected_checkpoint_hash:
+            raise RuntimeError("pretraining report does not match the verified checkpoint")
+        run_manifest["pretraining"] = pretraining_report
+        write_json(out_dir / "run_manifest.json", run_manifest)
+        local_report = pretraining_report["local_layers"]
+        print(
+            "Loaded pretrained input slice and "
+            f"{local_report['loaded_tensor_count']} local tensors from "
+            f"{pretrained_embed_path}; "
+            f"{len(local_report['seeded_model_keys'])} model tensors remain seeded"
+        )
 
     # ---- Optimizer ----
     all_params = list(model.parameters())
@@ -644,6 +854,7 @@ def main() -> None:
     history = []
     best_val_mae = float("inf")
     start_epoch = 1
+    global_step = 0
 
     # ── Resume from checkpoint ──────────────────────────────────────────
     if args.resume:
@@ -652,15 +863,15 @@ def main() -> None:
             print(f"Loading resume checkpoint from {latest_path} ...")
             resume_ckpt = torch.load(latest_path, map_location=device,
                                      weights_only=False)
+            if config_sha256(resume_ckpt.get("config", {})) != config_sha256(cfg):
+                raise ValueError("resume checkpoint configuration does not match this run")
             model.load_state_dict(resume_ckpt["model"])
             optimizer.load_state_dict(resume_ckpt["optimizer"])
-            try:
-                scheduler.load_state_dict(resume_ckpt["scheduler"])
-            except Exception as e:
-                print(f"WARNING: Could not restore scheduler state: {e}")
+            scheduler.load_state_dict(resume_ckpt["scheduler"])
             best_val_mae = resume_ckpt.get("best_val_mae", float("inf"))
             history = resume_ckpt.get("history", [])
             start_epoch = resume_ckpt["epoch"] + 1
+            global_step = int(resume_ckpt.get("global_step", 0))
             if ema is not None and "ema_shadow" in resume_ckpt:
                 ema.shadow = resume_ckpt["ema_shadow"]
                 ema.backup = resume_ckpt["ema_backup"]
@@ -668,6 +879,9 @@ def main() -> None:
                 aux_defect_head.load_state_dict(resume_ckpt["aux_defect_head"])
             if use_swa and "swa_model" in resume_ckpt:
                 swa_model.load_state_dict(resume_ckpt["swa_model"])
+            if "rng_state" not in resume_ckpt:
+                raise ValueError("resume checkpoint lacks reproducible RNG state")
+            restore_rng_state(resume_ckpt["rng_state"])
             print(f"▶ Resumed from epoch {resume_ckpt['epoch']} "
                   f"(best_val_mae={best_val_mae:.4f}, "
                   f"remaining={epochs - resume_ckpt['epoch']} epochs)")
@@ -696,10 +910,14 @@ def main() -> None:
         logf.write(msg)
         logf.flush()
 
-        global_step = 0
         for epoch in range(start_epoch, epochs + 1):
             t0 = time.time()
             model.train()
+            label_noise_generator = make_label_noise_generator(
+                device, seed=int(cfg.get("seed", 42)), epoch=epoch
+            )
+            if sampler is not None:
+                sampler.set_epoch(epoch - 1)
             if aux_defect_head is not None:
                 aux_defect_head.train()
             train_loss, train_abs, n_seen = 0.0, 0.0, 0
@@ -718,7 +936,12 @@ def main() -> None:
 
                 # P1-3: Label noise
                 if label_noise_std > 0:
-                    noise = torch.randn_like(target) * label_noise_std
+                    noise = torch.randn(
+                        target.shape,
+                        dtype=target.dtype,
+                        device=target.device,
+                        generator=label_noise_generator,
+                    ) * label_noise_std
                     target_noisy = target + noise
                 else:
                     target_noisy = target
@@ -785,8 +1008,8 @@ def main() -> None:
                         if getattr(model, "ct_uae_table", None) is not None:
                             z = batch.get("atomic_numbers")
                             if z is not None:
-                                z_c = z.clamp(0, model.ct_uae_table.shape[0] - 1)
-                                _x_aux = torch.cat([_x_aux, model.ct_uae_table[z_c]], dim=-1)
+                                uae_fea = lookup_ct_uae(model.ct_uae_table, z)
+                                _x_aux = torch.cat([_x_aux, uae_fea], dim=-1)
                         h_embed = model.embed(_x_aux)
                     logits = aux_defect_head(h_embed, mask)
                     aux_loss = nn.functional.binary_cross_entropy_with_logits(
@@ -904,6 +1127,7 @@ def main() -> None:
                 "global_step": global_step,
                 "normalizer": normalizer.state_dict(),
                 "config": cfg,
+                "rng_state": capture_rng_state(),
             }
             if ema is not None:
                 _resume_state["ema_shadow"] = ema.shadow
@@ -922,6 +1146,10 @@ def main() -> None:
         model.load_state_dict(ckpt["model"])
         test_metrics = evaluate(model, test_loader, normalizer, device)
         val_final = evaluate(model, val_loader, normalizer, device)
+        calibration_metrics = (
+            evaluate(model, calibration_loader, normalizer, device)
+            if calibration_loader is not None else None
+        )
         final_line = f"\n[Final] Test MAE {test_metrics['mae']:.4f} | RMSE {test_metrics['rmse']:.4f}\n"
         print(final_line)
         logf.write(final_line)
@@ -929,8 +1157,22 @@ def main() -> None:
     summary = {
         "config": cfg, "n_params": n_params, "history": history,
         "best_val_mae": best_val_mae,
+        "split_id": split_id,
+        "validation": {
+            key: val_final[key]
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
+        },
+        "test": {
+            key: test_metrics[key]
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
+        },
         "test_mae": test_metrics["mae"], "test_rmse": test_metrics["rmse"],
     }
+    if calibration_metrics is not None:
+        summary["calibration"] = {
+            key: calibration_metrics[key]
+            for key in ("n", "mae", "rmse", "bias", "pearson", "spearman", "r2")
+        }
     # Save model internals for interpretability analysis
     if hasattr(model, 'jk_weights'):
         import torch.nn.functional as _F
@@ -947,10 +1189,48 @@ def main() -> None:
     with open(metrics_path, "w") as f:
         json.dump(summary, f, indent=2)
     np.savez(out_dir / "test_predictions.npz",
+             schema_version=np.asarray("prm_predictions_v1"),
+             split_id=np.asarray(split_id), split=np.asarray("test"),
+             indices=test_metrics["indices"],
              preds=test_metrics["preds"], targets=test_metrics["targets"])
     # Save validation predictions for post-hoc calibration
     np.savez(out_dir / "val_predictions.npz",
+             schema_version=np.asarray("prm_predictions_v1"),
+             split_id=np.asarray(split_id), split=np.asarray("val"),
+             indices=val_final["indices"],
              preds=val_final["preds"], targets=val_final["targets"])
+    if calibration_metrics is not None:
+        np.savez(
+            out_dir / "calibration_predictions.npz",
+            schema_version=np.asarray("prm_predictions_v1"),
+            split_id=np.asarray(split_id), split=np.asarray("calibration"),
+            indices=calibration_metrics["indices"],
+            preds=calibration_metrics["preds"],
+            targets=calibration_metrics["targets"],
+        )
+    output_paths = {
+        "metrics": "metrics.json",
+        "checkpoint": "best.pt",
+        "split_indices": "split_indices.npz",
+        "validation_predictions": "val_predictions.npz",
+        "test_predictions": "test_predictions.npz",
+    }
+    if calibration_metrics is not None:
+        output_paths["calibration_predictions"] = "calibration_predictions.npz"
+    output_sha256 = {
+        key: file_sha256(out_dir / relative_path)
+        for key, relative_path in output_paths.items()
+    }
+    run_manifest.update(
+        {
+            "status": "truncated" if args.max_steps else "complete",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "outputs": output_paths,
+            "output_sha256": output_sha256,
+            "metrics": summary,
+        }
+    )
+    write_json(out_dir / "run_manifest.json", run_manifest)
 
 
 if __name__ == "__main__":

@@ -1,136 +1,98 @@
 % !TEX root = ../main.tex
 
-%----------------------------------------------------------------------
-\subsection{Defect engineering in two-dimensional materials}
-%----------------------------------------------------------------------
+Point defects and incorporated impurity atoms reshape carrier densities,
+localized electronic states, magnetism, and catalytic response in
+two-dimensional (2D) materials.  Their formation energies rank relaxed
+defective structures relative to a pristine host and an atomic reservoir, and
+therefore couple the local defect environment to the surrounding chemical
+reference state~\cite{freysoldt2014}.  This coupling is especially varied in
+2D hosts: defect structures and energetics differ from their bulk
+counterparts~\cite{komsa2015}, while exposed surfaces and internal voids support distinct
+adsorbate and interstitial incorporation geometries~\cite{imp2d2023}.  The
+IMP2D database provides a systematic survey of these neutral impurities across
+host chemistries, impurity elements, incorporation classes, and candidate
+sites~\cite{imp2d2023}.  It thereby enables a broader question than pooled
+energy prediction: how does model error evolve when the host, impurity, or
+incorporation geometry departs from the training distribution?
 
-Point defects---substitutional impurities, interstitials, and
-adsorbates---fundamentally govern the electronic, optical, and catalytic
-properties of two-dimensional (2D) materials~\cite{imp2d2023}.
-In transition-metal dichalcogenides (TMDs) such as MoS$_2$ and WSe$_2$,
-a single dopant atom can shift the Fermi level, create mid-gap trap states,
-or activate catalytic edge sites---properties directly relevant to
-photocatalytic water splitting, single-photon emission, and
-next-generation field-effect transistors.
-The defect formation energy $\ef$ quantifies the thermodynamic cost of
-introducing such a defect and serves as the primary descriptor for
-high-throughput defect screening: low-$\ef$ dopants are thermodynamically
-accessible under typical growth conditions, while high-$\ef$ species
-indicate kinetically trapped or unstable configurations.
+Structure-based machine learning now provides several routes to defect
+energetics.  Graph models operate directly on periodic atomic
+structures~\cite{alignn2021,schutt2018} and have been adapted to bulk defects through
+defect-specific networks, semiconductor models, and persistent-homology
+features~\cite{witman2023,rahman2024,fang2025}.  A recent framework extended
+structural prediction to multiple charge states by aligning reference energies
+and treating perturbed host states consistently~\cite{kiyohara2025}.  For 2D
+systems, sparse defect representations on 2DMD and tree or descriptor models
+on IMP2D have demonstrated complementary data-efficient
+strategies~\cite{kazeev2023,kesorn2024,elalouani2026}.  Universal machine-learning
+interatomic potentials offer another route: large-scale calculations of
+unrelaxed vacancy energies across 86,259 Materials Project entries can be
+followed by relaxation of selected candidates~\cite{berger2025screening}.
+These advances establish predictive accuracy, charge-state treatment, and
+computational throughput, but leave the structure of chemical transfer error
+largely unresolved.
 
-However, the combinatorial space of possible host--dopant configurations
-is enormous.
-The Impurities in 2D Materials Database (IMP2D)~\cite{imp2d2023} covers 44
-monolayer hosts doped with 65 elements, yielding a $44\times65 = 2{,}860$
-matrix of which only 91.2\% entries have converged DFT results
-(10\,641 configurations).
-Each DFT supercell calculation requires hours of CPU time, making exhaustive
-enumeration impractical for the remaining gaps and for extensions to larger
-supercells or additional host families.
+The central challenge is to distinguish interpolation from transfer across
+chemistry.  A host--impurity pair absent from training may still recombine two
+familiar constituents, whereas a held-out host or impurity removes an entire
+source of target supervision.  Random structure splits mix these regimes and
+can also place numerically equivalent structures across the train--test
+boundary~\cite{li2024mdhit}; grouped evaluation is required to separate the
+resulting levels of chemical novelty~\cite{omee2024,li2025ood}.  A single
+pooled error further averages over physically distinct adsorbate and
+interstitial environments.  Finally, a periodic representation must assign
+identical predictions to structures that differ only by atom labeling.  These
+requirements connect transfer evaluation to both local defect physics and
+representation correctness.
 
-%----------------------------------------------------------------------
-\subsection{Limitations of existing approaches}
-%----------------------------------------------------------------------
+Impurity formation energy combines a localized structural perturbation with
+the broader chemistry and geometry of the host, while remaining a
+non-extensive target.  This observation motivates the Defect-Aware Radial
+Transformer (DART), an impurity-centered graph model that combines defect-local
+message passing, radial-bias self-attention, and a gated graph readout
+[Fig.~\ref{fig:architecture}].  The local representation is strictly invariant
+to atom relabeling and uses exact minimum-image distances; the readout fuses
+defect-sensitive and graph-level information without imposing atomwise
+extensive scaling.  We evaluate the resulting model under random,
+host--impurity-pair, predefined chemistry-block, impurity-held-out, and
+host-held-out protocols, followed by class-resolved error analysis.
 
-Machine-learning (ML) surrogate models offer orders-of-magnitude speedup
-over DFT.
-The Atomistic Line Graph Neural Network (ALIGNN)~\cite{alignn2021}, a
-state-of-the-art crystal property predictor with 4.03\,M parameters, achieves
-an MAE of 0.540\eV{} on IMP2D under random 80/10/10 splitting.
-El~Alouani \textit{et al.}~\cite{elalouani2024} applied gradient-boosted
-trees with hand-crafted Jacobi--Legendre descriptors, reaching 0.518\eV{}.
-In the 3D bulk domain, defect-specific GNNs have emerged:
-DefiNet~\cite{definet2025} introduces equivariant GNN with explicit defect
-markers for 14\,866 bulk defects;
-Fang and Yan~\cite{fang2025} leverage persistent homology features to
-reduce defect $\ef$ MAE by 55\%;
-and Kiyohara \textit{et al.}~\cite{kiyohara2025} predict charged-defect
-energies from crystal structure alone.
-However, none of these approaches address the 2D setting or provide
-systematic out-of-distribution (OOD) evaluation with prospective validation.
+Across 10,224 retained IMP2D structures, recombining familiar constituents
+remains close to random interpolation, whereas withholding a complete impurity
+or host roughly doubles the mean absolute error.  The larger host-transfer
+error is associated with structural novelty after accounting for training
+support.  Incorporation geometry defines a second axis: interstitials are more
+than twice as difficult as adsorbates, with their errors associated with roomy,
+weakly constrained environments while adsorbate errors track chemical
+mismatch.  Readout comparisons show that atomwise addition is poorly matched
+to the non-extensive target.  For existing DFT-relaxed IMP2D candidates,
+pair-held-out predictions identify the lower-energy incorporation class with
+91.4\% accuracy.  Atom-relabeling tests further reveal that an order-sensitive
+representation can shift individual predictions by up to 8.8~eV while leaving
+pooled error nearly unchanged.  Together, these results connect transferability
+in impurity energetics to chemical novelty, local defect environments, target
+scaling, and representation correctness.
 
-Despite these advances, four critical gaps persist:
-\begin{enumerate}
-  \item \textbf{Parameter efficiency.}
-    ALIGNN's 4.03\,M parameters are disproportionate for a dataset of
-    ${\sim}10$\,k samples, risking overfitting.
-    Our scaling analysis reveals $\alpha_\mathrm{data} = -0.40$ vs.\
-    $\beta_\mathrm{params} \approx -0.01$ ($R^2 = 0.95$)---data, not
-    model capacity, is the bottleneck.
-
-  \item \textbf{Physical inductive bias for defects.}
-    Standard GNNs are bounded by a fixed cutoff radius, yet point defects in
-    2D materials induce strain fields and charge-density perturbations
-    extending well beyond typical $r_\mathrm{cut}$~\cite{fang2025}.
-    Moreover, the readout stage typically uses mean pooling, which dilutes the
-    extreme features of the defect atom among dozens of host atoms.
-
-  \item \textbf{Rigorous innovation assessment.}
-    Most architecture papers report only point estimates of accuracy gains.
-    With typical materials test sets of ${\sim}10^3$ samples, statistical
-    power is limited; bootstrap hypothesis testing is essential to
-    distinguish genuine improvements from noise.
-
-  \item \textbf{Prospective validation.}
-    All prior work on IMP2D reports only random-split accuracy---a measure
-    of interpolation.
-    No study has evaluated whether predictions transfer to \emph{unseen
-    host materials} or validated model-recommended candidates with
-    independent DFT calculations.
-\end{enumerate}
-
-%----------------------------------------------------------------------
-\subsection{Our contributions}
-%----------------------------------------------------------------------
-
-We address these gaps by introducing \dart{} (Defect-Aware Radial
-Transformer), a compact model with three architectural innovations and
-twelve systematically evaluated physical inductive biases, accompanied by
-rigorous statistical testing and multi-tier generalization assessment.
-
-Our central thesis is that, in the data-limited regime of materials science
-($N \sim 10^4$), \emph{physically informed architecture design combined with
-careful training engineering} yields larger gains than scaling model capacity
-or adding auxiliary loss terms.
-\dart{} demonstrates this: none of six attempted auxiliary losses (label
-reweighting, contrastive, focal, heteroscedastic) improve over the base
-model, while targeted architectural changes (gated pooling, environment
-enrichment) provide consistent gains.
-
-Specifically, our contributions are:
-
-\begin{enumerate}
-  \item \textbf{\dart{} architecture} (\S\ref{sec:arch}):
-    A 0.83\,M-parameter model combining local bond--angle message passing
-    with global periodic self-attention, augmented by three innovations:
-    \emph{defect-aware gated attention pooling} ($-19.9\%$),
-    \emph{local environment enrichment} ($-18.0\%$), and
-    \emph{pre-norm residual connections} ($-21.0\%$).
-    Together, these reduce single-model MAE from 0.516 to 0.381\eV{}
-    ($-26.2\%$), with the best variant (MoE readout) reaching
-    \textbf{0.379\eV{}} ($-30\%$ vs.\ ALIGNN).
-
-  \item \textbf{Systematic innovation ablation} (\S\ref{sec:ablation_innov}):
-    Twelve physically motivated innovations---spanning architecture,
-    loss functions, and training strategies---evaluated with bootstrap
-    hypothesis testing ($n = 10{,}000$ resamples, 95\% CI).
-    Six match the baseline ($p > 0.05$); six are significantly harmful
-    ($p < 0.05$), providing actionable negative results.
-
-  \item \textbf{Efficient ensemble} (\S\ref{sec:ensemble}):
-    Greedy forward selection from 20 models identifies an 8-model
-    ensemble at \textbf{0.344\eV{}} ($-36\%$ vs.\ ALIGNN), surpassing
-    a prior 29-model ensemble (0.359\eV{}) with 3.6$\times$ fewer members.
-
-  \item \textbf{Graduated OOD assessment and calibrated UQ}
-    (\S\ref{sec:ood}, \S\ref{sec:uq}):
-    Three-tier protocol (ID $\to$ intra-family LOHO $\to$ compositional
-    block-out) quantifying deployment boundaries, with temperature-scaled
-    ensemble uncertainty achieving 93.4\% coverage at 90\% nominal level.
-
-  \item \textbf{Prospective DFT validation} (\S\ref{sec:dft}):
-    Independent first-principles verification of model-recommended
-    candidates, bridging the gap between benchmark accuracy and
-    real-world deployment.
-    % TODO: expand when DFT results are finalized
-\end{enumerate}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figure1_image2_v19_clean_lattice.pdf}
+\caption{Architecture of the Defect-Aware Radial Transformer (DART).
+  (a) A fixed 128-dimensional ct-UAE vector and nine normalized elemental
+  attributes are projected from 137 to 128 channels, after which a learned
+  impurity-status embedding marks the unique impurity node. (b) A callout from
+  that node enlarges its periodic 5-\AA{} neighborhood and identifies the four
+  defect-environment quantities: coordination number, mean and maximum
+  neighbor distances, and electronegativity contrast. These quantities are
+  normalized, projected, and added only at the impurity node before three
+  5-\AA{} distance-gated local blocks and two four-head geometric Transformer
+  blocks. The Transformer radial bias uses 32 basis functions spanning
+  0--12~\AA{}. (c) A graph-dependent scalar gate fuses an atom-attention weighted
+  sum and a channelwise maximum before a
+  $128\rightarrow128\rightarrow1$ head predicts one formation energy per
+  structure. The small pictograms illustrate only the operations named in
+  their enclosing boxes, and the bottom strip summarizes the same
+  architecture-level design principle; neither introduces an additional model component. The
+  schematic was edited with OpenAI GPT Image 2; the authors specified and
+  verified its scientific content.}
+\label{fig:architecture}
+\end{figure*}

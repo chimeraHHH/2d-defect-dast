@@ -1,0 +1,56 @@
+{
+  "collector_git": {
+    "commit": "865e90a695e3641e21bc9f2c98fc05c80723abcf",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "data_sha256": "1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b",
+  "factorial_bundle": "bundle.json",
+  "factorial_bundle_sha256": "04549d152850e05c89af64f178ee86dd7e05beb0e3982136698ffecef9c15a4e",
+  "locked_test": {
+    "bias": {
+      "ci_high": -0.012691812907169892,
+      "ci_low": -0.05188771798926336,
+      "mean": -0.03162173224353156,
+      "std": 0.02463892787809478
+    },
+    "mae": {
+      "ci_high": 0.3868856805561289,
+      "ci_low": 0.3771649361085529,
+      "mean": 0.3819841129156121,
+      "std": 0.006067071736584771
+    },
+    "r2": {
+      "ci_high": 0.9319059124768353,
+      "ci_low": 0.9220832841228237,
+      "mean": 0.927149511494324,
+      "std": 0.0060833512384524625
+    },
+    "rmse": {
+      "ci_high": 0.8971775665299493,
+      "ci_low": 0.8203108043117137,
+      "mean": 0.8625584961582815,
+      "std": 0.04851435023568295
+    },
+    "spearman": {
+      "ci_high": 0.9741149127192956,
+      "ci_low": 0.9666256735076125,
+      "mean": 0.9699854574005314,
+      "std": 0.004923599426842707
+    }
+  },
+  "n_runs": 40,
+  "rule": "minimum mean validation MAE; exact ties use fewer enabled components then variant code",
+  "schema_version": "prm_factorial_selection_v1",
+  "selected_variant": "g111",
+  "selection_data": "validation only",
+  "training_commits": [
+    "7a6593a7eaaf991fd9c18a15653c3d888b060c7e"
+  ],
+  "validation_mae": {
+    "ci_high": 0.3853558653835131,
+    "ci_low": 0.35725813426175884,
+    "mean": 0.37130699982263593,
+    "std": 0.018037102092661024
+  }
+}

@@ -1,0 +1,12 @@
+# Additional packages used by the frozen PRM experiment and analysis pipeline.
+# Versions match the verified L40S environment used for the reruns.
+ase==3.28.0
+lightgbm==4.7.0
+matplotlib==3.10.9
+numpy==2.4.4
+pytest==9.1.1
+PyYAML==6.0.3
+scikit-learn==1.8.0
+scipy==1.17.1
+torch==2.11.0
+torch-geometric==2.8.0

@@ -1,0 +1,154 @@
+{
+  "architecture": {
+    "atom_input_dimension": 137,
+    "attention_heads": 4,
+    "ct_uae_dimension": 128,
+    "elemental_attribute_dimension": 9,
+    "environment_features": [
+      "coordination_count",
+      "mean_neighbor_distance",
+      "maximum_neighbor_distance",
+      "absolute_electronegativity_contrast"
+    ],
+    "global_layers": 2,
+    "hidden_dimension": 128,
+    "local_graph_radius_A": 5.0,
+    "local_layers": 3,
+    "modules": {
+      "E": true,
+      "G": true,
+      "P": true
+    },
+    "radial_bias_grid_endpoint_A": 12.0,
+    "radial_bias_grid_is_attention_cutoff": false,
+    "selected_variant": "g111",
+    "selection_data": "validation only"
+  },
+  "counts": {
+    "ambiguous_identity_exclusions": 349,
+    "canonical_rows": 10224,
+    "defect_types": {
+      "adsorbate": 6925,
+      "interstitial": 3299
+    },
+    "dopants": 65,
+    "duplicate_exclusions": 64,
+    "host_dopant_cells": 2526,
+    "hosts": 44,
+    "raw_component_exclusions": 4,
+    "raw_rows": 17364,
+    "source_filtered_rows": 10641
+  },
+  "created_at": "2026-08-09T12:22:56.151175+00:00",
+  "inputs": {
+    "data_audit": {
+      "path": "artifacts/prm_protocol_v2/data_audit.json",
+      "sha256": "d2d537e93bd363252b60cd76ee13b73967450e9fd8d53bd20b215fb40f110bc0"
+    },
+    "figure_generator": {
+      "path": "scripts/prm_make_protocol_figure.py",
+      "sha256": "037c479954d86f01e093b4fcbcccecba28e2913b15de7b34ebbfa7f8d80190c0"
+    },
+    "global_block_source": {
+      "path": "src/models/baseline.py",
+      "sha256": "ad5627537082bbf09c77faceb0d7ac2e4d859f7f5c8fc02c2651d673ea1256e3"
+    },
+    "graph_source": {
+      "path": "src/graph.py",
+      "sha256": "206705aadcd93408e0f7fe9521271980cd698dc1fd160ded4538680750fe3487"
+    },
+    "model_source": {
+      "path": "src/models/crystal_v2.py",
+      "sha256": "c044074250aa52e9f82289083e8c10736cb4bac1a823be72ce6df103c116487e"
+    },
+    "protocol_manifest": {
+      "path": "artifacts/prm_protocol_v2/manifest.json",
+      "sha256": "7deff479a52c9c5095a94fbcd2f4d6bbc65d8800cc30fe28ba06b73c83b01dbb"
+    },
+    "sample_table": {
+      "path": "artifacts/prm_protocol_v2/samples.csv",
+      "sha256": "03e8bb9fc68f22aecba336dbcb40a35eceab51e7b6497d4af7bd69d6042f1168"
+    },
+    "selected_config": {
+      "path": "configs/prm/promoted/g111/transfer/id_cv5_f0_seed242.yaml",
+      "sha256": "db34ecf5ca9a43f315a98ffd929e4119e9befe53c91bc177404f02bfafe3d61d"
+    }
+  },
+  "outputs": {
+    "architecture_pdf": {
+      "path": "paper_Q1/figures/fig_dart_architecture.pdf",
+      "sha256": "a37bf236c851bda5c3c27ef35ee01c4fd1ecca64c414b5006288c0d1df6a7c89"
+    },
+    "architecture_png": {
+      "path": "paper_Q1/figures/fig_dart_architecture.png",
+      "sha256": "d83c7e164a9547bdb0217f6c77dfa9600a1ad4f71d3ff8c63ff936b33c9cf17a"
+    },
+    "protocol_pdf": {
+      "path": "paper_Q1/figures/fig_protocol_overview.pdf",
+      "sha256": "16a38705ed431456cc5a26693fdf368edd42d8a28669c24c2991afd4a931f828"
+    },
+    "protocol_png": {
+      "path": "paper_Q1/figures/fig_protocol_overview.png",
+      "sha256": "eafd1134f0e29058ebe0abe660fdb6b08b6af12aa9fa7b375b55be43128d077f"
+    }
+  },
+  "partition_profiles": [
+    {
+      "calibration": 0.0,
+      "label": "Paired ID",
+      "test": 1023.0,
+      "total": 10224.0,
+      "train": 8179.0,
+      "val": 1022.0
+    },
+    {
+      "calibration": 0.0,
+      "label": "Random OOF",
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
+    },
+    {
+      "calibration": 0.0,
+      "label": "Host OOF",
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
+    },
+    {
+      "calibration": 0.0,
+      "label": "Impurity OOF",
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
+    },
+    {
+      "calibration": 0.0,
+      "label": "Pair OOF",
+      "test": 2044.8,
+      "total": 10224.0,
+      "train": 6134.4,
+      "val": 2044.8
+    },
+    {
+      "calibration": 0,
+      "label": "Chem. block",
+      "test": 365,
+      "total": 10224.0,
+      "train": 9487,
+      "val": 372
+    },
+    {
+      "calibration": 511,
+      "label": "UQ holdout",
+      "test": 1023,
+      "total": 10224.0,
+      "train": 7668,
+      "val": 1022
+    }
+  ],
+  "schema_version": "prm_protocol_figure_v3"
+}

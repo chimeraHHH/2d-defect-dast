@@ -1,0 +1,29 @@
+{
+  "adsorbate_bottom_quartile_error_threshold_eV": 0.0645142623706303,
+  "case_panel_complete": false,
+  "claim_boundary": "case panel is exploratory, incomplete, or lacks a passing population association",
+  "conv2_pathology_rule": "exactly ceil(0.01*10224)=103 finite rows ranked by descending abs_conv2, then sample_index",
+  "evidence_label": "CANONICAL \u2014 REPAIRED G2 OOF",
+  "evidence_tier": "canonical",
+  "high_error_host_families": 2,
+  "main_text_gate": 0,
+  "matching_fallback_used": false,
+  "n_conv2_pathology": 103,
+  "n_finite_conv2": 10224,
+  "n_high_error_selected": 4,
+  "n_matched_controls_selected": 3,
+  "p1_population_effect_gate": true,
+  "schema_version": "prm_g3_case_selection_summary_v1",
+  "target_decile_cutpoints_eV": [
+    -0.6383104015000102,
+    0.22230654699999816,
+    0.8604233110000142,
+    1.4637757720000033,
+    2.1001942799999944,
+    2.7068148550000033,
+    3.4561083455000094,
+    4.549206589000002,
+    6.301862950999882
+  ],
+  "target_decile_tie_rule": "np.searchsorted(side='right')"
+}

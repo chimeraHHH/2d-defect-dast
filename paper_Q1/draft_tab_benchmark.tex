@@ -1,0 +1,25 @@
+% DRAFT TABLE - generated from artifacts/prm_results/repaired_transfer_metrics.json
+% by the command recorded in the introducing commit; replaced by the formal
+% asset generator before submission.  DART values are repaired G2 predictions;
+% SchNet and descriptor comparators come from audited archives whose
+% independence from the DART graph defects is established.
+\begin{table}[t]
+\caption{Test MAE (eV) across the five transfer regimes.  DART values are
+seed-averaged repaired out-of-fold predictions (fold mean); SchNet is the
+additive-readout baseline under the identical protocol; the descriptor
+column is the model selected by validation MAE within each split.
+Parentheses give the fold standard deviation where five folds exist.}
+\label{tab:benchmark}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Regime & DART & SchNet & Descriptor \\
+\midrule
+Random cross-validation & 0.408 (0.019) & 0.571 (0.018) & 0.625 \\
+Pair held out & 0.442 (0.014) & 0.628 (0.029) & 0.674 \\
+Chemistry block & 0.483 & 0.543 & 0.642 \\
+Impurity held out & 0.844 (0.139) & 1.692 (0.098) & 1.334 \\
+Host held out & 0.891 (0.145) & 6.701 (2.619) & 1.266 \\
+\bottomrule
+\end{tabular}
+\end{table}

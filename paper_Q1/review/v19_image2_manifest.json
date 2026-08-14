@@ -1,0 +1,67 @@
+{
+  "schema_version": "prm_v19_image2_manifest_v1",
+  "model": "OpenAI GPT Image 2 via Codex built-in image generation",
+  "date": "2026-08-13",
+  "author_authorization": "User explicitly authorized Image 2 editing for self-made figures",
+  "figures": [
+    {
+      "formal_figure_number": 1,
+      "source": "paper_Q1/figures/figure1_manual.png",
+      "source_sha256": "faa8486b8a8179727d74a8e84ae118d165cea052b711a6cbfbd3b670a528a63c",
+      "edited_png": "paper_Q1/figures/figure1_image2_v19.png",
+      "paper_asset": "paper_Q1/figures/figure1_image2_v19.pdf",
+      "edited_png_sha256": "f0c3df0b55a49f364fca3095c8f4512d47d6a0cca2de6d33638de87c129d3999",
+      "paper_asset_sha256": "d303a11400d79ee73fa50167c5e37f98dfb4fb3bee1e6bac38561223f6593fdf",
+      "superseded_by_png": "paper_Q1/figures/figure1_image2_v19_inset.png",
+      "superseded_by_pdf": "paper_Q1/figures/figure1_image2_v19_inset.pdf",
+      "superseded_by_png_sha256": "36e684b74922d43ccaa6009e4c9b12580e8ec9e85ec369e5e093646e88cf1bff",
+      "superseded_by_pdf_sha256": "da33d709d97a4d463ac263dccd8a0b881347e1373221dead5802beb57084ecfd",
+      "paperstyle_png": "paper_Q1/figures/figure1_image2_v19_paperstyle.png",
+      "paperstyle_pdf": "paper_Q1/figures/figure1_image2_v19_paperstyle.pdf",
+      "paperstyle_png_sha256": "e57656edf3b5942100179f6ab4146e5f4fc8740acd8ff9a089aee6c662cb441e",
+      "paperstyle_pdf_sha256": "cd4c4571fd3d0a1890c6a7b00e787c9e5202909a46556d554b707f5808972f2b",
+      "style_reference_sha256": "174b8cf74ba480eda85629709138cb21e91958943e71828191524e6365c7040f",
+      "style_reference_use": "visual style only; no objects, labels, data, or layout copied",
+      "aligned_icons_png": "paper_Q1/figures/figure1_image2_v19_aligned_icons.png",
+      "aligned_icons_pdf": "paper_Q1/figures/figure1_image2_v19_aligned_icons.pdf",
+      "aligned_icons_png_sha256": "0bbf7c74ef3c816add54d0f39a57d9235c25f175f624bd9fab57bc9eb4795491",
+      "aligned_icons_pdf_sha256": "6114b3a02cd79a93d4ac4b91f2b2c3884ccef1bdb4f954c7663d603192731d13",
+      "aligned_icons_scope": "grid alignment; removal of the in-image attention-cutoff disclaimer; pictograms for existing operations only",
+      "clean_lattice_png": "paper_Q1/figures/figure1_image2_v19_clean_lattice.png",
+      "clean_lattice_pdf": "paper_Q1/figures/figure1_image2_v19_clean_lattice.pdf",
+      "clean_lattice_png_sha256": "f02f3d74ba7d95471c7d2e9d435a32a5e0b5add85f0fbfbce69672e013b84d96",
+      "clean_lattice_pdf_sha256": "0fd59a60d88140d83dcbf97bed0896a7d2c8e19cbc94e1724a7b39b62c06e382",
+      "repair_reference_sha256": "547ad6aaaf551f3c022d167127439347fe529bb7328ca589bf84549969bfeb3a",
+      "clean_lattice_scope": "localized removal of ghosted and duplicated atom contours in the 2D-supercell inset",
+      "edit_scope": "Correct architecture labels and topology; remove prospective screening decision; integrate the E-module inset",
+      "scientific_qa": "author-directed labels and topology verified against manuscript methods"
+    },
+    {
+      "formal_figure_number": 2,
+      "source": "paper_Q1/figures/figure2_manual.png",
+      "source_sha256": "e0aa02e82e9ea26dd22e201ae7006511891c65e9ca4fca4faa6b838bb1b238e9",
+      "edited_png": "paper_Q1/figures/figure2_image2_v19.png",
+      "paper_asset": "paper_Q1/figures/figure2_image2_v19.pdf",
+      "edited_png_sha256": "2f0e0138206937b08b086c66e3f122560d8ed03f85ad4f3dcaa6efbb05a445c1",
+      "paper_asset_sha256": "ba23729c7129a0d800450638e474e0e330b128383a164bf96b4a853ff4972439",
+      "stix_png": "paper_Q1/figures/figure2_image2_v19_stix.png",
+      "stix_pdf": "paper_Q1/figures/figure2_image2_v19_stix.pdf",
+      "stix_png_sha256": "27644b54c0af1c0bc4ffeac41a61ae20b5b65145d4c3994b11c4c2245bc9923f",
+      "stix_pdf_sha256": "ee210a27f90b33d904fb6be4dfdf7d429ded10bcd21c8e7896aa773d5359d7cc",
+      "stix_scope": "typography-only edit matching the STIXGeneral-like hierarchy of Figure 3",
+      "edit_scope": "Separate adsorbate and interstitial into alternative single-impurity panels and add redundant shape encoding",
+      "scientific_qa": "author-directed class separation and labels verified against manuscript dataset definition"
+    }
+  ],
+  "quantitative_figures_generated_by_image_model": false,
+  "private_inputs_sent": [
+    "the two user-supplied source schematics",
+    "the displayed scientific editing prompts"
+  ],
+  "private_inputs_not_sent": [
+    "manuscript source or PDF",
+    "result tables or prediction archives",
+    "reviewer text",
+    "author identity"
+  ]
+}

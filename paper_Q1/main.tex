@@ -1,4 +1,4 @@
-\documentclass[twocolumn,superscriptaddress,prb,floatfix]{revtex4-2}
+\documentclass[aps,prb,reprint,superscriptaddress,floatfix,longbibliography]{revtex4-2}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -15,9 +15,6 @@
 \setcounter{topnumber}{4}
 \setcounter{bottomnumber}{3}
 \setcounter{totalnumber}{8}
-\usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, shapes.geometric, fit,
-                 decorations.pathreplacing, calc}
 \usepackage[colorlinks=true,
             linkcolor=blue!60!black,
             citecolor=green!50!black,
@@ -29,44 +26,60 @@
 \newcommand{\mae}{\mathrm{MAE}}
 \newcommand{\eV}{\ensuremath{\,\mathrm{eV}}}
 
+% Canonical result assets are exposed to the manuscript only after every
+% generated table and figure has completed successfully.
+\newif\ifprmresultsready
+\IfFileExists{generated/results_ready.tex}{%
+  \prmresultsreadytrue
+  \input{generated/results_macros.tex}%
+  \input{draft_repaired_macros.tex}%
+  \input{prb_context_macros.tex}%
+}{%
+  \prmresultsreadyfalse
+}
+
 \begin{document}
 
-\title{DART: Defect-Aware Radial Transformer with Physically Informed
-       Innovations for Formation Energy Prediction in Two-Dimensional Materials}
+\title{Defect-aware graph transformer for impurity formation energies in
+two-dimensional materials: Chemical transferability and error analysis}
 
 \author{Yiming Hua}
 \affiliation{Wuhan University, Wuhan, China}
-% TODO: add other authors
+% Author-controlled submission blocker: insert the verified full author list,
+% affiliations, corresponding-author email, and ORCIDs.
 
 \date{\today}
 
 \begin{abstract}
-Point defects govern the electronic, optical, and catalytic properties of
-two-dimensional (2D) materials, yet first-principles formation-energy
-calculations remain prohibitively expensive for exhaustive host--dopant
-screening.  Here we present \dart{} (Defect-Aware Radial Transformer), a
-compact graph transformer that combines local bond-angle message passing,
-global periodic self-attention, and three targeted architectural
-innovations---defect-aware gated attention pooling, local environment
-enrichment, and pre-norm residual connections---to predict defect formation
-energies on the IMP2D benchmark with substantially fewer parameters than
-existing approaches.  A small ensemble of physically diverse models further
-improves accuracy beyond a much larger prior ensemble.
-
-We systematically evaluate twelve physically motivated innovations spanning
-architecture, loss functions, and training strategies, using bootstrap
-hypothesis testing with rigorous statistical controls.  Notably, all
-auxiliary-loss and reweighting strategies significantly \emph{worsen}
-performance, while targeted architectural changes provide consistent gains---a
-finding that challenges the common practice of importing imbalanced-learning
-techniques from computer vision into data-limited materials science.
-
-A graduated three-tier out-of-distribution protocol quantifies deployment
-boundaries from interpolation through intra-family transfer to compositional
-extrapolation, revealing graceful degradation.  Temperature-scaled ensemble
-uncertainty provides well-calibrated confidence estimates.  Together, these
-results establish \dart{} as an efficient and rigorously validated surrogate
-for accelerating defect engineering in 2D materials.
+\ifprmresultsready
+Random-split accuracy does not show how defect-energy models transfer across
+chemistry or how their errors depend on incorporation geometry.  We develop
+the Defect-Aware Radial Transformer (DART), an impurity-centered graph model
+that combines defect-local message passing, geometric attention, and a
+non-extensive gated readout.  Evaluated on 10,224 neutral impurity structures
+from IMP2D, DART achieves similar errors under random and pair-held-out
+evaluation, but the mean absolute error rises to 0.845 and 0.891~eV for unseen
+impurities and hosts, respectively.  The host--impurity asymmetry is associated
+with structural novelty after accounting for training support.  Interstitials
+are more than twice as difficult as adsorbates: their errors are associated
+with roomy, weakly constrained environments, whereas adsorbate errors track
+chemical mismatch, particularly signed valence differences.  A readout
+comparison shows that atomwise addition is poorly matched to the non-extensive
+target, while defect-centered pooling avoids size-dependent drift.  For
+retrospective reranking of existing DFT-relaxed IMP2D candidates,
+pair-held-out predictions identify the lower-energy incorporation class with
+91.4\% accuracy.  Atom-relabeling tests further show that an order-sensitive
+representation can shift individual predictions by up to 8.8~eV while leaving
+pooled error nearly unchanged.  Together, these results connect chemical
+transfer, local defect environments, and representation correctness in
+machine-learned defect energetics.
+\else
+We study how impurity formation-energy prediction changes across host,
+impurity, and incorporation-geometry axes in two-dimensional materials.  The
+analysis uses a defect-aware graph Transformer and a curated subset
+of IMP2D; numerical results are available only when the corresponding audited
+result bundle is present.
+\fi
 \end{abstract}
 
 \maketitle
@@ -82,7 +95,7 @@ for accelerating defect engineering in 2D materials.
 \input{sections/methods}
 
 %----------------------------------------------------------------------
-\section{Experimental Setup}\label{sec:setup}
+\section{Evaluation Protocol}\label{sec:setup}
 %----------------------------------------------------------------------
 \input{sections/setup}
 
@@ -104,8 +117,24 @@ for accelerating defect engineering in 2D materials.
 \begin{acknowledgments}
 This work was supported by the National College Students Innovation and
 Entrepreneurship Training Program (Key Support Area Project).
-Computations were performed on 8$\times$NVIDIA L40S GPUs at Wuhan University.
+Computations were performed on an NVIDIA L40S cluster at Wuhan University.
+OpenAI Codex (GPT-5, accessed August 2026) assisted with implementation and
+debugging of analysis and verification scripts, manuscript restructuring,
+language revision, and consistency checks. OpenAI GPT Image 2 was used to edit
+the two schematic figures identified in their captions. The authors directed
+these uses, reviewed the AI-assisted code, analyses, text, and schematics, and
+verified the manuscript against the archived results, source code, and cited
+literature. No AI tool generated or modified the IMP2D reference labels or any
+quantitative result figure, and the authors take responsibility for the final
+manuscript.
 \end{acknowledgments}
+
+\section*{Data availability}
+The source data are available as version 2 of the Interstitial and Adsorbate
+Structure Database~\cite{imp2d_dataset2022}; their construction is described in
+Ref.~\cite{imp2d2023}.  The sample audit, split definitions, resolved
+configurations, analysis code, and machine-readable results used in this study
+are available in the project repository~\cite{dart_repository2026}.
 
 \bibliography{references}
 

@@ -1,0 +1,373 @@
+import json
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+
+from scripts.prm_collect_results import (
+    DESCRIPTOR_SELECTED_MODEL,
+    bootstrap_ci,
+    comparison_archive_manifests,
+    file_sha256,
+    load_prediction_array,
+    paired_sample_comparison,
+    prediction_partitions_align,
+    regression_metrics,
+    regime_for_split,
+    retain_selected_descriptor_rows,
+    select_descriptor_families,
+    validate_descriptor_root,
+    validate_expected_config_coverage,
+    validate_neural_campaign_commits,
+    write_csv,
+)
+from src.prm_provenance import validate_protocol_targets
+
+
+def test_regime_names_are_derived_from_frozen_split_ids():
+    assert regime_for_split("id_cv5_f2") == "id_cv"
+    assert regime_for_split("pair_cv5_f4") == "pair_cv"
+    assert regime_for_split("host_cv5_f0") == "host_cv"
+    assert regime_for_split("dopant_cv5_f3") == "dopant_cv"
+    assert regime_for_split("chemistry_block_g6x3d") == "chemistry_block"
+
+
+def test_descriptor_family_selection_ignores_test_metrics():
+    rows = [
+        {
+            "model": "descriptor:a", "family": "a", "regime": "id_cv",
+            "split_id": "id_cv5_f0",
+            "validation_mae": 0.4, "test_mae": 10.0,
+        },
+        {
+            "model": "descriptor:b", "family": "b", "regime": "id_cv",
+            "split_id": "id_cv5_f0",
+            "validation_mae": 0.5, "test_mae": 0.1,
+        },
+    ]
+    selected = select_descriptor_families(rows)
+    assert (
+        selected["id_cv"]["split_selections"]["id_cv5_f0"]["selected_family"]
+        == "a"
+    )
+    assert (
+        selected["id_cv"]["selection_data"]
+        == "validation only within each split"
+    )
+
+
+def test_descriptor_family_selection_is_independent_in_each_split():
+    rows = [
+        {
+            "model": f"descriptor:{family}",
+            "family": family,
+            "regime": "host_cv",
+            "split_id": split_id,
+            "validation_mae": validation,
+            "test_mae": test,
+        }
+        for split_id, values in (
+            ("host_cv5_f0", {"a": (0.2, 9.0), "b": (0.4, 0.1)}),
+            ("host_cv5_f1", {"a": (0.5, 0.1), "b": (0.3, 9.0)}),
+        )
+        for family, (validation, test) in values.items()
+    ]
+    rows.extend(
+        {
+            "model": "descriptor:mean",
+            "family": "mean",
+            "regime": "host_cv",
+            "split_id": split_id,
+            "validation_mae": 2.0,
+            "test_mae": 2.0,
+        }
+        for split_id in ("host_cv5_f0", "host_cv5_f1")
+    )
+
+    selection = select_descriptor_families(rows)
+    retained = retain_selected_descriptor_rows(rows, selection)
+
+    assert selection["host_cv"]["family_counts"] == {"a": 1, "b": 1}
+    assert {
+        (row["split_id"], row["family"], row["model"])
+        for row in retained
+        if row["model"] == DESCRIPTOR_SELECTED_MODEL
+    } == {
+        ("host_cv5_f0", "a", DESCRIPTOR_SELECTED_MODEL),
+        ("host_cv5_f1", "b", DESCRIPTOR_SELECTED_MODEL),
+    }
+
+
+def test_paired_bootstrap_difference_is_positive_for_worse_comparator():
+    targets = np.zeros(100)
+    dart = np.full(100, 0.1)
+    comparator = np.full(100, 0.5)
+    result = paired_sample_comparison(targets, dart, comparator, seed=1, draws=500)
+    assert result["mae_difference_comparator_minus_dart_eV"] > 0.0
+    assert result["ci_low_eV"] > 0.0
+    assert result["n_resampling_units"] == 100
+
+
+def test_paired_bootstrap_resamples_declared_clusters():
+    targets = np.zeros(4)
+    dart = np.asarray([0.0, 0.0, 0.0, 1.0])
+    comparator = np.asarray([1.0, 1.0, 1.0, 0.0])
+
+    result = paired_sample_comparison(
+        targets, dart, comparator, seed=1, draws=500,
+        groups=["host-a", "host-a", "host-a", "host-b"],
+    )
+
+    assert result["mae_difference_comparator_minus_dart_eV"] == 0.5
+    assert result["n"] == 4
+    assert result["n_resampling_units"] == 2
+
+
+def test_pooled_metrics_include_group_and_low_energy_diagnostics():
+    targets = np.arange(-5.0, 5.0)
+    predictions = targets.copy()
+    predictions[0] += 1.0
+    hosts = ["A"] * 5 + ["B"] * 5
+    dopants = ["X", "Y"] * 5
+
+    metrics = regression_metrics(targets, predictions, hosts, dopants)
+
+    assert metrics["spearman"] < 1.0
+    assert metrics["favorable_n"] == 6
+    assert metrics["low_energy_k"] == 1
+    assert metrics["low_energy_mae"] == 1.0
+    assert metrics["low_energy_recall"] == 1.0
+    assert metrics["host_macro_mae"] == 0.1
+    assert metrics["dopant_macro_mae"] == 0.1
+
+
+def test_constant_mean_baseline_has_explicitly_undefined_rank_metric():
+    targets = np.asarray([-1.0, 0.0, 2.0])
+    predictions = np.full(3, 0.5)
+
+    metrics = regression_metrics(targets, predictions)
+
+    assert metrics["spearman"] is None
+
+
+def test_pooled_metrics_mark_empty_nonpositive_stratum_as_undefined():
+    targets = np.asarray([1.0, 2.0, 3.0])
+    predictions = np.asarray([1.1, 2.1, 2.9])
+
+    metrics = regression_metrics(targets, predictions)
+
+    assert metrics["favorable_n"] == 0
+    assert metrics["favorable_mae"] is None
+
+
+def test_single_fold_interval_is_explicitly_not_estimable():
+    summary = bootstrap_ci([0.5], seed=1)
+
+    assert summary["mean"] == 0.5
+    assert summary["ci_low"] is None
+    assert summary["ci_high"] is None
+    assert summary["interval_status"] == "not_estimable_single_fold"
+
+
+def test_descriptor_root_requires_observed_data_and_artifact_hashes(tmp_path):
+    protocol_dir = tmp_path / "protocol"
+    split_dir = protocol_dir / "splits"
+    split_dir.mkdir(parents=True)
+    (split_dir / "id_cv5_f0.json").write_text("{}")
+    protocol_path = protocol_dir / "manifest.json"
+    protocol_path.write_text(json.dumps({"data_sha256": "data-sha"}))
+
+    descriptor_root = tmp_path / "descriptors"
+    result_dir = descriptor_root / "id_cv5_f0"
+    result_dir.mkdir(parents=True)
+    metrics_path = result_dir / "metrics.json"
+    predictions_path = result_dir / "predictions.npz"
+    metrics_path.write_text("{}")
+    predictions_path.write_bytes(b"predictions")
+    manifest = {
+        "schema_version": "prm_descriptor_manifest_v2",
+        "status": "complete",
+        "selection_data": "validation only",
+        "data_sha256": "data-sha",
+        "data_file_sha256": "data-sha",
+        "protocol_manifest_sha256": file_sha256(protocol_path),
+        "git": {"dirty": False, "commit": "training"},
+        "metric_encoding": {
+            "schema_version": "prm_nullable_correlations_v1",
+            "normalizer_git": {"dirty": False, "commit": "normalizer"},
+        },
+        "splits": ["id_cv5_f0"],
+        "split_artifacts": {
+            "id_cv5_f0": {
+                "metrics_sha256": file_sha256(metrics_path),
+                "predictions_sha256": file_sha256(predictions_path),
+            }
+        },
+    }
+    manifest_path = descriptor_root / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest))
+
+    validate_descriptor_root(descriptor_root, protocol_dir)
+
+    manifest["data_file_sha256"] = "copied-not-observed"
+    manifest_path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="independently verified"):
+        validate_descriptor_root(descriptor_root, protocol_dir)
+
+
+def test_write_csv_uses_lf_line_endings(tmp_path):
+    output = tmp_path / "metrics.csv"
+
+    write_csv(output, [{"split": "id_cv5_f0", "mae": 0.5}])
+
+    assert output.read_bytes() == b"split,mae\nid_cv5_f0,0.5\n"
+
+
+def test_neural_prediction_loader_preserves_target_storage_precision(tmp_path):
+    path = tmp_path / "test_predictions.npz"
+    protocol_targets = {1: -3.210987654321, 2: 12.3456789012345}
+    np.savez(
+        path,
+        schema_version=np.asarray("prm_predictions_v1"),
+        split_id=np.asarray("id_cv5_f0"),
+        split=np.asarray("test"),
+        indices=np.asarray([2, 1]),
+        targets=np.asarray(
+            [protocol_targets[2], protocol_targets[1]], dtype=np.float32
+        ),
+        preds=np.asarray([11.0, -2.0], dtype=np.float32),
+    )
+
+    indices, targets, _ = load_prediction_array(path, "dart")
+    canonical = validate_protocol_targets(
+        indices, targets, protocol_targets, context="DART predictions"
+    )
+
+    assert targets.dtype == np.float32
+    assert canonical.dtype == np.float64
+    assert canonical.tolist() == [protocol_targets[1], protocol_targets[2]]
+
+
+def test_partial_prediction_partitions_are_not_pairable():
+    reference_indices = np.asarray([1, 2, 3])
+    reference_targets = np.asarray([0.1, 0.2, 0.3])
+
+    assert prediction_partitions_align(
+        reference_indices,
+        reference_targets,
+        reference_indices.copy(),
+        reference_targets.copy(),
+    )
+    assert not prediction_partitions_align(
+        reference_indices,
+        reference_targets,
+        np.asarray([1, 2]),
+        np.asarray([0.1, 0.2]),
+    )
+
+
+def test_comparison_archive_excludes_already_archived_factorial_runs(tmp_path):
+    result_root = tmp_path / "results"
+    factorial = result_root / "factorial" / "g101" / "run" / "run_manifest.json"
+    transfer = result_root / "selected" / "g101" / "transfer" / "run_manifest.json"
+    schnet = result_root / "baselines" / "schnet" / "run_manifest.json"
+    rows = [
+        {"model": "dart", "manifest_path": str(factorial)},
+        {"model": "dart", "manifest_path": str(transfer)},
+        {"model": "schnet", "manifest_path": str(schnet)},
+        {"model": "descriptor:mean", "manifest_path": "descriptor.json"},
+    ]
+
+    selected = comparison_archive_manifests(rows, result_root)
+
+    assert selected == sorted([transfer.resolve(), schnet.resolve()])
+
+
+def test_neural_campaigns_require_one_bound_commit_each():
+    rows = [
+        {"model": "dart", "regime": "id_repeat", "git_commit": "factorial"},
+        {"model": "dart", "regime": "host_cv", "git_commit": "transfer"},
+        {"model": "schnet", "regime": "host_cv", "git_commit": "schnet"},
+    ]
+    selection = {"training_commits": ["factorial"]}
+
+    assert validate_neural_campaign_commits(rows, selection) == {
+        "dart_factorial": "factorial",
+        "dart_transfer": "transfer",
+        "schnet": "schnet",
+    }
+
+    rows.append(
+        {"model": "schnet", "regime": "dopant_cv", "git_commit": "other"}
+    )
+    with pytest.raises(ValueError, match="schnet results do not share one"):
+        validate_neural_campaign_commits(rows, selection)
+
+
+def test_neural_campaign_requires_each_controlled_output_exactly_once(tmp_path):
+    result_root = tmp_path / "results"
+    expected = {
+        "selected/g111/transfer/id_cv5_f0/seed242": SimpleNamespace(
+            sha256="a" * 64
+        ),
+        "selected/g111/transfer/id_cv5_f1/seed242": SimpleNamespace(
+            sha256="b" * 64
+        ),
+    }
+    rows = [
+        {
+            "model": "dart",
+            "controlled_output_dir": output_dir,
+            "manifest_path": str(result_root / output_dir / "run_manifest.json"),
+        }
+        for output_dir in expected
+    ]
+
+    coverage = validate_expected_config_coverage(
+        rows, "dart", expected, result_root
+    )
+
+    assert coverage["n_expected"] == 2
+    assert coverage["n_observed"] == 2
+    assert coverage["complete"] is True
+    assert coverage["missing_output_dirs"] == []
+
+    with pytest.raises(ValueError, match="not represented once"):
+        validate_expected_config_coverage(
+            rows + [dict(rows[0])], "dart", expected, result_root
+        )
+
+
+def test_neural_campaign_rejects_missing_or_misplaced_outputs(tmp_path):
+    result_root = tmp_path / "results"
+    output_dir = "baselines/schnet/id_cv5_f0/seed342"
+    expected = {
+        output_dir: SimpleNamespace(sha256="c" * 64),
+        "baselines/schnet/id_cv5_f1/seed342": SimpleNamespace(
+            sha256="d" * 64
+        ),
+    }
+    row = {
+        "model": "schnet",
+        "controlled_output_dir": output_dir,
+        "manifest_path": str(result_root / output_dir / "run_manifest.json"),
+    }
+
+    with pytest.raises(ValueError, match="lacks 1 controlled"):
+        validate_expected_config_coverage(
+            [row], "schnet", expected, result_root
+        )
+    partial = validate_expected_config_coverage(
+        [row], "schnet", expected, result_root, require_all=False
+    )
+    assert partial["complete"] is False
+
+    misplaced = dict(row)
+    misplaced["manifest_path"] = str(result_root / "elsewhere/run_manifest.json")
+    with pytest.raises(ValueError, match="outside its controlled output"):
+        validate_expected_config_coverage(
+            [misplaced],
+            "schnet",
+            {output_dir: expected[output_dir]},
+            result_root,
+        )

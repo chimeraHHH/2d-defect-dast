@@ -1,0 +1,55 @@
+model: v2
+data_path: data/processed/cleaned_dataset_g1_repaired_v1.pkl
+output_dir: g1/pilots/no_pretrain/pair_cv5_f0/seed242
+split_path: artifacts/prm_g1/splits/pair_cv5_f0_repaired_v1.json
+seed: 242
+batch_size: 64
+num_workers: 0
+epochs: 30
+loss: mae
+grad_clip: 5.0
+online_aug: false
+host_balanced: true
+samples_per_host: 200
+label_noise_std: 0.03
+asset_integrity_required: true
+asset_sha256:
+  ct_uae: ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc
+scheduler_type: cosine
+warmup_epochs: 10
+optimizer:
+  lr: 0.0005
+  weight_decay: 0.0001
+scheduler:
+  eta_min: 1.0e-06
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  use_gated_pooling: true
+  use_env_enrichment: true
+  use_prenorm_local: true
+  env_zero_neighbor_mode: zero_residual_v1
+data_sha256: cdcbef7cf1098063b446f4f4c672008961dd6c92e9b6b6054000abc4dceb474a
+g1_pilot_contract:
+  schema_version: prm_g1_pilot_config_v1
+  graph_builder_version: exact_mic_invariant_triplets_v1
+  graph_builder_source_sha256: 86d035ef407cae48c4e375bfcbcfdc7492203529d1529e96be0a5bf23b8038a7
+  env_zero_neighbor_mode: zero_residual_v1
+  model_source_sha256: 57f44e468c9420bdc0405daaddd31d79d2d622ca2c195e860631a950328495b3
+  repaired_dataset_receipt_sha256: 4e643ea1a38c195c460eb6613f97e31b65f5dd2b1463f87b90ab4d1838e968fe
+  repaired_dataset_builder_commit: 73fd7cef51a45945977f2602f216e1ac7b6bb697
+  source_split_sha256: 2a27fd4f3e862d2225048b6255ef3c5d9d2e7b88f326e9cd9bd3da5a0223895a
+  base_config_sha256: 04cdb90d48f8e55e0c15b92064ca1af4dc5d64dcc3db012c059e3ea58b642f8e
+  derived_split_sha256: 1db92c551ed2f4168bf8f4710d99b7f0884b987eee2f88a2e27e043daaf82123
+  catastrophic_validation_mae_eV_lt: 3.0
+  test_partition_role: collected_by legacy trainer but forbidden for pilot decisions
+  arm: no_pretrain
+  claim_boundary: correctness-clean IMP2D graph pilot; no transfer claim

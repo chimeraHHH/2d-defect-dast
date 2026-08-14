@@ -1,0 +1,75 @@
+{
+  "catalog_version": "prb_v19_figures_v1",
+  "updated_on": "2026-08-13",
+  "evidence_boundary": "Quantitative panels reproduce existing repaired-model evidence; GPT Image 2 was used only for the two author-directed scientific schematics.",
+  "rendered_package": {
+    "main_pdf_pages": 13,
+    "supplement_pdf_pages": 13,
+    "main_figure_count": 6,
+    "supplement_figure_count": 8,
+    "main_pdf_render_qa": "pass",
+    "supplement_render_qa": "pass"
+  },
+  "main_figures": [
+    {
+      "number": 1,
+      "label": "fig:architecture",
+      "role": "Verified DART data path and non-extensive readout",
+      "source": "paper_Q1/figures/figure1_image2_v19_clean_lattice.pdf",
+      "provenance": "paper_Q1/review/v19_image2_manifest.json",
+      "status": "author_directed_image2_clean_lattice_revision_verified"
+    },
+    {
+      "number": 2,
+      "label": "fig:incorporation_classes",
+      "role": "Alternative adsorbate and interstitial single-impurity configurations",
+      "source": "paper_Q1/figures/figure2_image2_v19_stix.pdf",
+      "sha256": "ee210a27f90b33d904fb6be4dfdf7d429ded10bcd21c8e7896aa773d5359d7cc",
+      "provenance": "paper_Q1/review/v19_image2_manifest.json",
+      "status": "author_directed_image2_stix_typography_revision_verified"
+    },
+    {
+      "number": 3,
+      "label": "fig:prediction_transfer",
+      "role": "Pair-held-out parity and chemical-transfer hierarchy",
+      "source": "paper_Q1/figures/fig_prediction_transfer_v19.pdf",
+      "generator": "scripts/prm_render_v19_main_figure.py",
+      "status": "deterministic_existing_evidence"
+    },
+    {
+      "number": 4,
+      "label": "fig:error_map",
+      "role": "Adjusted physical error map",
+      "source": "paper_Q1/figures/fig_error_map.pdf",
+      "status": "existing_repaired_evidence"
+    },
+    {
+      "number": 5,
+      "label": "fig:reranking",
+      "role": "Retrospective reranking of available relaxed candidates",
+      "source": "paper_Q1/figures/fig_reranking_repaired.pdf",
+      "status": "existing_repaired_evidence"
+    },
+    {
+      "number": 6,
+      "label": "fig:permutation",
+      "role": "Permutation-sensitivity diagnostic",
+      "source": "paper_Q1/figures/fig_permutation_repair.pdf",
+      "sha256": "8ae97dd6ff29703363e065fb7cade3717b524fd82b822fe605730468107bc06a",
+      "editable_source": "paper_Q1/figures/fig_permutation_repair.svg",
+      "editable_source_sha256": "d08f27455cc76e1d251e637d08b9ef3dc835cae8b777deead756fef42f56a759",
+      "generator": "scripts/prm_render_permutation_figure.py",
+      "status": "existing_repaired_evidence"
+    }
+  ],
+  "supplement_figures": [
+    {"number": "S1", "role": "Data provenance and evaluation protocol", "source": "paper_Q1/figures/fig_protocol_overview.pdf"},
+    {"number": "S2", "role": "Paired architecture factorial", "source": "paper_Q1/figures/fig_factorial_autofigure_v1.pdf"},
+    {"number": "S3", "role": "Internal uncertainty evaluation", "source": "paper_Q1/figures/fig_uq.pdf"},
+    {"number": "S4", "role": "Descriptive error heterogeneity", "source": "paper_Q1/figures/fig_error_heterogeneity.pdf"},
+    {"number": "S5", "role": "Pair-held-out parity reference", "source": "paper_Q1/figures/fig_parity_pair.pdf"},
+    {"number": "S6", "role": "Macro physical-error panels", "source": "paper_Q1/figures/fig_error_map_macro.pdf"},
+    {"number": "S7", "role": "Per-impurity error map", "source": "paper_Q1/figures/fig_impurity_ptable.pdf"},
+    {"number": "S8", "role": "Illustrative case gallery", "source": "paper_Q1/figures/fig_case_gallery.pdf"}
+  ]
+}

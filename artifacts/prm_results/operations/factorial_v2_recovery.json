@@ -1,0 +1,43 @@
+{
+  "schema_version": "prm_factorial_recovery_v1",
+  "recorded_at": "2026-07-28T08:24:02.363864+00:00",
+  "failed_queue": {
+    "archive_manifest_sha256": "507abfd20ca5056046f1a3bc018d1fa134d5b5632168a952533753de1a59627f",
+    "archive_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/_failed_attempts/factorial-v2-af6eeec-20260724",
+    "archive_tree_excluding_manifest": {
+      "file_count": 160,
+      "sha256": "847dcc91b9f5a6b3f7de34feff698b210d52ebf0de6a34ed45719e0c626c9819",
+      "size_bytes": 4313851
+    },
+    "jobs_failed": 40,
+    "jobs_with_pin_memory_thread_exit": 40,
+    "jobs_with_too_many_open_files": 40,
+    "metrics_files": 0,
+    "model_checkpoints": 0,
+    "queue_id": "factorial-v2",
+    "root_cause": "DataLoader multiprocessing exhausted process file descriptors before epoch completion",
+    "scheduler_state_sha256": "80b0ef2d4aba72ef2793a3734f8d78dbbbd8507b25469ce1202a3854a480bb21",
+    "training_git_commit": "af6eeec1b08e6108c4e7ea0514cbfb3858147618"
+  },
+  "recovery": {
+    "formal_config_count": 131,
+    "formal_num_workers": 0,
+    "git_commit": "c746b77c4a28342ec0548aeb1c4cc26e3c18ec39",
+    "remote_test_result": {
+      "passed": 133,
+      "warnings": 2
+    }
+  },
+  "smoke": {
+    "config_sha256": "42c66897eaae979cd4a7bf0d946124b49e22607534444b21b5c7e128e673b733",
+    "epochs_completed": 2,
+    "git_dirty": false,
+    "manifest_sha256": "7c718169c6bc08287df10281e7f622b9b89f3265cd119a627ec159eb1c976e6c",
+    "num_workers": 0,
+    "output_hashes_verified": 5,
+    "provenance_sha256": "8f0c407a6fb01092fd96243cf03d1bcc5c7ef049847ebd1882db2f8a9ea144ff",
+    "scientific_use": false,
+    "source_config_sha256": "1144ab4c24a7b61c9287ead65b1e434824dd57b21a16af0aee2cd1c2e7a0a66a",
+    "status": "complete"
+  }
+}

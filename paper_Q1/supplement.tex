@@ -1,0 +1,507 @@
+\documentclass[aps,prb,onecolumn,superscriptaddress,floatfix]{revtex4-2}
+
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=blue!60!black,
+            citecolor=green!50!black,
+            urlcolor=blue!70!black]{hyperref}
+
+\input{generated/results_macros.tex}
+\graphicspath{{figures/}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\Roman{table}}
+
+\begin{document}
+
+\title{Supplemental Material for ``Learning impurity incorporation energetics
+across host and impurity chemistry in two-dimensional materials with a
+defect-aware graph Transformer''}
+
+\author{Yiming Hua}
+\affiliation{Wuhan University, Wuhan, China}
+% Keep the final author list and affiliations identical to the main manuscript.
+
+\date{\today}
+
+\maketitle
+
+\section{Data audit and fixed evaluation partitions}
+
+The retained modeling set is obtained through a sequential source audit,
+target-provenance check, unique-impurity requirement, and duplicate-control
+procedure. Figure~\ref{fig:supp_protocol} summarizes those exclusions, the
+formation-energy distribution, chemical coverage, and the fixed evaluation
+partitions used throughout the study.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_protocol_overview.pdf}
+\caption{Data provenance and evaluation protocol. (a) Sequential source
+filtering, raw-energy reconstruction audit, impurity-identity audit, and
+structure canonicalization. The final set excludes four rows with zero
+sentinels in a raw energy component, 349 rows without a unique impurity atom,
+and 64 redundant structures. (b) Formation-energy distributions for the two
+incorporation classes in the retained set. (c) Number of structures for each
+of 44 hosts and 65 impurity elements; white cells are unobserved combinations.
+(d) Train, validation, calibration, and test fractions for each evaluation
+regime. Bars for fivefold protocols show fold averages. All regimes cover the
+same 10{,}224 retained structures; the common 417-row exclusion set is omitted
+from the bars.}
+\label{fig:supp_protocol}
+\end{figure}
+
+\input{draft_tab_benchmark.tex}
+
+\clearpage
+\section{Architecture factorial}
+
+The paired architecture experiment selected the frozen all-enabled recipe and
+is reported here in full so that the main text can emphasize chemical
+transfer and materials-physics analysis.  These runs were executed under the
+superseded, order-sensitive graph implementation and are retained as
+recipe-selection provenance; no main-text claim rests on them, and every
+main-text number derives from the repaired representation.
+
+\input{generated/tab_factorial.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_factorial_autofigure_v1.pdf}
+\caption{Paired architecture experiment. (a) Validation and test MAE for all
+eight G/E/P variants; shading marks the validation-selected variant. (b)
+Orthogonal main effects and interactions on validation and test MAE, with 95\%
+bootstrap intervals over paired repeats. Negative effects reduce MAE.}
+\label{fig:supp_factorial}
+\end{figure}
+
+\clearpage
+\section{Development-era surveys and pilots}
+
+\subsection{Architecture survey}
+
+Before the formal protocol was frozen, a broad architecture survey was run
+on the development-era random split (the superseded ``leak-free v1''
+partition with a 1{,}065-structure test set, predating the protocol-v2
+sample audit and the graph repair).  These values are development history:
+they are not comparable to the main-text protocol and support no main-text
+claim, but they document why the formal comparison kept SchNet as the
+aligned neural comparator.  At matched parameter budgets, a trained
+equivariant MACE (0.44M parameters) reached 1.46\,eV test MAE and the
+equivariant ViSNet (1.69M) 0.86\,eV, against 0.58\,eV for SchNet (0.46M),
+0.54\,eV for ALIGNN at 4.0M parameters, and 0.52\,eV for the early
+defect-centered transformer (0.75M).  Classical baselines spanned
+1.16--2.30\,eV.  Separately, the MACE-MP-0 foundation model was evaluated
+as a zero-shot energy surrogate for the IMP2D formation-energy labels on a
+100-structure sample and was found inadequate (2.62\,eV, correlation
+$r\approx0.04$): the database's formation-energy convention with its
+crystalline impurity reference is not recoverable from generic
+foundation-model total energies without convention-matched chemical
+potentials.  No claim about foundation-model \emph{relaxation} quality is
+made; only the label-surrogate use was tested.
+
+\begin{table}[h!]
+\caption{Development-era survey on the superseded random split
+(1{,}065-structure test set; pre-repair implementation era).  Not
+comparable to main-text protocol numbers.}
+\label{tab:dev_survey}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Model & Parameters (M) & Test MAE (eV) \\
+\midrule
+Mean predictor & -- & 2.30 \\
+Ridge regression & -- & 1.92 \\
+Random forest & -- & 1.23 \\
+LightGBM & -- & 1.16 \\
+MACE (small, trained) & 0.44 & 1.46 \\
+ViSNet & 1.69 & 0.86 \\
+SchNet & 0.46 & 0.58 \\
+ALIGNN & 4.03 & 0.54 \\
+Early defect-centered transformer & 0.75 & 0.52 \\
+\midrule
+MACE-MP-0 (zero-shot label surrogate) & -- & 2.62 ($r\approx0.04$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Defect locality of the learned representation}
+
+Attribution analyses of the development-era model support the
+defect-centered design from inside the network.  Masking single atoms and
+recording the prediction change (100 test structures) places
+$91\pm13\%$ of the total attribution on the impurity atom itself; the
+mean occlusion effect at the impurity atom exceeds that at other atoms by
+more than two orders of magnitude; per-atom attributions decay with
+distance from the defect (mean Pearson correlation $0.99$ with inverse
+distance); and $80\%$ of the non-defect attribution is contained within
+roughly $9$\,\AA{} of the defect site, inside the $12$\,\AA{}
+radial-bias horizon of the architecture.  Attention shows the same
+concentration (200 structures): mean incoming attention to the defect atom
+is $32$ times that to a random other atom.  The learned function is
+therefore defect-local in the same sense as the target --- the property
+that the main text's mean-versus-additive readout comparison probes
+behaviorally.
+
+\subsection{Held-out-host case studies}
+
+Five leave-one-host-out case studies, each withholding every structure of
+one named host, trace the novelty gradient concretely on the development
+split.  Hosts with close structural relatives in training transfer at no
+measurable cost: MoS$_2$ ($n=308$) matches the in-distribution reference
+exactly ($0.516$ versus $0.516$\,eV) and the Janus host MoSSe ($n=464$)
+comes in below it ($0.448$\,eV).  TaSe$_2$ ($n=222$, $1.23\times$) and
+the halide Cr$_2$I$_6$ ($n=334$, $1.63\times$) degrade moderately.  The
+hydrogenated covalent host graphane, C$_2$H$_2$ ($n=231$, $2.40$\,eV), is
+the extreme of the distribution --- and it is also the one host with no
+hydrogenated or purely covalent relative anywhere in the database, so the
+gradient anticipates the main-text attribution of held-out-host error to
+the structural novelty of the withheld host.
+
+\subsection{Cross-database and multi-source experiments}
+
+The same development era probed whether other formation-energy sources
+could extend or substitute IMP2D supervision; all values below carry the
+same superseded-split provenance and support no main-text claim.
+Zero-shot evaluation of an IMP2D-trained model on JARVIS vacancy data ---
+a different defect type computed with a different DFT code --- failed at
+the 2.3\,eV (2D hosts) and 2.6\,eV (3D hosts) level with negative
+$R^2$; few-shot fine-tuning onto those targets underperformed training
+from scratch at every budget tested (10--300 labels); and four-source
+joint training (IMP2D with JARVIS-2D, JARVIS-3D, and DFT-3D at tuned
+weights) improved the IMP2D development-split error by only about
+$4.5\%$ --- and leave-one-host-out replays of the same multi-source
+recipe degraded held-out-host transfer by $22$--$65\%$ across the three
+hosts tested, so diluting defect-centered supervision with bulk-crystal
+gradients hurts exactly the transfer axis this paper measures.  Together
+with the foundation-model surrogate test above, these
+results identify the cross-database barrier as one of reference
+conventions and defect-class mismatch rather than representation capacity,
+and they motivated both the frozen single-database protocol and the
+convention-matching requirements of the preregistered external-validation
+design.  The retained pipeline is nevertheless two-source: the corrected
+JARVIS-3D pretraining (19{,}902 records) initializes every reported model.
+
+\subsection{Prospective DFT feasibility pilot}
+
+The development era also exercised, end to end, the external test the main
+text identifies as the most direct next step: independent first-principles
+calculations on candidates ranked by the model itself.  From a pool of 287
+generated single-impurity candidates (interstitial and substitutional
+mutations of database hosts), 60 were selected --- the 30 lowest predicted
+formation energies and the 30 largest calibrated uncertainties, with a
+per-host diversity cap --- and evaluated with plane-wave PBE calculations
+in Quantum ESPRESSO 7.3.1 (PSL~1.0.0 pseudopotentials, $30/180$\,Ry
+cutoffs, $\Gamma$-only, Methfessel--Paxton smearing): 125 runs in total
+covering the defect supercells, the 27 pristine hosts, and 38
+isolated-atom chemical-potential references.  A pseudopotential-library
+augmentation incompatibility removed the 22 La/Cs candidates and one run
+did not converge, leaving $N=37$ validated formation energies.
+
+The pilot's two findings sharpen the convention analysis above.  First,
+the raw predicted-versus-DFT comparison is uncorrelated, and aligning the
+pilot's isolated-atom chemical-potential reference with the database's
+crystalline convention through one constant per impurity element
+(estimated from the paired data, as the pilot computed no bulk references)
+restores rank agreement --- Spearman $0.35$, stratified-bootstrap $95\%$
+interval $[0.04, 0.60]$, excluding zero.  The cross-database barrier is
+therefore a per-element reference-convention offset, not a loss of rank
+information.  Second, model ranking concentrates first-principles effort
+effectively: within the low-predicted-energy bucket, $70\%$ ($14/20$;
+interval $[50\%, 90\%]$) of the converged candidates were confirmed below
+$+1$\,eV and $40\%$ were exothermic, against roughly $18\%$ of the full
+pool predicted below the same threshold.  The pilot used development-era
+model predictions and unrelaxed single-point energies at pilot-grade
+settings, so its absolute errors (median $1.7$\,eV on this deliberately
+out-of-distribution set) characterize the pilot rather than the repaired
+model, and no pilot number supports a main-text claim; what carries over
+is the demonstrated workflow --- candidate generation, reference
+chemical potentials, pseudopotential coverage, and per-element convention
+alignment --- which leaves convention matching as the only remaining
+ingredient of the preregistered external-validation design.
+
+\clearpage
+\section{Reproducibility specification}
+
+\paragraph{Elemental feature construction.}
+The nine elemental attribute columns of the main-text node representation
+are min--max normalized over atomic numbers 1--100; an unavailable van der
+Waals radius is replaced by the corresponding covalent radius, and the
+other tabulated values, including explicit unavailable or approximate
+entries, are fixed by the released feature table.  The 128-dimensional
+ct-UAE table is reconstructed from the published checkpoint by applying
+its linear \texttt{atom\_embed} layer to each one-hot elemental code,
+$\mathbf U=\mathbf W^{\mathsf T}+\mathbf 1\mathbf b^{\mathsf T}$;
+after a zero-padding row is prepended, atomic number $Z$ indexes table row
+$Z$, corresponding to row $Z-1$ of $\mathbf U$.
+
+Table~\ref{tab:reproducibility} records the fixed model and optimization
+settings used in the main comparison.  The resolved configuration for every
+run, including split and seed, is archived under \path{configs/prm/}; the
+corresponding run manifests bind those configurations to checkpoints,
+predictions, environments, and output hashes.
+
+\begin{table}[htbp]
+\caption{Fixed settings for the selected DART model and the predefined
+periodic SchNet comparator.  Settings not shown as different were shared.}
+\label{tab:reproducibility}
+\centering
+\small
+\newcommand{\settingcell}[1]{\parbox[t]{0.19\textwidth}{\raggedright #1}}
+\newcommand{\modelcell}[1]{\parbox[t]{0.36\textwidth}{\raggedright #1}}
+\newcommand{\sharedcell}[1]{\parbox[t]{0.74\textwidth}{\raggedright #1}}
+\begin{tabular}{lll}
+\toprule
+\settingcell{Setting} & \modelcell{DART (\texttt{g111})} &
+\modelcell{Periodic SchNet (additive readout)} \\
+\midrule
+\settingcell{Atomic input} &
+\modelcell{Fixed 128-dimensional ct-UAE vector, nine tabulated elemental
+attributes, and a learned 128-channel impurity-status embedding} &
+\modelcell{Learned atomic-number embedding} \\
+\settingcell{Interaction stack} &
+\modelcell{Three 5-\AA{} local layers with 32 radial and 32 angular functions,
+followed by two four-head geometric Transformer blocks with 32 radial-bias
+centers over 0--12~\AA{} and all-atom attention} &
+\modelcell{Six 5-\AA{} interaction blocks with 50 Gaussian functions} \\
+\settingcell{Hidden width and readout} &
+\modelcell{128 channels; gated fusion of an atom-attention sum and channelwise
+maximum} &
+\modelcell{128 channels and filters; atomwise additive scalar readout} \\
+\settingcell{Trainable parameters} & \modelcell{820,558} &
+\modelcell{455,937} \\
+\settingcell{Optimization} & \modelcell{AdamW, batch size 64} &
+\modelcell{AdamW, batch size 32} \\
+\settingcell{Shared schedule} &
+\multicolumn{2}{l}{\sharedcell{150 epochs; MAE objective; learning rate
+$5\times10^{-5}$ to $5\times10^{-4}$ over a ten-epoch linear warmup, then
+cosine decay to $10^{-6}$; weight decay $10^{-4}$; gradient clipping at 5.}} \\
+\settingcell{Shared sampling and regularization} &
+\multicolumn{2}{l}{\sharedcell{Training-target standardization;
+host-balanced sampling of 200 structures per host per epoch; 0.03-eV Gaussian
+target noise; no coordinate or strain augmentation.  DART additionally uses
+0.1 dropout.}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Factorial assignment seeds were 42--46 with paired model seeds 142--146.
+Transfer runs used DART seeds 242--244 and SchNet seeds 342--344, with one
+fixed seed per fold for random and host--impurity-pair cross-validation
+and three seeds per split for host, impurity, and chemistry-block evaluation.
+The dedicated DART uncertainty ensemble used seeds 442--446.
+
+The descriptor search was also fixed before test aggregation.  Ridge used
+$\alpha\in\{0.01,0.1,1,10,100\}$.  Random forests used 400 trees with
+\texttt{max\_features} in $\{0.5,1.0\}$ and
+\texttt{min\_samples\_leaf} in $\{1,2\}$.  Histogram gradient boosting used
+400 iterations, learning rate 0.05, leaf counts in $\{31,63\}$, and
+$L_2$ regularization in $\{0,1\}$.  LightGBM used 600 trees, learning rate
+0.05, leaf counts in $\{31,63\}$, child counts in $\{20,50\}$,
+$L_2$ regularization 1, and row/column subsampling fractions 0.9.  A
+hyperparameter setting and then a learned family were selected independently
+inside each split by validation MAE; the training-target mean predictor was
+reported separately and never entered family selection.
+
+\clearpage
+\section{Internal uncertainty and selective prediction}
+
+The internal ensemble analysis uses a dedicated calibration/test partition
+drawn from the retained IMP2D population.  Its intervals therefore assess
+marginal calibration inside that population rather than calibration under an
+explicit host or impurity shift.  The ensemble members were trained under the
+superseded graph implementation; the analysis is retained as supporting
+evidence for the calibration methodology, and no main-text claim rests on
+these values.
+
+% Values mirror generated/tab_uq.tex; the local table controls float order.
+\begin{table}[h!]
+\caption{Internal split-conformal interval performance on the dedicated test
+partition. These structures were excluded from ensemble fitting, checkpoint
+selection, and calibration, but not from the earlier architecture-development
+corpus. Coverage is in percent and mean width is in eV.}
+\label{tab:uq}
+\centering
+\begin{tabular}{cccc}
+\toprule
+Nominal & Observed & Mean width & Quantile \\
+\midrule
+50 & 52.0 & 0.336 & 0.270 \\
+80 & 78.3 & 0.752 & 0.604 \\
+90 & 87.2 & 1.141 & 0.917 \\
+95 & 93.7 & 1.847 & 1.484 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_uq.pdf}
+\caption{Internal uncertainty evaluation on the dedicated ensemble test
+split. (a) Nominal versus observed split-conformal coverage; annotations give
+mean interval widths. (b) MAE risk as increasingly uncertain predictions are
+rejected, compared with oracle ordering by realized error. (c) Calibrated
+standard deviation versus absolute error on the dedicated test partition.}
+\label{fig:supp_uq}
+\end{figure}
+
+\clearpage
+\section{Retrospective reranking metrics}
+
+These metrics compare predictions and reference energies over available
+DFT-relaxed IMP2D geometries, using the repaired representation's
+pair-held-out predictions throughout.  The geometries and reference energies
+were produced by the same completed DFT workflow, so the analysis does not
+replace candidate generation or relaxation.
+
+% Values mirror generated/tab_screening.tex; terminology and float order are
+% controlled locally without altering any number.
+\begin{table}[h!]
+\caption{Retrospective out-of-fold reranking metrics from host--impurity-pair
+folds. Intervals are 95\% nonparametric cluster-bootstrap intervals over
+host--impurity pairs. Accuracy gains are model minus reference in percentage
+points.}
+\label{tab:reranking}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Metric & Model [95\% interval] & Reference & Gain [95\% interval] & $n$ \\
+\midrule
+Incorporation-class preference accuracy (\%) & 91.4 [90.0, 92.7] & 66.2 & 25.1 [22.7, 27.6] & 1730 \\
+Global exact-site accuracy (\%) & 68.9 [66.7, 71.1] & 23.4 & 45.5 [43.4, 47.7] & 1730 \\
+Global reranking regret (eV) & 0.142 [0.116, 0.172] & -- & -- & 1730 \\
+Within-class exact-site accuracy (\%) & 73.6 [72.0, 75.1] & 37.1 & 36.5 [35.0, 38.0] & 3140 \\
+Within-class top-2 accuracy (\%) & 91.5 [90.3, 92.7] & 62.1 & 29.4 [28.2, 30.6] & 2145 \\
+Within-class reranking regret (eV) & 0.099 [0.083, 0.118] & -- & -- & 3140 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\section{Descriptive error heterogeneity}
+
+\input{generated/results_error_heterogeneity_narrative.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_error_heterogeneity.pdf}
+\caption{Error heterogeneity from DART pair-held-out
+  out-of-fold predictions.
+  (a,b) Host- and impurity-group MAE versus the number of retained structures;
+  labels mark the three largest group MAEs and $\rho_s$ is the descriptive
+  Spearman association.
+  (c) MAE by incorporation class and source site label.  These summaries were
+  not used for architecture, hyperparameter, or model selection.}
+\label{fig:supp_error_heterogeneity}
+\end{figure}
+
+Figure~\ref{fig:supp_parity} shows the parity of the repaired pair-held-out
+out-of-fold predictions by incorporation class; the class MAEs match the
+main-text values, and the interstitial cloud carries both the larger spread
+and the extreme-target tail.  Figure~\ref{fig:supp_error_macro} reports
+the canonical family-level macro errors with identity and structure counts,
+alongside the out-of-plane expansion-factor diagnostic behind the
+$\mathrm{XF}\leq2$ gate. Figure~\ref{fig:supp_ptable} maps the descriptive
+per-impurity-element errors and retained counts. Figure~\ref{fig:supp_cases} renders the
+four highest-error non-pathological interstitials and their matched
+bottom-quartile adsorbate controls, aligned column by column by the frozen
+matching rule (the first-ranked interstitial has no eligible control); the
+extreme interstitial errors concentrate at extreme formation-energy
+targets ($E_f \approx 12$--$19$\,eV for three of the four).  The case
+panel is
+illustrative (exploratory tier under the frozen evidence rules) and
+supports no gated main-text claim.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.55\textwidth]{fig_parity_pair.pdf}
+\caption{Parity of repaired pair-held-out out-of-fold predictions for the
+  10{,}224 retained structures, by incorporation class.  Marker shape and
+  color encode the class; the inset reports pooled and per-class MAE.}
+\label{fig:supp_parity}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_error_map_macro.pdf}
+\caption{Macro panels of the canonical error map.
+  (a) Pair-held-out absolute error against the database out-of-plane
+  expansion factor; the dotted line marks $\mathrm{XF}=2$, beyond which
+  structures are treated as reconstructed and analyzed separately.
+  (b) Host-family and impurity-series sample-weighted macro MAEs with
+  pair-clustered intervals; group labels give (identities/structures), and
+  the diamond marks the class-pooled value.}
+\label{fig:supp_error_macro}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_impurity_ptable.pdf}
+\caption{Per-impurity-element MAE of the repaired pair-held-out out-of-fold
+  predictions. Each occupied cell reports the element and its retained
+  structure count; gray cells are elements outside the 65-impurity set. The
+  color scale is clipped at the 95th percentile of the per-element MAEs. These
+  are descriptive summaries of the same out-of-fold predictions; no
+  per-element claim is gated.}
+\label{fig:supp_ptable}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_case_gallery.pdf}
+\caption{Structures selected by the frozen case rule, rendered from the
+  source-database geometries (side view, periodic images tiled in plane,
+  impurity atom outlined in black and labeled).  Top row: the four
+  highest-error non-pathological interstitials under pair holdout, in
+  match order.  Bottom row: the matched bottom-quartile adsorbate controls
+  under the same frozen rule.  Panel headers give the pair-held-out
+  absolute error and the reference formation energy.  Illustrative only;
+  no gated claim.}
+\label{fig:supp_cases}
+\end{figure}
+
+\clearpage
+\section{Post-hoc SchNet graph-readout sensitivity}
+
+The predefined periodic SchNet comparator follows the original
+energy-oriented construction~\cite{schutt2018}: its learned atomwise scalar
+contributions are summed to produce the graph prediction.  The present defect
+formation energy is non-extensive with respect to host atom count, and prior
+atomistic studies show that graph pooling can materially affect intensive or
+localized quantum-property prediction~\cite{buterez2023pooling}.  Because the
+target may still contain long-range host response, this comparison tests the
+specific SchNet readout rather than assuming strict spatial locality.  We
+therefore performed one bounded post-hoc
+sensitivity analysis after completing the main comparison.
+
+The intervention changed only the graph readout from atomwise addition to mean
+pooling.  It retained all five predefined host-held-out folds, seeds 342--344,
+the SchNet interaction stack, learned atomic-number input, optimizer, learning
+rate schedule, host-balanced sampler, target normalization, target-noise
+stream, gradient clipping, and 150-epoch budget.  Predictions were averaged
+over the three seeds within each fold.  The pooled mean-minus-add difference in
+absolute error was evaluated with 20,000 bootstrap samples clustered by the 44
+host materials.
+
+\input{generated/tab_schnet_readout.tex}
+
+Mean pooling reduced the host-held-out MAE in all
+\PRMSchNetMeanBetterFolds{}/5 folds.  Across individual samples, the Spearman
+association between atom count and absolute error changed from
+\PRMSchNetAddSampleSizeErrorSpearman{} for additive pooling to
+\PRMSchNetMeanSampleSizeErrorSpearman{} for mean pooling.  Across the 44 hosts,
+the corresponding association between median atom count and host MAE changed
+from \PRMSchNetAddHostSizeErrorSpearman{} to
+\PRMSchNetMeanHostSizeErrorSpearman{}.  These descriptive associations are
+consistent with a size-sensitive additive readout, but atom count covaries with
+host chemistry and therefore does not identify a standalone causal mechanism.
+The intervention establishes that readout choice contributes to the extreme
+additive-SchNet error; it neither replaces the predefined main comparator nor
+attributes the remaining DART--SchNet difference to a single component.
+
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,165 @@
+{
+  "analysis": {
+    "adjusted_profile_features": [
+      "cn_5A",
+      "postrelaxation_min_clearance_A"
+    ],
+    "adjusted_profile_grid_points": 41,
+    "any_canonical_effect_gate": true,
+    "bh_fdr": 0.05,
+    "bootstrap_draws": 2000,
+    "bootstrap_seed": 20260810,
+    "cluster": "host_dopant_pair",
+    "eligible_features": [
+      "cn_5A",
+      "e_module_effective_mean_distance_A",
+      "e_module_effective_max_distance_A",
+      "smooth_cn_5A",
+      "neighbor_distance_std_A",
+      "postrelaxation_min_clearance_A",
+      "depth_boundary_distance",
+      "abs_log_extension_factor",
+      "e_module_effective_abs_electronegativity_contrast",
+      "local_abs_electronegativity_contrast",
+      "local_signed_covalent_radius_mismatch_A",
+      "local_abs_covalent_radius_mismatch_A",
+      "local_signed_electronegativity_mismatch",
+      "local_signed_valence_mismatch",
+      "local_abs_valence_mismatch"
+    ],
+    "estimator": "Huber IRLS with within-iteration crossed fixed-effect projection",
+    "excluded_or_sm_features": [],
+    "fixed_effects": [
+      "host",
+      "dopant",
+      "pair_fold"
+    ],
+    "n_complete": 10224,
+    "n_primary_excluded": 0,
+    "n_zero_neighbor_rows": 14,
+    "n_zero_neighbor_rows_retained": 14,
+    "nuisance_controls": [
+      "natoms",
+      "cell_area_A2",
+      "host_slab_thickness_A",
+      "train_host_support",
+      "train_impurity_support",
+      "abs_target_eV",
+      "abs_conv2"
+    ],
+    "nuisance_fixed_effects": [
+      "spacegroup",
+      "supercell"
+    ],
+    "p3_claim_gate": true,
+    "p4_case_panel_complete": false,
+    "p4_main_text_gate": false,
+    "zero_neighbor_imputation_medians": {
+      "adsorbate": {
+        "local_abs_covalent_radius_mismatch_A": 0.2479999999999999,
+        "local_abs_electronegativity_contrast": 0.5658124999999996,
+        "local_abs_valence_mismatch": 2.4000000000000004,
+        "local_signed_covalent_radius_mismatch_A": 0.15999999999999992,
+        "local_signed_electronegativity_mismatch": -0.44719827586206906,
+        "local_signed_valence_mismatch": -0.25,
+        "neighbor_distance_std_A": 0.7264622856716823,
+        "postrelaxation_min_clearance_A": -0.054949907663032704
+      },
+      "interstitial": {
+        "local_abs_covalent_radius_mismatch_A": 0.254375,
+        "local_abs_electronegativity_contrast": 0.5199999999999996,
+        "local_abs_valence_mismatch": 2.3257575757575757,
+        "local_signed_covalent_radius_mismatch_A": -0.003484848484848424,
+        "local_signed_electronegativity_mismatch": -0.29000000000000015,
+        "local_signed_valence_mismatch": -0.625,
+        "neighbor_distance_std_A": 0.8940812182303519,
+        "postrelaxation_min_clearance_A": -0.3547682173481965
+      }
+    },
+    "zero_neighbor_nuisance": "unscaled binary main-effect adjustment; profile reference=0"
+  },
+  "created_at": "2026-08-12T13:41:20.878814+00:00",
+  "env_zero_neighbor_mode": "zero_residual_v1",
+  "evidence_label": "CANONICAL \u2014 REPAIRED G2 OOF",
+  "evidence_tier": "canonical",
+  "extraction_manifest_sha256": "d588da3849dd576160303140573999bd1458c7d196c46676d41862e435f57567",
+  "implemented_prespecified_modules": [
+    "P0 provenance and coverage",
+    "P1 robust local geometry and chemistry",
+    "P2 family decomposition",
+    "P3 identity-level host-versus-impurity novelty",
+    "P4 deterministic structural-case ledger",
+    "A2-W2 training-support arm for the host-versus-impurity gap",
+    "A2-W3 incorporation-class attenuation ladder"
+  ],
+  "irls_cycle_bounds": {
+    "beta_relative_lt": 0.0006,
+    "robust_weight_lt": 0.003
+  },
+  "irls_limit_cycle_accepts": 235,
+  "joined_descriptors_sha256": "67e44520bce2011f78d36163c4169031f18b95f9c570951b7bc1ea836f96f75c",
+  "oof_inference_batch_size": 64,
+  "outputs": {
+    "a2_attenuation.json": {
+      "sha256": "f5054af66129476ed6e8fe2e3e241ea764d01193cdb8e51415660a04a501adaa"
+    },
+    "analysis_row_ledger.csv": {
+      "sha256": "2f57f4da6db8e3248b877bce7770f164135ab8a3c11f224500672cc676f93e63"
+    },
+    "analysis_started.json": {
+      "sha256": "c818f7340c831defc096a6960d4fdb2339c26fb4944a21951203e02b9496741d"
+    },
+    "block_tests.csv": {
+      "sha256": "e559a94387fd4d9c12c03b598b915153e5916efdcaf41a181d51729847ae06d0"
+    },
+    "case_eligible_pool.csv": {
+      "sha256": "0920b2a49285eda24a7652e270af1488faee6eee3c71b672309445e5eb8565b7"
+    },
+    "case_selection.csv": {
+      "sha256": "c7a58bbd28b23b2fa6f0ad9f7d343e5f3d6ac252f1fd8e56af7757d46afeabda"
+    },
+    "case_selection_summary.json": {
+      "sha256": "93d0d7ef4e2e495c250cc7335ad6c3bb1f1a80f967c84e0662ca8f10de068861"
+    },
+    "coverage.csv": {
+      "sha256": "9801dd50b3e59414c0eab41572e03ab195a1f761b032944ec042a28814ec8500"
+    },
+    "effect_estimates.csv": {
+      "sha256": "9ecf29695b77ae1ed0f85890d7c57307170e3e1d49e08c1d24761eb6e573c17e"
+    },
+    "family_mae.csv": {
+      "sha256": "12c2bf1de816036d4c49caeabdf8f24f238a2d3bc460ff28bc51c84d3dd4a900"
+    },
+    "novelty_analysis.json": {
+      "sha256": "4455e200a068575009e094563063c394424e8c89eaab523379c736bf9dff2abc"
+    },
+    "novelty_rows.csv": {
+      "sha256": "0d445479ce568e19b833bef2113c5dafe3b52e215922de12ddd65cf34f1383f3"
+    },
+    "physical_figure_data.csv": {
+      "sha256": "14e3522fe2b857dd98d7b0ee82d79abc8dfd44f05f653d6ec6eab1f849fe51cb"
+    }
+  },
+  "pending_prespecified_modules": [
+    "W1 extensivity diagnostic (separate preregistration and script)"
+  ],
+  "runtime": {
+    "cuda_visible_devices": "",
+    "git": {
+      "commit": "46956ef3bdf70c8efbf7d2188d73bbbb7d1b9af2",
+      "dirty": false,
+      "remote_refs": [
+        "origin/prm-revision"
+      ],
+      "status_porcelain": []
+    },
+    "host_alias": "server:WHUServer-L40S",
+    "platform_machine": "x86_64",
+    "platform_system": "Linux",
+    "python_alias": "$PRM_PYTHON",
+    "python_executable_sha256": "90ba8f7e695db2a38b092b52addff0fc5593fddf2aa724822c6c40ebe25343e0",
+    "python_implementation": "CPython",
+    "python_version": "3.11.15"
+  },
+  "schema_version": "prm_g3_analysis_manifest_v1"
+}

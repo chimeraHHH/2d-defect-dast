@@ -34,6 +34,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .baseline import RBFExpansion
+from .element_table import lookup_ct_uae, prepare_ct_uae_table
 
 
 # ---------------------------------------------------------------------------
@@ -328,6 +329,46 @@ class MoEReadout(nn.Module):
 # ---------------------------------------------------------------------------
 # Local Environment Enrichment
 # ---------------------------------------------------------------------------
+ENV_ZERO_NEIGHBOR_CORRECTED = "zero_residual_v1"
+ENV_ZERO_NEIGHBOR_LEGACY = "legacy_batch_dependent_v0"
+_ENV_ZERO_NEIGHBOR_MODES = {
+    ENV_ZERO_NEIGHBOR_CORRECTED,
+    ENV_ZERO_NEIGHBOR_LEGACY,
+}
+
+
+def _env_residual_mask(
+    coord_count: torch.Tensor,
+    flat_defect_mask: torch.Tensor,
+    flat_indices: torch.Tensor,
+    defect_mask: torch.Tensor,
+    batch_size: int,
+    max_atoms: int,
+    mode: str,
+    dtype: torch.dtype,
+) -> torch.Tensor:
+    """Return the frozen residual mask for defect-environment enrichment.
+
+    The corrected contract makes a defect atom with no outgoing local edge a
+    strict no-op, including the bias of ``proj(zeros)``.  The legacy contract
+    deliberately retains the historical batch-dependent behaviour so archived
+    checkpoints can still be round-trip audited without changing their
+    predictions.
+    """
+    if mode == ENV_ZERO_NEIGHBOR_LEGACY:
+        return defect_mask.to(dtype=dtype).unsqueeze(-1)
+    if mode != ENV_ZERO_NEIGHBOR_CORRECTED:
+        raise ValueError(f"unsupported E-module zero-neighbour semantics: {mode!r}")
+    active_flat = flat_defect_mask.bool() & coord_count.gt(0)
+    active_padded = torch.zeros(
+        batch_size * max_atoms,
+        dtype=torch.bool,
+        device=coord_count.device,
+    )
+    active_padded.index_copy_(0, flat_indices, active_flat)
+    return active_padded.reshape(batch_size, max_atoms, 1).to(dtype=dtype)
+
+
 class LocalEnvEnrichment(nn.Module):
     """Vectorized physics-aware features for defect sites.
 
@@ -340,8 +381,19 @@ class LocalEnvEnrichment(nn.Module):
     Uses scatter operations for GPU-efficient computation — no Python loops.
     """
 
-    def __init__(self, hidden_dim: int, n_env_features: int = 4) -> None:
+    def __init__(
+        self,
+        hidden_dim: int,
+        n_env_features: int = 4,
+        zero_neighbor_mode: str = ENV_ZERO_NEIGHBOR_CORRECTED,
+    ) -> None:
         super().__init__()
+        if zero_neighbor_mode not in _ENV_ZERO_NEIGHBOR_MODES:
+            raise ValueError(
+                "zero_neighbor_mode must be one of "
+                f"{sorted(_ENV_ZERO_NEIGHBOR_MODES)}, got {zero_neighbor_mode!r}"
+            )
+        self.zero_neighbor_mode = zero_neighbor_mode
         self.proj = nn.Sequential(
             nn.Linear(n_env_features, hidden_dim // 2),
             nn.SiLU(),
@@ -430,10 +482,20 @@ class LocalEnvEnrichment(nn.Module):
         env_padded.index_copy_(0, flat_indices, env_fea)
         env_padded = env_padded.reshape(B, N_max, 4)
 
-        # Project and add
+        # Project and add.  The corrected mask is applied after projection so
+        # its learned biases cannot enrich a zero-neighbour impurity.
         env_emb = self.proj(env_padded)
-        defect_mask_f = defect_mask.float().unsqueeze(-1)
-        h = h + env_emb * defect_mask_f
+        residual_mask = _env_residual_mask(
+            coord_count,
+            flat_defect_mask,
+            flat_indices,
+            defect_mask,
+            B,
+            N_max,
+            self.zero_neighbor_mode,
+            h.dtype,
+        )
+        h = h + env_emb * residual_mask
 
         return h
 
@@ -464,8 +526,19 @@ class LocalEnvEnrichmentV2(nn.Module):
     SHELL_BOUNDARIES = [0.0, 2.0, 4.0]  # Shell starts; last shell extends to rcut
     N_ENV_FEATURES = 11
 
-    def __init__(self, hidden_dim: int, n_env_features: int = 11) -> None:
+    def __init__(
+        self,
+        hidden_dim: int,
+        n_env_features: int = 11,
+        zero_neighbor_mode: str = ENV_ZERO_NEIGHBOR_CORRECTED,
+    ) -> None:
         super().__init__()
+        if zero_neighbor_mode not in _ENV_ZERO_NEIGHBOR_MODES:
+            raise ValueError(
+                "zero_neighbor_mode must be one of "
+                f"{sorted(_ENV_ZERO_NEIGHBOR_MODES)}, got {zero_neighbor_mode!r}"
+            )
+        self.zero_neighbor_mode = zero_neighbor_mode
         self.proj = nn.Sequential(
             nn.Linear(n_env_features, hidden_dim),
             nn.SiLU(),
@@ -572,10 +645,20 @@ class LocalEnvEnrichmentV2(nn.Module):
         env_padded.index_copy_(0, flat_indices, env_fea)
         env_padded = env_padded.reshape(B, N_max, self.N_ENV_FEATURES)
 
-        # Project and add (residual)
+        # Project and add (residual).  Mask after projection so its biases are
+        # also a strict no-op for a zero-neighbour impurity.
         env_emb = self.proj(env_padded)
-        defect_mask_f = defect_mask.float().unsqueeze(-1)
-        h = h + env_emb * defect_mask_f
+        residual_mask = _env_residual_mask(
+            coord_count,
+            flat_defect_mask,
+            flat_indices,
+            defect_mask,
+            B,
+            N_max,
+            self.zero_neighbor_mode,
+            h.dtype,
+        )
+        h = h + env_emb * residual_mask
 
         return h
 
@@ -753,6 +836,7 @@ class CrystalTransformerV2(nn.Module):
         use_env_enrichment: bool = True,
         use_prenorm_local: bool = True,
         env_enrichment_version: int = 1,  # 1=original (4 features), 2=enhanced (11 features)
+        env_zero_neighbor_mode: str = ENV_ZERO_NEIGHBOR_CORRECTED,
         # V3: defect-type conditioning
         use_defect_type_cond: bool = False,
         n_defect_types: int = 4,  # vacancy, substitution, interstitial, adsorbate
@@ -775,8 +859,10 @@ class CrystalTransformerV2(nn.Module):
 
         # --- Input embedding ---
         if ct_uae_path is not None:
-            uae_table = torch.load(ct_uae_path, map_location="cpu",
-                                   weights_only=False)
+            source_table = torch.load(
+                ct_uae_path, map_location="cpu", weights_only=True
+            )
+            uae_table = prepare_ct_uae_table(source_table)
             self.register_buffer("ct_uae_table", uae_table)
             uae_dim = uae_table.shape[1]
             self.embed = nn.Linear(atom_fea_len + uae_dim, hidden_dim)
@@ -816,11 +902,22 @@ class CrystalTransformerV2(nn.Module):
 
         # --- Local environment enrichment ---
         self.use_env_enrichment = use_env_enrichment
+        if env_zero_neighbor_mode not in _ENV_ZERO_NEIGHBOR_MODES:
+            raise ValueError(
+                "env_zero_neighbor_mode must be one of "
+                f"{sorted(_ENV_ZERO_NEIGHBOR_MODES)}, got "
+                f"{env_zero_neighbor_mode!r}"
+            )
+        self.env_zero_neighbor_mode = env_zero_neighbor_mode
         if use_env_enrichment:
             if env_enrichment_version == 2:
-                self.env_enrichment = LocalEnvEnrichmentV2(hidden_dim)
+                self.env_enrichment = LocalEnvEnrichmentV2(
+                    hidden_dim, zero_neighbor_mode=env_zero_neighbor_mode
+                )
             else:
-                self.env_enrichment = LocalEnvEnrichment(hidden_dim)
+                self.env_enrichment = LocalEnvEnrichment(
+                    hidden_dim, zero_neighbor_mode=env_zero_neighbor_mode
+                )
         else:
             self.env_enrichment = None
 
@@ -964,8 +1061,7 @@ class CrystalTransformerV2(nn.Module):
         if self.ct_uae_table is not None:
             z = batch.get("atomic_numbers")
             if z is not None:
-                z_clamped = z.clamp(0, self.ct_uae_table.shape[0] - 1)
-                uae_fea = self.ct_uae_table[z_clamped]
+                uae_fea = lookup_ct_uae(self.ct_uae_table, z)
                 x = torch.cat([x, uae_fea], dim=-1)
         h = self.embed(x)
 

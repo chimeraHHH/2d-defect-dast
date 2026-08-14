@@ -128,6 +128,7 @@ def main():
     grad_clip = cfg.get("grad_clip", 5.0)
     best_val_mae = float("inf")
     ckpt_path = out_dir / "best.pt"
+    history = []
 
     print(f"Pretraining on DFT-3D: {len(train_set)}/{len(val_set)}/{len(test_set)} "
           f"| {n_params/1e6:.3f}M params | device={device}")
@@ -168,6 +169,15 @@ def main():
                 "epoch": epoch,
             }, ckpt_path)
 
+        history.append({
+            "epoch": epoch,
+            "train_mae": train_mae,
+            "val_mae": val_m["mae"],
+            "val_rmse": val_m["rmse"],
+            "lr": optimizer.param_groups[0]["lr"],
+            "best": improved,
+        })
+
         dt = time.time() - t0
         print(f"Ep {epoch:02d}/{epochs} | train {train_mae:.4f} | "
               f"val {val_m['mae']:.4f} | lr {optimizer.param_groups[0]['lr']:.2e} | "
@@ -192,7 +202,8 @@ def main():
 
     with open(out_dir / "metrics.json", "w") as f:
         json.dump({"test_mae": test_m["mae"], "test_rmse": test_m["rmse"],
-                    "best_val_mae": best_val_mae, "n_params": n_params}, f, indent=2)
+                    "best_val_mae": best_val_mae, "n_params": n_params,
+                    "history": history}, f, indent=2)
 
 
 if __name__ == "__main__":

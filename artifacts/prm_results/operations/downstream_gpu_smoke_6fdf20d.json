@@ -1,0 +1,71 @@
+{
+  "checks": {
+    "dart_calibration_prediction_present": true,
+    "dart_checkpoint_readable": true,
+    "dart_config_hash_matches": true,
+    "dart_data_and_split_hashes_match": true,
+    "dart_outputs_and_metrics_recomputed": true,
+    "dart_pretraining_assets_validated": true,
+    "dart_service_success": true,
+    "dart_two_epochs_complete": true,
+    "dart_worktree_clean": true,
+    "distinct_gpus": true,
+    "gpu2_excluded": true,
+    "schnet_checkpoint_readable": true,
+    "schnet_config_hash_matches": true,
+    "schnet_data_and_split_hashes_match": true,
+    "schnet_outputs_and_metrics_recomputed": true,
+    "schnet_retry_service_success": true,
+    "schnet_two_epochs_complete": true,
+    "schnet_worktree_clean": true,
+    "shared_commit_exact": true
+  },
+  "dart": {
+    "completed_at": "2026-07-28T12:00:54.856235+00:00",
+    "config_canonical_sha256": "de8833af65d4f1e4b49d6f0e424fda8729b00cc0b9f72562f5f70ca460bab564",
+    "config_file_sha256": "5e8e4feca9fe8fb3a77f2ca31bf149040f15f5030e1bbf2e9ed6392999e600bf",
+    "config_path": "/storage/ssd/metaiot_guest/yiminghua/prm_smoke_configs/6fdf20d/dart_uq_g111_seed442_2ep.yaml",
+    "epoch_seconds": [
+      6.5547850131988525,
+      6.320472955703735
+    ],
+    "gpu": 1,
+    "manifest_sha256": "8e15dba525bb2cf4b6a3605c89f2e34eb5083077f360924310384d43ece75fd6",
+    "output_hash_count": 6,
+    "run_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/smoke/downstream-6fdf20d/dart_uq_g111_seed442_2ep",
+    "split_id": "uq_calibration_s62",
+    "started_at": "2026-07-28T12:00:40.341348+00:00",
+    "systemd_unit": "prm-smoke-dart-6fdf20d.service"
+  },
+  "git_commit": "6fdf20dcf4d6b2ef6e0edc9600963fa5423bde6e",
+  "recorded_at": "2026-07-28T12:05:30Z",
+  "schema_version": "prm_downstream_gpu_smoke_v1",
+  "scientific_use": false,
+  "schnet": {
+    "completed_at": "2026-07-28T12:02:00.660021+00:00",
+    "config_canonical_sha256": "a62f98868dd7d1a591a5e1dfb3c97439c85fe05946a1c8c5fa5349a7e3f3fae3",
+    "config_file_sha256": "8290961b3f6073dc37dd038d563842a3928eb03e5c4b56f185fe84beccaa9dde",
+    "config_path": "/storage/ssd/metaiot_guest/yiminghua/prm_smoke_configs/6fdf20d/schnet_id_repeat_s42_seed342_warmup1_2ep.yaml",
+    "epoch_seconds": [
+      2.8942267894744873,
+      2.667789936065674
+    ],
+    "gpu": 4,
+    "manifest_sha256": "47ccc58a002bd6c6ba50dd68708d66a8717656577c268620167e9f22628cf535",
+    "output_hash_count": 5,
+    "run_path": "/storage/ssd/metaiot_guest/yiminghua/prm_runs_v2/smoke/downstream-6fdf20d/schnet_id_repeat_s42_seed342_warmup1_2ep",
+    "split_id": "id_repeat_s42",
+    "started_at": "2026-07-28T12:01:54.743259+00:00",
+    "successful_systemd_unit": "prm-smoke-schnet-6fdf20d-r2.service"
+  },
+  "schnet_first_attempt": {
+    "config_file_sha256": "7d9248992e7409492132e0bfe2768d870711d6f9627dac6c0b767779ae46ae92",
+    "failure_stage": "scheduler construction before training",
+    "reason": "warmup_epochs must satisfy 0 <= warmup_epochs < epochs",
+    "scientific_output": false,
+    "systemd_exec_main_status": 1,
+    "systemd_result": "exit-code",
+    "systemd_unit": "prm-smoke-schnet-6fdf20d.service"
+  },
+  "status": "complete"
+}

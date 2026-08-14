@@ -1,0 +1,41 @@
+model: v2
+data_path: data/processed/cleaned_dataset.pkl
+output_dir: factorial/g111/split42_seed142
+split_path: artifacts/prm_protocol_v2/splits/id_repeat_s42.json
+seed: 142
+batch_size: 64
+num_workers: 0
+epochs: 150
+loss: mae
+grad_clip: 5.0
+online_aug: false
+host_balanced: true
+samples_per_host: 200
+label_noise_std: 0.03
+pretrained_embed: results/pretrain_dft3d/pretrained_embed.pt
+asset_integrity_required: true
+asset_sha256:
+  ct_uae: ac77b2720b7bb8a3b290d6bfbae482857962d55daa7fc3486f2c7f44c41c60dc
+  pretrained_embed: 5dd085b1393acee4db83422241102595a5d011c18a880a44c09947b29274a3bc
+scheduler_type: cosine
+warmup_epochs: 10
+optimizer:
+  lr: 0.0005
+  weight_decay: 0.0001
+scheduler:
+  eta_min: 1.0e-06
+model_kwargs:
+  atom_fea_len: 9
+  hidden_dim: 128
+  n_local_layers: 3
+  n_global_layers: 2
+  num_heads: 4
+  rcut_local: 5.0
+  dmax_global: 12.0
+  defect_embedding: true
+  dropout: 0.1
+  ct_uae_path: data/ct_uae_mt3_embeddings.pt
+  use_gated_pooling: true
+  use_env_enrichment: true
+  use_prenorm_local: true
+data_sha256: 1d59cc818d81252d49da525c6d77e2da8549ceb604d54af953d1caa4fb974a9b

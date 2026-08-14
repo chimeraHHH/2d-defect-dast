@@ -11,7 +11,6 @@ import random
 from collections import defaultdict
 from typing import Iterator, List, Optional
 
-import numpy as np
 from torch.utils.data import Sampler, Subset
 
 
@@ -48,19 +47,26 @@ class HostBalancedSampler(Sampler[int]):
 
         self.hosts = sorted(self.host_to_indices.keys())
         self.samples_per_host = samples_per_host
-        self.rng = random.Random(seed)
+        self.seed = int(seed)
+        self.epoch = 0
         self._epoch_size = len(self.hosts) * samples_per_host
 
+    def set_epoch(self, epoch: int) -> None:
+        if epoch < 0:
+            raise ValueError("epoch must be nonnegative")
+        self.epoch = int(epoch)
+
     def __iter__(self) -> Iterator[int]:
+        rng = random.Random(self.seed + self.epoch * 1_000_003)
         indices = []
         for host in self.hosts:
             pool = self.host_to_indices[host]
             if len(pool) >= self.samples_per_host:
-                chosen = self.rng.sample(pool, self.samples_per_host)
+                chosen = rng.sample(pool, self.samples_per_host)
             else:
-                chosen = self.rng.choices(pool, k=self.samples_per_host)
+                chosen = rng.choices(pool, k=self.samples_per_host)
             indices.extend(chosen)
-        self.rng.shuffle(indices)
+        rng.shuffle(indices)
         return iter(indices)
 
     def __len__(self) -> int:
