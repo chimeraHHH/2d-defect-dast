@@ -1,0 +1,69 @@
+{
+ "n_filtered": 10641,
+ "n_used": 10307,
+ "excluded_hosts": [
+  "Cr2I6"
+ ],
+ "n_hosts": 43,
+ "frac_nonmagnetic": 0.2141,
+ "spin_is_integer": true,
+ "parity_rule_holds_frac_all": 0.9615,
+ "baselines": {
+  "parity_only": {
+   "exact": 0.5559,
+   "within1": 0.578,
+   "mae": 1.2914,
+   "bacc_mag": 0.8148
+  },
+  "free_atom_hund": {
+   "exact": 0.4763,
+   "within1": 0.5831,
+   "mae": 1.1343,
+   "bacc_mag": 0.6538
+  }
+ },
+ "grouped_cv": {
+  "pair-holdout": {
+   "GBM": {
+    "exact": 0.7598,
+    "within1": 0.791,
+    "mae": 0.5169,
+    "bacc_mag": 0.8665
+   },
+   "dopant-mode lookup": {
+    "exact": 0.5598,
+    "within1": 0.6677,
+    "mae": 1.0052,
+    "bacc_mag": 0.7347
+   }
+  },
+  "host-holdout": {
+   "GBM": {
+    "exact": 0.6999,
+    "within1": 0.7324,
+    "mae": 0.7263,
+    "bacc_mag": 0.8363
+   },
+   "dopant-mode lookup": {
+    "exact": 0.5601,
+    "within1": 0.6678,
+    "mae": 1.0128,
+    "bacc_mag": 0.7352
+   }
+  },
+  "dopant-holdout": {
+   "GBM": {
+    "exact": 0.6916,
+    "within1": 0.7217,
+    "mae": 0.6719,
+    "bacc_mag": 0.8312
+   },
+   "dopant-mode lookup": {
+    "exact": 0.5559,
+    "within1": 0.578,
+    "mae": 1.2914,
+    "bacc_mag": 0.8148
+   }
+  }
+ }
+}

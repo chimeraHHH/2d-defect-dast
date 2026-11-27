@@ -758,7 +758,7 @@ pip install -r requirements.txt
 
 # 数据
 mkdir -p data/raw
-curl -L https://cmr.fysik.dtu.dk/_downloads/imp2d.db -o data/raw/imp2d.db
+curl -L https://wiki.fysik.dtu.dk/cmr-files/imp2d.db -o data/raw/imp2d.db
 python scripts/prepare_dataset.py
 python scripts/build_leak_free_aug.py     # ×3 增强, ~2.2 GB
 
